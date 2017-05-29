@@ -1,0 +1,297 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux下的守护进程 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="在Linux下，守护进程一般是随着系统启动而启动，直到系统关闭才关闭，没有控制终端，在后台运行。经常用作服务器进程。
+编写一个守护进程一般有如下几步：
+
+调用umask将文件模式创建屏蔽字设置为0.由继承得到的文件模式屏蔽字可能会拒绝设置某些权限。
+调用fork，然后父进程退出（exit）。
+调用s">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux下的守护进程"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Linux下的守护进程</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>在Linux下，守护进程一般是随着系统启动而启动，直到系统关闭才关闭，没有控制终端，在后台运行。经常用作服务器进程。</p>
+<p>编写一个守护进程一般有如下几步：</p>
+<ol>
+<li>调用umask将文件模式创建屏蔽字设置为0.由继承得到的文件模式屏蔽字可能会拒绝设置某些权限。</li>
+<li>调用fork，然后父进程退出（exit）。</li>
+<li>调用setsid以创建一个新会话。</li>
+<li>将当前工作目录更改为更目录。</li>
+<li>关闭不需要的文件描述符。</li>
+<li>某些守护进程打开/dev/null使其具有文件描述符0,1,2,这样，任何一个试图读标准输入，写标准输出或标准出错的库例程都不会产生任何效果。<br>大致代码如下：<br><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #ffffff;">daemonize</span>(<span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"><em></em></span> <span style="color: #f5deb3;">cmd</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd0</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd2</span><span style="color: #da70d6;">///fd0,fd1,fd2分表表示打开的文件描述符，正确的话分别是0,1,2</span><br><span style="color: #f5deb3;">pid_t</span> <span style="color: #f5deb3;">pid</span><span style="color: #da70d6;">//子进程id</span><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">rlimit</span> <span style="color: #f5deb3;">rl</span>;<span style="color: #da70d6;">//getrlimit所需要的结构，查看文件描述符的最大值</span><br><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">sigaction</span> <span style="color: #f5deb3;">sa</span><span style="color: #da70d6;">//siaaction结构</span><br><span style="color: #da70d6;">/ clear file creation mask. <em>/</em></span><br><span style="color: #f5deb3;">umask</span>(<span style="color: #add8e6;">0</span>);<span style="color: #da70d6;">//设置umask值</span><br><span style="color: #da70d6;">/</span><br><span style="color: #da70d6;">     <em> Get maximum number of file descriptors.</em></span><br><span style="color: #da70d6;">     /</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">getrlimit</span>(<span style="color: #f5deb3;">RLIMIT_NOFILE</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rl</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<span style="color: #da70d6;">//得到文件描述符的最大值</span><br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“%s: can’t get file limit”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cmd</span>);<span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      Become a session leader to loss controlling TTY.</span><br><span style="color: #da70d6;">     */</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>((<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">fork</span>()) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<span style="color: #da70d6;">//创建一个子进程</span><br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“%s: can’t fork”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cmd</span>);<br><span style="color: #b0c4de; font-weight: bold;">else</span> <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">0</span>)  <span style="color: #da70d6;">//parent</span><br><span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">0</span>);<span style="color: #da70d6;">//父进程退出</span><br><span style="color: #f5deb3;">setsid</span>();<span style="color: #da70d6;">//创建一个新会话，上面调用fork，父进程退出，所以保证流setsid的正确执行</span></div></li>
+</ol>
+<p><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“setsid success</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      Ensure future opens won’t allocate controlling TTYs.</span><br><span style="color: #da70d6;">     */</span><br><span style="color: #f5deb3;">sa</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sa_handler</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">SIG_IGN</span><br><span style="color: #f5deb3;">sigemptyset</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">sa</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sa_mask</span>);<br><span style="color: #f5deb3;">sa</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sa_flags</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">sigaction</span>(<span style="color: #f5deb3;">SIGHUP</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">sa</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<span style="color: #da70d6;">//忽略控制终端的信号</span><br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“%s: can’t ignore SIGHUP”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cmd</span>);<br><span style="color: #b0c4de; font-weight: bold;">if</span>((<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">fork</span>()) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“%s: can’t fork”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cmd</span>);<br><span style="color: #b0c4de; font-weight: bold;">else</span> <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">0</span>)  <span style="color: #da70d6;">//parent</span><br><span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">0</span>);</p>
+<p><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“second child</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      change the current working directory to the root so</span><br><span style="color: #da70d6;">     <em> we won’t prevent file systems from being unmounted.</em></span><br><span style="color: #da70d6;">     /</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">chdir</span>(<span style="color: #7fffd4;">“/tmp”</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<span style="color: #da70d6;">//设置工作目录</span><br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“%s: can’t change directory to /“</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cmd</span>);<br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“chdir successed</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      Close all open file descriptors.</span><br><span style="color: #da70d6;">     <em>/</em></span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">rl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">rlim_max</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">RLIM_INFINITY</span>)<br><span style="color: #f5deb3;">rl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">rlim_max</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1024</span><br><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">rl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">rlim_max</span>; <span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">i</span>)<br><span style="color: #f5deb3;">close</span>(<span style="color: #f5deb3;">i</span>);<span style="color: #da70d6;">//关闭所有的文件描述符</span><br><span style="color: #da70d6;">//从这里开始，所有的文件描述符都已经关闭流，因此printf的所有输出都不会有任何效果</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“rlimit_max:%d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">rl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">rlim_max</span>);<br><span style="color: #da70d6;">/</span><br><span style="color: #da70d6;">     <em> Attach file descriptors 0, 1 and 2 to /dev/null</em></span><br><span style="color: #da70d6;">     /</span><br><span style="color: #f5deb3;">fd0</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">open</span>(<span style="color: #7fffd4;">“/dev/null”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">O_RDWR</span>);<span style="color: #da70d6;">//这个会返回0</span><br><span style="color: #f5deb3;">fd1</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">dup</span>(<span style="color: #add8e6;">0</span>);<span style="color: #da70d6;">//返回1</span><br><span style="color: #f5deb3;">fd2</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">dup</span>(<span style="color: #add8e6;">0</span>);<span style="color: #da70d6;">//返回2</span></p>
+<p><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      Initialize to log file.</span><br><span style="color: #da70d6;">     */</span><br><span style="color: #eeee00;">#if 1</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“before openlog</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<span style="color: #da70d6;">//这些已经没有效果了</span><br><span style="color: #f5deb3;">openlog</span>(<span style="color: #f5deb3;">cmd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">LOG_CONS</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">LOG_DAEMON</span>);<span style="color: #da70d6;">//openlog是记录出错信息用的</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“after openlog</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">fd0</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">0</span> || <span style="color: #f5deb3;">fd1</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">1</span> || <span style="color: #f5deb3;">fd2</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">2</span>)<span style="color: #da70d6;">//如果出错</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">syslog</span>(<span style="color: #f5deb3;">LOG_ERR</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“unexpected file descriptors %d %d %d”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd0</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd2</span>);<br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“fd error</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">1</span>);<br><span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#endif</span><br><span style="color: #f5deb3;">}</span></p>
+<p><br>这样我们就得到了一个守护进程了，可以在main函数里面调用，然后用ps查看结果。至于为什么需要利用两次fork。原因是第一次fork得到的子进程（first child）是它所在的session的组长，但是<span style="color: #ff0000;">每个session的组长是可以控制一个终端的</span>，只调用一次fork的话，那么就可能达不到我们的要求（<span style="color: #ff0000;">守护进程不能有控制终端</span>），第二次fork（first child会直接退出）得到的进程（second child）不是所在session的组长，不能控制终端，这样就确保了守护进程没有控制终端。</p>
+<p>由于守护进程木有控制终端，所以出错记录需要另外记录，且要方便记录查看。这里就可以使用syslog来产生错误消息。上面代码中的openlog和syslog就是用来干这个事的，openlog是配置log文件的一些信息，syslog用来输出出错记录。</p>
+<p>有时我们需要只运行守护进程的一个副本[如果有多个实例运行的话，可能导致任务运行多次，而产生错误]，这样的话我们就需要用到单例守护进程。我们可以使用文件和记录锁机制来实现这个效果。即第一次运行的时候，给文件上锁，以后需要运行的时候，先查看文件是否上锁，如果上锁就退出，否则继续运行。代码如下</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #eeee00;">#define LOCKFILE “/var/run/daemon.pid”</span><br><span style="color: #eeee00;">#define LOCKMODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)</span><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">lockfile</span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">fd</span>)<span style="color: #da70d6;">//给文件上锁</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">flock</span> <span style="color: #f5deb3;">fl</span><br><span style="color: #f5deb3;">fl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">l_type</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">F_WRLCK</span><br><span style="color: #f5deb3;">fl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">l_start</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">fl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">l_whence</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">SEEK_SET</span><br><span style="color: #f5deb3;">fl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">l_len</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> (<span style="color: #f5deb3;">fcntl</span>(<span style="color: #f5deb3;">fd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">F_SETLK</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">fl</span>));<br><span style="color: #f5deb3;">}</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">already_running</span>(<span style="color: #98fb98; font-weight: bold;">void</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">fd</span><br><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">16</span><span style="color: #f5deb3;">];</span></div></p>
+<p><span style="color: #f5deb3;">fd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">open</span>(<span style="color: #f5deb3;">LOCKFILE</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">O_RDWR</span> | <span style="color: #f5deb3;">O_CREAT</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">LOCKMODE</span>);<br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">fd</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">syslog</span>(<span style="color: #f5deb3;">LOG_ERR</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“can’t open %s: %s</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">LOCKFILE</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">strerror</span>(<span style="color: #f5deb3;">errno</span>));<br><span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">1</span>);<br><span style="color: #f5deb3;">}</span></p>
+<p><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">lockfile</span>(<span style="color: #f5deb3;">fd</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">errno</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">EACCES</span> || <span style="color: #f5deb3;">errno</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">EAGAIN</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">close</span>(<span style="color: #f5deb3;">fd</span>);<br><span style="color: #b0c4de; font-weight: bold;">return</span> (<span style="color: #add8e6;">1</span>);<br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">syslog</span>(<span style="color: #f5deb3;">LOG_ERR</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“can’t lock %s: %s</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">LOCKFILE</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">strerror</span>(<span style="color: #f5deb3;">errno</span>));<br><span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">1</span>);<br><span style="color: #f5deb3;">}</span></p>
+<p><span style="color: #f5deb3;">ftruncate</span>(<span style="color: #f5deb3;">fd</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>);<br><span style="color: #f5deb3;">sprintf</span>(<span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“%ld”</span><span style="color: #f5deb3;">,</span> (<span style="color: #98fb98; font-weight: bold;">long</span>)<span style="color: #f5deb3;">getpid</span>());<br><span style="color: #f5deb3;">write</span>(<span style="color: #f5deb3;">fd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">strlen</span>(<span style="color: #f5deb3;">buf</span>) <span style="color: #f5deb3;">+</span> <span style="color: #add8e6;">1</span>);<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></p>
+<p><br>这样的话，任何时候都只可能有一个进程副本在运行。</p>
+<p>如果在守护进程中需要打开文件，而且调用openlog前先调用了chroot，那么怎么确保能够正确的打开文件呢？这个只需要用文件描述符就行了，文件描述符在chroot之后是不会更改的。</p>
+<p>这篇文章大部分内容来自APUE第13章，更详细的内容请移步APUE。</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2014/05/09/linux-dbm/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2014/02/28/how-to-think-like-a-computer-scientist/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2014-05-02 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/APUE/">APUE<span>4</span></a></li> <li><a href="/tags/linux/">linux<span>24</span></a></li> <li><a href="/tags/daemon/">daemon<span>1</span></a></li> <li><a href="/tags/syslog/">syslog<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

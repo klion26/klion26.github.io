@@ -1,0 +1,286 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>SRM 620 RandomGraph | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="题目链接
+题目大意：给你一个图无向图G，G有n个顶点，所有的边都是以概率p存在。然后给定 n 和 p, 问图 G 中至少有一个联通子图含有4个以上（包括4个）顶点的概率。其中 2&amp;lt;= n &amp;lt;= 50
+这个题目还是比较有意思的。
+首先我们可以把4个以上转化为不超过4个，也就是说变成求这个问">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="SRM 620 RandomGraph"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> SRM 620 RandomGraph</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><a href="http://community.topcoder.com/stat?c=problem_statementpm=13143&amp;rd=15853" target="_blank" rel="external">题目链接</a></p>
+<p>题目大意：给你一个图无向图G，G有n个顶点，所有的边<i,j>都是以概率p存在。然后给定 n 和 p, 问图 G 中至少有一个联通子图含有4个以上（包括4个）顶点的概率。其中 2&lt;= n &lt;= 50</i,j></p>
+<p>这个题目还是比较有意思的。</p>
+<p>首先我们可以把4个以上转化为<span style="color: #ff0000;">不超过4个</span>，也就是说变成求这个问题的一个互补问题，因为转化之后的问题情况就变得少了很多，从而能够更好的求解</p>
+<p>接下来我们考虑怎么求图 G 中所有联通子图的顶点数都不超过4个的概率。首先不超过4个的情况只有如下几种<a href="http://www.klion26.com/wp-content/uploads/2014/05/graph1svg.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2014/05/graph1svg-300x115.png" alt="" title="graph1svg"></a></p>
+<p>第一种情况就是只有一个点在子图中，第二种情况是有两个顶点在图中，第三种和第四种是有3个顶点在子图中。我们可以把一个图中 第一种情况的个数设为 a,第二种情况的个数设为 b, 第三种和第四种情况的个数设为 c, 那么我们要求的就是图中只有这四种情况的概率。我们设<span style="color: #ff0000;"> f(r, a, b, c)</span> 表示 r 个顶点中 a 个第一种情况，b 个第二种情况，c个第三和第四种情况的概率。那么我们要求的就是 f(n, a, b, c) 且 a + 2b + 3c == n 的概率（其中 n 是图 G 的顶点个数）。那么接下来就是怎么算 f(r, a, b, c) 的事情了。</p>
+<p>我们假设现在有一个图 T，其中有 a 个第一种情况， b 个第二种情况， c 个第三和第四种情况。那么我们再加入一个顶点的时候，会发生什么呢？</p>
+<ol>
+<li>我们加入的点单独成为一个子图，也就是说不和任何的点有边连接，变成<span style="color: #ff0000;"> f(r+1, a+1, b, c),</span> 那么这种情况的概率是 (1-p)^(a+2b+3c)</li>
+<li>我们和第一种情况中的任何一个点有连接，那么就变成了<span style="color: #ff0000;"> f(r+1, a-1, b+1, c)</span>, 这样情况的概率是 (a<em>p)</em>(1-p)^(a-1)*(1-p)^(2b+3c)，首先是从 a 个点中选择一个，然后算概率</li>
+<li>我们和第一种情况种的任何两个点连接，变成一个第三种情况，那么就变成了<span style="color: #ff0000;"> f(r+1, a-2, b, c+1)</span>, 概率为 (a<em>(a-1))/2</em>p^2 <em> (1-p)^(a-2)</em>(1-p)^(2b+3c)</li>
+<li>我们和第二种情况种的某一个点连接，把连接的这个第二种情况变成第<span style="color: #ff0000;">三</span>种情况，也就是<span style="color: #ff0000;"> f(r+1, a, b-1, c+1)</span>, 概率为 (1-p)^a <em> <span style="color: #0000ff;">(2b)</span></em>p<em>(1-p)^(2b-1) </em> (1-p)^3c,其中标记出来的是从第二种情况种选择一个点进行连接，然后算的概率</li>
+<li>我们和第二种情况种的两个点进行连接，从而变成第<span style="color: #ff0000;">四</span>种情况（<span style="color: #ff0000;">注意这里和上面的区别</span>），也就是<span style="color: #ff0000;"> f(r+1, a, b-1, c+1)</span>, 概率为 (1-p)^a <em> b </em> p^2 <em> (1-p)^(2b-2)</em>(1-p)^3c.<br>接下来就可以用动态规划的思想来计算所有的 f(r, a, b, c) 了，然后计算出来之后我们求的所有 a+2b+3c == n 的 f(n, a, b, c)，记这个为 s 的话，那么我们最终要求的结果就是 1-s。到这里结束了</li>
+</ol>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2014/05/27/using-gdb-to-debug-nginx/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2014/05/09/linux-dbm/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2014-05-17 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li> <li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/algorithm/">algorithm<span>14</span></a></li> <li><a href="/tags/数学/">数学<span>5</span></a></li> <li><a href="/tags/probability/">probability<span>1</span></a></li> <li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

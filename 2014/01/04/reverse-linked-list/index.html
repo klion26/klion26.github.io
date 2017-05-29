@@ -1,0 +1,276 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>有关链表逆序 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="给你一个链表，然后需要把链表给逆序输出，而且不能用交换链表的值或者新建一个链表的方式。
+1. 把一个链表从头到尾全部逆序，这个应该算这一些列问题里面最基本的东西了。大致思路就是每次把一个链表的当前node和next node给反过来，然后你需要记录下一个处理的节点是哪个，也就是处理完当前节点，需要往">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="有关链表逆序"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> 有关链表逆序</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>给你一个链表，然后需要把链表给逆序输出，而且不能用交换链表的值或者新建一个链表的方式。</p>
+<p>1. 把一个链表从头到尾全部逆序，这个应该算这一些列问题里面最基本的东西了。大致思路就是每次把一个链表的当前node和next node给反过来，然后你需要记录下一个处理的节点是哪个，也就是处理完当前节点，需要往后移动一个。直接上代码：</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;">p<span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">root</span><span style="color: #da70d6;">//root是链表的头节点</span><br><span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">root</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span>;<span style="color: #da70d6;">//这里我们假定链表是非空的</span><br><span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #b0c4de; font-weight: bold;">NULL</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">q</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">t</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span>;<span style="color: #da70d6;">//记录下q的next，移动到下一个处理的地方要用到</span><br><span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span> <span style="color: #f5deb3;">=</span> p;<span style="color: #da70d6;">//链表逆序</span><br>p <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">q</span><span style="color: #da70d6;">//移动到下一个节点</span><br><span style="color: #f5deb3;">q</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">t</span><span style="color: #da70d6;">//用上面记录下来的q-&gt;;next更新q，因为q-&gt;next会变成p。</span><br><span style="color: #f5deb3;">}</span></div><br>上面的代码就是把链表逆序的核心代码了，当然最后你还需要处理链表的头节点什么的。首先我们用p和q两个指针指向当前节点，和原链表中的下一个节点，如果下一个节点为NULL的话，我们就直接退出循环了，因为这里不需要逆序了。对于p和q，我们首先记录下q的下一个节点t，因为待会我们会把q的next指针更新为p也就是逆序，如果不记录下q的下一个节点，那么这个节点我们就再也访问不到了。然后将q的next指针指向p（对链表进行逆序），然后将p更新为q，q更新为t，也就是说处理原链表中p的下一个节点。这个处理完了之后，链表基本已经逆序了，为什么说基本呢？可以看一个例子：1-&gt;2-&gt;3-&gt;4，用上述算法处理完成之后将变成1-&gt;2, 2-&gt;1, 3-&gt;2, 4-&gt;3，也就是说1和3都指向2，而没有指针指向4，但是4现在是表头。所以这里我们需要对原链表的表头和表尾进行处理。</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">root</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span> <span style="color: #f5deb3;">=</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span>;<br><span style="color: #f5deb3;">root</span> <span style="color: #f5deb3;">=</span> p;</div><br>这里root是原链表的表头，也就是新链表的表尾，所以它的next就是NULL，同时更新表头节点，经过while循环之后，p指向的是原链表的最后一个节点，当然就是新链表的头节点了。到此，链表逆序也就完成了。不过这只是基本的链表逆序而已，下面有两个变种。</p>
+<p>2. 给定一个链表，然后给定两个数m和n，1&lt;=m&lt;=n&lt;=length，length是链表的长度。你需要把链表中从第m个到第n个元素给逆序。这里大致思路还是和上面的差不多，不过处理的是链表的一部分，而不是全部，这个会比上面稍微的麻烦一点。上面我们在while循环之后加了两句话用来更新头节点和尾节点，那么同样我们这里需要更新类似的“头节点”和“尾节点”，比如1-&gt;2-&gt;3-&gt;4-&gt;5，m=2，n=4，的话，我们要在逆序之后，使得1指向4，而2指向5，这就是我们这里的“头节点”和“尾节点”，对于2指向5这个问题还是比较好处理的，因为我们能够找到2和5，这样的话直接加上一句就行了，然后把1指向4的话，我们需要保存节点2的<span style="color: #ff0000;">前一个</span>节点，这里我们需要保存每个节点的前一个节点，这样的话，我们才能够使得最后让1（2的前一个节点）指向4.不过这里有一个小小的trick，也就是说如果当前节点没有前一个节点（m=1），那么我们需要特殊处理一下，同样我们需要更新链表的头节点。具体的代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Reverse-Linked-List-II.cpp" target="_blank" rel="external">参照这里</a>。</p>
+<p>3. 如果给定一个链表，然后给定一个数n，让你把链表分成n个节点一段，每一段里面进行逆序，如果最后没有n个节点的话，那么就保持原样，比如1-&gt;2-&gt;3-&gt;4-&gt;5，然后n=2，处理完之后应该是2-&gt;1-&gt;4-&gt;3-&gt;5.这个问题，比上面两个要更复杂，首先你不能顺序依次处理过去，因为如果依次处理过去的话，段之间的链接就不对了，可以用笔画一下，依次处理过去的时候，2的下一个节点是不好指向4的，因为3-&gt;4这一段还没有逆序，但是最后我们需要的是2指向4，而不是3.这里就需要我们从后往前处理了，也就是说我们必须把当前段后面的所有段都已经处理完成了，然后再处理当前段，比如我们处理3-&gt;4的时候，5必须处理好（单个节点不需要好处理），然后处理1-&gt;2的时候，3-&gt;4-&gt;5必须处理好了，也就是变成了4-&gt;3-&gt;5.这样就满足递归的性质了，我们可以把这个问题用递归的方法写出来，先找到一段，然后处理这一段的后面所有段，然后再处理当前段，这样的话，我们就保证了处理当前段的时候，后面的已经是处理好了。具体代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Reverse-Nodes-in-K-Group.cpp" target="_blank" rel="external">参考这里</a>。</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2014/01/07/binary-tree-traversal-without-recursive/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2013/12/25/string-to-integer-atoi/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2014-01-04 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/algorithm/">algorithm<span>14</span></a></li> <li><a href="/tags/leetcode/">leetcode<span>6</span></a></li> <li><a href="/tags/linked-list/">linked-list<span>1</span></a></li> <li><a href="/tags/reverse/">reverse<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

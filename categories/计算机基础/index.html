@@ -1,0 +1,740 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>计算机基础 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+<!-- title -->
+<div class="page-header page-header-inverse ">
+  <h1 class="archive-title-category title title-inverse ">计算机基础</h1>
+</div>
+
+<div class="row page">
+  <!-- cols -->
+  
+  <div class="col-md-9">
+	
+
+	  <div id="top_search"></div>
+
+      
+
+      <div class="mypage">
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-03-08 </div>
+			<div class="article-title"><a href="/2015/03/08/github-blog-math-expression-support/" >让 Github Blog 支持数学公式</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文将提供一种方法，让 github blog 可以支持数学公式，通俗的说就是支持 latex 写法。假设已经有一个 github blog。本文利用的是 Mathjax 来支持 latex 公式的解析和显示。下面假设本地仓库所在的文件夹为”xxx.github.com”</p>
+<p>1. 切换到”xxx.github.com_includes\themes\dinky” 其中 dinky 是你现在使用的模板名称</p>
+<p>2. 用文本编辑器打开”default.html” 文件，跳转到文件末尾，在  和 &lt;/html&gt; 之间加上如下代码</p>
+<p><pre class="lang:js decode:true">  <script type="text/javascript">window.MathJax = false;&lt;/script&gt;<br>  <script type="text/x-mathjax-config"><br>          MathJax.Hub.Config({<br>          tex2jax: {inlineMath: [[“$”,”$”],[“\(“,”\)”]]}<br>              });<br></script>&lt;script type=”text/javascript” src=”<a href="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full&quot;&gt;MathJax.Hub.Queue([&quot;Typeset&quot;,MathJax.Hub" target="_blank" rel="external">http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full&quot;&gt;MathJax.Hub.Queue([&quot;Typeset&quot;,MathJax.Hub</a>]);<br></pre><br>3. 在 “xxx.githu.com” 下建立一个名为 extensions 的目录，然后把 <a href="https://github.com/mathjax/MathJax/blob/master/extensions/MathMenu.js" target="_blank" rel="external">MathMenu</a> 和 <a href="https://github.com/mathjax/MathJax/blob/master/extensions/MathZoom.js" target="_blank" rel="external">MathZoom</a> 两个文件添加到 extensions 目录下（如果到这一步还出现问题的话，可以利用 chrome 打开相应的 github blog 页面，然后按下 F12 打开 console，把缺少的文件添加到 extensions 目录即可）</p>
+<p>4. 在 github blog 中使用相应的数学公式，查看就会发现可以显示了。</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-12-29 </div>
+			<div class="article-title"><a href="/2014/12/29/show-me-the-code/" >Show me the code</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>想着好好的学习下 Python，只看书当然是不行的，就在网上找一些项目做，想找合适的项目太难的，每个人的情况不一样，对 A 是合适的，对 B 就不一定合适，后来找到 <a href="https://github.com/karan/Projects" target="_blank" rel="external">100 project </a>和 <a href="https://github.com/Yixiaohan/show-me-the-code" target="_blank" rel="external">show-me-the-code </a>这两个 Github 上的 repo，想着自己先做做，等逐渐熟练了之后，再去解决其他的问题。期间问了一个美团公司的工程师有什么可以推荐的不，他建议找自己想解决的问题，我当时想着在桌面写一个<a href="http://www.meituan.com/lottery/past?mtt=1.index%2Ffloor.rd.1.i49jroiy" target="_blank" rel="external">美团网自动抽奖</a>的程序，由于自己不熟悉前端，有些地方不懂，问了好几个搞前端的同学，也没搞定。想着干脆先照着前面两个 repo 写，另外写个爬虫，熟悉下。等自己熟悉那个抽奖系统的链接跳转之后，再去搞定它。</p>
+<p>下面是我做这些 project 时遇到的一些问题，这里会逐渐更新，所有的代码都放到<a href="https://github.com/klion26/Projects" target="_blank" rel="external">这个库中</a>。</p>
+<p>1. 在图片的右上角加一个红色的数字（类似 QQ 消息的信息数目提示），直接用 PIL 库可以解决，不过由于在 windows 确实某个库 _imagingft  C，照着网上的安装之后还是不行，不能更改字体，导致添加的数字字体太小。另外应该可以用 PyQt 或者 Opencv来解决。</p>
+<p>2. 生成一个定长的随机字符串：这个学到了好几种方法，个人觉得较好的是 a)跑 for 循环，每次生成一个字符; b) 用 random.sample ；c)用 random.shuffle。写这个的时候，以及其他一些东西的时候，自己还是用 c/c++ 的思想在写 python，另外一个比较明显的例子是交换两个数，这个要慢慢改过来。</p>
+<p>至于用生成的随机字符串生成验证码，也可以用 PIL 库解决，将字符串画到图片上，再在图片上画一些黑点/黑线，然后对图片进行扭曲操作，不过不要操作过头了，导致用户都不认识。</p>
+<p>3. 找出 html 文件中的正文，链接，或者下载某个页面中的所有图片。自己用的正则表达式处理，正文直接匹配的 <body[\s\s]*&lt; body="">，这里中间用 “[\s\S]”表示所有字符，不用通配符 <em>，是因为会有换行等特殊字符在里面；链接用的是 href=\”[^\”]</em>\”, 至于下载某个页面中的所有图片，首先利用正则表达式 src=\”http[^\”]*jpg\”（这里需要考虑多种图片格式），找出所有图片的 url，然后用urllib.urlretrieve() 函数将远程的图片下载到本地。</body[\s\s]*&lt;></p>
+<p>4. 对密码进行加密，直接用 hashlib 库就行了，可以用不同的加密函数，至于加密密码的时候，需要添加 salt，salt可以由用户提供，也可以用 uuid 生成一个随机的字符串，最后把 salt 添加到 hash 后的密码后面，为了后面验证需要。</p>
+<p>未完待续…</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-08-25 </div>
+			<div class="article-title"><a href="/2014/08/25/the-hardwaresoftware-interface-csapp-lab2-bomb/" >The Hardware/Software Interface Lab2 bomb</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>这个 bomb 是 Couresa 上面的一门课  <a href="https://class.coursera.org/hwswinterface-002/" target="_blank" rel="external">The Hardware/Software Interface</a> 中第四章的一个实验。同时也是<a href="http://book.douban.com/subject/1896753/" target="_blank" rel="external"> CSAPP </a>  里面的一个作业。花了1天时间把这个做了。期间主要是用到了 <strong>gdb</strong>，objdump 的一些知识，当然还有一些汇编的基础知识，比如说在 64 位系统下，参数通过 <code>rdi</code>, <code>rsi</code>, <code>rdx</code>, <code>rcx</code>, <code>r8</code>, <code>r9 传递，返回值在 rax中。其他的利用 gdb 差不多就可以完成了[这里只讲前五个关卡，不包括后面的附加关卡和隐藏]。</code></p>
+<p>首先我们不知道任何有关 bomb 的输入，所以直接 gdb 运行即可，随便输入看看程序需要什么[下面所有红色的斜体字表示命令]。</p>
+<p>一: 运行 <span style="color: #ff0000;"><em>gdb bomb</em></span>。然后在 gdb 的命令行里面执行 <span style="color: #ff0000;">_b phase<em>1</em><span style="color: #000000;">。然后运行程序，会发现程序停在那，等你输入，这个时候随便输入一些字符即可。然后发现程序执行到了 phase_1 处，利用 gdb 的命令 disas 反汇编指令查看 phase_1 函数的汇编语句，如下所示</span></span></p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">=&gt;</span> <span style="color: #f5deb3;">0</span><span style="color: #ffffff;">x0000000000400e70</span> <span style="color: #f5deb3;">&lt;+</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">:</span>    <span style="color: #d8bfd8;">sub</span>    <span style="color: #b0c4de; font-weight: bold;">$</span><span style="color: #add8e6;">0x8</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">%</span><span style="color: #d8bfd8;">rsp</span><br><span style="color: #f5deb3;">0</span><span style="color: #ffffff;">x0000000000400e74</span> <span style="color: #f5deb3;">&lt;+</span><span style="color: #add8e6;">4</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">:</span>    <span style="color: #d8bfd8;">mov</span>    <span style="color: #b0c4de; font-weight: bold;">$</span><span style="color: #add8e6;">0x401af8</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">%</span><span style="color: #b0c4de; font-weight: bold;">esi</span><br><span style="color: #f5deb3;">0</span><span style="color: #ffffff;">x0000000000400e79</span> <span style="color: #f5deb3;">&lt;+</span><span style="color: #add8e6;">9</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">:</span>    <span style="color: #d8bfd8;">callq</span>  <span style="color: #add8e6;">0x40123d</span> <span style="color: #f5deb3;">&lt;</span><span style="color: #d8bfd8;">strings_not_equal</span><span style="color: #f5deb3;">&gt;</span><br><span style="color: #f5deb3;">0</span><span style="color: #ffffff;">x0000000000400e7e</span> <span style="color: #f5deb3;">&lt;+</span><span style="color: #add8e6;">14</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">:</span>    <span style="color: #d8bfd8;">test</span>   <span style="color: #f5deb3;">%</span><span style="color: #b0c4de; font-weight: bold;">eax</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">%</span><span style="color: #b0c4de; font-weight: bold;">eax</span><br><span style="color: #f5deb3;">0</span><span style="color: #ffffff;">x0000000000400e80</span> <span style="color: #f5deb3;">&lt;+</span><span style="color: #add8e6;">16</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">:</span>    <span style="color: #d8bfd8;">je</span>     <span style="color: #add8e6;">0x400e87</span> <span style="color: #f5deb3;">&lt;</span><span style="color: #d8bfd8;">phase_1</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">23</span><span style="color: #f5deb3;">&gt;</span><br><span style="color: #f5deb3;">0</span><span style="color: #ffffff;">x0000000000400e82</span> <span style="color: #f5deb3;">&lt;+</span><span style="color: #add8e6;">18</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">:</span>    <span style="color: #d8bfd8;">callq</span>  <span style="color: #add8e6;">0x40163d</span> <span style="color: #f5deb3;">&lt;</span><span style="color: #d8bfd8;">explode_bomb</span><span style="color: #f5deb3;">&gt;</span><br><span style="color: #f5deb3;">0</span><span style="color: #ffffff;">x0000000000400e87</span> <span style="color: #f5deb3;">&lt;+</span><span style="color: #add8e6;">23</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">:</span>    <span style="color: #d8bfd8;">add</span>    <span style="color: #b0c4de; font-weight: bold;">$</span><span style="color: #add8e6;">0x8</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">%</span><span style="color: #d8bfd8;">rsp</span><br><span style="color: #f5deb3;">0</span><span style="color: #ffffff;">x0000000000400e8b</span> <span style="color: #f5deb3;">&lt;+</span><span style="color: #add8e6;">27</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">:</span>    <span style="color: #d8bfd8;">retq</span></div><br>发现调用了一个叫做 string_not<em>equal 的函数，用 </em><span style="color: #ff0000;">stepi</span>_ 执行到第三行，然后根据函数返回结果（函数返回结果在 rax 中，eax 是 rax 的低 32 位）。判断是否 explode<em>bomb。那么我们利用 </em><span style="color: #ff0000;">stepi</span>_ 指令运行到 callq  0x40123d <strings_not_equal> 这一行，利用 <em><span style="color: #ff0000;">x /s $rdi</span></em> 和<em><span style="color: #ff0000;"> x /s $rsi</span></em> 来查看 string_not<em>equal 函数的两个参数。发现 </em><span style="color: #ff0000;"> x /s $rsi</span><em> 的输出是 “Science isn’t about why, it’s about why not?”，</em><span style="color: #ff0000;">x /s $rdi </span>_的输出就是你输入的东西，也就是说我们需要输入的是这个字符串，这样就两个参数就相等了。也就是说，第一关我们需要输入的就是这个字符串”Science isn’t about why, it’s about why not?”. 接下来低二关</strings_not_equal></p>
+<p>二:  在等待输入的时候，继续随便输入一些字符（我们只是用这些字符来调试的，从而得到正确的答案）。</p>
+<p><pre class="lang:asm mark:12,13 decode:true ">=&gt; 0x0000000000400e8c &lt;+0&gt;: mov %rbx,-0x20(%rsp)<br> 0x0000000000400e91 &lt;+5&gt;: mov %rbp,-0x18(%rsp)<br> 0x0000000000400e96 &lt;+10&gt;: mov %r12,-0x10(%rsp)<br> 0x0000000000400e9b &lt;+15&gt;: mov %r13,-0x8(%rsp)<br> 0x0000000000400ea0 &lt;+20&gt;: sub $0x48,%rsp<br> 0x0000000000400ea4 &lt;+24&gt;: mov %rsp,%rsi<br> 0x0000000000400ea7 &lt;+27&gt;: callq 0x401743 &lt;read_six_numbers&gt;<br> 0x0000000000400eac &lt;+32&gt;: mov %rsp,%rbp<br> 0x0000000000400eaf &lt;+35&gt;: lea 0xc(%rsp),%r13<br> 0x0000000000400eb4 &lt;+40&gt;: mov $0x0,%r12d<br> 0x0000000000400eba &lt;+46&gt;: mov %rbp,%rbx<br> 0x0000000000400ebd &lt;+49&gt;: mov 0xc(%rbp),%eax<br> 0x0000000000400ec0 &lt;+52&gt;: cmp %eax,0x0(%rbp)<br> 0x0000000000400ec3 &lt;+55&gt;: je 0x400eca &lt;phase_2+62&gt;<br> 0x0000000000400ec5 &lt;+57&gt;: callq 0x40163d &lt;explode_bomb&gt;<br> 0x0000000000400eca &lt;+62&gt;: add (%rbx),%r12d<br> 0x0000000000400ecd &lt;+65&gt;: add $0x4,%rbp<br> 0x0000000000400ed1 &lt;+69&gt;: cmp %r13,%rbp<br> 0x0000000000400ed4 &lt;+72&gt;: jne 0x400eba &lt;phase_2+46&gt;<br> 0x0000000000400ed6 &lt;+74&gt;: test %r12d,%r12d<br> 0x0000000000400ed9 &lt;+77&gt;: jne 0x400ee0 &lt;phase_2+84&gt;<br> 0x0000000000400edb &lt;+79&gt;: callq 0x40163d &lt;explode_bomb&gt;<br> 0x0000000000400ee0 &lt;+84&gt;: mov 0x28(%rsp),%rbx<br> 0x0000000000400ee5 &lt;+89&gt;: mov 0x30(%rsp),%rbp<br> 0x0000000000400eea &lt;+94&gt;: mov 0x38(%rsp),%r12<br> 0x0000000000400eef &lt;+99&gt;: mov 0x40(%rsp),%r13<br> 0x0000000000400ef4 &lt;+104&gt;: add $0x48,%rsp<br> 0x0000000000400ef8 &lt;+108&gt;: retq</pre><br>在上面的额汇编代码中，我们看到首先，是会调用一个叫做 read_six_numbers 的函数，也就是说需要读入的是6个数字。然后接下来我们发现12行中把 0xc($rbp) 所对应的内存中的数据赋值给 %eax, 然后用 %eax 和 0x0($rbp) 做比较，如果不相等就爆炸，也就是说我们输入的6个数字中第1个数字和第4个数字必须相等. 我用的是数字 4. 从第11行到第19行，是一个循环，<del>表示输入的这 6 个数的前4个都要相等</del><span style="color: #ff0000;">表示第1个数和第4个数相等，第2个数和第5个数相等，第3个数和第6个数相等（相差3个位置）。谢谢网友@zxd 指出。</span>在这里我用的是4个4，然后测试 $12d 是否为0， 这个 $12d 是前4个数字的和，不等于0就行了，否则就会爆炸了。接下来到了第3关</p>
+<p>三: 继续输入无关字符，我们停在 phase_3 处，得到如下汇编代码</p>
+<p><pre class="lang:asm mark:13 decode:true "><pre class="lang:asm decode:true ">=gt; 0x0000000000400ef9 &amp;lt;+0&amp;gt;: sub $0x18,%rsp<br> 0x0000000000400efd lt;+4&amp;gt;: lea 0x8(%rsp),%rcx<br> 0x0000000000400f02 lt;+9&amp;gt;: lea 0xc(%rsp),%rdx<br> 0x0000000000400f07 lt;+14&amp;gt;: mov $0x401ebe,%esi<br> 0x0000000000400f0c lt;+19&amp;gt;: mov $0x0,%eax<br> 0x0000000000400f11 lt;+24&amp;gt;: callq 0x400ab0 &amp;lt;__isoc99_sscanf@plt&amp;gt;<br> 0x0000000000400f16 lt;+29&amp;gt;: cmp $0x1,%eax<br> 0x0000000000400f19 lt;+32&amp;gt;: jg 0x400f20 &amp;lt;phase_3+39&amp;gt;<br> 0x0000000000400f1b lt;+34&amp;gt;: callq 0x40163d &amp;lt;explode_bomb&amp;gt;<br> 0x0000000000400f20 lt;+39&amp;gt;: cmpl $0x7,0xc(%rsp)<br> 0x0000000000400f25 lt;+44&amp;gt;: ja 0x400f63 &amp;lt;phase_3+106&amp;gt;<br> 0x0000000000400f27 lt;+46&amp;gt;: mov 0xc(%rsp),%eax<br> 0x0000000000400f2b lt;+50&amp;gt;: jmpq <em>0x401b60(,%rax,8)<br> 0x0000000000400f32 lt;+57&amp;gt;: mov $0x217,%eax<br> 0x0000000000400f37 lt;+62&amp;gt;: jmp 0x400f74 &amp;lt;phase_3+123&amp;gt;<br> 0x0000000000400f39 lt;+64&amp;gt;: mov $0xd6,%eax<br> 0x0000000000400f3e lt;+69&amp;gt;: jmp 0x400f74 &amp;lt;phase_3+123&amp;gt;<br> 0x0000000000400f40 lt;+71&amp;gt;: mov $0x153,%eax<br> 0x0000000000400f45 lt;+76&amp;gt;: jmp 0x400f74 &amp;lt;phase_3+123&amp;gt;<br> 0x0000000000400f47 lt;+78&amp;gt;: mov $0x77,%eax<br> 0x0000000000400f4c lt;+83&amp;gt;: jmp 0x400f74 &amp;lt;phase_3+123&amp;gt;<br> 0x0000000000400f4e lt;+85&amp;gt;: mov $0x160,%eax<br>—Type lt;return&amp;gt; to continue, or q &amp;lt;return&amp;gt; to quit—<br> 0x0000000000400f53 lt;+90&amp;gt;: jmp 0x400f74 &amp;lt;phase_3+123&amp;gt;<br> 0x0000000000400f55 lt;+92&amp;gt;: mov $0x397,%eax<br> 0x0000000000400f5a lt;+97&amp;gt;: jmp 0x400f74 &amp;lt;phase_3+123&amp;gt;<br> 0x0000000000400f5c lt;+99&amp;gt;: mov $0x19c,%eax<br> 0x0000000000400f61 lt;+104&amp;gt;: jmp 0x400f74 &amp;lt;phase_3+123&amp;gt;<br> 0x0000000000400f63 lt;+106&amp;gt;: callq 0x40163d &amp;lt;explode_bomb&amp;gt;<br> 0x0000000000400f68 lt;+111&amp;gt;: mov $0x0,%eax<br> 0x0000000000400f6d lt;+116&amp;gt;: jmp 0x400f74 &amp;lt;phase_3+123&amp;gt;<br> 0x0000000000400f6f lt;+118&amp;gt;: mov $0x39e,%eax<br> 0x0000000000400f74 lt;+123&amp;gt;: cmp 0x8(%rsp),%eax<br> 0x0000000000400f78 lt;+127&amp;gt;: je 0x400f7f &amp;lt;phase_3+134&amp;gt;<br> 0x0000000000400f7a lt;+129&amp;gt;: callq 0x40163d &amp;lt;explode_bomb&amp;gt;<br> 0x0000000000400f7f lt;+134&amp;gt;: add $0x18,%rsp<br> 0x0000000000400f83 lt;+138&amp;gt;: retq<br></em></pre><br>我们看到第6行调用 sscanf，然后第7行对 sscanf 的返回结果做判断，也就是说我们必须输入至少两个数字（或字符串），否则就爆炸了。然后跳到第10行，用我们输入的的第一个数字和7比较，不能大于7，否则就爆炸了。接下来需要知道13行中的代码表示是一个 switch 语句。其中 0x401b60 表示 jump table 的地址，后面的 rax 表示第几个，8表示数据类型。由于我一开始输入的数字是 2，然后跳转到相应的位置（我们可以用 <em><span style="color: #ff0000;">print *0x401b60</span></em> 来查看 jump table 的起始位置，其中 gdb 的 print 命令用来输出值， x 命令用来显示相应位置的的内存内容，通俗的说 print 可以看成一个值，x 看成一个指针。）跳到第16行。然后把 $eax 和 第二个输入的数值做对比（$eax 是在前面第 16 行进行的赋值，0xd6），所以我们的第二个参数设置位 0xd6(214) 就行了.然后到了第四关</pre></p>
+<p>四：来到第四关，我们得到如下汇编代码</p>
+<p><pre class="lang:asm decode:true ">=&gt; 0x0000000000400fc1 &lt;+0&gt;: sub $0x18,%rsp<br> 0x0000000000400fc5 &lt;+4&gt;: lea 0xc(%rsp),%rdx<br> 0x0000000000400fca &lt;+9&gt;: mov $0x401ec1,%esi<br> 0x0000000000400fcf &lt;+14&gt;: mov $0x0,%eax<br> 0x0000000000400fd4 &lt;+19&gt;: callq 0x400ab0 &lt;__isoc99_sscanf@plt&gt;<br> 0x0000000000400fd9 &lt;+24&gt;: cmp $0x1,%eax<br> 0x0000000000400fdc &lt;+27&gt;: jne 0x400fe5 &lt;phase_4+36&gt;<br> 0x0000000000400fde &lt;+29&gt;: cmpl $0x0,0xc(%rsp)<br> 0x0000000000400fe3 &lt;+34&gt;: jg 0x400fea &lt;phase_4+41&gt;<br> 0x0000000000400fe5 &lt;+36&gt;: callq 0x40163d &lt;explode_bomb&gt;<br> 0x0000000000400fea &lt;+41&gt;: mov 0xc(%rsp),%edi<br> 0x0000000000400fee &lt;+45&gt;: callq 0x400f84 &lt;func4&gt;<br> 0x0000000000400ff3 &lt;+50&gt;: cmp $0x37,%eax<br> 0x0000000000400ff6 &lt;+53&gt;: je 0x400ffd &lt;phase_4+60&gt;<br> 0x0000000000400ff8 &lt;+55&gt;: callq 0x40163d &lt;explode_bomb&gt;<br> 0x0000000000400ffd &lt;+60&gt;: add $0x18,%rsp<br> 0x0000000000401001 &lt;+64&gt;: retq</pre><br>首先看到 sscanf 函数，然后判断 eax 是否等于1，也就说说这里有且只有一个输入，然后在第8行把这个参数和0比较，必须大于0，否则爆炸。然后把这个输入作为参数调用 func4 。下面得到的是 func4 的汇编代码</p>
+<p><pre class="lang:asm decode:true ">=&gt; 0x0000000000400f84 &lt;+0&gt;: mov %rbx,-0x10(%rsp)<br> 0x0000000000400f89 &lt;+5&gt;: mov %rbp,-0x8(%rsp)<br> 0x0000000000400f8e &lt;+10&gt;: sub $0x18,%rsp<br> 0x0000000000400f92 &lt;+14&gt;: mov %edi,%ebx<br> 0x0000000000400f94 &lt;+16&gt;: mov $0x1,%eax<br> 0x0000000000400f99 &lt;+21&gt;: cmp $0x1,%edi<br> 0x0000000000400f9c &lt;+24&gt;: jle 0x400fb2 &lt;func4+46&gt;<br> 0x0000000000400f9e &lt;+26&gt;: lea -0x1(%rbx),%edi<br> 0x0000000000400fa1 &lt;+29&gt;: callq 0x400f84 &lt;func4&gt;<br> 0x0000000000400fa6 &lt;+34&gt;: mov %eax,%ebp<br> 0x0000000000400fa8 &lt;+36&gt;: lea -0x2(%rbx),%edi<br> 0x0000000000400fab &lt;+39&gt;: callq 0x400f84 &lt;func4&gt;<br> 0x0000000000400fb0 &lt;+44&gt;: add %ebp,%eax<br> 0x0000000000400fb2 &lt;+46&gt;: mov 0x8(%rsp),%rbx<br> 0x0000000000400fb7 &lt;+51&gt;: mov 0x10(%rsp),%rbp<br> 0x0000000000400fbc &lt;+56&gt;: add $0x18,%rsp<br> 0x0000000000400fc0 &lt;+60&gt;: retq<br>End of assembler dump.</pre><br>这份代码一开始的时候还是有点绕的，这个函数是一个递归函数。带回我们就可以看到这个函数的原函数了。<br>首先我们看到，如果这个函数的参数小于等于1的话，那么直接返回（第7，8行的比较和跳转），设置的返回值是1（第6行，记着我们的返回值存在 $rax 中，$eax 是 $rax 的低位）。如果大于1的话，那么就调用两次改函数（调用自己），第一次的参数是 $rdi-1(这里的 $rdi 是函数传入的参数）, 第二次的参数是 $rdi-2,其中第一个在第9行设置成 $rdi-1, 第二个函数在第12行，这里的 $rbx 是保存的 $rdi，然后把两个函数的结果相加得到改函数的返回结果，也就是变成了如下的原函数</p>
+<p><pre class="lang:c decode:true ">int func4(int x)<br>{<br>  if(x&lt;=1)<br>    return 1;<br>   return func4(x-1)+ func4(x-2);<br>}</pre><br>接下来我们用这个原函数来计算相应的值，我们需要得到的结果等于 0x37.这个是在第四关的第13行。得到的是 9.到此我们第四关完成了，接下来是第无关</p>
+<p>五：第无关来了，得到如下的汇编代码</p>
+<p><pre class="lang:asm decode:true ">=&gt; 0x0000000000401002 &lt;+0&gt;: sub $0x18,%rsp<br> 0x0000000000401006 &lt;+4&gt;: lea 0x8(%rsp),%rcx<br> 0x000000000040100b &lt;+9&gt;: lea 0xc(%rsp),%rdx<br> 0x0000000000401010 &lt;+14&gt;: mov $0x401ebe,%esi<br> 0x0000000000401015 &lt;+19&gt;: mov $0x0,%eax<br> 0x000000000040101a &lt;+24&gt;: callq 0x400ab0 &lt;__isoc99_sscanf@plt&gt;<br> 0x000000000040101f &lt;+29&gt;: cmp $0x1,%eax<br> 0x0000000000401022 &lt;+32&gt;: jg 0x401029 &lt;phase_5+39&gt;<br> 0x0000000000401024 &lt;+34&gt;: callq 0x40163d &lt;explode_bomb&gt;<br> 0x0000000000401029 &lt;+39&gt;: mov 0xc(%rsp),%eax<br> 0x000000000040102d &lt;+43&gt;: and $0xf,%eax<br> 0x0000000000401030 &lt;+46&gt;: mov %eax,0xc(%rsp)<br> 0x0000000000401034 &lt;+50&gt;: cmp $0xf,%eax<br> 0x0000000000401037 &lt;+53&gt;: je 0x401065 &lt;phase_5+99&gt;<br> 0x0000000000401039 &lt;+55&gt;: mov $0x0,%ecx<br> 0x000000000040103e &lt;+60&gt;: mov $0x0,%edx<br> 0x0000000000401043 &lt;+65&gt;: add $0x1,%edx<br> 0x0000000000401046 &lt;+68&gt;: cltq<br> 0x0000000000401048 &lt;+70&gt;: mov 0x401ba0(,%rax,4),%eax<br> 0x000000000040104f &lt;+77&gt;: add %eax,%ecx<br> 0x0000000000401051 &lt;+79&gt;: cmp $0xf,%eax<br> 0x0000000000401054 &lt;+82&gt;: jne 0x401043 &lt;phase_5+65&gt;<br> 0x0000000000401056 &lt;+84&gt;: mov %eax,0xc(%rsp)<br> 0x000000000040105a &lt;+88&gt;: cmp $0xc,%edx<br> 0x000000000040105d &lt;+91&gt;: jne 0x401065 &lt;phase_5+99&gt;<br> 0x000000000040105f &lt;+93&gt;: cmp 0x8(%rsp),%ecx<br> 0x0000000000401063 &lt;+97&gt;: je 0x40106a &lt;phase_5+104&gt;<br> 0x0000000000401065 &lt;+99&gt;: callq 0x40163d &lt;explode_bomb&gt;<br> 0x000000000040106a &lt;+104&gt;: add $0x18,%rsp<br> 0x000000000040106e &lt;+108&gt;: retq<br>End of assembler dump.</pre><br>同样我们看到 sscanf，然后判断返回值，必须大于1个参数，然后把输入的第一个参数与上 0xf。也就是把这个参数调整到 [1,15] 这个范围内，接下来17-22行一个循环，我们可以还原成一个函数，如下</p>
+<p><pre class="lang:c decode:true ">int a[] = {a, 2, e, 7, 8, c, f, b, 0, 4, 1, d, 3, 9, 6, 5};//16进制<br>ecx = 0<br>edx = 1;<br>eax = a[eax];<br>ecx += eax;<br>while(eax != f)<br>{<br>    ++edx;<br>    eax = a[eax];<br>    ecx += eax;<br>}</pre><br>然后把 edx 和7比较，也就是说 我们必须让 edx =7.然后把 ecx 和设置的值做比较（也就是说我们输入的第二个参数），我们可以用反推出来的函数计算结果。最后就行了。最后就完全完成了。至此无关完全完成。 Oh，yeah！</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-06-20 </div>
+			<div class="article-title"><a href="/2014/06/20/nginx-http-filter-module/" >Nginx HTTP Filter 模块</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文主要是写一个 Http Filter 模块。 本文不会详细的介绍如何写一个 Http Filter，以及其中的原理，想查看原理的可以自行网上搜索，或者参考书[1].<span style="color: #ff0000;">本文最后有解决书[1]中过滤模块无作用的方法</span>。</p>
+<p>处理 Http Filter 模块，主要是把所有的 Filter 串成一个链表，然后逐个处理，最后返回给用户。本文的 Filter 功能很简单，检测配置文件是否配置相关信息，如果配置了，那么用自己编译的 Filter 函数来处理。本文的全部代码可以从<a href="http://taohui.org.cn/codeexample/v1/chapter6.zip" target="_blank" rel="external">这里进行下载</a></p>
+<p><div style="background: #fdfdfd; color: black;">下面是这个模块的config 文件</div></p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">ngx_addon_name</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">ngx_http_myfilter_module</span><br><span style="color: #f5deb3;">HTTP_FILTER_MODULES</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“$HTTP_FILTER_MODULES ngx_http_myfilter_module”</span><br><span style="color: #f5deb3;">NGX_ADDON_SRCS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_myfilter_module.c”</span></div><br>其中 ngx_http_myfilter_module 是模块名，ngx_http_myfilter_module.c 是模块代码。</p>
+<p>首先我们需要在配置文件中设定一个配置项，来标记是否开启当前的过滤模块，我们使用 ngx_flag_t 变量来存储该变量</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #b0c4de; font-weight: bold;">struct</span><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">ngx_flag_t</span> <span style="color: #f5deb3;">enable</span> <span style="color: #da70d6;">//这个在配置文件里面的配置项，其结果将存储在 enable 中</span><br><span style="color: #f5deb3;">}</span><span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span></div><br>如果需要启用这个过滤模块，可以在配置文件中进行开启.而我们需要使用 ngx_http_myfilter_create_conf 函数和 ngx_http_myfilter_merge_conf 函数来设置 ngx_http_myfilter_conf_t.</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #ffffff;">ngx_http_myfilter_create_conf</span>(<span style="color: #f5deb3;">ngx_conf_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">cf</span>)<br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">// </span><br><span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">mycf</span><span style="color: #f5deb3;">mycf</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">ngx_pcalloc</span>(<span style="color: #f5deb3;">cf</span><span style="color: #f5deb3;">-&gt;;</span><span style="color: #f5deb3;">pool</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span>));<br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #b0c4de; font-weight: bold;">NULL</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">mycf</span>)<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span><br><span style="color: #da70d6;">/<em> ngx_flag_t 类型的变量。如果使用预设函数 ngx_conf_set_flag_slot 解析配置项参数，那么必须初始化为 NGX_CONF_UNSET </em>/</span><br><span style="color: #f5deb3;">mycf</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">enable</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">NGX_CONF_UNSET</span>;<span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">mycf</span>;<br><span style="color: #f5deb3;">}</span><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #ffffff;">ngx_http_myfilter_merge_conf</span>(<span style="color: #f5deb3;">ngx_conf_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">cf</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">parent</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">child</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">prev</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">parent</span><br><span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">conf</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">child</span><br><span style="color: #da70d6;">//这个函数的功能是，如果 conf-&gt;enable 设置了，就直接返回。</span><br><span style="color: #da70d6;">//如果没设置但是 prev-&gt;enable 设置了，那么就把 conf-&gt;enable 设置为 prev-&gt;enable</span><br><span style="color: #da70d6;">//否则设置为0</span><br><span style="color: #f5deb3;">ngx_conf_merge_value</span>(<span style="color: #f5deb3;">conf</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">enable</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">prev</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">enable</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>);<span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">NGX_CONF_OK</span>;<br><span style="color: #f5deb3;">}</span></div></p>
+<p><br>下面定义 ngx_command_t 数组和 ngx_http_module_t 以及 ngx_module_t 从而定义整个过滤模块</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_command_t</span> <span style="color: #f5deb3;">ngx_http_myfilter_commands</span><span style="color: #f5deb3;">[]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">ngx_string</span>(<span style="color: #7fffd4;">“add_prefix”</span><span style="color: #f5deb3;">),</span>    <span style="color: #da70d6;">//add_prefix 是配置文件中的配置项</span><br><span style="color: #f5deb3;">NGX_HTTP_MAIN_CONF</span>|<span style="color: #f5deb3;">NGX_HTTP_SRV_CONF</span>|<span style="color: #f5deb3;">NGX_HTTP_LOC_CONF</span>|<span style="color: #f5deb3;">NGX_HTTP_LMT_CONF</span>|<span style="color: #f5deb3;">NGX_CONF_FLAG</span><span style="color: #f5deb3;">,</span><br><span style="color: #f5deb3;">ngx_conf_set_flag_slot</span><span style="color: #f5deb3;">,</span>   <span style="color: #da70d6;">//我们使用 Nginx 内置的 ngx_conf_set_flag_slot 来设置 enable[根据配置文件中 add_prefix 是否配置]</span><br><span style="color: #f5deb3;">NGX_HTTP_LOC_CONF_OFFSET</span><span style="color: #f5deb3;">,</span> <span style="color: #da70d6;">//解析之后的值存在哪一块</span><br><span style="color: #f5deb3;">offsetof</span>(<span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">enable</span><span style="color: #f5deb3;">),</span><span style="color: #da70d6;">//解析后的值具体存在哪，这里是存在 enable 中</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">},</span><br><span style="color: #f5deb3;">ngx_null_command</span><br><span style="color: #f5deb3;">};</span><br><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_http_module_t</span> <span style="color: #f5deb3;">ngx_http_myfilter_module_ctx</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span>                                    <span style="color: #da70d6;">//preconfiguration</span><br><span style="color: #f5deb3;">ngx_http_myfilter_init</span><span style="color: #f5deb3;">,</span>                  <span style="color: #da70d6;">//postconfiguration 方法，把我们的过滤模块加入到过滤模块链中</span><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><span style="color: #da70d6;">//create main</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><span style="color: #da70d6;">//init main</span><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><span style="color: #da70d6;">//create srv</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><span style="color: #da70d6;">//merge srv</span><span style="color: #f5deb3;">ngx_http_myfilter_create_conf</span><span style="color: #f5deb3;">,</span>     <span style="color: #da70d6;">//create loc</span><br><span style="color: #f5deb3;">ngx_http_myfilter_merge_conf</span>       <span style="color: #da70d6;">//merge loc</span><br><span style="color: #f5deb3;">};</span></div></p>
+<p><span style="color: #f5deb3;">ngx_module_t</span> <span style="color: #f5deb3;">ngx_http_myfilter_module</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">NGX_MODULE_V1</span><span style="color: #f5deb3;">,</span><br><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">ngx_http_myfilter_module_ctx</span><span style="color: #f5deb3;">,</span>   <span style="color: #da70d6;">//模块上下文</span><br><span style="color: #f5deb3;">ngx_http_myfilter_commands</span><span style="color: #f5deb3;">,</span>      <span style="color: #da70d6;">//模块命令</span><br><span style="color: #f5deb3;">NGX_HTTP_MODULE</span><span style="color: #f5deb3;">,</span>                 <span style="color: #da70d6;">//模块类型，过滤模块其实也是 HTTP 模块</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #f5deb3;">NGX_MODULE_V1_PADDING</span><br><span style="color: #f5deb3;">};</span></p>
+<p><br>对于添加到过滤模块链中，Nginx 使用的是改变链表的头指针。以及 static  的局部指针，具体如下所示</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">//利用 static 的局部性，下面的两个变量只能在本文中使用，可以用来链接整个过滤链表</span><br><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_http_output_header_filter_pt</span> <span style="color: #f5deb3;">ngx_http_next_header_filter</span><br><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_http_output_body_filter_pt</span>   <span style="color: #f5deb3;">ngx_http_next_body_filter</span><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_int_t</span> <span style="color: #ffffff;">ngx_http_myfilter_init</span>(<span style="color: #f5deb3;">ngx_conf_t</span> <span style="color: #f5deb3;">*</span><span style="color: #f5deb3;">cf</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #da70d6;">//把当前的头过滤模块添加到整个链表中</span><br><span style="color: #f5deb3;">ngx_http_next_header_filter</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_top_header_filter</span><br><span style="color: #f5deb3;">ngx_http_top_header_filter</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_myfilter_header_filter</span><br><span style="color: #da70d6;">//把当前的 body 过滤模块添加到整个链表中</span><br><span style="color: #f5deb3;">ngx_http_next_body_filter</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_top_body_filter</span><br><span style="color: #f5deb3;">ngx_http_top_body_filter</span>  <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_myfilter_body_filter</span><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">NGX_OK</span>;<br><span style="color: #f5deb3;">}</span></div></p>
+<p><br>利用上面的函数把该过滤模块添加到整个链表中后，我们需要的就是写具体的 header_filter 和 body_filter。具体如下</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_int_t</span> <span style="color: #ffffff;">ngx_http_myfilter_header_filter</span>(<span style="color: #f5deb3;">ngx_http_request_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">r</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">ngx_http_myfilter_ctx_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">ctx</span><br><span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">conf</span><br><span style="color: #da70d6;">//只对 NGX_HTTP_OK 进行过滤</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">headers_out</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">status</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">NGX_HTTP_OK</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ngx_http_next_header_filter</span>(<span style="color: #f5deb3;">r</span>);<br><span style="color: #f5deb3;">}</span><span style="color: #f5deb3;">ctx</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_get_module_ctx</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_http_myfilter_module</span>);<br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">ctx</span>)<br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">/ 该请求上下文已经存在，说明这个过滤模块已经被调用过 1 次 */</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ngx_http_next_header_filter</span>(<span style="color: #f5deb3;">r</span>);<br><span style="color: #f5deb3;">}</span></div></p>
+<p><span style="color: #f5deb3;">conf</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_get_module_loc_conf</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_http_myfilter_module</span>);</p>
+<p><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">conf</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">enable</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>) <span style="color: #da70d6;">//没有配置，或者配置为 off。直接跳过这个过滤模块</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ngx_http_next_header_filter</span>(<span style="color: #f5deb3;">r</span>);<br><span style="color: #f5deb3;">}</span></p>
+<p><span style="color: #f5deb3;">ctx</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_pcalloc</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">pool</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">ngx_http_myfilter_ctx_t</span>));</p>
+<p><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #b0c4de; font-weight: bold;">NULL</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">ctx</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">NGX_ERROR</span><br><span style="color: #f5deb3;">}</span></p>
+<p><span style="color: #da70d6;">/<em> add_prefix 为 0 表示不加前缀 </em>/</span><br><span style="color: #f5deb3;">ctx</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">add_prefix</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span>;</p>
+<p><span style="color: #da70d6;">/<em> 将构造的上下文设置到当前请求中 </em>/</span><br><span style="color: #f5deb3;">ngx_http_set_ctx</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ctx</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_http_myfilter_module</span>);</p>
+<p><span style="color: #da70d6;">/<em> 这里为什么需要在 sizeof 后面减1呢？这里还没太明白，我觉得是直接用 sizeof 的结果 </em>/</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">headers_out</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">content_type</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">len</span> <span style="color: #f5deb3;">&gt;=</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #7fffd4;">“text/plain”</span>) <span style="color: #f5deb3;">-</span> <span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">ngx_strncasecmp</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">headers_out</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">content_type</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">data</span><span style="color: #f5deb3;">,</span> (<span style="color: #f5deb3;">u_char</span> <span style="color: #f5deb3;"><em></em></span>) <span style="color: #7fffd4;">“text/plain”</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #7fffd4;">“text/plain”</span>) <span style="color: #f5deb3;">-</span> <span style="color: #add8e6;">1</span>) <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #da70d6;">/ 设置为1表示需要在 HTTP 包体前加入前缀 */</span><br><span style="color: #f5deb3;">ctx</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">add_prefix</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span>;</p>
+<p><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">headers_out</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">content_length_n</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">headers_out</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">content_length_n</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">filter_prefix</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">len</span>;<br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ngx_http_next_header_filter</span>(<span style="color: #f5deb3;">r</span>);<br><span style="color: #f5deb3;">}</span><br><span style="color: #da70d6;">//对 body 进行过滤</span><br><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_int_t</span> <span style="color: #ffffff;">ngx_http_myfilter_body_filter</span>(<span style="color: #f5deb3;">ngx_http_request_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_chain_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">in</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">ngx_http_myfilter_ctx_t</span>     <span style="color: #f5deb3;">*</span><span style="color: #f5deb3;">ctx</span><br><span style="color: #f5deb3;">ctx</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_get_module_ctx</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_http_myfilter_module</span>);</p>
+<p><span style="color: #da70d6;">/<em> 如果获取不到上下文，或者上下文结构体中的 add_prefix 为0 或者2 时，都不会添加前缀，这时直接交给下一个 HTTP 过滤模块处理 </em>/</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">ctx</span> <span style="color: #f5deb3;">==</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span> || <span style="color: #f5deb3;">ctx</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">add_prefix</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">1</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ngx_http_next_body_filter</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">in</span>);<br><span style="color: #f5deb3;">}</span></p>
+<p><span style="color: #da70d6;">/<em> 将 add_prefix 设置为2, 这样即使 ngx_http_myfilter_body_filter 再次回调时，也不会重复添加前缀 </em>/</span><br><span style="color: #f5deb3;">ctx</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">add_prefix</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">2</span>;</p>
+<p><span style="color: #f5deb3;">ngx_buf_t</span> <span style="color: #f5deb3;"><em></em></span>b <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_create_temp_buf</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">pool</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">filter_prefix</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">len</span>);<br><span style="color: #da70d6;">//filter_prefix 是我们定一个的一个 ngx_str_t 变量，存着我们将要添加的数据</span><br>b<span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">start</span> <span style="color: #f5deb3;">=</span> b<span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">pos</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">filter_prefix</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">data</span>;<br>b<span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">last</span> <span style="color: #f5deb3;">=</span> b<span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">pos</span> <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">filter_prefix</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">len</span>;<br><span style="color: #da70d6;">//把我们的添加的数据加入到 ngx_chain_t 中</span><br><span style="color: #f5deb3;">ngx_chain_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">cl</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_alloc_chain_link</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">pool</span>);<br><span style="color: #f5deb3;">cl</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">buf</span> <span style="color: #f5deb3;">=</span> b;<br><span style="color: #f5deb3;">cl</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">in</span>;</p>
+<p><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ngx_http_next_body_filter</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cl</span>);<br><span style="color: #f5deb3;">}</span></p>
+<p><br>到这里我们的过滤模块基本完成了，我们过滤的是<span style="color: #ff0000;"> txt 文档</span>，也就是说我们在 header_filter 中的判断，是否和 <span style="color: #ff0000;">“text/plain”</span> 一样，对于 “text/plain” 我们可以查看 /usr/local/nginx/conf/mime.types, 然后接下来我们可以在 /usr/local/nginx/html 下新建一个文件 123.txt 。然后我们通过请求 “127.0.0.1/123.txt”, 我们可以看到在文件内容的前面加上了相应的前缀。<br>Reference<br>1.《深入理解 Nginx》第6章</p>
+<ol>
+<li><a href="http://blog.csdn.net/zy825316/article/details/24268463" target="_blank" rel="external">nginx：将自己编写HTTP过滤模块融入nginx时遇到的问题</a></li>
+</ol>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-05-27 </div>
+			<div class="article-title"><a href="/2014/05/27/using-gdb-to-debug-nginx/" >用 GDB 调式 Nginx</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文主要内容讲述如何使用 gdb 对 nginx 进行调式。本文使用的 nginx 版本是1.0.14。</p>
+<p>1. 下在 nginx 源代码，进行解压。我的源代码放在 ~/Desktop/Learn/nginx/下。</p>
+<p>2. 进入 nginx-1.0.14 目录，进行 configure [这里不要考虑 –prefix之类的命令，这里只需要使用默认命令即可]</p>
+<p>3. 因为需要进行调式，所以需要在编译代码时加上”-g”选项，以及去掉所有的优化选项[即 -O1,-O2 等，可以改成-O0]，这个可以在 nginx-1.0.14/objs/Makefile 文件中对 CFLAGS 进行修改。</p>
+<p>4. 在 nginx-1.0.14 目录下进行 make，如果你前面已经 make 过一次，而这次 make 的时候提示说已经时最新的了，那么就用 “make -B” 进行强制 make</p>
+<p>5. 使用 make install 进行 Nginx 的安装，这里会安装在 /usr/local/nginx 目录下</p>
+<p>6. 编辑默认配置文件，使用命令 “sudo vi  /usr/local/nginx/conf/nginx.conf” ，在文件里面加上依据”daemon off”，禁用 daemon。</p>
+<p>6. 进入”~/Desktop/Learn/nginx/nginx-1.0.14”目录，然后运行如下命令“sudo gdb ./objs/nginx”</p>
+<p>7 在 gdb 界面下输入命令 r。发现界面停止了，连提示符都没有了，这是因为我们取消了 nginx 的 daemon 运行模式，现在 nginx 已经接管了控制终端，输入 CTRL+C即可。按下中断键，你会发现类似“Program received signal SIGINT, Interrupt.    0xb7fff424 in __kernel_vsyscall ()”的字样，这就是退出了nginx，现在你又回到了 gdb 的终端了，接下来你就可以打个端点，然后测试下了。</p>
+<p>8 到这里基本上算是可以调式了，不过具体怎么调式，调式什么，那将由你来决定。</p>
+<p>附</p>
+<p>参考地址1. <span style="font-size: 1.5em;"><a href="http://lenky.info/archives/2011/09/58" target="_blank" rel="external">利用gdb调试nginx</a></span></p>
+<p>参考地址2 <a href="http://www.cnblogs.com/yjf512/archive/2012/05/10/2494635.html" target="_blank" rel="external">nginx模块_使用gdb调试nginx源码</a></p>
+<p>参考地址3 <a href="http://blog.csdn.net/xiajun07061225/article/details/9383883" target="_blank" rel="external">Nginx学习之十四-GDB调试Nginx初试</a></p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-02-28 </div>
+			<div class="article-title"><a href="/2014/02/28/how-to-think-like-a-computer-scientist/" >How to think like a computer scientist(C++)笔记</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<div>1. The way of the program</div><br><div>      1.1 what’s a program language?</div><br><div>            high-level languages and low-level languages.</div><br><div>            2 ways to translate a program: interpreting or compiling.</div><br><div>      1.2 what is a program?</div><br><div>           input</div><br><div>           output</div><br><div>           math</div><br><div>           testing</div><br><div>           repeatition.</div><br><div>      1.3 what is debugging?</div><br><div>           1.3.1 compile-time errors</div><br><div>           1.3.2 run-time errors</div><br><div>           1.3.3 logic errors and semantics</div><br><div>           1.3.4 experimental debugging</div><br><div>      1.4 Formal and natural languages</div><br><div>           Programming languages are formal languages that have been designed to express computations.</div><br><div>           Differences between formal and natural languages:</div><br><div>                    ambiguity</div><br><div>                    redundancy</div><br><div>                    literalness</div><br><div>      1.5 The first program</div><br><div>      1.6 Glossary</div><br><div>2. Variables and types</div><br><div>      2.1 More output</div><br><div>     2.2 Values</div><br><div>     2.3 Variables</div><br><div>     2.4 Assignment</div><br><div>     2.5 Outputting variables</div><br><div>     2.6 Keywords</div><br><div>     2.7 Operators</div><br><div>           A possible alternative in integer division is to calculate a percentage rather than a fraction</div><br><div>      2.8 Order of operations</div><br><div>      2.9 Operators for characters</div><br><div>      2.10 Composition</div><br><div>      2.11 Glossary</div><br><div>3. Function</div><br><div>     3.1 Floating-point</div><br><div>     3.2 Converting from double to int</div><br><div>     3.3 Math functions</div><br><div>     3.4 Composition</div><br><div>     3.5 Adding new functions</div><br><div>          why is it worth the trouble to create all these new functions:</div><br><div>                a. Creating a new function gives you an opportunity to give a name to group of statements.</div><br><div>                b. Creating a new function can make a program smaller by eliminating repetitive code.</div><br><div>    3.6 Definitions and uses</div><br><div>    3.7 Programs with multiple functions</div><br><div>    3.8 Parameters and arguments</div><br><div>    3.9 Parameters and variables are local</div><br><div>    3.10 Functions with multiple parameters</div><br><div>    3.11 Functions with results</div><br><div>            Any time you have a question about what is legal or illegal in C++, a good way to find out is to ask the compiler.</div><br><div>    3.12 Glossary</div><br><div>4. Conditionals and recursion</div><br><div>    4.1 The modulus operator</div><br><div>    4.2 Conditional execution</div><br><div>    4.3 Alternative execution</div><br><div>    4.4 Chained conditionals</div><br><div>    4.5 Nested conditionals</div><br><div>    4.6 The return statement</div><br><div>    4.7 Recursion</div><br><div>    4.8 Infinite recursion</div><br><div>             If a recursion never reaches a base case, it will never terminate. This is known as infinite recursion.</div><br><div>    4.9 Stack diagrams for recursive functions</div><br><div>    4.10 Glossary</div><br><div>5. Fruitful functions</div><br><div>      5.1 Return values</div><br><div>              fruitful functions ==&gt; functions with return value</div><br><div>      5.2 Program development</div><br><div>              incremental development.</div><br><div>              The key aspects of the process are:</div><br><div>                         a. Start with a working program and make small, incremental changes. At any point, if there is an error, you will know exactly where it it.</div><br><div>                         b. Use temporary variables to hold intermediate values so you can output and check them.</div><br><div>                         c. Once the program is working, you might want to remove some of the scaffolding or consolidate multiple statements into compound expressions, but only if it does not make the program difficult to read.</div><br><div>        5.3 Composition</div><br><div>        5.4 Overloading</div><br><div>               Make sure that the version of the program you are looking at is the version of the program that is running!</div><br><div>         5.5 Boolean values</div><br><div>         5.6 Boolean variables</div><br><div>         5.7 Logical operators</div><br><div>         5.8 Bool functions</div><br><div>         5.9 Returning from main</div><br><div>         5.10 More recursion</div><br><div>         5.11 Leap of faith</div><br><div>         5.12 One more example</div><br><div>         5.13 Glossary</div><br><div>6. Iteration</div><br><div>         6.1 Multiple assignment</div><br><div>         6.2 Iteration</div><br><div>         6.3 The while statement</div><br><div>         6.4 Tables</div><br><div>         6.5 Two-dimensional tables</div><br><div>         6.6 Encapsulation and generalization</div><br><div>         6.7 Functions</div><br><div>                    Some of the reasons functions are useful:</div><br><div>                            a. By giving a name to a sequence of statements, you make your program easier to read and debug.</div><br><div>                            b. Dividing a long program into functions allows you to separate parts of the program, debug them in isolation, and then compose them into a whole.</div><br><div>                            c. Functions facilitate both recursion and iteration.</div><br><div>                            d. Well-designed functions are often useful for many programs. Once you write and debug one, you can reuse it.</div><br><div>         6.8 More encapsulation</div><br><div>         6.9 Local variables</div><br><div>         6.10 More generalization</div><br><div>         6.11 Glossary</div><br><div>7. Strings and things</div><br><div>         7.1 Containers for strings</div><br><div>         7.2 strings variables</div><br><div>         7.3 Extracting characters from a string</div><br><div>         7.4 Length</div><br><div>         7.5 Traversal</div><br><div>         7.6 A run-time error</div><br><div>          7.7 The find function</div><br><div>          7.8 Our own version of find</div><br><div>          7.9 Looping and counting</div><br><div>          7.10 Increment and decrement operators</div><br><div>          7.11 String concatenation</div><br><div>          7.12 strings are mutable</div><br><div>          7.13 strings are comparable</div><br><div>          7.14 Character classification</div><br><div>          7.15 Other string functions</div><br><div>          7.16 Glossary</div><br><div>8. Structures</div><br><div>          8.1 Compound values</div><br><div>                   structures</div><br><div>                   classes</div><br><div>          8.2 Point objects</div><br><div>          8.3 Accessing instance variables</div><br><div>          8.4 Operations on structures</div><br><div>          8.5 Structures as parameters</div><br><div>          8.6 Call by value</div><br><div>          8.7 Call by reference</div><br><div>          8.8 Rectangles</div><br><div>          8.9 Structures as return types</div><br><div>          8.10 Passing other types by reference</div><br><div>          8.11 Getting user input</div><br><div>          8.12 Glossary</div><br><div>9. More structures</div><br><div>          9.1 Time</div><br><div>          9.2 printTime</div><br><div>                   display the instance variables in a human-readable form.</div><br><div>          9.3 Functions for objects</div><br><div>          9.4 Pure functions</div><br><div>                    Takes objects and/or basic types as arguments but does not modify the objects.</div><br><div>          9.5 const parameters</div><br><div>          9.6 Modifiers</div><br><div>                Takes objects as parameters and modifies some or all of them.</div><br><div>          9.7 Fill-in functions</div><br><div>                One of the parameters is an “empty” object that gets filled in by the function.</div><br><div>          9.8 Which is best?</div><br><div>          9.9 Incremental development versus planning</div><br><div>          9.10 Generalization</div><br><div>          9.11 Algorithms</div><br><div>          9.12 Glossary</div><br><div>10. Vectors</div><br><div>          10.1 Accessing elements</div><br><div>          10.2 Copying vectors</div><br><div>          10.3 for loops</div><br><div>          10.4 Vector size</div><br><div>          10.5 Vector functions</div><br><div>          10.6 Random numbers</div><br><div>          10.7 Statistics</div><br><div>          10.8 Vector of random numbers</div><br><div>          10.9 Counting</div><br><div>          10.10 Checking the other values</div><br><div>          10.11 A histogram</div><br><div>          10.12 A single-pass solution</div><br><div>          10.13 Random seeds</div><br><div>          10.14 Glossary</div><br><div>11. Member functions</div><br><div>          11.1 Objects and functions</div><br><div>                  Member functions differ from the other functions we have written in two ways:</div><br><div>                         a. When we call the function, we invoke it on an object, rather than just call it.</div><br><div>                         b. The function is declared inside the struct or class definition, in order to make the relationship between the structure and the function explicit.</div><br><div>          11.2 print</div><br><div>          11.3 Implicit variable access</div><br><div>          11.4 Another example</div><br><div>          11.5 Yet another example</div><br><div>          11.6 A more complicated example</div><br><div>          11.7 Constructors</div><br><div>          11.8 Initialize or construct?</div><br><div>          11.9 One last example</div><br><div>          11.10 Header files</div><br><div>          11.11 Glossary</div><br><div>12. Vectors of Objects</div><br><div>          12.1 Composition</div><br><div>          12.2 Card objects</div><br><div>          12.3 The printCard function</div><br><div>          12.4 The equals function</div><br><div>          12.5 The isGreater function</div><br><div>          12.6 Vectors of cards</div><br><div>          12.7 The printDeck function</div><br><div>          12.8 Searching</div><br><div>          12.9 Bisection search</div><br><div>          12.10 Decks and subdecks</div><br><div>          12.11 Glossary</div><br><div>13. Objects of Vectors</div><br><div>         13.1 Enumerated types</div><br><div>         13.2 switch statement</div><br><div>         13.3 Decks</div><br><div>         13.4 Another constructor</div><br><div>         13.5 Deck member functions</div><br><div>         13.6 Shuffling</div><br><div>                 perfect shuffle</div><br><div>         13.7 Sorting</div><br><div>         13.8 Subdecks</div><br><div>         13.9 Shuffling and dealing</div><br><div>         13.10 Mergesort</div><br><div>         13.11 Glossary</div><br><div>14. Classes and invariants</div><br><div>         14.1 Private data and classes</div><br><div>         14.2 What is a class?</div><br><div>         14.3 Complex numbers</div><br><div>         14.4 Accessor functions</div><br><div>         14.5 Output</div><br><div>         14.6 A function on Complex numbers: add</div><br><div>         14.7 Another function on Complex numbers: mul</div><br><div>         14.8 Invariants</div><br><div>         14.9 Preconditions</div><br><div>         14.10 Private functions</div><br><div>         14.11 Glossary</div><br><div>15. File Input/Output and apmatrixes</div><br><div>          15.1 Streams</div><br><div>          15.2 File input</div><br><div>          15.3 File output</div><br><div>          15.4 Parsing input</div><br><div>          15.5 Parsing numbers</div><br><div>          15.6 The Set data structure</div><br><div>                  Ordering</div><br><div>                  Uniqueness</div><br><div>                  Arbitrary size</div><br><div>          15.7 apmatrix</div><br><div>          15.8 A distance matrix</div><br><div>          15.9 A proper distance matrix</div><br><div>          15.10 Glossary</div><br><div></div>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-03-07 </div>
+			<div class="article-title"><a href="/2013/03/07/matlab-2012-libsvm/" >Matlab 2012下安装libsvm</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>由于需要使用svm，自己又不是很熟，然后就用到了libsvm，libsvm是网上别人写好的一个库。</p>
+<p>首先从<a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/#download" target="_blank" rel="external">libsvm官网</a>下载最新版本，现在是3.16，然后解压到某个路径，比如d:\libsvm-3.16,然后把d:\libsvm-3.16\matlab添加到matlab的路径中，具体操作如下<br>在matlab中依次打开File -&gt; Set path -&gt; Add Fold,然后添加就行了，接下来就是编译了，步骤如下<br>在matlab命令窗口输入mex -setup其中mex和后面的中间有一个空格，然后选择一个自己系统上安装好的c++编译器，一般选择visual studio是最方便的。然后再把当前目录改到d:\lbsvm-3.16\matlab,然后输入命令make，如果没有出现错误就算安装好了，然后可以用自带的样例做测试。<br>进入到d:\libsvm-3.16，然后用如下命令进行测试<br>[heart_scale_label,heart_scale_inst]=libsvmread(‘heart_scale’);<br>model = svmtrain(heart_scale_label,heart_scale_inst, ‘-c 1 -g 0.07’);<br>[predict_label, accuracy, dec_values] =svmpredict(heart_scale_label, heart_scale_inst, model); % test the trainingdata<br>如果出现一行Accuracy = 86.6667% (234/270) (classification)就说明成功了。就可以在matlab中使用svm了。<br>参考文献<br>[1] <a href="http://blog.csdn.net/lqhbupt/article/details/8596349" target="_blank" rel="external">http://blog.csdn.net/lqhbupt/article/details/8596349</a><br>[2] <a href="http://www.matlabsky.com/thread-11925-1-1.html" target="_blank" rel="external">http://www.matlabsky.com/thread-11925-1-1.html</a></p>
+<p>要是出现错误的话，有可能是你添加路径的时候没有添加正确，或者工作路径不对，也就是Matlab上面的Current path。</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-10-23 </div>
+			<div class="article-title"><a href="/2012/10/23/structure-and-interpretation-of-computer-programs-1-3/" >Structure and Interpretation of Computer Programs 1.3</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>看了这么久，终于把这本书的第一章看完了，估计第三节看的时间比前两节加起来还长了。不过第三节确实讲了很多东西。这一节主要讲的就是抽象，抽象，抽象，再抽象。。。最后你也变得抽象了。</p>
+<p>1.3.1讲了把procedure作为参数传个另外的procedure[在scheme里面procedure的参数可以使任何你想传的东西，返回值也是任何你想返回的东西]。主要是把类似功能的procedure写成一个模板，然后参数是procedure，这样多个功能的procedure都可以用这个procedure来实现了。简单地说就是一个procedure计算a+b，另外一个procedure计算a*b，第三个procedure计算a-b。那么我们就可以写一个procedure，参数是运算符和相应的两个参数，这样就可以省去了很多重复的操作。</p>
+<p>1.3.2主要介绍了lambda和let。为了后面做准备，lambda就是匿名procedure，define也会用到它。let是作为局部变量用的。</p>
+<p>1.3.3这一小节也是说抽象，主要是用匿名表达式来写代码和let来表示局部变量。这一节里面说到了求一个函数的零点和一个函数的不动点。求f(x)零点的时候就是假设f(a)&gt;0 f(b)&lt;0那么在[a,b]中间至少存在一个零点，可以通过不停的二分来找到这个零点(当然f(x)是连续的，所以不能找到一个很准确的值，只能找一个误差比较小的)。求不动点的时候，就是首先猜测一个值，然后不停的计算当前值的函数值，知道函数值和自变量的差很小为止(关于这个比较的时候，如果自变量很小或者很大都不能直接用(x-f(x))来比较这样是很可能造成死循环，可以用比值来代替简单的减法)，还有就是有些函数，如果你直接用f(x)去替换x的话，也会造成死循环，这样你可以用average(x,f(x))来代替x，当然有些函数你一次average还不行，就必须用到多次average，这个在习题里面有体现。</p>
+<p>1.3.4这一小节看上去很厉害的样子，看了我好久啊，现在我都变得抽象了，有木有啊！！！</p>
+<p>这一节中主要讲的知识是procedure作为procedure的返回值，这个就比较有意思了，这样我们又可以把procedure再一次抽象化 了。这样我们也可以把procedure更加的分离开来，这样所有的procedure之间的耦合度就再次降低了有木有啊。把一个procedure作为返回值的话，需要用到lambda这一匿名过程表达式。比如下面这个</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">average-damp</span> <span style="color: #d8bfd8;">f</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">x</span>) (<span style="color: #ffffff;">average</span> <span style="color: #d8bfd8;">x</span> (<span style="color: #ffffff;">f</span> <span style="color: #d8bfd8;">x</span>))))</div><br>这个procedure的返回值是一个procedure，返回的这个procedure的返回值是average( x,f(x)),这样如果我们需要计算不同函数的average的话，那么我们只需要把相应的procedure作为参数传进去就行了</p>
+<p>然后这一小节讲了Newton’s method，具体看<a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-12.html#%_sec_1.3.4" target="_blank" rel="external">这个链接吧</a>。可以通过不动点就零点，同样可以反过来求，里面用到微分，微分的具体区间得自己取。然后最后面又讲了一种抽象(我表示现在看到神马都是抽象啊！！！)，把average和f函数分开传个相应的procedure。具体见下面这个procedure:</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">fixed-point-of-transform</span> <span style="color: #d8bfd8;">g</span> <span style="color: #d8bfd8;">transform</span> <span style="color: #d8bfd8;">guess</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #ffffff;">fixed-point</span> (<span style="color: #ffffff;">transform</span> <span style="color: #d8bfd8;">g</span>) <span style="color: #d8bfd8;">guess</span>))</div><br>这里(transform g)就是fixed-point中的转移函数，我们这里又可以定义不同的转移方式。scheme最后表示反正你想怎么搞，它都能实现出来，无论你长得多抽象，它都不嫌弃了！！！</p>
+<p>下面是习题的相关分析和解答：</p>
+<p>1.29 计算<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-29.gif" alt="">，其中<em>h</em> = (<em>b</em> - <em>a</em>)/<em>n，<em>y</em><sub><em>k</em></sub> = <em>f</em>(<em>a</em> + <em>k__h</em>)，</em>a和b是这个区间，这个用1.3.1里面的sum函数可以很好的求出结果，分成4块，第一项，最后一项，剩下的按奇数偶数分开就成</p>
+<p>1.30 把1.3.1节中的sum写成iterative的，这个比较简单，都写了好多次了</p>
+<p>1.31要求仿照sum写product的procedure。然后要求计算<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-30.gif" alt="">，product的procedure完全可以照着sum的procedure写就行了。后面的也好写。接着你需要把你当product的procedure改成iterative的(如果你一开始的是recursive的)，反之亦反。</p>
+<p>1.32再次抽象sum和product的procedure，写一个更加抽象的procedure，形如(accumulate combiner null-value term a next b)，其中accumulate是名字，combiner是组合器，null-value是最末尾的值(递归的终止条件下的值) 剩下的和sum中的几个意思一样。这里也可以仿照sum来写，不过把相应的改成抽象就行了。</p>
+<p>1.33把上一题中的procedure再加一个参数，即filter。表示从a到b中满足filter条件的才计算。这个只需要在上面一题的procedure中判断下是否满足条件即可。然后写filter的时候自己仔细写</p>
+<p>1.34给一个procedure：</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">f</span> <span style="color: #d8bfd8;">g</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #ffffff;">g</span> <span style="color: #add8e6;">2</span>))</div><br>然后你求(f f)的值，给出说明。首先结果是会出错。然后说明：(f f)–&gt;(f 2)-&gt;(2 2)然后就出错了。</p>
+<p>1.35用1.3小节中的fixed-point procedure来计算黄金分割率。这个只要写出相应的变换函数就行了，如下</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">y</span>) (<span style="color: #b0c4de; font-weight: bold;">+ </span><span style="color: #add8e6;">1</span> (<span style="color: #b0c4de; font-weight: bold;">/ </span><span style="color: #add8e6;">1</span> <span style="color: #d8bfd8;">y</span>)))</div><br>1.36首先修改fixed-point，从而可以打印出所有的guess数，这个好办，直接display就行了。另外写一个procedure，计算x^x=N,其中N是给定的数，求x，这个也即是求x-&gt;log_x{N}的的一个不动点。函数关系出来之后，procedure就好写了，对于log_x{N}可以用log_e{N}/log_e{x}，刚好scheme里面的log就是log_e的。</p>
+<p>1.37给出连分数的形式，然后写一个procedure来计算k层连分数的值，而且所有的分子分母不一定是一样的，然后接着改成iterative的(如果一开始是recurrence的)，反之亦然。我的代码如下：</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">cont-frac</span> n <span style="color: #d8bfd8;">d</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">02 </span>  (<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">frac</span> <span style="color: #d8bfd8;">i</span>)<br><span style="color: #da70d6;">03 </span>    (<span style="color: #b0c4de; font-weight: bold;">if </span>(<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">i</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">04 </span>        (<span style="color: #b0c4de; font-weight: bold;">/ </span>(n <span style="color: #d8bfd8;">i</span>) (<span style="color: #ffffff;">d</span> <span style="color: #d8bfd8;">i</span>))<br><span style="color: #f810b0;">05 </span>        (<span style="color: #b0c4de; font-weight: bold;">/ </span>(n <span style="color: #d8bfd8;">i</span>) (<span style="color: #b0c4de; font-weight: bold;">+ </span>(<span style="color: #ffffff;">d</span> <span style="color: #d8bfd8;">i</span>) (<span style="color: #ffffff;">frac</span> (<span style="color: #b0c4de; font-weight: bold;">+ </span><span style="color: #d8bfd8;">i</span> <span style="color: #add8e6;">1</span>))))<br><span style="color: #da70d6;">06 </span>     )<br><span style="color: #da70d6;">07 </span>   )<br><span style="color: #da70d6;">08 </span>  (<span style="color: #ffffff;">frac</span> <span style="color: #add8e6;">1</span>)<br><span style="color: #da70d6;">09 </span>)<br><span style="color: #f810b0;">10 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">cont-iter</span> n <span style="color: #d8bfd8;">d</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">11 </span>  (<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">iter</span> <span style="color: #d8bfd8;">ret</span> <span style="color: #d8bfd8;">idx</span>)<br><span style="color: #da70d6;">12 </span>    (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">13 </span>        <span style="color: #da70d6;">((= 1 idx)   ret)</span><br><span style="color: #da70d6;">14 </span>        ((<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">idx</span> <span style="color: #add8e6;">0</span>)   <span style="color: #d8bfd8;">ret</span>)<br><span style="color: #f810b0;">15 </span>        (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #ffffff;">iter</span> (<span style="color: #b0c4de; font-weight: bold;">/ </span>(n <span style="color: #d8bfd8;">idx</span>) (<span style="color: #b0c4de; font-weight: bold;">+ </span>(<span style="color: #ffffff;">d</span> <span style="color: #d8bfd8;">idx</span>) <span style="color: #d8bfd8;">ret</span>)) (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">idx</span> <span style="color: #add8e6;">1</span>) ))<br><span style="color: #da70d6;">16 </span>     )<br><span style="color: #da70d6;">17 </span>  )<br><span style="color: #da70d6;">18 </span>  (<span style="color: #ffffff;">iter</span> <span style="color: #add8e6;">0</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">19 </span>)</div><br>1.38用连分数求出e - 2的值，其中e是自然对数的底。题中给出了连分数相应的分子分母值的函数，具体实现还是比较容易的。</p>
+<p>1.39<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-36.gif" alt="">给出这么个东西，然后需要你写一个procedure，而且由用户确定深度，这个就是连分数的变形，不过相应的分子分母通项需要自己求出来而已。</p>
+<p>1.40写一个cubic的procedure，通过用(newtons-method (cubic a b c) 1)来计算x^3+a<em>x^2+b</em>x+c=0的解。这个只需要写那个procedure容易了。就是传入a，b，c返回x^3+a<em>x^2+b</em>x+c就行了</p>
+<p>1.41定义一个叫做double的procedure。传入一个procedure，返回执行这个procedure两次之后的procedure。这个定义还算好写：</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">double</span> <span style="color: #d8bfd8;">f</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">x</span>)<br><span style="color: #da70d6;">3 </span>    (<span style="color: #ffffff;">f</span> (<span style="color: #ffffff;">f</span> <span style="color: #d8bfd8;">x</span>))<br><span style="color: #da70d6;">4 </span>  )<br><span style="color: #f810b0;">5 </span>)</div><br>接下来的就纠结了。求(((double (double double)) inc) 5)的值，其中inc是把一个数加1的procedure。一开始想着是13(=5+8)，可以运行出来结果是21(=5+16)。想不通啊想不通，调试也没找到什么理由，最后在网上找了答案，<a href="http://wiki.drewhess.com/wiki/SICP_exercise_1.41" target="_blank" rel="external">这里</a>写的很详细，自己照着手动执行一次，就会清楚很多东西，而且遇到类似的也再也不怕了。最后还知道了如果把inc放最里面的话，结果是13.<span style="color: #ff0000;">此题强烈建议手动执行</span></p>
+<p>1.42写一个compose的procedure，传入两个procedure，分别是f和g，然后先执行f，再执行g，这个可以仿照double的写法来上一个。</p>
+<p>1.43写一个名叫repeated的procedure，传入一个procedure，和一个数值n，表示把传入的procedure执行n次，最后让你用写出来的repeated的procedure来计算((repeated square 2) 5)，从而验证。</p>
+<p>提示给出了可以用compose，当然也可以用double了。也就是前两个习题的的procedure。不过也可以不用前两个东西:</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">repeated</span> <span style="color: #d8bfd8;">f</span> n)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">repeat</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">3 </span>  (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">4 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">k</span> <span style="color: #add8e6;">1</span>)  <span style="color: #d8bfd8;">f</span>)<br><span style="color: #f810b0;">5 </span>    (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">x</span>) (<span style="color: #ffffff;">f</span> ((<span style="color: #ffffff;">repeat</span> (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">k</span> <span style="color: #add8e6;">1</span>)) <span style="color: #d8bfd8;">x</span>))))   <span style="color: #da70d6;">关键是参数x必须先传到最里面的procedure才可以</span><br><span style="color: #da70d6;">6 </span>   )<br><span style="color: #da70d6;">7 </span>  )<br><span style="color: #da70d6;">8 </span>  (<span style="color: #ffffff;">repeat</span> n)<br><span style="color: #da70d6;">9 </span>)</div><br>关于log_2{N}的写法就是不等于1的时候，可以利用double来进行加速，类似快速幂的方法。</p>
+<p>1.44写一个smooth的procedure，参数是一个叫做f的procedure，然后返回(f(x)+f(x-dx)+f(x+dx))/3的一个procedure。然后利用smooth和上一题的repeated来写一个nth-smooth，表示smootn次。写第一个procedure的时候比较简单，一下就出来了，第二个也不难，就写成(repeated smooth n)就变成了nth-smooth了。最后自己再检测下写的是否正确。</p>
+<p>1.45 给出一系列说明，说求sqrt和3次根的时候，average-damp只需要用一次，然后求4次根的时候用2次，让你通过实验得出一个求n次根的抽象procedure。这里首先你必须得知道对于n次根，需要用多少次average-damp。实验4,5,6,7的时候都是2次，但是8的时候是3次，大致可以猜测需要的是floor(log_2{n})次average-damp。算出这个次数之后，程序就变得非常好写了。如下</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">nth-root</span> n <span style="color: #d8bfd8;">x</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #ffffff;">fixed-point</span> ((<span style="color: #ffffff;">repeated</span> <span style="color: #d8bfd8;">average-damp</span> (<span style="color: #b0c4de; font-weight: bold;">floor </span>(<span style="color: #ffffff;">log2</span> n)))<br><span style="color: #da70d6;">3 </span>                (<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">y</span>) (<span style="color: #b0c4de; font-weight: bold;">/ </span><span style="color: #d8bfd8;">x</span> (<span style="color: #ffffff;">pow</span> <span style="color: #d8bfd8;">y</span> (<span style="color: #b0c4de; font-weight: bold;">- </span>n <span style="color: #add8e6;">1</span>)))))<br><span style="color: #da70d6;">4 </span>               <span style="color: #add8e6;">1.0</span>)<br><span style="color: #f810b0;">5 </span>)</div><br>其中log2是一个自定义的procedure，表示以2为底n的对数，pow也是一个自定义的procedure，计算y的(n-1)次。</p>
+<p>1.46因为前面有很多procedure是传入两个procedure，其中一个是good-enough?，因外一个是improve，现在你需要写一个抽象的procedure，传入这两个procedure，然后传回一个procedure，传回的procedure有一个参数guess。这个过程还是比较绕的，不过在做过前面的几个习题之后，会发现这个习题也是可做的。代码如下：</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">iterative-improve</span> <span style="color: #d8bfd8;">g</span> <span style="color: #d8bfd8;">f</span>)<br><span style="color: #da70d6;">02 </span>    (<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">guess</span>)<br><span style="color: #da70d6;">03 </span>        (<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">iter</span> <span style="color: #d8bfd8;">guess</span>)<br><span style="color: #da70d6;">04 </span>            (<span style="color: #b0c4de; font-weight: bold;">let </span>((<span style="color: #ffffff;">next</span> (<span style="color: #ffffff;">f</span> <span style="color: #d8bfd8;">guess</span>)))<br><span style="color: #f810b0;">05 </span>                (<span style="color: #b0c4de; font-weight: bold;">if </span>(<span style="color: #ffffff;">g</span> <span style="color: #d8bfd8;">guess</span> <span style="color: #d8bfd8;">next</span>)<br><span style="color: #da70d6;">06 </span>                    <span style="color: #d8bfd8;">next</span><br><span style="color: #da70d6;">07 </span>                    (<span style="color: #ffffff;">iter</span> <span style="color: #d8bfd8;">next</span>))))<br><span style="color: #da70d6;">08 </span>        (<span style="color: #ffffff;">iter</span> <span style="color: #d8bfd8;">guess</span>)<br><span style="color: #da70d6;">09 </span>    )<br><span style="color: #f810b0;">10 </span>)</div><br>这个procedure，看起来很简单,但是写起来不那么简单，不过题目已经给你打好框架了，你只需要填写lambda里面的东西。写了前面的一些题，会发现，差不多都是这样，里面调用一个procedure，然后多次调用这个里面的procedure就完事了。</p>
+<p>终于把第一章看完了，继续加油。好好学习，天天向上。</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-10-17 </div>
+			<div class="article-title"><a href="/2012/10/17/structure-and-interpretation-of-computer-programs-1-2/" >Structure and Interpretation of Computer Programs 1.2</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>1.2 <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#%_sec_1.2.6" target="_blank" rel="external"> Procedures and the Processes They Generate</a></p>
+<p>一开始用阶乘讲解了Linear Recursion和Iteration，Linear Recursion实现阶乘的时候如下所示:<br>(factorial 6)<br>(<em> 6 (factorial 5))<br>(</em> 6 (<em> 5 (factorial 4)))<br>(</em> 6 (<em> 5 (</em> 4 (factorial 3))))<br>(<em> 6 (</em> 5 (<em> 4 (</em> 3 (factorial 2)))))<br>(<em> 6 (</em> 5 (<em> 4 (</em> 3 (<em> 2 (factoral 1))))))<br>(</em> 6 (<em> 5 (</em> 4 (<em> 3 (</em> 2 1)))))<br>(<em> 6 (</em> 5 (<em> 4 (</em> 3 2))))<br>(<em> 6 (</em> 5 (<em> 4 6)))<br>(</em> 6 (<em> 5 24))<br>(</em> 6 120)<br>720<br>但是Iteration的方式是下面这样的<br>(factorial 6)<br>(fact-iter 1 1 6)<br>(fact-iter 1 2 6)<br>(fact-iter 2 3 6)<br>(fact-iter 6 4 6)<br>(fact-iter 24 5 6)<br>(fact-iter 120 6 6)<br>(fact-iter 720 7 6)<br>720<br>这里可以看出后面一种基本不要什么多余的空间消耗，但是第一种是要消耗多余的空间的，第二种貌似就是尾递归。</p>
+<p>1.2.2讲述了树递归，用的是fibonacci数列的例子。首先给出一张图，直观的看到算fib[5]的时候需要算哪些值，而且很多都重复的算了很多次。然后给出fibonacci数列的每一项都近似于Φ^n/sqrt(5).其中<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-14.gif" alt="">，然后还把fibonacci数列的求值改了方式，变成了O(n)的。</p>
+<p>接下来讲了一个分钱的例子。给你100块，然后你手上有50,25,10,5,1块的足够多，问你用这些面值的钱可以由多少种方式来换这100块。这个你可以选中1中钱币，然后看是否需要，如果需要，就看到底要多少个，不用的话，就只剩下其他的其中钱币了。这样就可以解决这个问题</p>
+<p>1.2.3大致讲了函数的增长趋势，也就是传说中是算法复杂度。这个讲的比较简略，具体参看算法书籍</p>
+<p>1.2.4讲了快速幂的想法，就是通过二进制一直求，这样得到复杂度是log_2(n)的其中n是指数。</p>
+<p>1.25 求最大公约数，用欧几里得算法</p>
+<p>1.26 找一个数的最小因子，费马小定理判定一个数是否是素数<br>习题如下:</p>
+<p>1.9 给出a+b的两种不同实现，然后让你写具体的执行步骤，这个一步一步写就行了，最后你得到的第一种就Linear Recursion，第二种是Iteration。</p>
+<p>1.10 给出Ackermann’s function的procedure，然后让你算几个Ackermann 值，当然你可以直接执行就可以了，也可以自己手动算，然后又几个定义：<br>(define (f n) (A 0 n))                (1)<br>(define (g n) (A 1 n))               (2)<br>(define (h n) (A 2 n))              (3)<br>(define (k n) (<em> 5 n n))           (4)   其中procedure A就是Ackermann’s function<br>这里你可以看到(1)==&gt;2n    (2)===&gt;2^n           (3)===&gt;2^2^….^2(n次)             (4)===&gt;5</em>n^2</p>
+<p>1.11给一个函数定义<em>f</em>(<em>n</em>) = <em>n</em> if <em>n</em>&lt;3 and <em>f</em>(<em>n</em>) = <em>f</em>(<em>n</em> - 1) + 2<em>f</em>(<em>n</em> - 2) + 3<em>f</em>(<em>n</em> - 3)让你写一个procedure，这个可以仿照fibonacci就行</p>
+<p>1.12写一个求<em>Pascal’s triangle </em>的第i行第j列的procedure。只要照着C[n,m]=C[n-1,m-1]+C[n-1,m]就行了，另外注意下边界</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span><span style="color: #da70d6;">Exercise 1.12</span><br><span style="color: #da70d6;">02 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">pascal</span> <span style="color: #d8bfd8;">r</span> <span style="color: #d8bfd8;">c</span>)<br><span style="color: #da70d6;">03 </span>  (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">04 </span>    ((<span style="color: #b0c4de; font-weight: bold;">&gt; </span><span style="color: #d8bfd8;">c</span> <span style="color: #d8bfd8;">r</span>) <span style="color: #add8e6;">0</span>)<br><span style="color: #f810b0;">05 </span>    ((<span style="color: #b0c4de; font-weight: bold;">&lt; </span><span style="color: #d8bfd8;">c</span> <span style="color: #add8e6;">0</span>) <span style="color: #add8e6;">0</span>)<br><span style="color: #da70d6;">06 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">c</span> <span style="color: #add8e6;">1</span>) <span style="color: #add8e6;">1</span>)<br><span style="color: #da70d6;">07 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">r</span> <span style="color: #d8bfd8;">c</span>) <span style="color: #add8e6;">1</span>)<br><span style="color: #da70d6;">08 </span>    (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #b0c4de; font-weight: bold;">+ </span>(<span style="color: #ffffff;">pascal</span> (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">r</span> <span style="color: #add8e6;">1</span>) <span style="color: #d8bfd8;">c</span>) (<span style="color: #ffffff;">pascal</span> (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">r</span> <span style="color: #add8e6;">1</span>) (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">c</span> <span style="color: #add8e6;">1</span>))))<br><span style="color: #da70d6;">09 </span>    <span style="color: #da70d6;">pascal[r,c] = pascal[r-1,c]+pascal[r-1,c-1]</span><br><span style="color: #f810b0;">10 </span>  )<br><span style="color: #da70d6;">11 </span>)</div><br>1.13 证明<em>F<strong>i</strong>b</em>(<em>n</em>) = (<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-11.gif" alt=""><sup><em>n</em></sup> - <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-12.gif" alt=""><sup><em>n</em></sup>)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5 其中<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-11.gif" alt=""> = (1 + <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/2   <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-12.gif" alt=""> = (1 - <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/2，我们可以计算F[0],F[1],F[2]得到F[0],F[1],F[2]满足条件，然后假设对于所有的k<n都满足上面的式子，由_f__i__b_(_n_) =="" (![](http:="" mitpress.mit.edu="" sicp="" full-text="" book="" book-z-g-d-11.gif)<sup=""><em>n</em> - <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-12.gif" alt=""><sup><em>n</em></sup>)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5可以知道F[i]可以表示成(A+B*<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5 对所有的i都成立，那么我们可以假设F[n-2]=(A+B<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5(其中A,B是常数)，那么我们可以得到F[n-1]=((A+5B)+(A+B)<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/2.再根据F[n]=F[n-1]+F[n-2]可以得到F[n]，和用(<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-11.gif" alt=""><sup><em>n</em></sup> - <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-12.gif" alt=""><sup><em>n</em></sup>)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5计算得到的一样，这样就得证了。也可以看<a href="http://community.schemewiki.org/?sicp-ex-1.13" target="_blank" rel="external">这里</a>和<a href="http://sicp.org.ua/sicp/Exercise1-13" target="_blank" rel="external">这里</a></n都满足上面的式子，由_f__i__b_(_n_)></p>
+<p>1.14要你写出11个cents分解成其他钱币值的具体过程，这个可以看<a href="http://telegraphics.com.au/~toby/sicp/ex1-14.svg" target="_blank" rel="external">这个链接</a>，画的很好</p>
+<p>1.15给出<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-19.gif" alt="">，和相应的procedure，然后让你求sin x的值。问你求sin 12.15的时候，具体的步骤如何，这个一步步慢慢做就行了。另外让你求这个函数的复杂度，可以分析得到是log_3(n)的，可以类似二分那样分析，二分的时候，除以2，所以得到log_2(n)，这里除以3，所以是log_3(n)</p>
+<p>1.16用successive squaring求a^b而且要求复杂度是log级别的。</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">get-expt</span> b n)                     <span style="color: #da70d6;">求最后结果</span><br><span style="color: #da70d6;">02 </span>  (<span style="color: #ffffff;">my-expt</span> <span style="color: #add8e6;">1</span> b n)<br><span style="color: #da70d6;">03 </span> )<br><span style="color: #da70d6;">04 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">my-expt</span> <span style="color: #d8bfd8;">a</span> b n)                   <span style="color: #da70d6;">求b^n 结果保存在a中</span><br><span style="color: #f810b0;">05 </span>  (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">06 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>n <span style="color: #add8e6;">0</span>) <span style="color: #d8bfd8;">a</span>)<br><span style="color: #da70d6;">07 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>n <span style="color: #add8e6;">1</span>) (<span style="color: #ffffff;">my-expt</span> (<span style="color: #b0c4de; font-weight: bold;"><em> </em></span><span style="color: #d8bfd8;">a</span> b) b (<span style="color: #b0c4de; font-weight: bold;">- </span>n <span style="color: #add8e6;">1</span>) ) )<br><span style="color: #da70d6;">08 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>n <span style="color: #add8e6;">2</span>) (<span style="color: #ffffff;">my-expt</span> (<span style="color: #b0c4de; font-weight: bold;"> </span><span style="color: #d8bfd8;">a</span> b b) b (<span style="color: #b0c4de; font-weight: bold;">- </span>n <span style="color: #add8e6;">2</span>))  )<br><span style="color: #da70d6;">09 </span>    ((<span style="color: #b0c4de; font-weight: bold;">even? </span>n) (<span style="color: #ffffff;">my-expt</span> <span style="color: #d8bfd8;">a</span> (<span style="color: #ffffff;">my-expt</span> <span style="color: #add8e6;">1</span> b (<span style="color: #b0c4de; font-weight: bold;">/ </span>n <span style="color: #add8e6;">2</span>)) <span style="color: #add8e6;">2</span>))<br><span style="color: #f810b0;">10 </span>    (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #ffffff;">my-expt</span> (<span style="color: #b0c4de; font-weight: bold;"><em> </em></span><span style="color: #d8bfd8;">a</span> b) b (<span style="color: #b0c4de; font-weight: bold;">- </span>n <span style="color: #add8e6;">1</span>)))<br><span style="color: #da70d6;">11 </span>   )<br><span style="color: #da70d6;">12 </span>)<br><span style="color: #da70d6;">13 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #b0c4de; font-weight: bold;">even? </span>n)                         <span style="color: #da70d6;">判断一个数是否是偶数</span><br><span style="color: #da70d6;">14 </span>  (<span style="color: #b0c4de; font-weight: bold;">if </span>(<span style="color: #b0c4de; font-weight: bold;">= </span>(<span style="color: #b0c4de; font-weight: bold;">remainder </span>n <span style="color: #add8e6;">2</span>) <span style="color: #add8e6;">0</span>)<br><span style="color: #f810b0;">15 </span>      <span style="color: #7fffd4;">#t</span><br><span style="color: #da70d6;">16 </span>      <span style="color: #7fffd4;">#f</span><br><span style="color: #da70d6;">17 </span>   )<br><span style="color: #da70d6;">18 </span> )</div><br>1.17 只用+ ，double， halve写一个procedure实现ab，要求步数是log级别的。</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">fast-multiply</span> <span style="color: #d8bfd8;">a</span> b)                     <span style="color: #da70d6;">快速a*b</span><br><span style="color: #da70d6;">02 </span>  (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">03 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>b <span style="color: #add8e6;">1</span>) <span style="color: #d8bfd8;">a</span>)<br><span style="color: #da70d6;">04 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>b <span style="color: #add8e6;">0</span>) <span style="color: #add8e6;">0</span>)<br><span style="color: #f810b0;">05 </span>    ((<span style="color: #b0c4de; font-weight: bold;">even? </span>b) (<span style="color: #ffffff;">fast-multiply</span> (<span style="color: #ffffff;">double</span> <span style="color: #d8bfd8;">a</span>) (<span style="color: #ffffff;">halve</span> b)))<br><span style="color: #da70d6;">06 </span>    (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #b0c4de; font-weight: bold;">+ </span><span style="color: #d8bfd8;">a</span> (<span style="color: #ffffff;">fast-multiply</span> <span style="color: #d8bfd8;">a</span> (<span style="color: #b0c4de; font-weight: bold;">- </span>b <span style="color: #add8e6;">1</span>))))<br><span style="color: #da70d6;">07 </span>  )<br><span style="color: #da70d6;">08 </span>)<br><span style="color: #da70d6;">09 </span><br><span style="color: #f810b0;">10 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">halve</span> n)                                <span style="color: #da70d6;">求一个数的一半</span><br><span style="color: #da70d6;">11 </span>  (<span style="color: #b0c4de; font-weight: bold;">/ </span>n <span style="color: #add8e6;">2</span>)<br><span style="color: #da70d6;">12 </span>)</div><br>1.18让你用1.16和1.17的相关知识，写一个procedure，来实现两个数相乘，也是用log级别的步数，我认为代码和1.17类似</p>
+<p>1.19给出fibonacci数列的一种转移，然后让你推一个公式，这个自己认真推导下就行了，我推出的是p’=(+ (<em> q q) (</em> p q))       q’=(+ (<em> 2 q p) (</em> q q))</p>
+<p>1.20用两种(normal-order 和applicative-order)不同的方式，要得到GCD（206,40）的具体步骤，步数有点多，具体请<a href="http://community.schemewiki.org/?sicp-ex-1.20" target="_blank" rel="external">移步这里</a>，只要知道normal-order和applicative-order的区别就行了，具体的问题分析起来还是比较容易的</p>
+<p>1.21用书中给出的smallest-divisor procedure求出199，1999和19999的最小因子，这个直接求就行</p>
+<p>1.22算procedure运行的时间，这个时间我运行的时候是不稳定的，在DrRacket里面没有runtime这个原语。我用的是time和apply-time。然后分别让你求大于100，1000,10000,100000的最小的3个素数，然后看运行时间。这个时间也不是固定的，每次都会变，而且很多时候都是0。另外，实现的时候，我自己2了好久，(+ cnt 2)是不会改变cnt的值的，一般改变一个变量的值用set!。</p>
+<p>1.23 求最小因子的procedure中，如果2不是n的最小因子，那么所有偶数都不可能是n的因子，因此我们可以略掉所有的偶数。这里就是需要你写这样一个procedure。这里只要把每次的(+ test 1)改变成(next test)而next是一个procedure，如果test==2，那么(next test)返回3，其他的返回test+2，小于2则出错(对于这题来说)。</p>
+<p>1.24测试费马小定理测素数所用的时间。用类似1.22中的方法</p>
+<p>1.25我认为会溢出(以前C/C++中这样会溢出，受数据类型的限制)，不过在scheme中却不会溢出，不过是时间用的比较多一点而已。</p>
+<p>1.26 把1.24中的procedure改了，改成(remainder (* (expmod base (/ exp 2) m)                       (expmod base (/ exp 2) m))    m))，也就是会算两次(expmod base (/ exp 2) m),这样的话复杂度就变成了O(n)的了</p>
+<p>1.27 测试Carmichael数，测试所有的a&lt;n a^n % n是否等于n。对于Carmichael数，费马小定理肯定是可以通过的，这样就Fool了费马小定理的测试。然后可以通过改变素数测试的参数，来得到最后的输出，看是否Fool了费马小定理的测试。可以<a href="http://community.schemewiki.org/?sicp-ex-1.27" target="_blank" rel="external">围观这里</a></p>
+<p>1.28素数检测的<em>Miller-Rabin</em>测试,要求写出相应的procedure。看以google相应的<em>Miller-Rabin </em>知识，然后写出procedure。这个测试可以把Carmichael刷选出来。可以<a href="http://sicp.org.ua/sicp/Exercise1-28" target="_blank" rel="external">到这里围观procedure</a></p>
+<p>表示这一节看了好久，继续加油。好好学习，天天向上。</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-10-16 </div>
+			<div class="article-title"><a href="/2012/10/16/structure-and-interpretation-of-computer-programs-1-1/" >Structure and Interpretation of Computer Programs 1.1</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>这几天没啥事的时候就看看这本书，感觉这书看上去就5章，可是每一章都好多内容，习题也不少，以前还打算每一章写一次习题报告，现在改变想法了，每一节写一下相关知识点习题解答，有些习题解答不怎么好描述，就在网上找了相关的链接放在这里。</p>
+<p>1.1 <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1" target="_blank" rel="external">The Elements of Programming</a></p>
+<p>主要介绍了一些基本东西，然后还介绍了一些scheme的基本语法之类的，分为3个方面讲: 1.<strong>primitive expressions; 2.<strong>means of combination; 3.<strong>means of abstraction. </strong></strong></strong>这个过程中讲解了scheme的一些基本语法，scheme的procedure怎么跑的，怎么写基本的procedure，以保证读者可以用scheme来完成接下来的习题。</p>
+<p>另外讲述了用Newton方法求平方根以及一些优化，Newton方法求平方根就是首先猜测一个值，然后看这个值是否足够好(平方之后是否和这个数相差很小)，然后如果不足够好的话，就用(y+x/y)/2来更新y，其中y是猜测的值，x是我们需要求平方根的值。</p>
+<p>函数/过程再调用的时候应该是一个黑箱操作，也就是我们只需要知道参数是什么，会返回什么，但是我们不需要知道里面的具体实现是什么。相应的，在实现函数/过程的时候，参数的取名就尽量取得有意义些，让调用这个函数/过程的人能够更好的使用它。</p>
+<p>下面是1.1节习题以及简要说明</p>
+<p>1.1 要读者写出每条语句会输出的答案，这个题目看过前面的知识之后，就没问题了，可以看<a href="http://community.schemewiki.org/?sicp-ex-1.1" target="_blank" rel="external">这里</a>对照答案</p>
+<p>1.2 把一个算术表达式转化为前缀表达式，(/ (+ 5 4 (- 2 (- 3 (+ 6 (/ 1 3))))) (* 3 (- 6 2) (- 2 7))), 注意括号</p>
+<p>1.3 定义一个procedure，接受3个参数，然后返回其中2个较大的值的平方和 我的程序:</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span>(define (square-larger x y z)   </span></span></li>
+<li><span>   (</span><span class="keyword">if</span><span> (&gt; x y)   </span></li>
+<li><span>      (</span><span class="keyword">if</span><span> (&gt; z y)   </span></li>
+<li><span>         (+ (square x) (square z))   </span></li>
+<li><span>         (+ (square x) (square y))   </span></li>
+<li><span>      )   </span></li>
+<li><span>      (</span><span class="keyword">if</span><span> (&gt; z x)   </span></li>
+<li><span>         (+ (square y) (square z))   </span></li>
+<li><span>         (+ (square y) (square x))   </span></li>
+<li><span>      )   </span></li>
+<li><span>   )   </span></li>
+<li><span>)  </span><br></li></ol></div><br>可以在<a href="http://community.schemewiki.org/?sicp-ex-1.3" target="_blank" rel="external">这里</a>看到更多种方法来解决这个问题
+
+<p>1.4给出一个procedure，让你解释这个procedure。”如果b &gt; 0 那么返回a+b 否则返回a-b”</p>
+<p>1.5给出一个procedure和调用procedure的语句，然后让你用applicative-order和normal-order分析这个procedure会输出什么，你看过applicative-order和normal-order的知识之后，就基本可以得到了，applicative-order是每次参数是procedure的话，就会调用procedure得到相应的答案，所以这里的话就会出现死循环了，但是normal-order的话就不管这么多了，等到需要这个procedure的返回值的时候，它才会去调用相应的procedure，所以这里就返回0</p>
+<p>1.6给你一个代替if的new-if  procedure，然后让你判断用new-if写出来的Newton方法在scheme下运行会输出什么。这个就用到了1.5中的相关知识了，因为scheme解释器用的是applicative-order，所以会死循环。</p>
+<p>1.7Newton求平方根的时候，怎么判断足够好，请你给出一个足够好的判断函数。这里可以通过判断每次更新的猜测值后更新前的猜测值之间的关系来判断(用y^2-x的差值来判断的话，对于很小的x和很大的x就会出现大误差)，比如更新后的猜测值和更新后的猜测值相差比小于0.01%等，也可以<a href="http://community.schemewiki.org/?sicp-ex-1.7" target="_blank" rel="external">查看这里</a>。</p>
+<p>1.8 给你一个更新函数，让你用Newton方法求一个数的三次方根，这个直接可以通过平方根的程序改编而来，当然判断足够好的函数还是需要自己来斟酌的。</p>
+
+	
+	</div>
+</div>
+
+	  
+      </div>
+	  <div>
+	    <center>
+	    <div class="pagination">
+<ul class="pagination">
+	 
+		
+          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+        
+
+        <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+
+		
+		   <li class="next"> <a href="/categories/计算机基础/page/2/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+        
+	
+</ul>
+</div>
+
+        </center>
+	    </div>	
+      
+
+</div> <!-- col-md-9/col-md-12 -->
+
+
+<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+	<div class="widget">
+		<h4>Categories</h4>
+		<ul class="tag_box inline list-unstyled">
+		
+			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+		
+			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+		
+			<li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+		
+			<li><a href="/categories/Linux/TeX/">TeX<span>1</span></a></li>
+		
+			<li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+		
+			<li><a href="/categories/Uncategorized/">Uncategorized<span>3</span></a></li>
+		
+			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+		
+			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
+		
+			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/成长/">成长<span>3</span></a></li>
+		
+			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+		
+			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
+		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+		</ul>
+	</div>
+
+		
+			
+	<div class="widget">
+		<h4>Tag Cloud</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
+		
+			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
+		
+			<li><a href="/tags/question/">question<span>1</span></a></li>
+		
+			<li><a href="/tags/exercise/">exercise<span>8</span></a></li>
+		
+			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
+		
+			<li><a href="/tags/tencent/">tencent<span>1</span></a></li>
+		
+			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
+		
+			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
+		
+			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
+		
+			<li><a href="/tags/no-recursive/">no-recursive<span>1</span></a></li>
+		
+			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
+		
+			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
+		
+			<li><a href="/tags/kv/">kv<span>1</span></a></li>
+		
+			<li><a href="/tags/notes/">notes<span>0</span></a></li>
+		
+			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
+		
+			<li><a href="/tags/插件/">插件<span>1</span></a></li>
+		
+			<li><a href="/tags/grub/">grub<span>2</span></a></li>
+		
+			<li><a href="/tags/redis/">redis<span>1</span></a></li>
+		
+			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
+		
+			<li><a href="/tags/RecurringTimer/">RecurringTimer<span>1</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>260</span></a></li>
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>Recent Posts</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
+      </li>
+    
+      <li>
+        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>Links</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="https://github.com/wzpan/freemind/" title="Freemind's Github repository." target="_blank"]);">Freemind</a></li>
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/wzpan" title="My Github account." target="_blank"]);">My Github</a></li>
+	
+		<li><i class="fa fa-linkedin"></i><a href="http://www.linkedin.com/in/hahack" title="My Linkin account." target="_blank"]);">My LinkedIn</a></li>
+	
+	</ul>
+</div>
+
+
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

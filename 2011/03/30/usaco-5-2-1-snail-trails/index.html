@@ -1,0 +1,263 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>USACO 5.2.1 Snail Trails | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="中文题目这题主要是看懂题目的意思,一开始没看懂意思,导致错了两次,后来经过再次再再次的读题,才读懂了题目,题意是:首先选一个方向,然后一直走,如果遇到边界或者障碍物就停下来而且转90度,继续走,但是如果在这之间遇到已经走过的一个地点,那么就之间停止了,主要是后面这个直接停止,如果没看懂就悲剧了.一开">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="USACO 5.2.1 Snail Trails"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> USACO 5.2.1 Snail Trails</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><a href="http://www.nocow.cn/index.php/Translate:USACO/snail" target="_blank" rel="external">中文题目</a><br>这题主要是看懂题目的意思,一开始没看懂意思,导致错了两次,后来经过再次再再次的读题,才读懂了题目,题意是:首先选一个方向,然后一直走,如果遇到边界或者障碍物就停下来而且转90度,继续走,但是如果在这之间遇到已经走过的一个地点,那么就之间停止了,主要是后面这个直接停止,如果没看懂就悲剧了.一开始我就是把这看错了.看来还是英语要好好的才行阿.懂了题意之后就直接搜就行了.代码如下:</p>
+<div class="source" style="font-family: amp;quot; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">ID:qcx97811</span><br><span style="color: #da70d6;">LANG:C</span><br><span style="color: #da70d6;">TASK:snail</span><br><span style="color: #da70d6;"> /</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="color: #eeee00;">#include <math.h></math.h></span><br><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">grid</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">128</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">128</span><span style="color: #f5deb3;">];</span><br><span style="color: #98fb98; font-weight: bold;">int</span> N<span style="color: #f5deb3;">,</span>B;<br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">change_i</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">4</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">};</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">change_j</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">4</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">{</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">};</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">work</span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">_i</span><span style="color: #f5deb3;">,</span><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">_j</span><span style="color: #f5deb3;">,</span><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">dis</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">_x</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_y</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">tmp_x</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">tmp_y</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">max</span><br><span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">dis</span><br><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">4</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">_x</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_i</span><br><span style="color: #f5deb3;">_y</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_j</span><br><span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #add8e6;">1</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">_x</span><span style="color: #f5deb3;">+=</span><span style="color: #f5deb3;">change_i</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br><span style="color: #f5deb3;">_y</span><span style="color: #f5deb3;">+=</span><span style="color: #f5deb3;">change_j</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">grid</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">_x</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">_y</span><span style="color: #f5deb3;">])</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">abs</span>(<span style="color: #f5deb3;">_x</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">_i</span>)<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">abs</span>(<span style="color: #f5deb3;">_y</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">_j</span>)<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">tmp_x</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_i</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">change_i</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br><span style="color: #f5deb3;">tmp_y</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_j</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">change_j</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br><span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #f5deb3;">!</span>((<span style="color: #f5deb3;">tmp_x</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">_x</span>) <span style="color: #f5deb3;">&amp;</span> (<span style="color: #f5deb3;">tmp_y</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">_y</span>)))<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">grid</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">tmp_x</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">tmp_y</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">tmp_x</span><span style="color: #f5deb3;">+=</span><span style="color: #f5deb3;">change_i</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br><span style="color: #f5deb3;">tmp_y</span><span style="color: #f5deb3;">+=</span><span style="color: #f5deb3;">change_j</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">work</span>(<span style="color: #f5deb3;">_x</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">change_i</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">_y</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">change_j</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">dis</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">abs</span>(<span style="color: #f5deb3;">_x</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">_i</span>)<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">abs</span>(<span style="color: #f5deb3;">_y</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">j</span>)<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>);<br><span style="color: #f5deb3;">tmp_x</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_i</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">change_i</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br><span style="color: #f5deb3;">tmp_y</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_j</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">change_j</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br><span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #f5deb3;">!</span>((<span style="color: #f5deb3;">tmp_x</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">_x</span>)<span style="color: #f5deb3;">&amp;</span>(<span style="color: #f5deb3;">tmp_y</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">_y</span>)))<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">grid</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">tmp_x</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">tmp_y</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">tmp_x</span><span style="color: #f5deb3;">+=</span><span style="color: #f5deb3;">change_i</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br><span style="color: #f5deb3;">tmp_y</span><span style="color: #f5deb3;">+=</span><span style="color: #f5deb3;">change_j</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">ret</span>)<br><span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">ret</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">break</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">grid</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">_x</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">_y</span><span style="color: #f5deb3;">])</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">tmp_x</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_x</span><br><span style="color: #f5deb3;">tmp_y</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_y</span><br><span style="color: #eeee00;">#if 1</span><br><span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">dis</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">abs</span>(<span style="color: #f5deb3;">_x</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">_i</span>)<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">abs</span>(<span style="color: #f5deb3;">_y</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">_j</span>)<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">max</span>)<br><span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">ret</span><br><span style="color: #eeee00;">#endif</span><br><span style="color: #b0c4de; font-weight: bold;">break</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">max</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span>(<span style="color: #98fb98; font-weight: bold;">void</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“snail.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdin</span>);<br><span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“snail.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdout</span>);<br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">ch</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">row</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">ans</span><br><span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d%<em>c”</em></span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span>B);<br><span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">grid</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">grid</span>));<br><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span>B;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%c”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">ch</span>);<br><span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%c”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">row</span>);<br><span style="color: #f5deb3;">grid</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">row</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">ch</span><span style="color: #f5deb3;">-</span><span style="color: #7fffd4;">‘A’</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span>N<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #f5deb3;">grid</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">grid</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><br><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span>N<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #f5deb3;">grid</span><span style="color: #f5deb3;">[</span>N<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">grid</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span>N<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><br><span style="color: #eeee00;">#if 0</span><br><span style="color: #da70d6;"> for(i=0;i<n;i++)< span=""><br><span style="color: #da70d6;"> {</span><br><span style="color: #da70d6;"> for(j=0;j<n;j++)< span=""><br><span style="color: #da70d6;"> printf(“%d  “,grid[i][j]);</span><br><span style="color: #da70d6;"> printf(“\n”);</span><br><span style="color: #da70d6;"> }</span><br><span style="color: #eeee00;">#endif</span><br><span style="color: #f5deb3;">grid</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">ans</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">work</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span>);<br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">ans</span>);<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></n;j++)<></span></n;i++)<></span></div>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2011/03/30/c-string-point-two-dimension/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2011/03/29/segment-tree-my-templete/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2011-03-30 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

@@ -1,0 +1,271 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>[博弈]HDU_2873 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="传送门VC时死活过不了的一题,原来是我把题目的输入搞错了,这出题的也太搞了,把读入的第一行的第一个当成(1,1)居然也不表示一下,我表示很蛋疼- -||,一般不都是第一行的最后一个表示(n,m)的么?VC时,我说:我保证sg函数没错,然后我保证是这样搞的,然后就没有然后了,就一直死活过不了,后来找了">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="[博弈]HDU_2873"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> [博弈]HDU_2873</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><a href="http://acm.hdu.edu.cn/showproblem.php?pid=2873" target="_blank" rel="external">传送门</a><br>VC时死活过不了的一题,原来是我把题目的输入搞错了,这出题的也太搞了,把读入的第一行的第一个当成(1,1)居然也不表示一下,我表示很蛋疼- -||,一般不都是第一行的最后一个表示(n,m)的么?<br>VC时,我说:我保证sg函数没错,然后我保证是这样搞的,然后就没有然后了,就一直死活过不了,后来找了报告,发现看不懂他的代码,不过思想也是博弈SG函数.然后作死的调啊调.可能是上天可怜我了,给我一组数据,而且我对拍是发现不对,最最重要的是,发现了那个正确的读入和我的不同啊@@@@@@.我想死啊.尼玛就不能说明下啊.<br>下面是说明,对于SG函数,sg[i]=mex{n,i可到n},mex是集合中未出现的最小值(&gt;=0).然后对于对个SG游戏的当前局面就是当前所有点的sg函数的异或,这个Game Theory上有证明,自己去看去.然后就没有然后了,这题就变成水题了.代码:</p>
+<div class="dp-highlighter"><br><br>1.  <span><span>#include <stdio.h>   </stdio.h></span></span><br>2.  <span>#include <string.h>   </string.h></span><br>3.  <span>#include <stdlib.h>   </stdlib.h></span><br>4.  <span>#include <math.h>   </math.h></span><br>5.  <span> </span><span class="keyword">int</span><span> sg[</span><span class="number">56</span><span>][</span><span class="number">56</span><span>];   </span><br>6.  <span class="keyword">int</span><span> n,m;   </span><br>7.  <span class="keyword">void</span><span> init_sg()   </span><br>8.  <span>{   </span><br>9.  <span>    </span><span class="keyword">int</span><span> i,j;   </span><br>10.  <span>    </span><span class="keyword">int</span><span> used[</span><span class="number">51</span><span><em></em></span><span class="number">51</span><span>];   </span><br>11.  <span>    </span><span class="keyword">int</span><span> ii,jj;   </span><br>12.  <span>    </span><span class="keyword">for</span><span>(i=</span><span class="number">1</span><span>i&lt;</span><span class="number">56</span><span>;i++)   </span><br>13.  <span>        {   </span><br>14.  <span>            sg[i][</span><span class="number">1</span><span>]=i-</span><span class="number">1</span><span>   </span><br>15.  <span>            sg[</span><span class="number">1</span><span>][i]=i-</span><span class="number">1</span><span>   </span><br>16.  <span>        }   </span><br>17.  <span>    </span><span class="keyword">for</span><span>(i=</span><span class="number">2</span><span>i&lt;</span><span class="number">51</span><span>;i++)   </span><br>18.  <span>        {   </span><br>19.  <span>            </span><span class="keyword">for</span><span>(j=</span><span class="number">2</span><span>j&lt;</span><span class="number">51</span><span>;j++)   </span><br>20.  <span>                {   </span><br>21.  <span>                    memset(used,</span><span class="number">0</span><span>,sizeof(used));   </span><br>22.  <span>                    </span><span class="keyword">for</span><span>(ii=</span><span class="number">1</span><span>ii<i;ii++) <="" span=""><br>23.  <span>                        {   </span><br>24.  <span>                            </span><span class="keyword">for</span><span>(jj=</span><span class="number">1</span><span>jj<j;jj++) <="" span=""><br>25.  <span>                                {   </span><br>26.  <span>                                    used[sg[ii][j]^sg[i][jj]]=</span><span class="number">1</span><span>   </span><br>27.  <span>                                }   </span><br>28.  <span>                        }   </span><br>29.  <span>                    </span><span class="keyword">for</span><span>(ii=</span><span class="number">0</span><span>ii&lt;</span><span class="number">2501</span><span>;ii++)   </span><br>30.  <span>                        {   </span><br>31.  <span>                            </span><span class="keyword">if</span><span>(</span><span class="number">0</span><span> == used[ii])   </span><br>32.  <span>                                {   </span><br>33.  <span>                                    sg[i][j]=ii;   </span><br>34.  <span>                                    </span><span class="keyword">break</span><span>   </span><br>35.  <span>                                }   </span><br>36.  <span>                        }   </span><br>37.  <span>                }   </span><br>38.  <span>        }   </span><br>39.  <span>    #</span><span class="keyword">if</span><span> </span><span class="number">0</span><span>  </span><br>40.  <span>    printf(</span><span class="string">“:::::::::::::::::::\n”</span><span>);   </span><br>41.  <span>    </span><span class="keyword">for</span><span>(i=</span><span class="number">1</span><span>i&lt;</span><span class="number">6</span><span>;i++)   </span><br>42.  <span>        {   </span><br>43.  <span>            </span><span class="keyword">for</span><span>(j=</span><span class="number">1</span><span>j&lt;</span><span class="number">6</span><span>;j++)   </span><br>44.  <span>                printf(</span><span class="string">“%d “</span><span>,sg[i][j]);   </span><br>45.  <span>            printf(</span><span class="string">“\n”</span><span>);   </span><br>46.  <span>        }   </span><br>47.  <span>    printf(</span><span class="string">“:::::::::::::::::::\n”</span><span>);   </span><br>48.  <span>    #endif   </span><br>49.  <span>}   </span><br>50.  <span class="keyword">void</span><span> work()   </span><br>51.  <span>{   </span><br>52.  <span>    </span><span class="keyword">int</span><span> i,j;   </span><br>53.  <span>    </span><span class="keyword">char</span><span> c;   </span><br>54.  <span>    </span><span class="keyword">int</span><span> ans=</span><span class="number">0</span><span>   </span><br>55.  <span>    </span><span class="keyword">for</span><span>(i=</span><span class="number">1</span><span>i&lt;=n;i++)   </span><br>56.  <span>        {   </span><br>57.  <span>            </span><span class="keyword">for</span><span>(j=</span><span class="number">1</span><span>j&lt;=m;j++)   </span><br>58.  <span>                {   </span><br>59.  <span>                    scanf(</span><span class="string">“%c”</span><span>,c);   </span><br>60.  <span>                    </span><span class="keyword">if</span><span>(‘#’ == c)   </span><br>61.  <span>                        {   </span><br>62.  <span>                            ans ^= sg[i][j];   </span><br>63.  <span>                        }   </span><br>64.  <span>                }   </span><br>65.  <span>            getchar();   </span><br>66.  <span>        }   </span><br>67.  <span>    </span><span class="keyword">if</span><span>(</span><span class="number">0</span><span> == ans)   </span><br>68.  <span>        printf(</span><span class="string">“Jack\n”</span><span>);   </span><br>69.  <span>    </span><span class="keyword">else</span><span>  </span><br>70.  <span>        printf(</span><span class="string">“John\n”</span><span>);   </span><br>71.  <span>    </span><span class="keyword">return</span><span> ;   </span><br>72.  <span>}   </span><br>73.  <span class="keyword">int</span><span> main(</span><span class="keyword">void</span><span>)   </span><br>74.  <span>{   </span><br>75.  <span>    freopen(</span><span class="string">“2873.in”</span><span>,</span><span class="string">“r”</span><span>,stdin);   </span><br>76.  <span>    freopen(</span><span class="string">“2873.out”</span><span>,</span><span class="string">“w”</span><span>,stdout);   </span><br>77.  <span>    init_sg();   </span><br>78.  <span>    </span><span class="keyword">while</span><span>(</span><span class="number">1</span><span>)   </span><br>79.  <span>        {   </span><br>80.  <span>            scanf(</span><span class="string">“%d%d%c”</span><span>,n,&amp;m);   </span><br>81.  <span>            </span><span class="keyword">if</span><span>(</span><span class="number">0</span><span> == n &amp; </span><span class="number">0</span><span>==m)   </span><br>82.  <span>                </span><span class="keyword">break</span><span>   </span><br>83.  <span>            work();   </span><br>84.  <span>        }   </span><br>85.  <span>    </span><span class="keyword">return</span><span> </span><span class="number">0</span><span>   </span><br>86.  <span>}   </span><br></j;jj++)></span></i;ii++)></span></div>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2011/05/18/number-theory-hdu-2879/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2011/05/13/factor-num-hdu-1299/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2011-05-16 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/博弈/">博弈<span>3</span></a></li> <li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

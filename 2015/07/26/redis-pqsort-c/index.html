@@ -1,0 +1,312 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Redis 中快排算法详解(pqsort.c) | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="Redis 中的快排中的思想是一篇叫做“Engineering a Sort Function”里面的思想。做到比标准库里面的快排更快，更稳定，（在自己电脑上做测试的时候，基本一样的时间），按照论文来说主要用到下面的优化：
+
+元素交换的时候更省时间
+在某些情况下使用了冒泡排序，以及插入排序
+选择一个">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Redis 中快排算法详解(pqsort.c)"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Redis 中快排算法详解(pqsort.c)</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><a href="https://github.com/klion26/redis-1.0-annotation/blob/master/pqsort.c" target="_blank" rel="external">Redis 中的快排</a>中的思想是一篇叫做“<a href="http://cs.fit.edu/~pkc/classes/writing/samples/bentley93engineering.pdf" target="_blank" rel="external">Engineering a Sort Function”</a>里面的思想。做到比标准库里面的快排<span style="color: #ff0000;">更快</span>，<span style="color: #ff0000;">更稳定</span>，（在自己电脑上做测试的时候，基本一样的时间），按照论文来说主要用到下面的优化：</p>
+<ol>
+<li>元素交换的时候更省时间</li>
+<li>在某些情况下使用了冒泡排序，以及插入排序</li>
+<li>选择一个接近中位数的数做 pivot<br>下面从上面三个方面入手分析代码</li>
+</ol>
+<p>对于元素交换方面，代码里面的做法首先会查看待排序的数组是否按机器字节对齐，以及每个元素所占的字节长度是否等于机器字节长度，代码如下：</p>
+<p><pre class="lang:c decode:true ">#define SWAPINIT(a, es) swaptype = ((char <em>)a - (char </em>)0) % sizeof(long) || \<br>    es % sizeof(long) ? 2 : es == sizeof(long)? 0 : 1;</pre><br><span style="color: #ff0000;">注意 || 的优先级比 ?: 的优先级要高</span>，不然这里会理解错误的。这里的 swaptype 就是用来确定交换时的类型的，有如下三种可能：</p>
+<ol>
+<li>数组首地址对齐，且数组元素占的字节数和 sizeof(long) 一样的。swaptype == 0</li>
+<li>数组首地址对齐，数组元素占的字节数是 sizeof(long) 的倍数的。swaptype == 1</li>
+<li>数组首地址不对齐；或者首地址对齐，但是数组元素所占的字节数不能整除 sizeof(long) 的。swaptype == 2<br>针对不能的情况，后面交换数据的时候分别有不同的选择。对于第一种和第二种，直接按照 long 类型来交换，其他的则按照 char 类型来交换。<br><pre class="lang:c decode:true">if (swaptype &lt;= 1)<br>swapcode(long, a, b, n)<br>else<br>swapcode(char, a, b, n)</pre><br>对于交换，本方法由于把数据分为了小于 pivot 的，大于 pivot 的和等于 pivot 的。因此还有数组的交换，将所有等于 pivot 的都换到中间。<br><pre class="lang:c decode:true ">#define vecswap(a, b, n) if ((n) &gt; 0) swapfunc((a), (b), (size_t)(n), swaptype)</pre><br>在进行完一次排序之后，数组内部的分布如下所示：</li>
+</ol>
+<p><span style="color: #ff0000;">|</span> pivot <span style="color: #ff0000;">|</span>  等于 pivot 的所有元素A <span style="color: #ff0000;">|</span>  小于 pivot 的所有元素  <span style="color: #ff0000;">|</span>大于 pivot 的所有元素 <span style="color: #ff0000;">|</span> 等于pivot 的所有元素B <span style="color: #ff0000;">|</span></p>
+<p>然后我们需要把小于 pivot 的所有元素换到数组的最左边，把原来数组最右边的等于 pivot 的所有元素B换到数组的中间。变成如下排列</p>
+<p><span style="color: #ff0000;">|</span> 小于 pivot 的所有元素  <span style="color: #ff0000;">|</span>  等于 pivot 的所有元素  <span style="color: #ff0000;">|</span>  大于 pivot 的所有元素 <span style="color: #ff0000;">|</span></p>
+<p>这里就需要用到上面的 vecswap，就是两段数之间的交换。将所有等于 pivot 的元素放到中间，所有小于 pivot 的元素放到左边，所有大于 pivot 的元素放到右边</p>
+<p>2. 利用冒泡和插入排序。</p>
+<p>在本方法中，对于少于7个元素的都利用冒泡排序解决（7 是一个 Magical number），然后对于接近已排好序的数组，利用插入排序，我们知道快速排序对于已排好序的数组进行排序复杂度是很高的，因此在内部采用了插入排序解决这一问题</p>
+<p><pre class="lang:c decode:true ">if (swap_cnt == 0) {  /<em> Switch to insertion sort </em>/<br>        /** {a[0]}  {a[1]…a[k]}  {a[k+1]…a[n-1]}</pre></p>
+<pre><code>     * a[i] &lt; a[0]  for 1&amp;lt;= i &amp;lt; k+1
+     * a[i] &gt; a[0]  for k+1 &lt;= i &amp;lt; n
+     **/
+    for (pm = (char *) a + es; pm &lt; (char *) a + n * es; pm += es)
+        for (pl = pm; pl &gt; (char *) a &amp;amp; cmp(pl - es, pl) &amp;gt; 0; 
+             pl -= es)
+            swap(pl, pl - es);
+    return;
+}&lt;/pre&gt;
+</code></pre><p>这段代码中的 swap_cnt 是记录了在第一次排序过程中是否进行过交换，等于零表示没有进行过交换。</p>
+<p>3. 找一个更合适的 pivot 这一点，本方法利用下面的方法来进行 pivot 的寻找，其中 pm 指向最终我们设定的 pivot</p>
+<p><pre class="lang:c decode:true">    pm = (char <em>) a + (n / 2) </em> es; /<strong> 首先用数组中间的那个元素做 pivot </strong>/<br>    if (n &gt; 7) { /<strong> 如果元素个数大于 7 </strong>/<br>        pl = (char <em>) a;/</em> 首元素 <em>/<br>        pn = (char </em>) a + (n - 1) <em> es; /</em> 末尾元素 <em>/<br>        if (n &gt; 40) { /<strong> 如果大于40个元素（40 也是一个 Magical Number） </strong>/<br>            d = (n / 8) </em> es; /<strong> 利用下面的 9 个数来近似整个数组的中位数 </strong>/<br>            pl = med3(pl, pl + d, pl + 2 <em> d, cmp); /</em> pl 这三个数里面的一个中位数 <em>/<br>            pm = med3(pm - d, pm, pm + d, cmp); /</em> pm 是这三个数的中位数 <em>/<br>            pn = med3(pn - 2 </em> d, pn - d, pn, cmp); /<em> pn 是这三个数的中位数 </em>/<br>        }<br>        pm = med3(pl, pm, pn, cmp); /<em> pm 是 pl pm pn 的中位数，近似整个数组的中位数 </em>/<br>    }</pre><br>这样找到的 pivot 不会偏向很严重，从而在快排的时候，不会导致某一边（大于 pivot 和小于 pivot 两边）的数据量比较大。</p>
+<p>另外在对数组的右半部分进行排序的时候，利用了 goto，而不是递归，这样可以节省栈空间。</p>
+<p>我在 Github 上存放了一份带所有注释的代码，地址如下：<a href="https://github.com/klion26/redis-1.0-annotation/blob/master/pqsort.c" target="_blank" rel="external">https://github.com/klion26/redis-1.0-annotation/blob/master/pqsort.c</a></p>
+<p>参考文章：</p>
+<ol>
+<li><a href="http://cs.fit.edu/~pkc/classes/writing/samples/bentley93engineering.pdf" target="_blank" rel="external">http://cs.fit.edu/~pkc/classes/writing/samples/bentley93engineering.pdf</a></li>
+</ol>
+<p>2. <a href="http://blog.csdn.net/guodongxiaren/article/details/45567291" target="_blank" rel="external">http://blog.csdn.net/guodongxiaren/article/details/45567291</a></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2016/01/20/how-to-read-a-book/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/07/17/experiment-of-storm-grouping/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-07-26 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/pqsort/">pqsort<span>1</span></a></li> <li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li> <li><a href="/tags/redis/">redis<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

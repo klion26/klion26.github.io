@@ -1,0 +1,375 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Scheme &amp; The Little Scheme | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="很早前就想学一门脚本语言来玩玩，看了一段时间的python，可是没有继续好好的学下去，导致现在python基本不会。暑假的时候看到王垠的博客写了一篇文章，推荐了Scheme语言和SICP这本书，上网搜了下后面这本书，发现评论非常好，评价非常高，可以和TAOCP相比了。就打算看看这本神书，顺便做做后面">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Scheme &amp; The Little Scheme"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Scheme &amp; The Little Scheme</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>很早前就想学一门脚本语言来玩玩，看了一段时间的python，可是没有继续好好的学下去，导致现在python基<br>本不会。暑假的时候看到<a href="http://blog.sina.com.cn/yinwang0" target="_blank" rel="external">王垠</a>的博客写了一篇文章，推荐了Scheme语言和SICP这本书，上网搜了下后面这本书，发现评论非常好，评价非常高，可以和TAOCP相比了。就打算看看这本神书，顺便做做后面的习题，网上很多大神已经写过题解，不过都是Scheme语言写的，所以就打算先学学Scheme语言。暑假看了《The Little Scheme》和《teach yourself scheme in fixnum days》的一部分，前面一本书是以Scheme语言为基础，主讲递归的思想(个人觉得讲的非常好，不过后面的章节需要一定的scheme语言基础)<br>后面这本书就是一本介绍scheme的书，比较薄，不过作为入门书还是可以的(用的scheme版本是R5RS)。<br>t-y Scheme里面首先也是讲数据类型 有boolean number string real等。在scheme里面最基本的东西就属<br>括号了，每一个过程都是用括号来表示，所以scheme的程序会有非常多的括号。而且表达式是前缀表达式，形如(+ 3 2)计算3+2的值，字符使用#\后面加上相应的字母来表示的，其他的和C语言差不多，<br>第三章讲述的是过程，类似于C语言中的函数，下面是一个例子</p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<ol>
+<li><span><span>(define area                                          ;定义过程 名字叫做area   </span></span></li>
+<li><span>   (lambda (length breadth)                           ;两个参数 分别是length 和breadth   </span></li>
+<li><span>      (* length breadth)                              ;计算并返回   </span></li>
+<li><span>   )   </span></li>
+<li><span>)   </span></li>
+<li><p><span>(area </span><span class="number">4</span><span> </span><span class="number">6</span><span>)                                            ;用area过程求值 结果为</span><span class="number">24</span><span>=</span><span class="number">4</span><span>*</span><span class="number">6</span><span>  </span><br></p></li></ol></div><br>过程可以用匿名过程，就是没有define那一行，其他地方都一样<br>第四章讲述的是各种判断，if、when等<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define p </span><span class="number">80</span><span>)   </span></span></p>
+</li>
+<li><span>(</span><span class="keyword">if</span><span> (&gt; p </span><span class="number">70</span><span>)   </span></li>
+<li><span>    ‘safe         ;如果p &gt; </span><span class="number">70</span><span>  </span></li>
+<li><span>    ‘unsafe       ;</span><span class="keyword">else</span><span>  </span></li>
+<li><p><span>)  </span><br></p></li></div><br>;unless 貌似是不会循环的 ，我试验的结果是只运行了一次<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(unless (&gt; p </span><span class="number">90</span><span>)   </span></span></p>
+</li>
+<li><span> ; (begin   </span></li>
+<li><span>    (set! p (+ p </span><span class="number">1</span><span>))    ;   </span></li>
+<li><span>    (display p)   </span></li>
+<li><span>  ;  )   </span></li>
+<li><p><span> )  </span><br></p></li></div><br>when和unless类似，另外我们可以用过程来写递归或者循环，这里面的递归貌似都是尾递归的。不过循环还有<br>一种表达方式就是do表达式，语法如下<br>(do ((var1 val1 update1)…)(test res …) exp …)<br>;说明：类似于C语言的for循环。先将val1赋值给var1,…之后循环开始，在每次循环的开始，先执行表达式<br>test,<br>;如果返回布尔值真，则循环终止，并返回结果res，如果表达式test返回#f，则运行表达式exp…，之后依次<br>;用update1…的值来为变量var1…重新赋值<br>例子如下：<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define </span><span class="keyword">do</span><span>-test                                 ;定义过程   </span></span></p>
+</li>
+<li><span>  (lambda (n)                                   ;一个参数 为n   </span></li>
+<li><span>    (</span><span class="keyword">do</span><span> ((sum </span><span class="number">0</span><span> (+ sum i)) (i </span><span class="number">1</span><span> (+ i </span><span class="number">1</span><span>)) )      ;sum 和i都赋初值，然后每次循环分别用 (+ sum i)和   </span>(+ i <span class="number">1</span>)来改变</li>
+<li><span>         ((&gt; i n) sum)                          ;如果i &gt; n则推出循环 返回sum   </span></li>
+<li><span>         (display sum)                          ;如果i &lt;= n 则循环    </span></li>
+<li><span>       )   </span></li>
+<li><span>      )   </span></li>
+<li><p><span>    )  </span><br></p></li></div><br>第五章讲的是变量的作用域，一般定义的是全局变量，在函数里面定义的只能在函数里面用，而且会屏蔽全局<br>同名变量，可以用let和let<em>来确定一个变量的作用域，let里面局部变量赋初值的时候不能用let里面定义的<br>变量，但是let</em>里面定义的局部变量可以用let*前面已经定义的局部变量来赋初值。例子如下<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define x </span><span class="number">20</span><span>)   </span></span></p>
+</li>
+<li><span>(let (   </span></li>
+<li><span>      (x </span><span class="number">2</span><span>)   </span></li>
+<li><span>      (y x)         </span> ;let:a reference to x in the initialization will refer to the global,not the local x</li>
+<li><span>      )   </span></li>
+<li><span>  (+ x y)                         ;结果是</span><span class="number">20</span><span>+</span><span class="number">2</span><span>  </span></li>
+<li><span>  )   </span></li>
+<li><span>(let* (   </span></li>
+<li><span>       (x </span><span class="number">1</span><span>)   </span></li>
+<li><span>       (z </span><span class="number">2</span><span>)   </span></li>
+<li><span>       (y x)   </span></li>
+<li><span>       )   </span></li>
+<li><span>  (+ x y)                         ;结果是</span><span class="number">1</span><span>+</span><span class="number">1</span><span>  </span></li>
+<li><p><span>  )  </span><br></p></li></div><br>第六章里面讲了多个函数相互调用的递归和letrec，letrec和let，let<em>的功能类似，不过let</em>里面的赋初值<br>只能用前面已经出现过的局部变量，但是不能用没有出现过的，letrec却可以用后面才出现的局部变量和局部<br>过程。例子如下：<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(letrec ((local-even? (lambda (n) (</span><span class="keyword">if</span><span> (= n </span><span class="number">0</span><span>) #t (local-odd? (- n </span><span class="number">1</span><span>)))))   </span></span></p>
+</li>
+<li><span>      ;如果用let* 那么上面的local-odd?过程就会是未定义的   </span></li>
+<li><span>         (local-odd? (lambda (n) (</span><span class="keyword">if</span><span> (= n </span><span class="number">0</span><span>) #f (local-even? (- n </span><span class="number">1</span><span>))))))   </span></li>
+<li><p><span>      (list (local-even? </span><span class="number">23</span><span>) (local-odd? </span><span class="number">23</span><span>)))  </span><br></p></li></div><br>这一章还讲了一个用来翻转list的过程，不过由于R6RS中已经不能用set-cdr!了，所以只能用R5RS来实现，过<br>程如下:<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define reverse!   </span></span></p>
+</li>
+<li><span>  (lambda (s)   </span></li>
+<li><span>    (let loop ((s s) (r ‘()))  ;定义s 和r 并赋初值   </span></li>
+<li><span>      (</span><span class="keyword">if</span><span> (</span><span class="keyword">null</span><span>? s) r   </span></li>
+<li><span>          (let ((d (cdr s)))   ;定义d 并赋初值   </span></li>
+<li><span>            (set-cdr! s r)   </span></li>
+<li><span>            (loop d s)   </span></li>
+<li><span>            )   </span></li>
+<li><span>          )   </span></li>
+<li><span>      )   </span></li>
+<li><span>    )   </span></li>
+<li><p><span>  )  </span><br></p></li></div><br>还有for-each 和 map两个东西，例子如下<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(</span><span class="keyword">for</span><span>-each display   </span></span></p>
+</li>
+<li><span>          (list </span><span class="string">“one”</span><span> </span><span class="string">“two”</span><span> </span><span class="string">“buckle my shoe”</span><span>)         ;输出onetwobuckle my shoe   </span></li>
+<li><span> )   </span></li>
+<li><p><span>(display (map cons ‘(</span><span class="number">1</span><span> </span><span class="number">2</span><span> </span><span class="number">3</span><span> </span><span class="number">4</span><span>) ‘(</span><span class="number">10</span><span> </span><span class="number">20</span><span> </span><span class="number">30</span><span> ())))        ;输出((</span><span class="number">1.10</span><span>) (</span><span class="number">2.20</span><span>) (</span><span class="number">3.30</span><span>) (</span><span class="number">4</span><span>));注意这里连接的两部分元素必须一样多  </span><br></p></li></div><br>第七章讲述了文件的基本操作，默认打开的是控制台，可以用open-input-file filename来打开输入文件，<br>open-output-file filename来打开输出文件，最后一定要关闭，不然操作的数据不会对文件进行相应的操作(<br>特指写功能)，可以用call-with-input-file  call-with-output-file来代替，这样的话可以不需要自己关<br>闭文件，处理完当前的任务就会自动关闭相应的文件，如果用open-output-file打开一个已经存在的文件的时<br>候，不加其他参数的话，是会报错的，如果想打开已经存在的文件可以加参数 #:extis ‘update/‘truncate<br>update的话是直接在原文件上从头开始修改，而truncate则是删掉旧文件，重新建一个新文件。例子如下<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define i (open-input-file </span><span class="string">“hello.txt”</span><span>))           ;打开文件   </span></span></p>
+</li>
+<li><span>(read-</span><span class="keyword">char</span><span> i)                                      ;读取一个字符   </span></li>
+<li><span>(define j (read i))                                ;定义j为读取剩下的所有字符的一个字符串   </span></li>
+<li><span>(define o (open-output-file </span><span class="string">“greeting.txt”</span><span> #:exists ‘update))      ;以update方式打开一个文件   </span></li>
+<li><span>(display </span><span class="string">“hello”</span><span> o)                                ;输出hello   </span></li>
+<li><span>(write-</span><span class="keyword">char</span><span> #\space o)                             ;输出空格   </span></li>
+<li><span>(display ‘world o)                                 ;输出world   </span></li>
+<li><span>(newline o)                                        ;输出空行  </span><br></li></div><br>如果greeting.txt文件里面的文字原来是”abcdefthijklmn”的话,那么上述操作会使得文件的内容变成”hello<br>worldlmn”,但是如果用truncate方式打开的话，那么就会变成”hello world”
+
+<p>顺便把The Little Scheme的commandment贴在这</p>
+<p><span style="color: #ff0000;">First</span>: When recurring on a list of atoms, lat, ask two questions about it: (null? lat) and else.<br>When recurring on a number, n, ask two questions about it: (zero? n) and else.<br>When recurring on a list of S-expressions, l, ask three questions about it: (null? l), (atom? (car l)), and else.</p>
+<p><span style="color: #ff0000;">Second</span>: Use cons to build lists.</p>
+<p><span style="color: #ff0000;">Third</span>: When building a list, describe the first typical element, and then cons it onto the natural recursion.</p>
+<p><span style="color: #ff0000;">Fourth</span>: Always change at least one argument while recurring .When recurring on a list of atoms, lat, use(cdr lat). When recurring on a number, n, user (sub1 n). And when recurring on a list of S-expressions, l, use (car l) and (cdr l) if neither (null? l) nor (atom? (car l)) are true.<br>It must be changed to be closer to termination. The changing argument must be tested in the termination condition:<br>when using cdr, test termination with null? and<br>when using sub1, test termination with zero?.</p>
+<p><span style="color: #ff0000;">Fifth</span>: When building a value with + , always use 0 for the value of the terminating line, for adding 0 does not change the value of an addition.<br>When building a value with x[multiply] , always use 1 for the value of the terminating line, for multiplying by 1 does not change the value of a multiplication.<br><span style="color: #ff0000;">Sixth</span>: Simplify only after the function is correct.</p>
+<p><span style="color: #ff0000;">Seventh</span>: Recur on the subparts that are of the smae nature:<br>On the sublists of a list.<br>On the subexpressions of an arithmetic expression.</p>
+<p><span style="color: #ff0000;">Eighth</span>: Use help functions to abstract from representations.</p>
+<p><span style="color: #ff0000;">Ninth</span>:  Abstract common patterns with a new function.</p>
+<p><span style="color: #ff0000;">Tenth</span>:  Build functions to collect more than one value at a time.<br>这书断断续续的看了一段时间，打算现在开始边看t-y-scheme边看SICP，然后把SICP的每一章课后习题都做了<br>，也好督促自己好好学习。</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2012/10/16/structure-and-interpretation-of-computer-programs-1-1/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2012/09/27/concrete-mathematics-chapter-1-homework-exercises/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2012-10-08 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/scheme/">scheme<span>1</span></a></li> <li><a href="/tags/SICP/">SICP<span>4</span></a></li> <li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

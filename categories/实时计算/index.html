@@ -1,0 +1,673 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>实时计算 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+<!-- title -->
+<div class="page-header page-header-inverse ">
+  <h1 class="archive-title-category title title-inverse ">实时计算</h1>
+</div>
+
+<div class="row page">
+  <!-- cols -->
+  
+  <div class="col-md-9">
+	
+
+	  <div id="top_search"></div>
+
+      
+
+      <div class="mypage">
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2017-01-15 </div>
+			<div class="article-title"><a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" >Spark Streaming 往 HDFS 追加 LZO 文件</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将数据从 Kafka 同步到 Hive，并且目标格式希望是 lzo。我们通过 Spark Streaming 做这件事，将文件写成 lzo 格式，并且添加索引。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>要实现将数据从 Kafka 同步到 Hive 的功能，我们通过将数据直接写到 HDFS 路径来解决，由于担心小文件太多的问题（一个 batch 一个文件的话，可能造成小文件太多，对 HDFS 造成非常大的压力），所以我们通过追加的方式写 HDFS 文件。</p>
+<p>往 HDFS 追加写文件的方式，我们在前面一篇文章中描述了具体的方案。但是对于格式为 LZO 的文件，我们发现一个现象：通过 Hive 查询，只能查到第一个 batch 的数据（也就是说所有 append 的数据都不能被查询到）。这是因为 LZO 文件会在关闭的时候在文件末尾添加一个块结束标记符，导致解析的时候只能读取到块结束符之前的数据（Linux 自带的 lzop 文件可以解析包含块结束符的文件）。到这里我们有两个思路：</p>
+<pre><code>1\. 在 Hive 层面进行修改，将 Hive 使用的 InputFormat 重新实现，从而可以解析 multipart 的文件；
+2\. 通过某种方式将文件进行追加，但是文件的中间不会出现结束块的标记符。
+</code></pre><p>由于第一种方式影响较大，实现起来周期较长，所以这里采用第二种方法。</p>
+<p>我们考虑如何做到往 HDFS 写完数据之后，文件流不进行关闭，在我们需要关闭的时候再手动关闭。也就是说同一个 Executor 上的多 batch 公用同一个文件流。</p>
+<p>查看<a href="http://spark.apache.org/docs/latest/streaming-programming-guide.html#design-patterns-for-using-foreachrdd" target="_blank" rel="external">官方文档</a>我们可以得到这是可以实现的，也就是文档中的 ConnectionPool 实现的方式，这可以做到在同一个 Executor 上执行的多个 batch 公用同一个文件流（个人觉得这里也可以从 JVM 的层面来考虑，就是利用了 static 变量的声明周期以及可访问范围）。</p>
+<p>当我们手动关闭某个文件的时候，再考虑将这个文件 move 到特定的地方（Hive 表对应的 HDFS 路径），然后添加索引，大致框架就完成了。当然这也仅仅是一个框架，需要处理的细节问题还有很多。</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2016-12-16 </div>
+			<div class="article-title"><a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" >Spark Streaming Ran out of messages before reaching ending offset 异常</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>Spark Streaming 处理数据过程中遇到 <code>Ran out of messages before reaching ending offset</code> 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）</p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>通过异常栈信息，我们知道异常从 KafkaRDD.scala#211 行抛出，下面是相应代码</p>
+<pre><code>206 override def getNext(): R = {
+      if (iter == null || !iter.hasNext) {
+208        iter = fetchBatch
+      }
+210      if (!iter.hasNext) {
+211        assert(requestOffset == part.untilOffset, errRanOutBeforeEnd(part))
+212        finished = true
+        null.asInstanceOf[R]
+      } else {
+        val item = iter.next()
+        if (item.offset &gt;= part.untilOffset) {
+217          assert(item.offset == part.untilOffset, errOvershotEnd(item.offset, part))
+          finished = true
+          null.asInstanceOf[R]
+        } else {
+          requestOffset = item.nextOffset
+          messageHandler(new MessageAndMetadata(
+            part.topic, part.partition, item.message, item.offset, keyDecoder, valueDecoder))
+        }
+      }
+226    }
+`&lt;/pre&gt;
+通过分析，我们知道这个地方是实际从 Kafka 读取数据的逻辑，首先会调用 `fetchBatch` 函数（208 行），然后进行逻辑判断，数据是否读取完毕，是否发生异常
+
+其中 211 行的异常表示还未读取到 part.untilOffset 但是当前迭代器中没有数据了；217 行表示当前读取的数据如果超过了 part.untilOffset ，那么在这个时候退出当前 batch（offset 从 fromOffset 逐次加一增加的，正常的逻辑肯定会和 part.untilOffset 相等）
+
+我们知道异常从 211 行抛出来的，也知道了异常的最直接原因，那么这个原因是什么造成的呢？
+
+211 行的代码执行了，也就是 210 行的 if 语句未 true，这样的话，207 行的逻辑也应该为 true。这样的话 iter 就是 fetchBatch 返回的迭代器了。接下来我们看看 fetchBatch 的代码
+&lt;pre&gt;`188 private def fetchBatch: Iterator[MessageAndOffset] = {
+189      val req = new FetchRequestBuilder()
+190        .addFetch(part.topic, part.partition, requestOffset, kc.config.fetchMessageMaxBytes)
+        .build()
+192      val resp = consumer.fetch(req)
+      handleFetchErr(resp)
+      // kafka may return a batch that starts before the requested offset
+      resp.messageSet(part.topic, part.partition)
+196       .iterator
+        .dropWhile(_.offset &lt; requestOffset)
+    }
+`&lt;/pre&gt;
+我们发现 192 行会通过 consumer 从 kafka 获取数据，本次从哪获取数据，以及获取多少分别由 190 行的 `topic`, `partition` 和 `kc.config.fetchMessageMaxBytes` 指定。我们查看 `kc.config.fetchMessageMaxBytes`，发现默认使用的是 1M
+&lt;pre&gt;`ConsumerConfig.scala
+29 val FetchSize = 1024 * 1024
+
+114 val fetchMessageMaxBytes = props.getInt(&quot;fetch.message.max.bytes&quot;, FetchSize)
+`&lt;/pre&gt;
+从这里我们知道每次从 kafka 上最多获取 1M 的数据（这也是为什么需要在 `KafkaRDD.getNext` 函数的开头通过 `iter.hasNext()` 来判断是否需要调用 `fetchBatch`
+
+然后看到 fetchBatch 函数对应的 196 行，获取迭代器作为返回值，查看相应代码，跳转到 `ByteBufferMessageSet.scala`
+&lt;pre&gt;`139 override def iterator: Iterator[MessageAndOffset] = internalIterator()
+145 private def internalIterator(isShallow: Boolean = false): Iterator[MessageAndOffset] = {
+    new IteratorTemplate[MessageAndOffset] {
+        ......
+152      def makeNextOuter: MessageAndOffset = {
+        // if there isn&apos;t at least an offset and size, we are done
+        if (topIter.remaining &lt; 12)
+          return allDone()
+        val offset = topIter.getLong()
+        val size = topIter.getInt()
+        if(size &lt; Message.MinHeaderSize)
+          throw new InvalidMessageException(&quot;Message found with corrupt size (&quot; + size + &quot;)&quot;)
+
+ 160       // we have an incomplete message
+ 161       if(topIter.remaining &lt; size)
+ 162         return allDone()
+       ....
+ 185     }
+</code></pre><p>从 161 行我们可以看出，如果读取的消息是一条不完整的，那么本次不处理，默认本次消息读取完成。</p>
+<p>上面所有的链条穿起来就抛出了我们文章开始的异常。</p>
+<ol>
+<li>从 kafka 读取 1M 的数据（默认大小）</li>
+<li>发现读取的数据不完整（这个消息的大小大于 1M），所以本次读取的 迭代器 为空</li>
+<li>发现迭代器为空，但是当前的 offset 和 part.untilOffset 不想等，抛出异常</li>
+</ol>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过设置 kafkaParam 的参数 <code>fetch.message.max.bytes</code> 就行了，我们设置成 2M（大于一条数据的最大值即可），就能够运行成功了</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2016-07-15 </div>
+			<div class="article-title"><a href="/2016/07/15/spark-streaming-saving-offset-in-zookeeper-2/" >Spark Streaming 中使用 zookeeper 保存 offset 并重用（二）</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://www.klion26.com/spark-streaming-save-offset-to-zookeeper.html" target="_blank" rel="external">上一篇文章</a>中，我们讲了如何在将 offset 保存在 zk 中，以及进行重用，但是程序中有个小问题“如果程序停了很长很长一段后再启动，zk 中保存的 offset 已经过期了，那会怎样呢？”本文将解决这个问题</p>
+<p>如果 kafka 上的 offset 已经过期，那么就会报 OffsetOutOfRange 的异常，因为之前保存在 zk 的 offset 已经 topic 中找不到了。所以我们需要在 从 zk 找到 offset 的这种情况下增加一个判断条件，如果 zk 中保存的 offset 小于当前 kafka topic 中最小的 offset，则设置为 kafka topic 中最小的 offset。假设我们上次保存在 zk 中的 offset 值为 123（某一个 partition），然后程序停了一周，现在 kafka topic 的最小 offset 变成了 200，那么用前文的代码，就会得到 OffsetOutOfRange 的异常，因为 123 对应的数据已经找不到了。下面我们给出，如何获取 <topic, parition=""> 的最小 offset，这样我们就可以进行对比了</topic,></p>
+<p><div class="code panel pdl conf-macro output-block" data-hasbody="true" data-macro-name="code"></div></p>
+<p><div class="codeContent panelContent pdl"></div></p>
+<p><div class="syntaxhighlighter sh-confluence nogutter scala"></div></p>
+<p><pre class="lang:scala decode:true ">val partitionOffset = zkClient.readData<a href="s&quot;${topicDirs.consumerOffsetDir}/${i}&quot;">String</a><br>val tp = TopicAndPartition(topic, i)</pre></p>
+<p>val requestMin = OffsetRequest(Map(tp -&gt; PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))<br>val consumerMin = new SimpleConsumer(“broker_host”, 9092, 10000, 10000, “getMinOffset”)  //注意这里的 broker_host，因为这里会导致查询不到，解决方法在下面<br>val curOffsets = consumerMin.getOffsetsBefore(requestMin).partitionErrorAndOffsets(tp).offsets<br>var nextOffset = partitionOffset.toLong<br>if (curOffsets.length &gt; 0 &amp; nextOffset &lt; curOffsets.head) {  // 通过比较从 kafka 上该 partition 的最小 offset 和 zk 上保存的 offset，进行选择<br>  nextOffset = curOffsets.head<br>}<br>fromOffsets += (tp -&gt; nextOffset) //设置正确的 offset，这里将 nextOffset 设置为 0（0 只是一个特殊值），可以观察到 offset 过期的现象<br>但是上面的代码有一定的问题，因为我们从 kafka 上获取 offset 的时候，需要寻找对应的 leader，从 leader 来获取 offset，而不是 broker，不然可能得到的 curOffsets 会是空的（表示获取不到）。下面的代码就是获取不同 partition 的 leader 相关代码</p>
+<p><pre class="lang:scala decode:true">val topic_name = “topic_name”     //topic_name 表示我们希望获取的 topic 名字<br>val topic2 = List(topic_name)<br>val req = new TopicMetadataRequest(topic2, 0)<br>val getLeaderConsumer = new SimpleConsumer(“broker_host”, 9092, 10000, 10000, “OffsetLookup”)  // 第一个参数是 kafka broker 的host，第二个是 port<br>val res = getLeaderConsumer.send(req)<br>val topicMetaOption = res.topicsMetadata.headOption<br>val partitions = topicMetaOption match {<br>  case Some(tm) =&gt;<br>    tm.partitionsMetadata.map(pm =&gt; (pm.partitionId, pm.leader.get.host)).toMap[Int, String]  // 将结果转化为 partition -&gt; leader 的映射关系<br>  case None =&gt;<br>    Map<a href="">Int, String</a><br>}</pre><br>上面的代码能够得到所有 partition 的 leader 地址，然后将 leader 地址替换掉上面第一份代码中的 broker_list 即可。</p>
+<p>到此，在 spark streaming 中将 kafka 的 offset 保存到 zk，并重用的大部分情况都覆盖到了</p>
+<p><br><br><br>&nbsp;</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2016-07-14 </div>
+			<div class="article-title"><a href="/2016/07/14/spark-streaming-save-offset-to-zookeeper/" >Spark Streaming 中使用 zookeeper 保存 offset 并重用</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>在 Spark Streaming 中消费 Kafka 数据的时候，有两种方式分别是 1）基于 Receiver-based 的 createStream 方法和 2）Direct Approach (No Receivers) 方式的 createDirectStream 方法，详细的可以参考 <a href="http://spark.apache.org/docs/latest/streaming-kafka-integration.html" target="_blank" rel="external">Spark Streaming + Kafka Integration Guide</a>，但是第二种使用方式中  kafka 的 offset 是保存在 checkpoint 中的，如果程序重启的话，会丢失一部分数据，可以参考  <a href="http://aseigneurin.github.io/2016/05/07/spark-kafka-achieving-zero-data-loss.html" target="_blank" rel="external">Spark  Kafka - Achieving zero data-loss</a>。</p>
+<p>本文主要讲在使用第二种消费方式（Direct Approach）的情况下，如何将 kafka 中的 offset 保存到 zookeeper 中，以及如何从 zookeeper 中读取已存在的 offset。</p>
+<p>大致思想就是，在初始化 kafka stream 的时候，查看 zookeeper 中是否保存有 offset，有就从该 offset 进行读取，没有就从最新/旧进行读取。在消费 kafka 数据的同时，将每个 partition 的 offset 保存到 zookeeper 中进行备份，具体实现参考下面代码</p>
+<p><pre class="lang:scala decode:true  ">val topic : String = “topic_name”   //消费的 topic 名字<br>    val topics : Set[String] = Set(topic)                    //创建 stream 时使用的 topic 名字集合</pre></p>
+<pre><code>val topicDirs = new ZKGroupTopicDirs(&quot;test_spark_streaming_group&quot;, topic)  //创建一个 ZKGroupTopicDirs 对象，对保存
+val zkTopicPath = s&quot;${topicDirs.consumerOffsetDir}&quot;          获取 zookeeper 中的路径，这里会变成 /consumers/test_spark_streaming_group/offsets/topic_name
+
+val zkClient = new ZkClient(&quot;10.4.232.77:2181&quot;)          //zookeeper 的host 和 ip，创建一个 client
+val children = zkClient.countChildren(s&quot;${topicDirs.consumerOffsetDir}&quot;)     //查询该路径下是否字节点（默认有字节点为我们自己保存不同 partition 时生成的）
+
+var kafkaStream : InputDStream[(String, String)] = null   
+var fromOffsets: Map[TopicAndPartition, Long] = Map()   //如果 zookeeper 中有保存 offset，我们会利用这个 offset 作为 kafkaStream 的起始位置
+
+if (children &gt; 0) {   //如果保存过 offset，这里更好的做法，还应该和  kafka 上最小的 offset 做对比，不然会报 OutOfRange 的错误
+    for (i &lt;- 0 until children) {
+      val partitionOffset = zkClient.readData[String](s&quot;${topicDirs.consumerOffsetDir}/${i}&quot;)
+      val tp = TopicAndPartition(topic, i)
+      fromOffsets += (tp -&gt; partitionOffset.toLong)  //将不同 partition 对应的 offset 增加到 fromOffsets 中
+      logInfo(&quot;@@@@@@ topic[&quot; + topic + &quot;] partition[&quot; + i + &quot;] offset[&quot; + partitionOffset + &quot;] @@@@@@&quot;)
+    }
+
+    val messageHandler = (mmd : MessageAndMetadata[String, String]) =&gt; (mmd.topic, mmd.message())  //这个会将 kafka 的消息进行 transform，最终 kafak 的数据都会变成 (topic_name, message) 这样的 tuple
+    kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParam, fromOffsets, messageHandler)
+}
+else {
+    kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParam, topics) //如果未保存，根据 kafkaParam 的配置使用最新或者最旧的 offset
+}
+
+var offsetRanges = Array[OffsetRange]()
+kafkaStream.transform{ rdd =&gt;
+  offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges //得到该 rdd 对应 kafka 的消息的 offset
+  rdd
+}.map(msg =&gt; msg._2).foreachRDD { rdd =&amp;gt;     
+  for (o &lt;- offsetRanges) {
+    val zkPath = s&quot;${topicDirs.consumerOffsetDir}/${o.partition}&quot;
+    ZkUtils.updatePersistentPath(zkClient, zkPath, o.fromOffset.toString)  //将该 partition 的 offset 保存到 zookeeper
+    logInfo(s&quot;@@@@@@ topic  ${o.topic}  partition ${o.partition}  fromoffset ${o.fromOffset}  untiloffset ${o.untilOffset} #######&quot;)
+  }
+
+  rdd.foreachPartition(
+    message =&gt; {
+      while(message.hasNext) {
+        logInfo(s&quot;@^_^@   [&quot; + message.next() + &quot;] @^_^@&quot;)
+      }
+    }
+  )
+}&lt;/pre&gt;
+</code></pre><p>使用上面的代码，我们可以做到 Spark Streaming 程序从 Kafka 中读取数据是不丢失</p>
+<p>欢迎阅读<a href="http://www.klion26.com/spark-streaming-saving-offset-in-zookeeper-2.html" target="_blank" rel="external">第二篇文章</a>，解决 offset out of range 的问题</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-07-17 </div>
+			<div class="article-title"><a href="/2015/07/17/experiment-of-storm-grouping/" >storm 分组方式实验结果</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p><span style="color: #ff0000;">打算把自己学习实时计算的相关东西写出来，形成一个从零开始学实时计算的系列，由于我也是刚开始接触，系列文中的描述或概念有不当的地方，还请不吝指教。在此谢过。</span></p>
+<p>本文对 storm 的几种分组方式进行测试，加深对每一种分组方式的理解。首先，storm 包含下面七种分组方式：</p>
+<ul>
+<li><strong><span style="color: #0000ff;">Shuffle grouping</span>:</strong> Tuples are randomly distributed across the bolt’s tasks in a way such that each bolt is guaranteed to get an equal number of tuples.</li>
+<li><span style="color: #0000ff;"><strong>Fields grouping</strong></span>: The stream is partitioned by the fields specified in the grouping. For example, if the stream is grouped by the “user-id” field, tuples with the same “user-id” will always go to the same task, but tuples with different “user-id”‘s may go to different tasks.</li>
+<li><span style="color: #000000;"><strong>Partial Key grouping</strong></span>: The stream is partitioned by the fields specified in the grouping, like the Fields grouping, but are load balanced between two downstream bolts, which provides better utilization of resources when the incoming data is skewed. <a href="https://melmeric.files.wordpress.com/2014/11/the-power-of-both-choices-practical-load-balancing-for-distributed-stream-processing-engines.pdf" target="_blank" rel="external">This paper</a> provides a good explanation of how it works and the advantages it provides.</li>
+<li><span style="color: #0000ff;"><strong>All grouping</strong></span>: The stream is replicated across all the bolt’s tasks. Use this grouping with care.</li>
+<li><span style="color: #0000ff;"><strong>Global grouping</strong>:</span> The entire stream goes to a single one of the bolt’s tasks. Specifically, it goes to the task with the lowest id.</li>
+<li><span style="color: #0000ff;"><strong>None grouping</strong>:</span> This grouping specifies that you don’t care how the stream is grouped. Currently, none groupings are equivalent to shuffle groupings. Eventually though, Storm will push down bolts with none groupings to execute in the same thread as the bolt or spout they subscribe from (when possible).</li>
+<li><strong>Direct grouping</strong>: This is a special kind of grouping. A stream grouped this way means that the producer of the tuple decides which task of the consumer will receive this tuple. Direct groupings can only be declared on streams that have been declared as direct streams. Tuples emitted to a direct stream must be emitted using one of the <a href="/javadoc/apidocs/backtype/storm/task/OutputCollector.html#emitDirect(int, int, java.util.List">emitDirect</a> methods. A bolt can get the task ids of its consumers by either using the provided<a href="https://storm.apache.org/javadoc/apidocs/backtype/storm/task/TopologyContext.html" target="_blank" rel="external">TopologyContext</a> or by keeping track of the output of the <code>emit</code> method in <a href="https://storm.apache.org/javadoc/apidocs/backtype/storm/task/OutputCollector.html" target="_blank" rel="external">OutputCollector</a> (which returns the task ids that the tuple was sent to).<br>由于测试环境种没有 Partial Key grouping 方式，Direct grouping 方式使用不同的消息发送方式。这里只对其他五种方式进行了测试。</li>
+</ul>
+<p>测试环境为：</p>
+<ul>
+<li>Spout 一个，循环发送一百个单词，配置了一个线程</li>
+<li><p>Bolt 一个，统计单词数目，配置了两个线程<br>测试结果为（<span style="color: #ff0000;">下面出现的阿拉伯数字为单词重复的次数</span>）：</p>
+</li>
+<li><p>Shuffle 从第<span style="color: #0000ff;">一百零八</span>个统计数据出现 2，后面还会穿插出现 1</p>
+</li>
+<li>Field 从第<span style="color: #0000ff;">一百零一</span>个统计数据出现 2，出现方式为一百个个1，然后一百个个 2，然后一百个3….</li>
+<li>Global 从第<span style="color: #0000ff;">一百零一</span>个统计数据出现2，出现方式与 Field grouping 方式一样</li>
+<li>All 从第<span style="color: #0000ff;">二百零一</span>个统计数据出现2，然后是两百个2，接着是两百个3….</li>
+<li>None 从第<span style="color: #0000ff;">一百</span>个统计数据出现 2，后面会穿插着出现 1，次数随机出现，与 Shuffle grouping 方式一样<br>其中 Shuffle 和 None 都是随机模式，会随机的发送给下一个 Bolt 的任何一个 task。Field 方式会把相同字段的分到同一个 task 上（<span style="color: #ff0000;">不同字段的也可以在相同 task 上</span>），Global 方式效果和 Field 一样，根据官方文档，每次都发送给 id 小的 task，All 会发送给 Bolt 上的所有 task（所有上述例子的循环长度为二百），这种方式会浪费比较多的资源。</li>
+</ul>
+<p>另外根据文档说明，<strong>Partial Key grouping 是在 Field 的基础上进行了压力均衡；Direct 方式需要使用 emitDirect 发送数据。</strong></p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-07-16 </div>
+			<div class="article-title"><a href="/2015/07/16/a-brief-view-of-storm/" >Storm 初探</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<pre><code>   &lt;span style=&quot;color: #ff0000;&quot;&gt;打算把自己学习实时计算的相关东西写出来，形成一个从零开始学实时计算的系列，由于我也是刚开始接触，系列文中的描述或概念有不当的地方，还请不吝指教。在此谢过。&lt;/span&gt;
+
+  [Storm](http://storm.apache.org/) 是一个分布式实时计算框架，由 Twitter 开放并开源。用来处理无边界的流数据，进行实时处理。与 Hadoop 做批处理相对应。因为底层使用 Thrift 来定义和提交 Topology（Storm 中的一种结构），Storm 可以使用任何语言来进行编程。可以用来做实时计算，在线机器学习等等一系列事情。每秒可以每个节点可以处理百万级别的 Tuple（Storm 中的一种结构）。伸缩性好，容错好，并且保证所有数据都会被处理。
+
+首先介绍 Storm 中几个结构的定义，分别是 Tuples, Stream, Spout, Bolt, Topology, Task.
+</code></pre><ul>
+<li>其中 Tuple 是最基本的结构，是传输数据过程中的最小单元，可以当作为一个包装好的结构体</li>
+<li>Stream： 是无边界的 Tuple 组成的数据流，可以理解为 Tuple 的流动</li>
+<li>Spout： 是程序的数据来源，由用户指定，指定之后，所有的数据都从 spout 发出</li>
+<li>Bolt： 数据中转和处理的节点，负责经过数据的中转以及处理</li>
+<li>Topology： 是包括 spout，stream，bolt 的一个完整流程，表示数据从开始到结束的整个过程，每一个 Topology 定义了数据的来源，中间需要怎么转换，以及最后输出到哪</li>
+<li>Task： Spout 或者 Bolt 中实际处理数据的单元，每一个 Spout 或 Bolt 可以包含多个 Task<br>下面的图形象的表示了大部分结构，其中水龙头表示 Spout，写有 Tuple 字样的表示 Tuple，闪电状的结构是 Bolt，多个 Tuple 形成了 Stream，整张图可以看作是一个 Topology。这里没有细分出 Task 结构。</li>
+</ul>
+<p>[caption id=”” align=”aligncenter” width=”640”]<a href="http://storm.apache.org/images/topology.png" target="_blank" rel="external"><img src="http://storm.apache.org/images/topology.png" alt=""></a> storm 基本结构图[/caption]</p>
+<p>由于 Storm 是分布式的实时处理框架，所有需要一个分配任务的节点，在 Storm 中，这个任务由 Nimbus 担任，所有的 Topology 都是提交 Nimbus 中，由 Nimbus 进行任务分配，Nimbus 会在所有的 Supervisor 中查找最合适的（最空闲），然后把任务分发给它，但是 Nimbus 和 Supervisor 不是直接通信，而是由 <a href="http://zookeeper.apache.org/" target="_blank" rel="external">Zookeeper</a> 进行中间传话（Supervisor 可以理解为实际的机器，然后 Bolt 会在每一个 Supervisor 上跑，每一个 Supervisor 上有多个 Bolt存在），为什么不让 Nimbus 和 Supervisor 直接通信呢，因为这样可以减少 Nimbus 的负担，Nimbus 只需要把任务分配写到 Zookeeper 就行了，然后 Supervisor 去 Zookeeper 读，每一个 Supervisor 的状态（空闲等情况）也会写到 Zookeeper 上，由 Nimbus 去读。如果是直接通信的话，那么需要 Nimbus 和 Supervisor 同时有空才可以，这样是不太现实的。（比如 A 需要把黄金交给 B，只能直接给的话，必须 A 和 B 同时有空才行，但是总共由四种情况存在：1. A 有空，B 没空；2 A 有空，B有空；3 A没空，B没空；4A没空，B有空。那么只有情况2才可以进行交易，就可能导致 A 一直跑过去找 B，或者B 一直去找 A 的情况，会大大浪费时间）</p>
+<p>由于每个 Bolt 有多个 Task 存在，那么对于 Tuple 传给哪一个对应的 Task 处理，就需要进行控制了，这里就有 Grouping 的概念了，Grouping 表示在 Topology 中从上一个节点（Spout/Bolt）到下一个节点（Bolt）时怎么进行 Tuple 的传输（传给哪个 Task）Storm 中包含了 7 中 Grouping 的方式｛<span class="s1">Shuffle grouping；Fields grouping；Partial Key grouping；All grouping；Global grouping；None grouping；Direct grouping｝（</span>对于 Fields 方式，只需要相同字段的分到一组就行了，并不需要不同字段的分到不同组）</p>
+<p>基本概念差不多就这些了，我也是刚开始接触，本文内容结合下面几个链接以及自己理解进行书写，如果有错误的地方，还请不吝指教。</p>
+<p>References：</p>
+<p>1. Apache Storm：<a href="http://storm.apache.org/" target="_blank" rel="external">http://storm.apache.org/</a></p>
+<p>2. Storm Concepts：<a href="https://storm.apache.org/documentation/Concepts.html" target="_blank" rel="external">https://storm.apache.org/documentation/Concepts.html</a></p>
+<ol>
+<li><a href="http://xumingming.sinaapp.com/category/storm/" target="_blank" rel="external">http://xumingming.sinaapp.com/category/storm/</a></li>
+</ol>
+
+	
+	</div>
+</div>
+
+	  
+      </div>
+	  <div>
+	    <center>
+	    <div class="pagination">
+<ul class="pagination">
+	 
+</ul>
+</div>
+
+        </center>
+	    </div>	
+      
+
+</div> <!-- col-md-9/col-md-12 -->
+
+
+<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+	<div class="widget">
+		<h4>Categories</h4>
+		<ul class="tag_box inline list-unstyled">
+		
+			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+		
+			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+		
+			<li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+		
+			<li><a href="/categories/Linux/TeX/">TeX<span>1</span></a></li>
+		
+			<li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+		
+			<li><a href="/categories/Uncategorized/">Uncategorized<span>3</span></a></li>
+		
+			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+		
+			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
+		
+			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/成长/">成长<span>3</span></a></li>
+		
+			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+		
+			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
+		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+		</ul>
+	</div>
+
+		
+			
+	<div class="widget">
+		<h4>Tag Cloud</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+		
+			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
+		
+			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+		
+			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
+		
+			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+		
+			<li><a href="/tags/learning/">learning<span>1</span></a></li>
+		
+			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
+		
+			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
+		
+			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+		
+			<li><a href="/tags/proof/">proof<span>1</span></a></li>
+		
+			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
+		
+			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
+		
+			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
+		
+			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
+		
+			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
+		
+			<li><a href="/tags/git/">git<span>4</span></a></li>
+		
+			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+		
+			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
+		
+			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+		
+			<li><a href="/tags/微信/">微信<span>1</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>260</span></a></li>
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>Recent Posts</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
+      </li>
+    
+      <li>
+        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>Links</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="https://github.com/wzpan/freemind/" title="Freemind's Github repository." target="_blank"]);">Freemind</a></li>
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/wzpan" title="My Github account." target="_blank"]);">My Github</a></li>
+	
+		<li><i class="fa fa-linkedin"></i><a href="http://www.linkedin.com/in/hahack" title="My Linkin account." target="_blank"]);">My LinkedIn</a></li>
+	
+	</ul>
+</div>
+
+
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

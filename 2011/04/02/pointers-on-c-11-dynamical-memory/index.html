@@ -1,0 +1,272 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>C和指针11章 动态内存分配 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="1.动态分配和数组的比较:数组方便,简单,但是不灵活会造成很大的浪费,还有就是如果数组开的太小了 没办法容纳后面的数据,这些缺点可以通过动态分配内存来搞定,不过动态分配也有一定的麻烦,易错,而且是那种可能你找好久都不能找出来的错误,因为有指针.2.相关函数:malloc,free,realloc,c">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="C和指针11章 动态内存分配"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> C和指针11章 动态内存分配</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>1.动态分配和数组的比较:数组方便,简单,但是不灵活会造成很大的浪费,还有就是如果数组开的太小了 没办法容纳后面的数据,这些缺点可以通过动态分配内存来搞定,不过动态分配也有一定的麻烦,易错,而且是那种可能你找好久都不能找出来的错误,因为有指针.<br>2.相关函数:malloc,free,realloc,calloc.<br>void <em>malloc(size_t size);//size_t是无符号型<br>void free(void </em>point);<br>void <em>realloc(void </em>ptr,size_t new_size);<br>void <em>calloc(size_t num_element,size_t element_size);<br>malloc是分配size个<span style="color: #ff0000;">字节<span style="color: #000000;">连续空间,如果不能分配返回NULL<span style="color: #ff0000;"> 这些内容不会被初始化</span></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">realloc改变prt的大小,改变为new_size个<span style="color: #ff0000;">字节</span>,如果是增大的话,保留原先的数据内容,然后增加,如果时间小的话,那么留下的那一段数据内容不变,这里减小的话,只能是释放掉后面的空间.如果不能在原来的内存上操作的话,就会新分配一个new_size的内存,把数据复制过去,<span style="color: #ff0000;">这样的话用了realloc之后ptr就不能再用了,得用返回的这个指针了</span></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">calloc:分配num_element个数据所需的内存,每个数据的字节是 element_size. <span style="color: #ff0000;">这些内容会被初始化为0</span></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">free是释放传入指针所分配的内存,不过这块内存必须是上面三个函数之一分配的,还有就是不能释放一部分,如果想释放一部分可以用realloc函数</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">分配内存是最好用sizeof,这样移植性好一点,比如malloc(100</span></span></em>sizeof(int));<br><span style="color: #ff0000;"><span style="color: #000000;">3.一般错误:I.对NULL指针的解引用(分配之后没有判断是否返回的指针为NULL)       II.对分配的内存操作时越界  III释放并非动态分配的内存,试图释放动态分配的内存的一部分  IV.释放的内存继续使用.</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">4.内存泄露就是该释放的内存没有释放,会导致内存一点点被榨干,直到再次重启程序或计算机.这样的后果可能会导致当前已经完成的工作统统丢失</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">5.字符串动态分配内存是千万别忘了考虑结尾NUL字符</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">下面给出一个书上的例子,可以防止那些不检测malloc返回指针是否为NULL的情况</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">alloc.h</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">#include <stdlib.h></stdlib.h></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">#define malloc //不直接使用malloc</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">#define MALLOC(num,type) (type <em>)alloc((num)</em>(sizeof(type)))</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">extern void *alloc(size_t size);</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">alloc.c</span></span><br><span style="color: #ff0000;">#include <stdio.h></stdio.h></span></p>
+<p>#include”alloc.h”</p>
+<p>#undef malloc//注意顺序我一开始把这句放在上面一句的前面结果很诡异的错误.<br><span style="color: #ff0000;"><span style="color: #000000;">void <em>alloc(size_t size)</em></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">{</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">    void new_mem;</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">  new_mem=malloc(size);</span></span><br><span style="color: #ff0000;"><span style="color: #000000;"> if(new_mem==NULL)</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">{</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">    printf(“fjkds;afkjds;af”);//自己改成需要的</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">   exit(1);</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">}</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">return new_mem;</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">}</span></span></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2011/04/06/pointers-on-c-link-list/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2011/03/31/poj-2478-eular-function/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2011-04-02 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

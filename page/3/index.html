@@ -1,0 +1,929 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Page 3 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 <div class="page-header page-header-inverse ">
+  <h1 class="title title-inverse ">Hexo</h1>
+</div>
+
+<div class="row page">
+
+	
+	<div class="col-md-9">
+	
+
+		<div class="slogan">
+      <i class="fa fa-heart"></i>
+      Yet another bootstrap theme.
+</div>    
+		<div id="top_search"></div>
+		<div class="mypage">
+		
+		<!-- title and entry -->
+        <!-- render top articles firstly -->
+        
+        <!-- render other articles -->
+        
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-07-16 </div>
+			<div class="article-title"><a href="/2015/07/16/a-brief-view-of-storm/" >Storm 初探</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<pre><code>   &lt;span style=&quot;color: #ff0000;&quot;&gt;打算把自己学习实时计算的相关东西写出来，形成一个从零开始学实时计算的系列，由于我也是刚开始接触，系列文中的描述或概念有不当的地方，还请不吝指教。在此谢过。&lt;/span&gt;
+
+  [Storm](http://storm.apache.org/) 是一个分布式实时计算框架，由 Twitter 开放并开源。用来处理无边界的流数据，进行实时处理。与 Hadoop 做批处理相对应。因为底层使用 Thrift 来定义和提交 Topology（Storm 中的一种结构），Storm 可以使用任何语言来进行编程。可以用来做实时计算，在线机器学习等等一系列事情。每秒可以每个节点可以处理百万级别的 Tuple（Storm 中的一种结构）。伸缩性好，容错好，并且保证所有数据都会被处理。
+
+首先介绍 Storm 中几个结构的定义，分别是 Tuples, Stream, Spout, Bolt, Topology, Task.
+</code></pre><ul>
+<li>其中 Tuple 是最基本的结构，是传输数据过程中的最小单元，可以当作为一个包装好的结构体</li>
+<li>Stream： 是无边界的 Tuple 组成的数据流，可以理解为 Tuple 的流动</li>
+<li>Spout： 是程序的数据来源，由用户指定，指定之后，所有的数据都从 spout 发出</li>
+<li>Bolt： 数据中转和处理的节点，负责经过数据的中转以及处理</li>
+<li>Topology： 是包括 spout，stream，bolt 的一个完整流程，表示数据从开始到结束的整个过程，每一个 Topology 定义了数据的来源，中间需要怎么转换，以及最后输出到哪</li>
+<li>Task： Spout 或者 Bolt 中实际处理数据的单元，每一个 Spout 或 Bolt 可以包含多个 Task<br>下面的图形象的表示了大部分结构，其中水龙头表示 Spout，写有 Tuple 字样的表示 Tuple，闪电状的结构是 Bolt，多个 Tuple 形成了 Stream，整张图可以看作是一个 Topology。这里没有细分出 Task 结构。</li>
+</ul>
+<p>[caption id=”” align=”aligncenter” width=”640”]<a href="http://storm.apache.org/images/topology.png" target="_blank" rel="external"><img src="http://storm.apache.org/images/topology.png" alt=""></a> storm 基本结构图[/caption]</p>
+<p>由于 Storm 是分布式的实时处理框架，所有需要一个分配任务的节点，在 Storm 中，这个任务由 Nimbus 担任，所有的 Topology 都是提交 Nimbus 中，由 Nimbus 进行任务分配，Nimbus 会在所有的 Supervisor 中查找最合适的（最空闲），然后把任务分发给它，但是 Nimbus 和 Supervisor 不是直接通信，而是由 <a href="http://zookeeper.apache.org/" target="_blank" rel="external">Zookeeper</a> 进行中间传话（Supervisor 可以理解为实际的机器，然后 Bolt 会在每一个 Supervisor 上跑，每一个 Supervisor 上有多个 Bolt存在），为什么不让 Nimbus 和 Supervisor 直接通信呢，因为这样可以减少 Nimbus 的负担，Nimbus 只需要把任务分配写到 Zookeeper 就行了，然后 Supervisor 去 Zookeeper 读，每一个 Supervisor 的状态（空闲等情况）也会写到 Zookeeper 上，由 Nimbus 去读。如果是直接通信的话，那么需要 Nimbus 和 Supervisor 同时有空才可以，这样是不太现实的。（比如 A 需要把黄金交给 B，只能直接给的话，必须 A 和 B 同时有空才行，但是总共由四种情况存在：1. A 有空，B 没空；2 A 有空，B有空；3 A没空，B没空；4A没空，B有空。那么只有情况2才可以进行交易，就可能导致 A 一直跑过去找 B，或者B 一直去找 A 的情况，会大大浪费时间）</p>
+<p>由于每个 Bolt 有多个 Task 存在，那么对于 Tuple 传给哪一个对应的 Task 处理，就需要进行控制了，这里就有 Grouping 的概念了，Grouping 表示在 Topology 中从上一个节点（Spout/Bolt）到下一个节点（Bolt）时怎么进行 Tuple 的传输（传给哪个 Task）Storm 中包含了 7 中 Grouping 的方式｛<span class="s1">Shuffle grouping；Fields grouping；Partial Key grouping；All grouping；Global grouping；None grouping；Direct grouping｝（</span>对于 Fields 方式，只需要相同字段的分到一组就行了，并不需要不同字段的分到不同组）</p>
+<p>基本概念差不多就这些了，我也是刚开始接触，本文内容结合下面几个链接以及自己理解进行书写，如果有错误的地方，还请不吝指教。</p>
+<p>References：</p>
+<p>1. Apache Storm：<a href="http://storm.apache.org/" target="_blank" rel="external">http://storm.apache.org/</a></p>
+<p>2. Storm Concepts：<a href="https://storm.apache.org/documentation/Concepts.html" target="_blank" rel="external">https://storm.apache.org/documentation/Concepts.html</a></p>
+<ol>
+<li><a href="http://xumingming.sinaapp.com/category/storm/" target="_blank" rel="external">http://xumingming.sinaapp.com/category/storm/</a></li>
+</ol>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-03-08 </div>
+			<div class="article-title"><a href="/2015/03/08/github-blog-math-expression-support/" >让 Github Blog 支持数学公式</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>本文将提供一种方法，让 github blog 可以支持数学公式，通俗的说就是支持 latex 写法。假设已经有一个 github blog。本文利用的是 Mathjax 来支持 latex 公式的解析和显示。下面假设本地仓库所在的文件夹为”xxx.github.com”</p>
+<p>1. 切换到”xxx.github.com_includes\themes\dinky” 其中 dinky 是你现在使用的模板名称</p>
+<p>2. 用文本编辑器打开”default.html” 文件，跳转到文件末尾，在  和 &lt;/html&gt; 之间加上如下代码</p>
+<p><pre class="lang:js decode:true">  <script type="text/javascript">window.MathJax = false;&lt;/script&gt;<br>  <script type="text/x-mathjax-config"><br>          MathJax.Hub.Config({<br>          tex2jax: {inlineMath: [[“$”,”$”],[“\(“,”\)”]]}<br>              });<br></script>&lt;script type=”text/javascript” src=”<a href="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full&quot;&gt;MathJax.Hub.Queue([&quot;Typeset&quot;,MathJax.Hub" target="_blank" rel="external">http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full&quot;&gt;MathJax.Hub.Queue([&quot;Typeset&quot;,MathJax.Hub</a>]);<br></pre><br>3. 在 “xxx.githu.com” 下建立一个名为 extensions 的目录，然后把 <a href="https://github.com/mathjax/MathJax/blob/master/extensions/MathMenu.js" target="_blank" rel="external">MathMenu</a> 和 <a href="https://github.com/mathjax/MathJax/blob/master/extensions/MathZoom.js" target="_blank" rel="external">MathZoom</a> 两个文件添加到 extensions 目录下（如果到这一步还出现问题的话，可以利用 chrome 打开相应的 github blog 页面，然后按下 F12 打开 console，把缺少的文件添加到 extensions 目录即可）</p>
+<p>4. 在 github blog 中使用相应的数学公式，查看就会发现可以显示了。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-02-18 </div>
+			<div class="article-title"><a href="/2015/02/18/everything-about-2014/" >痛·快二零一四</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>今年外婆去世了，以前总想着以后应该会有机会孝顺她，结果在自己毕业前她去世了，自从读大学以来，每年去看她的机会也变的越来越少，后来几次去看她，她一直和我说我妈不容易，让我以后要孝顺我妈。外婆摔伤之后，由于年龄太大不方便手术，就一直这样护理着，记得同学对我说“你外婆年龄这么大了，摔伤了，你应该有心里准备啊”。我也想过，而且外婆受伤之后，一直只能躺在床上，肯定也不好受，只是自己一直自私的想着等我毕业之后孝顺她。<br>今年终于能像朋友一样和我爸聊天了，从小时候觉得他是最厉害的人，能言善道，能文能武，慢慢的变成他也就那样，他会的我都会，甚至有些比他做的还要好，然后再到现在。其实想想我爸确实也挺厉害的，单就他的账单十多年没出过差错就够厉害的了，只是我和他不是一样的性格，中间一段时间我一直以自己的标准要求他，总是无限放大他的缺点，对他的优点进行无视。<br>明年就毕业了，学生生涯也要正式结束了。今年第一次开始找工作，大学期间搞比赛，保研，过的懒懒散散，就没想着去找工作，面过一次，也是裸面。研究生两年学的东西也很杂，基本今年才确定搞后台方向，发现自己除了会点数据结构，算法，其他的一窍不通。找实习被虐的太惨，期间把后台方向的几本基础书过了一遍，后来9月正式找工作了，阴差阳错找了一个还算过的去的工作，去做大数据存储。父母一直劝我进国企，说稳定，我想着进了国企，按自己的性格估计就废了，不善言辞，技术荒废，就等着养老。还是想趁着年轻出去闯闯，其他的再说吧。至于毕业，呵呵。<br>读了这么久的书，以前一直没有好好的想过自己为什么要读书，从小只被教育要读书，小学要求升初中，初中要求升高中，高中要求升大学，大学之后读研。却没有实实在在的考虑过自己为什么要读书，读了书之后干嘛，现在看来读了这么久的书，给我的好处就是认识到一个更大的世界。遗憾的是，读书的过程中，基本无视了人文的教育，没有好好培养自己的思辨能力，就想着怎么得到标准答案，考高分，思维习惯性的懒惰，这个要慢慢改过来,一遇到非专业问题，基本歇菜。今年下半年事情一件接着一件，在当时的自己看来，每一件都是非常重大。过程中找同学聊过天，看《少有人走的路》和其他杂书，去操场跑步。感谢四宝和PN的开导，虽然PN说的“但行好事，莫问前程”我现在还不一定能做到，只能慢慢的去实践了。幸亏买了一个kindle，无聊和心情不好的时候可以看书，看书非常方便，也让自己能顺利看完一些大部头书，看完了CSAPP，《邓小平时代》和《盗墓笔记》，据说现在《盗墓笔记》拍电视剧了，这又会毁了一部小说，虽然小说的最后还有好多坑没有填上。有段时间一直跑步，坚持了好久，结果后来天冷了就没坚持跑了。<br>以前一直活在一个很小很小的世界中，有一次和同学聊天，我说“以前以为读好书就行了，现在才发现这远远不够”，同学说“你才发现读书不够啊，不过现在发现也不晚”。自己啥也不懂，就像一个小孩子一样，不懂人情世故，听不懂别人说的话，没有爱人的能力，爱是一种能力，需要不断的学习和实践。记得有一次几个同学聚会，我问听不懂别人说话怎么办，然后眼睛同学举了两个例子，结果我顺利的没听懂，在我听来，那完全是两句不同的话，完全听出来其中一句话的话中话:(。<br>我的目标是不断的了解自己，然后接受自己，最后成为一个男人，而不是一个巨婴。要不停的告诉自己“我为什么不是一张桌子，而是一个人，我是特别的”。这是一件不容易的事情，自己会有习惯性的思维，这就需要自己时刻都能感受自己的想法，要能够自己和自己谈判，这个过程中往往就会谈崩:(。发现自己起步晚，进步慢。很多事情会不停的前进，后退，前进，后退，如此循环往复。对于自己不熟悉又重视的事情，往往会不自信，怕出错。需要把自信内化，每个人都是不一样的，都有自己的特别之处，这些特别之处才是我们之所以成为自己的根本。这些最终都可以归结到节奏上，自己需要有自己的节奏，就像有些人进退有度，怎么看怎么舒服，而节奏好只是一个结果，自己需要知道的是怎么样才能节奏好，并不断的实践。至于最终自己能做到啥样子，就像 Dota 中问“猴子，你能起来不？”一样，兵需要一个个去补，装备需要一件件去出，事情需要一件件去做，最终结果只有时间能证明。<br>现在看来，那些难受的事也不过如此，让自己知道欠下多少东西需要补，至于补不补，补到什么程度，就看自己的造化了。感谢遇到的所有人，所有事。<br>良业为取履，因长跪而履之。<br>“跳着走，是不是很好玩啊”<br>“嗯，很好玩。”<br>“那舅舅和你一起跳着走，好不好”<br>“好啊”</p>
+<p>klion26 于家</p>
+<p>二零一四年十二月三十日</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-01-17 </div>
+			<div class="article-title"><a href="/2015/01/17/recursion/" >Recursion</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://en.wikipedia.org/wiki/Recursion" target="_blank" rel="external">递归</a>（Recursion）是一种不停的调用自身的过程。比如下面这个故事就是一个递归的例子</p>
+<p>从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？「从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？『从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？……』」</p>
+<p>本文说的递归，讲的是递归函数，也就是一个函数不停的调用自己而形成的。</p>
+<p>首先，递归函数都满足两个性质</p>
+<ol>
+<li>有一个 base case。base case 可以理解为可以直接得到结果的一个状态或者说是终止状态。</li>
+<li>每一次函数调用都往 base case 靠拢，否则会形成 infinite loop<br>这里我们用阶乘函数 f(n) = n! 来进行说明。对于阶乘函数我们写出的递归函数大致是下面的样子</li>
+</ol>
+<pre class="lang:c decode:true ">int fac(int n)
+{
+  if(n<0) base="" case="" return="" 0;="" if(n<2)="" 1;="" n*fac(n-1);="" 调用="" fac(n-1)，往="" 靠拢="" }<="" pre=""> 
+
+<p>这个函数中前面两个 if 语句组成了 base case。也就是说如果 n&lt;0,那么 n 的阶乘是0，如果 n 是 0 或者 1，那么阶乘是1。这两种情况就组成了阶乘函数的 base case。剩下的 return 语句就是先计算 (n-1) 的阶乘（调用函数 fac(n-1))，然后再乘上 n [n!= n*(n-1)!]，得到最终的结果 n!。</p>
+<p>对于递归函数，刚开始的时候难就难在栈状态的理解，首先可以不考虑栈，把递归函数看成一个数学上的递归式，比如上面的阶乘，f(n) = f*f(n-1).那么如果我们想要求 f(n)，首先就需要知道 f(n-1).刚好这就是函数 fac()所解决的问题。对于刚开始学习递归的时候，可以手动模拟代码是怎么跑的，在纸上画出来，方便自己理解。假设我们要求 6！，就会变成下面的状态</p>
+<p>1 —&gt; fac(6)</p>
+<p>2 —&gt;  6*fac(5)   //6&gt;=2，所以执行最后一句话</p>
+<p>3 —&gt; 6<em>(5</em>fac(4)) //5&gt;=2 这里在 5*fac(4)这一层加上括号表示调用 fac(5)的时候，6是被屏蔽掉的，可以理解成”看不见”</p>
+<p>4 —&gt; 6<em>(5</em>(4*fac(3))) //4 &gt;=2</p>
+<p>5—&gt; 6<em>(5</em>(4<em>(3</em>fac(2)))) //3&gt;=2</p>
+<p>6 —&gt; 6<em>(5</em>(4<em>(3</em>(2*fac(1))))) //2&gt;=2</p>
+<p>7 —&gt; 6<em>(5</em>(4<em>(3</em>(2*(1)))))      //1 &lt; 2 所以返回1，这里在 1 的外面加上括号表示 1 是一个函数调用过程。</p>
+<p>8 —&gt; 6<em>(5</em>(4<em>(3</em>2)))      //这里的2表示是调用 fac(2)返回的结果，最里面的 3<em>2 是调用 fac(3)时 最后依据 n</em>fac(n-1)的具体化</p>
+<p>9—&gt; 6<em>(5</em>(4<em>6))    //4</em>6 表示的是调用 fac(4) 时执行的最后一句，其中 6 是 fac(4-1) 的结果</p>
+<p>10 —&gt; 6<em>(5</em>24)     // 5*24 表示的是调用 fac(5) 时执行的最后一句，其中 24 是 fac(5-1) 的结果</p>
+<p>11 —&gt; 6<em>120   // 6</em>120 表示的是调用 fac(6) 时执行的组后一句，其中 120 是 fac(6-1) 的结果</p>
+<p>12 —&gt; 720 // 调用 fac(6) 返回的结果</p>
+<p>每一行中，如果有函数就先计算函数的值，如果没有函数，那么就计算最里面一层括号中的值。对于每一次函数调用都会开辟一块新的栈空间，在相应的栈空间上进行操作， 就算同一个函数，两次不同的调用操作，也会在不同的栈空间上进行操作。这里一开始可以把函数看成一个黑盒子，盒子的输入就是 n， 盒子的输出是 n!,不用去考虑具体的栈空间什么的，这样会比较好一点。</p>
+<p>对于阶乘来说，如果传入的参数 n&lt;2 就表示是 base case（&lt;0 的情况是特例需要处理），其它的情况，每次都会调用 fac(n-1)，每次 n 都会减1，这样会往1靠拢，也就是往 base case 靠拢。刚好满足上面两个性质。</p>
+<p>在<a href="http://www.klion26.com/dynamic-programming.html" target="_blank" rel="external">动态规划</a>这篇文章里面，最开始的代码也是用的递归写的，base case 就是前面两个 if 语句判断（base case 一般都是用 if 特判），剩下的就是把其它的状态状态为 base case。比如有名的 <a href="http://en.wikipedia.org/wiki/Tower_of_Hanoi" target="_blank" rel="external">Hanoi 塔</a>问题，就可以用来测试自己是否理解了递归。Fibonacci 数列和 Euclid’s GCD 也可以用递归来写，还有一个<a href="http://www.algorithmist.com/index.php/Coin_Change" target="_blank" rel="external">找零钱</a>问题，也可以用递归来写。很多代码用递归写出来之后会变得很简洁。不过如果递归的层数比较深的话，可能会导致栈溢出的问题。</p>
+<p>熟悉递归之后，就还有尾递归的消除，至于怎么消除尾递归（有些语言里面会自带尾递归的消除），<a href="http://blog.moertel.com/tags/recursion-to-iteration%20series.html" target="_blank" rel="external">这个系列</a>讲的很详细，可以参考参考。</p>
+</0)></pre>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-01-05 </div>
+			<div class="article-title"><a href="/2015/01/05/dynamic-programming/" >Dynamic Programming</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://en.wikipedia.org/wiki/Dynamic_programming" target="_blank" rel="external">Dynamic Programming</a>（动态规划）是一种以<span style="color: #0000ff;">空间换时间</span>的算法，可以用来解决的问题都有一个共性：<span style="color: #0000ff;">重叠子问题</span>。用通俗的话说就是记忆化搜索。也就是说，所有的动态规划都是可以用搜索去写的，但是用简单的搜索写，会发现时间复杂度太高，从而达不到要求，因为在搜索的过程中我们重复计算了很多以前已经计算过的问题（重叠子问题），这里就会浪费大量的时间。</p>
+<p>下面借助一个经典的入门题<a href="http://acm.hdu.edu.cn/showproblem.php?pid=2084" target="_blank" rel="external">数塔</a>来讲解具体的过程：</p>
+<p>数塔的大致意思如下：在一棵二叉树中，每个节点都有一个权值，现在你的任务是需要求从根出发到树的最底层的任何一条路径中（每一次都只能往下走），所经过的节点权值加起来最大（或者最小）的一条路径，并输出这个最大值（最小值）。下图中，9是树的根，需要求的是从9出发，最后到达｛19, 7, 10, 4, 16} 这一层的所有路径中，权值加起来最大的那一条。这里是{9-12-10-18-10}最大值为59.<a href="http://www.klion26.com/wp-content/uploads/2015/01/2084-1.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2015/01/2084-1-300x148.jpg" alt="2084-1"></a>我们在看到这个题目的时候，最开始可能想到的是用搜索直接求解，写一个递归函数解决之。因为每个节点只能往下走，所以每个节点的路径必然是经过左儿子或者右儿子节点，那么最大路径也必然从左儿子或右儿子中间选取。如果我们写一个函数叫做 f(i, j) 用来求每个点到最底层的最大路径和的话，那么这个函数的大致轮廓就可以写成：</p>
+<pre class="lang:c mark:7,8 decode:true ">int f(int i, int j)
+{
+if(i>MAX) //超过层数
+ return 0;
+if(j>i) //每一层的边界
+ return 0;
+int a = f(i+1, j); //左儿子
+int b = f(i+1, j+1); //右儿子
+if(a>b)
+ return a+num[i][j];
+else
+ return b+num[i][j];
+}</pre> 
+
+<p>写出这个代码之后，对于层数不多的时候，我们是可以求出最终的答案的，不过当层数比较多的时候，就会发现，求结果所需要的时间太多了。每一条路径可能会计算好几次，路径{18-10}就会被计算3次，分别是{12-10-18-10},{12-6-18-10}和{15-6-18-10},其中有两次是浪费的，因为前面我们计算过一次，如果能够保存下来的话，那么就可以直接查询就行了。那么接下来我们来看是否可以改进上面的代码。</p>
+<p>我们发现对于每个节点，都需要计算它的左儿子和右儿子到底层的最大路径和，这个路径是会重叠的，比如路径{9-12-6-18-10}和路径{9-15-6-18-10}的后面一段{6-18-10}就是重合的，也就是说用上面的代码我们会计算两次这条路径的值。这就造成了资源上的浪费，耗费了很多不必要的时间。那么现在我们用一个二维数组 dp[][] 记录下每个节点到底层的最大路径和，在第一次计算的时候，将这个结果赋值给二维数组 dp[][] 中相应的单元格，在后面需要的时候直接从 二维数组 dp[][] 里面取就行了，于是就有了下面的代码</p>
+<pre class="lang:c++ mark:7,8,9,10 decode:true ">int f(int i, int j)
+{
+if(i>MAX)
+  return 0;
+if(j<0 ||="" j="">i)
+  return 0;
+if(dp[i][j] == -1)//dp[][]数组初始化为-1，因为所有路径和都是正数，所以这里-1表示未计算过
+  dp[i+1][j] = f(i+1, j);
+if(dp[i+1][j+1] == -1)
+  dp[i+1][j+1] = f(i+1, j+1);
+if(dp[i+1][j]>dp[i+1][j+1])
+  return dp[i+1][j]+num[i][j];
+else
+  return dp[i+1][j+1]+num[i][j];
+}</0></pre> 
+
+<p>这段代码和第一段代码的区别就是用二维数组 dp[][] 保存下了每一个状态，这样每一条路径我们就只会计算一次，对于一棵节点很多的树来说，这节省下来的时间是非常多的，可以自己生成一个符合条件的二叉树，用上面两段代码同时计算所需要的结果，最后对比运行时间。<br>到这里差不多动态规划的思想就出来了：<span style="color: #0000ff;">空间换时间。<span style="color: #000000;">从而解决有<span style="color: #0000ff;">重叠子问题</span>的问题。</span><span style="color: #000000;">某些路径我们会计算很多次，那么就把这些结果保存下来，供后面需要的时候查询。当然本文的第二段代码，很多人叫做记忆化搜索，实际上思想是一样的，都是<span style="color: #0000ff;">用空间换时间</span>。当然接下来我们还可以继续把第二段代码写成非递归的，甚至对非递归的写法继续优化，这里就不涉及相应的内容了，这里给出一个优化版的非递归版本：（从底层开始计算，最后计算到树根结束，这样空间只需要 O(n) ），代码如下</span></span></p>
+<pre class="lang:c++ mark:10 decode:true ">int f(int i, int j)
+{
+int dp[MAX];//保存结果
+for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int="" i="MAX-2;">=0; --i)
+{
+ for(int j=0; j<=i; ++j)="" {="" dp[j]="max(dp[j]," dp[j+1])="" +="" num[i][j];="" 最大值是由自己的左儿子和右儿子的最大路径和构成="" }="" return="" dp[0];="" }<="" pre=""> 
+
+<p>在动态规划里面，还有两个术语叫做“<span style="color: #0000ff;">状态</span>”和“<span style="color: #0000ff;">转移方程</span>”，通俗的说“状态”就是表示某一情况下的结果，比如本文第二段代码中 dp[i][j] 就表示的是 (i,j)这个节点的状态，而“转移方程”就阐述了如何从一个“状态”变化到“另外一个状态”，比如上面第三段代码中的第10行 dp[j] = max(dp[j], dp[j+1]) + num[i][j]，表示了当前节点怎么从左儿子和右儿子的状态变化而来. 到这里，基本的动态规划问题，应该是能够理解了，当然能够理解不代表就能够解出新的题目，对于<span style="color: #0000ff;">怎么选取状态</span>，<span style="color: #0000ff;">怎么找出转移方程</span>，这些问题都需要通过<span style="color: #0000ff;">不停的训练</span>才能够获得。动态规划里面最难的就是<span style="color: #0000ff;">状态的选取</span>以及<span style="color: #0000ff;">转移方程</span>，当然利用其譬如优先队列等东西优化就属于更高级的东西了，如果能够知道怎么表达状态，以及写出相应的转移方程，那么剩下的就只是苦力活了。</p>
+<p>至于经典的最长公共子序列，最长上升子序列，背包问题等都是可以用上述思路来解</p>
+<p>至于自己想找题目练习的话，我推荐 Topcoder，至于其他的 OJ，可以自行搜索。<a href="http://community.topcoder.com/tc?module=ProblemArchivesr=&amp;er=&amp;sc=&amp;sd=&amp;class=&amp;cat=Dynamic+Programming&amp;div1l=&amp;div2l=&amp;mind1s=&amp;mind2s=&amp;maxd1s=&amp;maxd2s=&amp;wr=" target="_blank" rel="external">这里</a>是 Topcoder 上所有的动态规划题目集合，可以自行选择相应的难度。另外推荐一篇讲动态规划的英文版的<a href="http://www.topcoder.com/tc?d1=tutorials&amp;d2=dynProg&amp;module=Static" target="_blank" rel="external">文章</a>，也来自 Topcoder。网上还有人总结的 <a href="http://www.cppblog.com/doer-xee/archive/2009/12/05/102629.html" target="_blank" rel="external">DP46 题</a>，也可以看看。</p>
+<p>当然如果有什么地方讲解不详细，或者有错误的话，欢迎讨论:)</p>
+</=i;></max;></pre>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-01-03 </div>
+			<div class="article-title"><a href="/2015/01/03/algorithm-series/" >Algorithm series</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>最近突然有想把自己知道的，学过的算法写成一个系列的想法，即可以理清自己的思路，督促自己学习(复习)相关知识，也可以帮助一部分人，暂时的想法是在自己的能力范围之内，把一些算法尽量的讲解透彻，做到从零开始，也可算是一个入门级别的吧，所以很多东西会讲的很基础，简单。当然由于自己水平有限，如果有些东西讲的不是很详细，明白的话，可以相互讨论，我会尽己所能，把自己想要讲解的东西，写出来。由于每一篇可能都会比较长，所以这个系列的更新频率会比较低，争取一周一篇。现在的预拟的目录如下（可能随着时间的推移而更改）：</p>
+<p>1. <a href="http://www.klion26.com/dynamic-programming.html" target="_blank" rel="external">Dynamic Programming</a></p>
+<p>2. Tree {Binary Tree, 2-3-4 Tree, Red Black Tree, AVL Tree, B/B+ Tree}</p>
+<p>3. Greedy {Huffman encoding, Minimum spanning Tree}</p>
+<p>4. Graph {shortest path, Minimum spanning tree, strongly connected components}</p>
+<p>5. Hash</p>
+<p>6. String {Longest common subsequence, String matching}</p>
+<p>7. Sorting {Bubble sort, Quick sort, Merge sort, Insertion sort, Shell sort, Heap sort}</p>
+<p>8. Searching {DFS, BFS, Binary search}</p>
+<p>9. Bit</p>
+<p>10. Data Compression</p>
+<p>11. Linked list</p>
+<p>12. <a href="http://www.klion26.com/recursion.html" target="_blank" rel="external">Recursion</a></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-12-29 </div>
+			<div class="article-title"><a href="/2014/12/29/show-me-the-code/" >Show me the code</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>想着好好的学习下 Python，只看书当然是不行的，就在网上找一些项目做，想找合适的项目太难的，每个人的情况不一样，对 A 是合适的，对 B 就不一定合适，后来找到 <a href="https://github.com/karan/Projects" target="_blank" rel="external">100 project </a>和 <a href="https://github.com/Yixiaohan/show-me-the-code" target="_blank" rel="external">show-me-the-code </a>这两个 Github 上的 repo，想着自己先做做，等逐渐熟练了之后，再去解决其他的问题。期间问了一个美团公司的工程师有什么可以推荐的不，他建议找自己想解决的问题，我当时想着在桌面写一个<a href="http://www.meituan.com/lottery/past?mtt=1.index%2Ffloor.rd.1.i49jroiy" target="_blank" rel="external">美团网自动抽奖</a>的程序，由于自己不熟悉前端，有些地方不懂，问了好几个搞前端的同学，也没搞定。想着干脆先照着前面两个 repo 写，另外写个爬虫，熟悉下。等自己熟悉那个抽奖系统的链接跳转之后，再去搞定它。</p>
+<p>下面是我做这些 project 时遇到的一些问题，这里会逐渐更新，所有的代码都放到<a href="https://github.com/klion26/Projects" target="_blank" rel="external">这个库中</a>。</p>
+<p>1. 在图片的右上角加一个红色的数字（类似 QQ 消息的信息数目提示），直接用 PIL 库可以解决，不过由于在 windows 确实某个库 _imagingft  C，照着网上的安装之后还是不行，不能更改字体，导致添加的数字字体太小。另外应该可以用 PyQt 或者 Opencv来解决。</p>
+<p>2. 生成一个定长的随机字符串：这个学到了好几种方法，个人觉得较好的是 a)跑 for 循环，每次生成一个字符; b) 用 random.sample ；c)用 random.shuffle。写这个的时候，以及其他一些东西的时候，自己还是用 c/c++ 的思想在写 python，另外一个比较明显的例子是交换两个数，这个要慢慢改过来。</p>
+<p>至于用生成的随机字符串生成验证码，也可以用 PIL 库解决，将字符串画到图片上，再在图片上画一些黑点/黑线，然后对图片进行扭曲操作，不过不要操作过头了，导致用户都不认识。</p>
+<p>3. 找出 html 文件中的正文，链接，或者下载某个页面中的所有图片。自己用的正则表达式处理，正文直接匹配的 <body[\s\s]*&lt; body="">，这里中间用 “[\s\S]”表示所有字符，不用通配符 <em>，是因为会有换行等特殊字符在里面；链接用的是 href=\”[^\”]</em>\”, 至于下载某个页面中的所有图片，首先利用正则表达式 src=\”http[^\”]*jpg\”（这里需要考虑多种图片格式），找出所有图片的 url，然后用urllib.urlretrieve() 函数将远程的图片下载到本地。</body[\s\s]*&lt;></p>
+<p>4. 对密码进行加密，直接用 hashlib 库就行了，可以用不同的加密函数，至于加密密码的时候，需要添加 salt，salt可以由用户提供，也可以用 uuid 生成一个随机的字符串，最后把 salt 添加到 hash 后的密码后面，为了后面验证需要。</p>
+<p>未完待续…</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-11-02 </div>
+			<div class="article-title"><a href="/2014/11/02/least-recently-used-algorithm/" >Least Recently Used Algorithm</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>LRU（_<a href="http://en.wikipedia.org/wiki/Cache_algorithms#LRU" target="_blank" rel="external">Least Recently Used</a>）_算法是操作系统中的一种页面置换（在缓存系统中也会用到），思想就是：每次都把<span style="color: #0000ff;">最近最少</span>使用的那个页面置换出去，这个思想基于，当前使用的页面在不久的将来也会使用。</p>
+<p>比如在内存为 3 的情况下，依次请求如下页面2，3，4，2，1，3，7，5，4，3.那么内存中保存的依次保存的页面会变成如下所示（每一行表示当前页面请求之后，内存中的页面情况，左边的页面比右边页面旧（也就是最后一次访问的时间早），<a href="http://www.youtube.com/watch?v=I9_BpSXBodU" target="_blank" rel="external">这里</a>有一个动态视频，给出每一次的情况（需要翻墙）</p>
+<ol>
+<li>2</li>
+<li>2 3</li>
+<li>2 3 4</li>
+<li>3 4 2</li>
+<li>4 2 1</li>
+<li>2 1 3</li>
+<li>1 3 7</li>
+<li>3 7 5</li>
+<li>7 5 4</li>
+<li>5 4 3<br>到这里基本想法就结束了，剩下的就是怎么实现的问题了。对于不同的要求，有不同的实现。</li>
+</ol>
+<p>第一种：最简单的模拟，用一个单链表表示 LRU 的大小，表头存最旧的页面，表尾存最新的页面，然后每次 get 和 put 的时候，都遍历一次单链表进行相应操作。由于每次都要遍历单链表，所以每次操作都是 O（L）的复杂度，其中 L 表示 LRU 的大小。代码如下</p>
+<pre class="lang:c++ decode:true ">typedef struct {
+    int key;
+    int val;
+} elem;
+class LRUCache{
+public:
+    elem *arr;  // lru cache
+    int sz; // total number of elements in the list currently.
+    int cap; //capacity
+    LRUCache(int capacity) {  //init LRUCache
+        arr = new elem[capacity];  //
+        sz = 0;
+        cap = capacity;
+ }
+ /* move the used element to the end of list */
+ void adjust(int a) {
+     if (a == sz - 1) {//the last one
+        return ;
+     }
+     elem cur = arr[a];
+     for (int i = a; i lt; sz - 1; i ++) {
+        arr[i] = arr[i + 1]; // move all elements after position a 1 step left
+     }
+     arr[sz - 1] = cur; // move arr[a] to the end
+ }
+ //get the value of key, return -1 if it doesn't exit
+ int get(int key) {
+     //iterate the whole list to find if the key exits
+     for (int i = 0; i lt; sz; i ++) {
+         if (arr[i].key == key) {
+            int a = arr[i].val;
+            adjust(i);
+            return a; // existent key
+         }
+    }
+    return -1;
+ }
+ //update the key/value
+ void set(int key, int value) {
+     for (int i = 0; i lt; sz; i ++) {
+         if (arr[i].key == key) { // existent
+            arr[i].val = value; //update value ,and adjust the list
+            adjust(i);
+            return;
+         }
+     }
+     if (sz == cap) { // check if reach the capacity
+         for (int i = 0; i lt; sz - 1; i ++) {
+             arr[i] = arr[i + 1]; // delete the least used element
+         }
+         arr[sz - 1].key = key;
+         arr[sz - 1].val = value;
+     } else {
+         arr[sz].key = key;
+         arr[sz].val = value;
+         sz ++; // increase the size
+     }
+ }
+};</pre> 
+
+<p>第二种写法就是用双链表存 LRU 中保存的实际内容，然后用 HASH 表保存每一个 key 所对应的内容在双链表中的位置，其中双链表还是表头存最旧的，表尾存最新的，用 HASH 就可以加速查找，用双链表则是更新的时候可以达到 O(1)[单链表不能获得前驱节点的信息]，<span style="color: #0000ff;">如果这里用 map 实现，而不是 hash_map 的话，那么复杂度是 log(L)，这个是由 map 的复杂度决定的</span>。代码如下：</p>
+<pre class="lang:c++ decode:true ">#include <iostream>
+#include <vector>
+#include <hash_map>
+
+using namespace std;
+using namespace stdext;
+
+template<class k,="" class="" t="">
+struct LRUCacheEntry
+{
+    K key;
+    T data;
+    LRUCacheEntry* prev;
+    LRUCacheEntry* next;
+};
+
+template<class k,="" class="" t="">
+class LRUCache
+{
+private:
+    hash_map< K, LRUCacheEntry&lt;K,T>* &gt; _mapping;
+    vector< LRUCacheEntry&lt;K,T>* &gt; _freeEntries;
+    LRUCacheEntry<k,t> * head;
+    LRUCacheEntry<k,t> * tail;
+    LRUCacheEntry<k,t> * entries;
+public:
+    LRUCache(size_t size){
+    entries = new LRUCacheEntry<k,t>[size];
+    for (int i=0; i<size; i++)="" _freeentries.push_back(entries+i);="" head="new" lrucacheentry<k,t="">;
+    tail = new LRUCacheEntry<k,t>;
+    head->prev = NULL;
+    head->next = tail;
+    tail->next = NULL;
+    tail->prev = head;
+ }
+ ~LRUCache()
+ {
+    delete head;
+    delete tail;
+    delete [] entries;
+ }
+ void put(K key, T data)
+ {
+    LRUCacheEntry<k,t>* node = _mapping[key];
+    if(node)
+      {
+        // refresh the link list
+        detach(node);
+        node->data = data;
+        attach(node);
+      }
+    else{
+       if ( _freeEntries.empty() )
+         {// lru cache is full
+             node = tail->prev;
+             detach(node);//delete a node
+             _mapping.erase(node->key);
+             node->data = data;
+             node->key = key;
+             _mapping[key] = node;
+             attach(node);//add the new node
+         }
+       else{
+             node = _freeEntries.back();
+             _freeEntries.pop_back();
+             node->key = key;
+             node->data = data;
+             _mapping[key] = node;
+             attach(node);
+           }
+       }
+ }
+
+ T get(K key)
+ {
+      LRUCacheEntry<k,t>* node = _mapping[key];
+      if(node)
+        {//if node is already in, refresh the double-link-list
+           detach(node);
+           attach(node);
+           return node->data;
+        }
+       else return NULL;
+ }
+
+private:
+    void detach(LRUCacheEntry<k,t>* node)
+    {// delete the node from the double-link-list
+         node->prev-&gt;next = node-&gt;next;
+         node->next-&gt;prev = node-&gt;prev;
+    }
+    void attach(LRUCacheEntry<k,t>* node)
+    {//add node to the head of double-link-list
+         node->next = head-&gt;next;
+         node->prev = head;
+         head->next = node;
+         node->next-&gt;prev = node;
+    }
+};</k,t></k,t></k,t></k,t></k,t></size;></k,t></k,t></k,t></k,t></class></class></hash_map></vector></iostream></pre> 
+
+<p>第二种方法利用双链表保存实际的 cache 内容，然后用 hash 来加速查找，hash 存的是每一个 key/value 的地址，这样就可以直接找到相应的 key/value 元素了。这种方法中，查找的复杂度是 O(1)，更新的复杂度，只需要进行一次查找，一次 detach，一次 attach，所以也是 O(1)的，较之第一种方法的优势就体现出来了。</p>
+<p>最后，如果你想看下自己写的 LRU 是否正确，速度如何，可以在 Leetcode 上进行提交，地址：<a href="https://oj.leetcode.com/problems/lru-cache/" target="_blank" rel="external">https://oj.leetcode.com/problems/lru-cache/</a>，提交之后可以查看是否正确，正确的话，查看用时多少（第一种方法，可能可以在 Leetcode 上通过，也可能会得到一个 <strong>Time Limit Exceeded </strong>的结果，这个就看你人品了）</p>
+<p>Reference</p>
+<p><a href="http://www.cs.uml.edu/~jlu1/doc/codes/lruCache.html" target="_blank" rel="external">Implement a LRU Cache in C++</a></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-10-01 </div>
+			<div class="article-title"><a href="/2014/10/01/2014-code-interview/" >2014找工作的那些事</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>先说下自己的背景吧</p>
+<ul>
+<li>中南本科+硕士</li>
+<li>数据结构/算法还过得去</li>
+<li>会一点 Linux 系统编程+网络编程</li>
+<li>无实习经验，无项目经验<br>今年校招有点早，8月就做了阿里的在线笔试，然后9月去武汉参加面试，没鄙视了（遗憾的是不知道是为什么被鄙视的，一个同去的同学和我情况一样）。后来就是腾讯面试，一面气场太差（面试官原话），表现不好，居然还让我过了，二面表现良好，然后就被刷了。。后来来长沙的软件公司基本都参加了，由于腾讯面试和美团笔试冲突，然后美团笔试没有参加。中间参加了华为，深信服的面试（可惜华为 SO 挑战赛的时间和腾讯笔试的时间冲突，没有拿到 SO 挑战赛的手机是一大遗憾）。最后霸面美团，然后成为美团长沙站最后一个参加面试的人（霸面），在9月底终于有一个去处了，至此心里终于有点着落了。</li>
+</ul>
+<p>找工作过程中会遇到各种事情（有同学腾讯的 hr 面面试结果一直被拖着），期间看到身边的人一个个都有 offer 了，也会心急。我算比较幸运的，有同学给我打气，腾讯一面被鄙视后，和四宝在公交上聊的那些，其实对我也挺有帮助的，有同学一起晚上锻炼身体。</p>
+<p>最后面上美团，应该也是运气足够好吧。最后一个参加面试的（还是霸面），而且三个面试官人都很 nice（参加的这些面试官中，个人认为美团的三个面试官和腾讯二面面试官人较好），基本无压力，可以发挥出自己的真实实力。不过美团的面试是我所参加的这些公司中强度最大的，3轮技术面，前两轮都会要求纸上写代码，每个程序基本是50-100行的样子；三面聊一些设计上的东西，代码基本不需要写了。我遇到的几个题大部分来自于 leetcode。刚好还是自己做过的，这个比较幸运。不过有一点小瑕疵的就是，我二面的时候，要求写一个不算太难的程序，然后一面面试官从我的代码中挑出了一个 bug。我当时瞬间都无语了，本以为100行以内的代码能做到 bug free。。。前两面的过程中，基本是代码一个接一个写，而且没有一点可以闲下来的功夫，强度很大。最后第三面的面试官问我一个概率题，我做出了简化版的，然后他问我要不要挑战下高级版的，我可耻的说“还没吃饭，就不挑战了”。</p>
+<p>第二天实验室在开会的时候，接到 HR 的电话，说下午过去谈谈。然后就过去谈了下，薪资基本是平均水平，然后福利貌似一般吧，其他的比如期权之类的由于没有经验，也没有询问，后来才知道原来薪资也是可以谈的（我是直接过去，然后 HR 通知你薪资多少，都没谈判，囧）。不过觉得方向还不错，自己也喜欢，就打算签了，到时候如果有更好的就再说吧。</p>
+<p>真正到了找工作的时候，才发现学校所在地还是很重要的，学校名气也很重要。武汉就比长沙要好很多，很多公司不来长沙招人，招也是很少一部分，基本走过场。在武汉面试的时候，有同学就被直接告知“我们基本只要武大，华科的”。唉，长沙毕竟还没有发展起来。</p>
+<p>找工作如果有真正的项目的话也是有一定优势的（当然如果能吃透一个开源的框架也是有优势的），一个进阿里的同学两轮技术面都是聊的项目，而且他的其中一个项目使用了现阶段的先进技术，面试官很感兴趣。如果没有项目的话，基础知识要求比较广，语言基础，操作系统，数据结构/算法，网络，组成原理，编译原理什么的都会问到，这个要准备起来，还是需要一定时间的。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-09-26 </div>
+			<div class="article-title"><a href="/2014/09/26/epoll-and-select/" >epoll 小解以及和select的区别</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>前面写过 <a href="http://www.klion26.com/select-and-poll.html" target="_blank" rel="external">select 和 poll</a> 的文章，在 Linux 下有一种更高效的 I/O 多路机制，那就是 epoll。epoll的高效和它的结构有关系（本文默认读者已经了解 select），首先 epoll 会把 select 的过程分成3个部分， epoll_create(), epoll_ctl() 和 epoll_wait。在 epoll_create 的过程中，会创建一个 eventpoll 结构体，这个结构体的部分定义如下</p>
+<pre class="lang:c decode:true ">struct eventpoll{
+    ...  
+    struct rb_root rbr; //红黑树，存储了所有添加到 epoll 中的事件
+    struct list_head rdllist; // 双向链表保存通过 epoll_wait 返回给用户的满足条件的事件
+    ...
+}</pre> 
+
+<p>这里的红黑树 rbr 存储了所有已经添加到 epoll 中的事件，如果使用 epoll_ctl 进行事件操作的时候，会在红黑树中进行查找，这个效率是很高的（红黑树是一颗自平衡二叉搜索树，查找事件 O(lgn))。双向链表 rdllist 则保存将要返回给用户的满足条件的事件。<br>然后所有添加的事件都会和设备（如网卡）驱动程序建立回调关系，一旦相应事件发生就回调用这里的回调函数，然后回调函数就会把事件添加到上面的双向链表中去。因为最后返回时只需要查看链表是否有数据，这个就比 select 要高效很多<br>然后最后是 epoll_wait.调用这个函数的时候，我们会等待一段时间（这段时间是由自己设置），这段时间过去之后，epoll 会自动返回双向链表中的事件，如果双向链表不为空，就把这里的事件复制到用户态内存中，同时将事件数量返回给用户。<br>epoll 的基本功能差不多就这些，当然还有一个叫做触发模式的，epoll 分为两种触发模式｛水平触发，边缘触发｝，区别就是水平触发的话，如果某一次没有处理，那么下一次还会返回给用户，但是边缘触发的话，只在事件发生时返回给用户一次，如果用户忽略掉了，那么后面就不会再返回给用户了。<br>至于为什么 epoll 会比 select 要好用，大致有如下几个原因<br>1. select 用的是 FD_SET进行操作，而 FD_SET 有上限限制（可以通过自己改源码进行修改），但是 epoll 没有这个限制<br>2. select 会对所有的感兴趣的 fd 一个个去检查是否就绪，这样就行成了一个轮询，这个是比较慢的，而 epoll 则通过设置回调函数，在有事件发生的时候，将事件添加到双向链表中，最后只需要检查双向链表是否为空即可，这个也是很高效的。<br>3. 还有 epoll_ctl 对事件进行操作时，会在红黑树中先查找是否存在，查找的过程也是很高效的。<br>这样 epoll 就可以轻松处理百万级的并发处理了。<br>epoll 的东西大致就这么一些，至于实际应用，这个需要看实际的情况了，这个没有经验，不敢妄谈。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+
+		</div>
+
+		<!-- pagination -->
+		<div>
+  		<center>
+		<div class="pagination">
+<ul class="pagination">
+	 
+		
+    	<li class="prev"><a href="/page/2/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+  		
+
+        <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+
+		
+		   <li class="next"> <a href="/page/4/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+        
+	
+</ul>
+</div>
+
+  		</center>
+		</div>
+
+		
+		
+	</div> <!-- col-md-9 -->
+
+	
+		<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+	<div class="widget">
+		<h4>Categories</h4>
+		<ul class="tag_box inline list-unstyled">
+		
+			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+		
+			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+		
+			<li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+		
+			<li><a href="/categories/Linux/TeX/">TeX<span>1</span></a></li>
+		
+			<li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+		
+			<li><a href="/categories/Uncategorized/">Uncategorized<span>3</span></a></li>
+		
+			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+		
+			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
+		
+			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/成长/">成长<span>3</span></a></li>
+		
+			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+		
+			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
+		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+		</ul>
+	</div>
+
+		
+			
+	<div class="widget">
+		<h4>Tag Cloud</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/c/">c++<span>1</span></a></li>
+		
+			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
+		
+			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
+		
+			<li><a href="/tags/greedy-algorithm/">greedy algorithm<span>1</span></a></li>
+		
+			<li><a href="/tags/topic/">topic<span>1</span></a></li>
+		
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+		
+			<li><a href="/tags/select/">select<span>2</span></a></li>
+		
+			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
+		
+			<li><a href="/tags/DFS/">DFS<span>2</span></a></li>
+		
+			<li><a href="/tags/project/">project<span>1</span></a></li>
+		
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
+		
+			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
+		
+			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
+		
+			<li><a href="/tags/https/">https<span>1</span></a></li>
+		
+			<li><a href="/tags/ASM/">ASM<span>1</span></a></li>
+		
+			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
+		
+			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
+		
+			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
+		
+			<li><a href="/tags/specify-timestamp/">specify_timestamp<span>1</span></a></li>
+		
+			<li><a href="/tags/command/">command<span>1</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>260</span></a></li>
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>Recent Posts</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
+      </li>
+    
+      <li>
+        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>Links</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="https://github.com/wzpan/freemind/" title="Freemind's Github repository." target="_blank"]);">Freemind</a></li>
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/wzpan" title="My Github account." target="_blank"]);">My Github</a></li>
+	
+		<li><i class="fa fa-linkedin"></i><a href="http://www.linkedin.com/in/hahack" title="My Linkin account." target="_blank"]);">My LinkedIn</a></li>
+	
+	</ul>
+</div>
+
+
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+	
+	
+</div> <!-- row-fluid -->
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

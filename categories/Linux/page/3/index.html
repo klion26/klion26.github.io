@@ -1,0 +1,671 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Page 3 | Linux | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+<!-- title -->
+<div class="page-header page-header-inverse ">
+  <h1 class="archive-title-category title title-inverse ">Linux</h1>
+</div>
+
+<div class="row page">
+  <!-- cols -->
+  
+  <div class="col-md-9">
+	
+
+	  <div id="top_search"></div>
+
+      
+
+      <div class="mypage">
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-04-19 </div>
+			<div class="article-title"><a href="/2012/04/19/vmware-ubuntu-fedora/" >VMware虚拟机有关的几个问题</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>环境:XP+VMware 7.0 英文版  ubuntu 10.4  fedora  13</p>
+<p><span style="color: #ff0000;">VMware里面安装ubuntu之后，第一次进去的时候，</span><span style="color: #ff0000;">来到输入密码界面的时候居然键盘失灵了</span>，这个比较囧。后来上网搜了下，发现是设置问题，但是要改设置得先进去才能改，这里首先可以通过如下方法进去:</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/04/ubuntu.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/04/ubuntu-300x91.jpg" alt="" title="ubuntu"></a></p>
+<p>看到上图中右下角的红色框框里面的那个小人没，点击小人来到下面的图片</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/04/ubuntu2.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/04/ubuntu2-300x157.jpg" alt="" title="ubuntu2"></a></p>
+<p>点击小人会出现上图中的红色框框中的那个东西，然后点击这个东西，就会出现后面的那个界面，然后选中第一个就可以了，重启之，发现出来了软键盘，然后就可以进入系统了。</p>
+<p>OK，现在需要修改配置文件让登陆的时候，键盘有效。</p>
+<p>在终端输入:vi /etc/default/console-setup</p>
+<p>然后来到文本的末尾，把[XKBMODEL=”SKIP”]一行中的”SKIP”改成”pc105”,把[XKBVARIANT=”U.S.English”]中的”U.S.English”改成空然后重启就可以了</p>
+<p><span style="color: #ff0000;">第二个问题是VMware里面不能用U盘</span>，我记得以前自己的可以的，只要在插入U盘的时候，选中虚拟机，然后就会询问是否在虚拟机里面用U盘，可是现在的信息是:host usb device connections disabled。上网搜了下，发现是一个服务没有开启，果断开启之.开启的方法如下:</p>
+<p>控制面板—&gt;管理工具—-&gt;服务—–&gt;找到”VMware USB Arbitration Service”然后开启之，当然你也可以选择让这个服务自动开启就行了，以后就不用这么麻烦了。然后重启虚拟机就OK了</p>
+<p><span style="color: #ff0000;">VMware里面装了fedora之后，进去发现fedora的鼠标左键不能用了</span>。这个有点坑爹啊。</p>
+<p>解决方法如下[需要root权限]</p>
+<p>首先调出终端<span style="font-family: 'Times New Roman';">:</span><span style="font-family: 宋体;">在桌面右击</span><span style="font-family: 'Times New Roman';">—&gt;</span><span style="font-family: 宋体;">按</span><span style="font-family: 'Times New Roman';">a.</span><span style="font-family: 宋体;">然后在命令那一栏添上</span><span style="font-family: 'Times New Roman';">gnome-terminal</span><span style="font-family: 宋体;">就行了</span><span style="font-family: 'Times New Roman';">.</span></p>
+<p>这里会在桌面加一个<span style="font-family: 'Times New Roman';">terminal</span><span style="font-family: 宋体;">的快捷方式</span><span style="font-family: 'Times New Roman';">,</span><span style="font-family: 宋体;">然后上下键可以移动了</span><span style="font-family: 'Times New Roman';">,</span><span style="font-family: 宋体;">选中</span><span style="font-family: 'Times New Roman';">terminal</span><span style="font-family: 宋体;">之后确定就启动</span><span style="font-family: 'Times New Roman';">terminal</span><span style="font-family: 宋体;">了</span></p>
+<p>接下来输入如下命令<span style="font-family: 宋体;"> “</span><span style="font-family: 'Times New Roman';">vi</span>    /lib/udev/rules.d/69-xorg-vmmouse.rules”然后<span style="font-family: 宋体;">在里面加上一句</span></p>
+<p>KERNEL==”event[0-9]*”<span style="font-family: 宋体;">就行了</span><span style="font-family: Arial;">,</span><span style="font-family: 宋体;">当然如果你加到中间的话</span><span style="font-family: Arial;">,</span><span style="font-family: 宋体;">要加上一个逗号</span></p>
+<p>接下来重启就行了</p>
+<p>一切Linux的问题貌似都和配置有关~~</p>
+<p>&nbsp;</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-07-09 </div>
+			<div class="article-title"><a href="/2011/07/09/fedora13-h3c/" >Fedora 13 H3C联网</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>搬了宿舍,然后ip神马的好多都变了,于是又得改了,可是隔了好久了都快忘记了.幸亏有history^-^</p>
+<p>这里把整个过程说下,也当是个备份</p>
+<p>如果想下文件的话<a href="http://www.linuxdiyf.com/viewarticle.php?id=192543" target="_blank" rel="external">猛击我吧 (</a>文件在文章末尾,这里有自动配置脚本,使用请慎重)</p>
+<p>首先你得安装H3C的文件.如果缺一个c++包的话,那么自己下下来之后放在/usr/lib下即可</p>
+<p>然后你需要配置ip和gateway等,下面的操作默认你是root权限</p>
+<p>vi /etc/sysconfig/network-scripts/ifcfg-eth0</p>
+<p>加上你的ip,gateway,dns,netmask等等之后就行了当然到了这里还不能联网,下面你就用system-config-network命令调出一个图形化窗口,修改eth0,这里的修改其实是把ip修改成静态的(其实上面可以不用编辑那么多,直接在这里以下改好也行).然后保存退出,会提醒你重启网卡或计算机之类的,你重启就行了,然后就可以联网了,如果还不行的话,你打电话问网络中心怎么回事吧,那有日志</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-06-22 </div>
+			<div class="article-title"><a href="/2011/06/22/xp-fedora-double-os/" >XP和Fedora的双系统之路</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>本来电脑上有XP和Ubuntu了,不过还是不喜欢Ubuntu,总感觉用上去不爽,想试试Fedora（中间试过CentOS,感觉太庞大了- -）,我装的是Fedora 13,一开始想自己刻dvd,然后安装,无赖一直刻不上,不知道是啥原因,刻了两张都说盘被损坏了,我囧啊.然后就只能从硬盘安装了,在网上搜到一个硬盘安装fedora 13和xp<a href="http://www.zhongsisi.com/fedora-13-hard-disk-installation-method/" target="_blank" rel="external">双系统的帖子</a>,照着做就行了,似乎只需要那个grldr文件就可以引导了,然后那文章就讲的很详细了,首先是让你可以进入引导程序,也就是在boot.ini里面加上一句C:\grldr=”Boot Loader”,这样只要grldr文件的位置在c盘根目录下就可以引导了,接下来就是安装fedora了,也就是如下命令</p>
+<table border="0" cellspacing="0" cellpadding="0"><br><tbody><br><tr><br><td><code>root (hd0,0)</code><br><br><code>kernel /isolinux/vmlinuz</code><br><br><code>initrd /isolinux/initrd.img</code><br><br><code>boot</code><br><br>当然hd0,0这是你xp装在了c盘第一个分区,如果不是那就类推吧,然后接下来就是会要求你选择fedora的ISO文件放在哪,那么你放哪将就填哪,哪里也需要填那个盘,自己推一下就行了(如果不对会让你回来继续选择的),选对之后,就会进行安装了,<span style="color: #ff0000;">安装过程中只有一点一定要注意的就是千万别覆盖了你的xp</span>,也就是选择装在哪的时候,空白区和最后一个create custom layout,边上有个缩略图,自己看看.<br>然后就是把修改写到硬盘,也就是安装fedora到硬盘了,接下来就是配置用户名和密码神马的了,其他的就over了.<br><br>======================我是分割线============================<br>这里说下联网,我的是H3C的校园网,由于在Ubuntu下联过网,所以轻松点,首先配置ip和dns gateway等等东西,这些在文件etc/sysconfig/network-scripts/下的ifcfg-eth0,自己加上就行了,然后在命令台敲命令system-config-network(命令可能有误,不过第一个是system,自己tab一下吧)然后选择 静态ip(其实在配置ip dns gateway那可以加上一句BOOTPROTO=static应该就行了),然后安装H3C的客户端,网上一搜一大把(没图形化界面,然后连接是用linux1x的)网上有一个自动配置脚本,不过对于Fedora 自己得改脚本,不然可能会悲剧.我是自己配的(因为不会改脚本- -,太难改了&amp;太懒了)配好之后应该就可以直接连上网了,如果不行,你可以打电话给网络中心(别和我说你们学下的校园网没网络中心,没有那就自己折腾吧)问问是啥原因,因为那边有记录的(我有次就是ip没配好,为了网络中心才配好的)<br><br>==========================邪恶的分割线========================<br><br>一般来说还有一个东西需要安装,那就是中文输入发,我习惯了fcitx,所以就继续用它,(现在有各种云输入法,暂时用用可以,但是云输入法绝非长久之计啊)yum install fcitx之后,就各种无语了,一个不自动启动,而是ctrl+space不能切换输入法,然后网上搜了一大把,基本就是一个各种软件冲突,其实我也不知道到底谁和谁冲突,怎么冲突的- -||.然后我重装了几次之后,居然就可以了,不过中间还是安装网上的做法做的,没做完一次就要重装一次啊.在ubuntu下可以用im-switch来设置的,fedora似乎有个im-chooser,不过不会用,路过的有谁会的就说下呗,那个开机自动启动,可以在系统-首选项-启动应用程序增加一个叫fcitx的启动项就ok了,只要路径对了就没问题,名字那啥都是浮云</td><br></tr><br></tbody><br></table>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-03-25 </div>
+			<div class="article-title"><a href="/2011/03/25/undefined-reference-to-sqrt-c/" >C语言编译时的undefined reference to &#39;sqrt&#39;</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>今天编译一C程序时,发现无论如何sqrt就是没定义,math.h也加了.实在是无语阿,后来搜了一下,发现是链接时的问题,也就是需要自己链接数学库,似乎Linux下的数学库是不自动链接的,也就是说需要你去链接.不过有些系统还是自动链接的.如果发现你加了某个系统函数的头文件还是出现没定义的错误的话,可是试着自己在编译时加上链接该库的指令,链接数学库是用的 -lm 也就是gcc -o example.out example.c -lm</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-31 </div>
+			<div class="article-title"><a href="/2010/12/31/linux-fork-2/" >Linux-fork(2)</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>由于这篇会比较长,所以就不接在上一篇后面了,在此再开一篇.这里说说和fork有关的两个比较有趣的程序</p>
+<p>第一个是这样的[一组,一共两个程序对比]</p>
+<p><div class="source" style="color: #f5deb3; background-color: #2f4f4f; font-family: 'Courier New', 'Lucida Console', Verdana;"><span style="color: #eeee00;">#include <unistd.h>;</unistd.h></span><br><span style="color: #eeee00;">#include <sys types.h="">;</sys></span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span> ()<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">pid_t</span> <span style="color: #f5deb3;">pid</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">fork</span><span style="color: #f5deb3;">”</span>);<span style="color: #da70d6;">//注意这句和下面的区别</span><br><span style="color: #f5deb3;">pid</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">fork</span>();<br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">error</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">fork</span><span style="color: #f5deb3;">!</span><span style="color: #f5deb3;">”</span>);<br><span style="color: #b0c4de; font-weight: bold;">else</span> <span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">am</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">child</span> <span style="color: #f5deb3;">process</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">my</span> <span style="color: #f5deb3;">process</span> <span style="color: #f5deb3;">id</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">dn</span><span style="color: #f5deb3;">”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">am</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">parent</span> <span style="color: #f5deb3;">process</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">my</span> <span style="color: #f5deb3;">process</span> <span style="color: #f5deb3;">id</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">dn</span><span style="color: #f5deb3;">”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br><span style="color: #f5deb3;">retrun</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#include <unistd.h>;</unistd.h></span><br><span style="color: #eeee00;">#include <sys types.h="">;</sys></span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span> ()<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">pid_t</span> <span style="color: #f5deb3;">pid</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">fork</span><span style="color: #f5deb3;">\</span>n<span style="color: #f5deb3;">”</span>);<span style="color: #da70d6;">//注意这句和下面的区别</span><br><span style="color: #f5deb3;">pid</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">fork</span>();<br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">error</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">fork</span><span style="color: #f5deb3;">!</span><span style="color: #f5deb3;">”</span>);<br><span style="color: #b0c4de; font-weight: bold;">else</span> <span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">am</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">child</span> <span style="color: #f5deb3;">process</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">my</span> <span style="color: #f5deb3;">process</span> <span style="color: #f5deb3;">id</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">dn</span><span style="color: #f5deb3;">”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">am</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">parent</span> <span style="color: #f5deb3;">process</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">my</span> <span style="color: #f5deb3;">process</span> <span style="color: #f5deb3;">id</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">dn</span><span style="color: #f5deb3;">”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div><br>上面的两个会输出什么呢?</p>
+<p>。</p>
+<p>。</p>
+<p>。</p>
+<p>。</p>
+<p>答案是</p>
+<p>第一个输出:</p>
+<p>forki am the child process, my process id is 2955</p>
+<p>forki am the child process, my process id is 2954</p>
+<p>第二个的输出是</p>
+<p>fork</p>
+<p>i am the child process, my process id is 2955</p>
+<p>i am the child process, my process id is 2954</p>
+<p>是不是觉得和我昨天说的不一样呢?怎么第一个中的fork输出两次呢？这里就和printf的缓冲有关了,具体的可以<a href="http://bbs.chinaunix.net/viewthread.php?tid=311067" target="_blank" rel="external"><span style="color: #ff0000;">参考这里</span></a></p>
+<p>下面的是<a href="http://www.cppblog.com/zhangxu/archive/2007/12/02/37640.aspx" target="_blank" rel="external"><span style="color: #ff0000;">转自这里</span></a></p>
+<p>我试验了下,结果和博主的相似.</p>
+<p>.给你两分钟抢答时间</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<p>OK,答案来了.</p>
+<p>对一下答案吧：[这分析和结果是复制过来的.]</p>
+<p>[hardy@localhost fork]$ ./fork<br>father<br>son<br>son<br>son<br>father<br>father<br>son<br>father<br>son<br>son<br>father<br>father<br>son<br>father<br>总共7个son7个father。你答对了么？</p>
+<p>这道题需要在纸上画画才好理解[由于格式会不对,所以我用图片,速度不给力的还请见谅]</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/fork-1.bmp" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/fork-1.bmp" alt="" title="fork-1"></a></p>
+<p>其中每一行分别代表一个进程的运行打印结果。</p>
+<p>当产生子进程的时刻，子进程打印son，当子进程调用fork的生成子子进程，他就提升为father。<br>总结来说，father永远打印father，son在fork之前是son，fork之后就为father，同时生成新的son。<br>这个比喻就像真正的父子，孩子长大了生了小孩，孩子就成了父亲。而父亲永远是父亲。</p>
+<p>我自己试验的时候的结果如下:</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/fork.bmp" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/fork.bmp" alt="" title="fork"></a></p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-30 </div>
+			<div class="article-title"><a href="/2010/12/30/linux-fork-test/" >fork函数小测试</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>本篇文章还是beta版,由于本人对这个函数的了解还不是非常清晰,暂时只知道返回值有两个,返回两次.一个是,表示创建的子进程,一个是创建的子进程的id.如果返回-1表示创建失败,下面就不考虑了.下面的函数是测试用代码.</p>
+<p>代码如下:</p>
+<p><div class="source" style="background-color: #2f4f4f; font-family: 'Courier New','Consolas','Lucida Console'; color: #f5deb3;"><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <unistd.h></unistd.h></span><br><span style="color: #eeee00;">#include <systypes.h></systypes.h></span></div><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span>(<span style="color: #98fb98; font-weight: bold;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #98fb98; font-weight: bold;">int</span> p;<br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“main——</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>    p <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">fork</span>();<span style="color: #da70d6;">//调用fork函数</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“after-fork<strong><em>*</em></strong></span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>    <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> p)<br>       <span style="color: #f5deb3;">{</span><br>          <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“child  %d—–ppid-&gt;%d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span><span style="color: #f5deb3;">(),</span><span style="color: #f5deb3;">getppid</span>());<br>       <span style="color: #f5deb3;">}</span><br>    <span style="color: #b0c4de; font-weight: bold;">else</span><br>       <span style="color: #f5deb3;">{</span><br>          <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“parent %d—</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br>       <span style="color: #f5deb3;">}</span><br>   <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“over—<em>*</em></span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>   <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></p>
+<p>结果如下:</p>
+<p>main——</p>
+<p>after-fork<strong><em>*</em></strong></p>
+<p>child  2579—–ppid-&gt;2578</p>
+<p>over—<em>*</em></p>
+<p>after-fork<strong><em>*</em></strong></p>
+<p>parent 2578—</p>
+<p>over—<em>*</em></p>
+<p>上述结果说明一些事情:首先是前面我说的.还有就是fork函数后面的都会被子进程和父进程都执行.还有一个是说这两个是并行的,也就是说可能先执行父进程再进行子进程,不过暂时结果没见过.等进一步了解之后,再来更新本篇文章.</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-23 </div>
+			<div class="article-title"><a href="/2010/12/23/linux-grub-encrypt/" >Linux Grub加密</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>上一篇文章中说到最好给grub也加密,由于我自己也没加密过,所以搜了下,方法如下 本人试验过可用<br>为grub密分为二种，一是明文，二是采用MD5算法的加密。<br>明文加密：编辑 grub.conf文件<br>vi /boot/grub/grub.conf 在default=0下面加一行 password=1234567890(这个就是明文密码)</p>
+<p>MD5加密：先要命令 grub-md5-crypt计算出MD5的值，然后复制这个值到grub.conf文件中 password –md5$BYxEn$e5X/xOTS2pTpPPWtgIMhU1(这个就是用MD5加密后的值)<br>转载自：<a href="http://blog.csdn.net/magicbreaker/archive/2008/11/23/3357209.aspx" target="_blank" rel="external">http://blog.csdn.net/magicbreaker/archive/2008/11/23/3357209.aspx
+</a>另外可以参照:<a href="http://linux.chinaitlab.com/safe/798285.html" target="_blank" rel="external">http://linux.chinaitlab.com/safe/798285.html</a>[说的比较好]</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-23 </div>
+			<div class="article-title"><a href="/2010/12/23/linux-single-user-config/" >Linux下单用户模式修改错误配置文件</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>晚上同学发过来一条消息说他的Linux出问题了,让我看看,如图</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/未命名.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/未命名.jpg" alt="" title="未命名"></a>root前面多了个sarwar<br>一开始我以为他他改的PS1,让他推出用root登录下再改PS1,可是他说他的密码错误了,这个就尴尬了,然后问他进行了什么操作,他说改了/etc/passwd这个文件.这就是问题所在了。到这里一般有两种方法解决,一是重装,因为是装载虚拟机里面,重装也不是什么很大的事,不过Red Hat9装起来还是比较麻烦的。二是通过单用户来修改错误配置,下面就讲下怎么通过单用户来修改错误配置首先来到grub项的时候如下图</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/grub1.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/grub1-300x285.jpg" alt="" title="grub1"></a></p>
+<p>这时按下e然后出现下面的界面</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/grub2.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/grub2-300x284.jpg" alt="" title="grub2"></a></p>
+<p>这时选中第二项再按下e会出现如下界面</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/grub3.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/grub3-300x284.jpg" alt="" title="grub3"></a></p>
+<p>在这里输入空格加1[空格是必需的,1代表单用户模式]然后回车出现如下界面</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/grub4.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/grub4-300x283.jpg" alt="" title="grub4"></a></p>
+<p>这时再按下b然后系统就会重启,重启后就是以单用户模式启动了.于是你就可以在这里修改错误的配置文件了.所以一般来说不需要知道别人的密码也可以进入他的Linux系统,因为用如上方式可以修改密码,而且不需要知道原来的密码.所以一般最好给grub也加上密码.这样就可以了</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-22 </div>
+			<div class="article-title"><a href="/2010/12/22/linux-shell-problem/" >Linux Shell遇到的问题</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>今天上实验课,遇到了一些Shell的问题,有些是帮同学解决问题时遇到的,有时是自己遇到的,也让我对某些命令有了个更好的了解.写此文章纯属备份.</p>
+<p> 挂载U盘的方法.</p>
+<p>1)插入U盘,fdisk -l得到U盘对应的分区.</p>
+<p>2)新建一个文件夹,一般建在/mnt下,名字一般加usb.[mkdir usb]</p>
+<p>3)挂载.mount  <span style="color: #ff0000;">/dev/sdb1  <span style="color: #000000;">/mnt/usb[红色的地方是你机器上查出来的分区]</span></span></p>
+<p><span style="color: #ff0000;"><span style="color: #000000;">卸载就直接用umount /dev/sdb1或者umount /mnt/usb</span></span></p>
+<p><span style="color: #ff0000;"><span style="color: #000000;">还有就是shell里面的x=x+1的写法,一开始由于这个导致我的程序各种无语,要不就是死循环,要不就是找不到命令.后来一个命令一个命令的分开试,然后再组起来.才发现是这句话的错误,原因是我的’+’两边没加空格.这还是自己写的少的原因.x=x+1有两种写法, x=$(($x + 1))和x=<code>expr $x + 1</code>[是反引号]</span></span></p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-15 </div>
+			<div class="article-title"><a href="/2010/12/15/vmware-redhat9-cant-mount/" >VMware 安装RedHat9时光盘无法挂载</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>昨天,同学把我叫过去,让我帮他装RedHat9.以前我也没装过RedHat9,不过我想应该很容易的,和其他的Linux系统应该没什么差别.不过中间还是遇到了一个小问题。问题如下 当第一个ISO文件安装完成后,得换盘.这时问题来了,换了盘之后出现无法挂载(could not mount).这个原因其实是VMware造成的.也就是说,当你的第一个ISO完成安装后,VMware把它弹出来了,这时它会断掉CD connection.如下图:[红色的地方]</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/vware.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/vware-300x194.jpg" alt="" title="vware"></a></p>
+<p>这时红色箭头所指的地方是没勾上的.也就是会出线无法挂载的问题.只要勾上就行了,然后换盘就可以继续安装了。</p>
+
+	
+	</div>
+</div>
+
+	  
+      </div>
+	  <div>
+	    <center>
+	    <div class="pagination">
+<ul class="pagination">
+	 
+		
+    	<li class="prev"><a href="/categories/Linux/page/2/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+  		
+
+        <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+
+		
+		   <li class="next"> <a href="/categories/Linux/page/4/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+        
+	
+</ul>
+</div>
+
+        </center>
+	    </div>	
+      
+
+</div> <!-- col-md-9/col-md-12 -->
+
+
+<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+	<div class="widget">
+		<h4>Categories</h4>
+		<ul class="tag_box inline list-unstyled">
+		
+			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+		
+			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+		
+			<li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+		
+			<li><a href="/categories/Linux/TeX/">TeX<span>1</span></a></li>
+		
+			<li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+		
+			<li><a href="/categories/Uncategorized/">Uncategorized<span>3</span></a></li>
+		
+			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+		
+			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
+		
+			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/成长/">成长<span>3</span></a></li>
+		
+			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+		
+			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
+		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+		</ul>
+	</div>
+
+		
+			
+	<div class="widget">
+		<h4>Tag Cloud</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
+		
+			<li><a href="/tags/stack/">stack<span>1</span></a></li>
+		
+			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+		
+			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
+		
+			<li><a href="/tags/apach/">apach<span>0</span></a></li>
+		
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
+		
+			<li><a href="/tags/command/">command<span>1</span></a></li>
+		
+			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
+		
+			<li><a href="/tags/english/">english<span>1</span></a></li>
+		
+			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
+		
+			<li><a href="/tags/插件/">插件<span>1</span></a></li>
+		
+			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+		
+			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
+		
+			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+		
+			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
+		
+			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
+		
+			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
+		
+			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+		
+			<li><a href="/tags/rename/">rename<span>1</span></a></li>
+		
+			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>260</span></a></li>
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>Recent Posts</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
+      </li>
+    
+      <li>
+        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>Links</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="https://github.com/wzpan/freemind/" title="Freemind's Github repository." target="_blank"]);">Freemind</a></li>
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/wzpan" title="My Github account." target="_blank"]);">My Github</a></li>
+	
+		<li><i class="fa fa-linkedin"></i><a href="http://www.linkedin.com/in/hahack" title="My Linkin account." target="_blank"]);">My LinkedIn</a></li>
+	
+	</ul>
+</div>
+
+
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

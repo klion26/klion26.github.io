@@ -1,0 +1,318 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Spark Streaming 中使用 zookeeper 保存 offset 并重用 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="在 Spark Streaming 中消费 Kafka 数据的时候，有两种方式分别是 1）基于 Receiver-based 的 createStream 方法和 2）Direct Approach (No Receivers) 方式的 createDirectStream 方法，详细的可以参考 S">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Spark Streaming 中使用 zookeeper 保存 offset 并重用"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Spark Streaming 中使用 zookeeper 保存 offset 并重用</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>在 Spark Streaming 中消费 Kafka 数据的时候，有两种方式分别是 1）基于 Receiver-based 的 createStream 方法和 2）Direct Approach (No Receivers) 方式的 createDirectStream 方法，详细的可以参考 <a href="http://spark.apache.org/docs/latest/streaming-kafka-integration.html" target="_blank" rel="external">Spark Streaming + Kafka Integration Guide</a>，但是第二种使用方式中  kafka 的 offset 是保存在 checkpoint 中的，如果程序重启的话，会丢失一部分数据，可以参考  <a href="http://aseigneurin.github.io/2016/05/07/spark-kafka-achieving-zero-data-loss.html" target="_blank" rel="external">Spark  Kafka - Achieving zero data-loss</a>。</p>
+<p>本文主要讲在使用第二种消费方式（Direct Approach）的情况下，如何将 kafka 中的 offset 保存到 zookeeper 中，以及如何从 zookeeper 中读取已存在的 offset。</p>
+<p>大致思想就是，在初始化 kafka stream 的时候，查看 zookeeper 中是否保存有 offset，有就从该 offset 进行读取，没有就从最新/旧进行读取。在消费 kafka 数据的同时，将每个 partition 的 offset 保存到 zookeeper 中进行备份，具体实现参考下面代码</p>
+<p><pre class="lang:scala decode:true  ">val topic : String = “topic_name”   //消费的 topic 名字<br>    val topics : Set[String] = Set(topic)                    //创建 stream 时使用的 topic 名字集合</pre></p>
+<pre><code>val topicDirs = new ZKGroupTopicDirs(&quot;test_spark_streaming_group&quot;, topic)  //创建一个 ZKGroupTopicDirs 对象，对保存
+val zkTopicPath = s&quot;${topicDirs.consumerOffsetDir}&quot;          获取 zookeeper 中的路径，这里会变成 /consumers/test_spark_streaming_group/offsets/topic_name
+
+val zkClient = new ZkClient(&quot;10.4.232.77:2181&quot;)          //zookeeper 的host 和 ip，创建一个 client
+val children = zkClient.countChildren(s&quot;${topicDirs.consumerOffsetDir}&quot;)     //查询该路径下是否字节点（默认有字节点为我们自己保存不同 partition 时生成的）
+
+var kafkaStream : InputDStream[(String, String)] = null   
+var fromOffsets: Map[TopicAndPartition, Long] = Map()   //如果 zookeeper 中有保存 offset，我们会利用这个 offset 作为 kafkaStream 的起始位置
+
+if (children &gt; 0) {   //如果保存过 offset，这里更好的做法，还应该和  kafka 上最小的 offset 做对比，不然会报 OutOfRange 的错误
+    for (i &lt;- 0 until children) {
+      val partitionOffset = zkClient.readData[String](s&quot;${topicDirs.consumerOffsetDir}/${i}&quot;)
+      val tp = TopicAndPartition(topic, i)
+      fromOffsets += (tp -&gt; partitionOffset.toLong)  //将不同 partition 对应的 offset 增加到 fromOffsets 中
+      logInfo(&quot;@@@@@@ topic[&quot; + topic + &quot;] partition[&quot; + i + &quot;] offset[&quot; + partitionOffset + &quot;] @@@@@@&quot;)
+    }
+
+    val messageHandler = (mmd : MessageAndMetadata[String, String]) =&gt; (mmd.topic, mmd.message())  //这个会将 kafka 的消息进行 transform，最终 kafak 的数据都会变成 (topic_name, message) 这样的 tuple
+    kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParam, fromOffsets, messageHandler)
+}
+else {
+    kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParam, topics) //如果未保存，根据 kafkaParam 的配置使用最新或者最旧的 offset
+}
+
+var offsetRanges = Array[OffsetRange]()
+kafkaStream.transform{ rdd =&gt;
+  offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges //得到该 rdd 对应 kafka 的消息的 offset
+  rdd
+}.map(msg =&gt; msg._2).foreachRDD { rdd =&amp;gt;     
+  for (o &lt;- offsetRanges) {
+    val zkPath = s&quot;${topicDirs.consumerOffsetDir}/${o.partition}&quot;
+    ZkUtils.updatePersistentPath(zkClient, zkPath, o.fromOffset.toString)  //将该 partition 的 offset 保存到 zookeeper
+    logInfo(s&quot;@@@@@@ topic  ${o.topic}  partition ${o.partition}  fromoffset ${o.fromOffset}  untiloffset ${o.untilOffset} #######&quot;)
+  }
+
+  rdd.foreachPartition(
+    message =&gt; {
+      while(message.hasNext) {
+        logInfo(s&quot;@^_^@   [&quot; + message.next() + &quot;] @^_^@&quot;)
+      }
+    }
+  )
+}&lt;/pre&gt;
+</code></pre><p>使用上面的代码，我们可以做到 Spark Streaming 程序从 Kafka 中读取数据是不丢失</p>
+<p>欢迎阅读<a href="http://www.klion26.com/spark-streaming-saving-offset-in-zookeeper-2.html" target="_blank" rel="external">第二篇文章</a>，解决 offset out of range 的问题</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2016/07/15/spark-streaming-saving-offset-in-zookeeper-2/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2016/06/11/asking-the-right-questions/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2016-07-14 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/kafka/">kafka<span>8</span></a></li> <li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li> <li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li> <li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li> <li><a href="/tags/zookeeper/">zookeeper<span>2</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

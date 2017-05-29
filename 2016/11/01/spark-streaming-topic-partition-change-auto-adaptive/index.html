@@ -1,0 +1,277 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Spark Streaming 自适应上游 kafka topic partition 数目变化 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="## 背景Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。## 思考过程">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Spark Streaming 自适应上游 kafka topic partition 数目变化"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Spark Streaming 自适应上游 kafka topic partition 数目变化</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <div class="markdown-body"><br><br>## 背景<br><br>Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。<br><br>## 思考过程<br><br>为了作业能够长时间的运行，一开始遇到这种情况的时候，想到两种方案：<br><br>1.  感知上游 topic 的 partition 数目变化，然后发送报警，让用户重启<br>2.  直接在作业内部自适应上游 topic partition 的变化，完全不影响作业<br>方案 1 是简单直接，第一反应的结果，但是效果不好，需要用户人工介入，而且需要删除 checkpoint 文件<br><br>方案 2 从根本上解决问题，用户不需要关心上游 partition 数目的变化，但是第一眼会觉得较难实现。<br><br>方案 1 很快被 pass 掉，因为人工介入的成本太高，而且实现起来很别扭。接下来考虑方案 2.<br><br>Spark Streaming 程序中使用 Kafka 的最原始方式为 <code>KafkaUtils.createDirectStream</code> 通过源码，我们找到调用链条大致是这样的<br><br><span style="color: #0000ff;"><strong><code>KafkaUtils.createDirectStream</code></strong></span>   –&gt;   <strong><span style="color: #0000ff;"><code>new DirectKafkaInputDStream</code></span></strong> –&gt; 最终由 <code>DirectKafkaInputDStream#compute(validTime : Time)</code> 函数来生成 KafkaRDD。<br><br>而 KafkaRDD 的 partition 数和 <strong><span style="color: #0000ff;">作业开始运行时</span></strong> topic 的 partition 数一致，topic 的 partition 数保存在 currentOffsets 变量中，currentOffsets 是一个 Map[TopicAndPartition, Long]类型的变量，保存每个 partition 当前消费的 offset 值，但是作业运行过程中 currentOffsets 不会增加 key，就是说不会增加 KafkaRDD 的 partition，这样导致每次生成 KafkaRDD 的时候都使用 <span style="color: #0000ff;"><strong>作业开始运行时</strong></span> topic 的 partition 数作为 KafkaRDD 的 partition 数，从而会造成数据的丢失。<br><br>## 解决方案<br><br>我们只需要在每次生成 KafkaRDD 的时候，将 currentOffsets 修正为正常的值（往里面增加对应的 partition 数，总共 B-A 个，以及每个增加的 partition 的当前 offset 从零开始）。<br><br><em>   第一个问题出现了，我们不能修改 Spark 的源代码，重新进行编译，因为这不是我们自己维护的。想到的一种方案是继承 DirectKafkaInputDStream。我们发现不能继承 DirectKafkaInputDStream 该类，因为这个类是使用 <code>private[streaming]</code> 修饰的。
+</em>   第二个问题出现了，怎么才能够继承 DirectKafkaInputDStream，这时我们只需要将希望继承 DirectKafkaInputDStream 的类放到一个单独的文件 F 中，文件 F 使用 <code>package org.apache.spark.streaming</code> 进行修饰即可，这样可以绕过不能继承 DirectKafkaInputDStream 的问题。这个问题解决后，我们还需要修改 <code>Object KafkaUtils</code>，让该 Object 内部调用我们修改后的 DirectKafkaInputDStream（我命名为 MTDirectKafkaInputDStream)<br><em>   第三个问题如何让 Spark 调用 MTDirectKafkaInputDStream，而不是 DirectKafkaInputDStream，这里我们使用简单粗暴的方式，将 KafkaUtils 的代码 copy 一份，然后将其中调用 DirectKafkaInputDStream 的部分都修改为 MTDirectKafkaInputDStream，这样就实现了我们的需要。当然该文件也需要使用 <code>package org.apache.spark.streaming</code> 进行修饰
+</em>   第二个和第三个问题的解决方案在  中国 Spark 技术峰会 2016  上，广点通的 林立伟 有提及，后续会进行尝试<br>总结下，我们需要做两件事<br><br>1.  修改 DirectKafkaInputDStream#compute 使得能够自适应 topic 的 partition 变更<br>2.  修改 KafkaUtils，使得我们能够调用修改过后的 DirectKafkaInputDStream<br><br>## 代码<br><br>    package org.apache.spark.streaming.kafka.mt<br><br>    import com.meituan.data.util.Constants<br>    import com.meituan.service.inf.kms.client.Kms<br>    import kafka.common.{ErrorMapping, TopicAndPartition}<br>    import kafka.javaapi.{TopicMetadata, TopicMetadataRequest}<br>    import kafka.javaapi.consumer.SimpleConsumer<br>    import kafka.message.MessageAndMetadata<br>    import kafka.serializer.Decoder<br>    import org.apache.spark.streaming.{StreamingContext, Time}<br>    import org.apache.spark.streaming.kafka.{DirectKafkaInputDStream, KafkaRDD}<br><br>    import scala.collection.JavaConverters.<em><br>    import scala.util.control.Breaks.</em><br>    import scala.reflect.ClassTag<br><br>    /<strong><br>      <em> Created by qiucongxian on 10/27/16.
+      </em>/<br>    class MTDirectKafkaInputDStream<a href="@transient ssc_ : StreamingContext,
+        val MTkafkaParams: Map[String, String],
+        val MTfromOffsets: Map[TopicAndPartition, Long],
+        messageHandler: MessageAndMetadata[K, V] =&gt; R"><br>      K: ClassTag,<br>      V: ClassTag,<br>      U &lt;: Decoder[K]: ClassTag,<br>      T &lt;: Decoder[V]: ClassTag,<br>      R: ClassTag</a> extends DirectKafkaInputDStream<a href="ssc_, MTkafkaParams , MTfromOffsets, messageHandler">K, V, U, T, R</a> {<br>        private val kafkaBrokerList : String = “host1:port1,host2:port2,host3:port3” //根据自己的情况自行修改<br><br>        override def compute(validTime: Time) : Option[KafkaRDD[K, V, U, T, R]] = {<br>          /</strong><br>            <em> 在这更新 currentOffsets 从而做到自适应上游 partition 数目变化
+            </em>/<br>            updateCurrentOffsetForKafkaPartitionChange()<br>            super.compute(validTime)<br>        }<br><br>        private def updateCurrentOffsetForKafkaPartitionChange() : Unit = {<br>          val topic = currentOffsets.head.<em>1.topic<br>          val nextPartitions : Int = getTopicMeta(topic) match {<br>              case Some(x) =&gt; x.partitionsMetadata.size()<br>              case </em> =&gt; 0<br>          }<br>          val currPartitions = currentOffsets.keySet.size<br><br>          if (nextPartitions &gt; currPartitions) {<br>            var i = currPartitions<br>            while (i &lt; nextPartitions) {<br>               currentOffsets = currentOffsets + (TopicAndPartition(topic, i) -&gt; 0)<br>               i = i + 1<br>            }<br>          }<br>          logInfo(s”######### ${nextPartitions}  currentParttions ${currentOffsets.keySet.size} ########”)<br>        }<br><br>        private def getTopicMeta(topic: String) : Option[TopicMetadata] = {<br>            var metaData : Option[TopicMetadata] = None<br>            var consumer : Option[SimpleConsumer] = None<br><br>            val topics = List<a href="topic">String</a><br>            val brokerList = kafkaBrokerList.split(“,”)<br>            brokerList.foreach(<br>              item =&gt; {<br>                val hostPort = item.split(“:”)<br>                try {<br>                  breakable {<br>                      for (i &lt;- 0 to 3) {<br>                          consumer = Some(new SimpleConsumer(host = hostPort(0), port = hostPort(1).toInt,<br>                                                soTimeout = 10000, bufferSize = 64 * 1024, clientId = “leaderLookup”))<br>                          val req : TopicMetadataRequest = new TopicMetadataRequest(topics.asJava)<br>                          val resp = consumer.get.send(req)<br><br>                          metaData = Some(resp.topicsMetadata.get(0))<br>                          if (metaData.get.errorCode == ErrorMapping.NoError) break()<br>                      }<br>                  }<br>                } catch {<br>                  case e =&gt; logInfo(s” ###### Error in MTDirectKafkaInputDStream ${e} ######”)<br>                }<br>              }<br>            )<br>            metaData<br>        }<br>    }<br><br>在修改过后的 KafkaUtils 文件中，将所有的 <code>DirectKafkaInputDStream</code> 都替换为 <code>MTDirectKafkaInputDStream</code> 即可<br><br></div>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2016/10/26/e8-a6-81-e5-a4-9a-e5-bf-ab-e6-89-8d-e8-83-bd-e8-b7-91-e5-ae-8c-e4-b8-80-e5-9c-ba-e9-a9-ac-e6-8b-89-e6-9d-be/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2016-11-01 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li> <li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/kafka/">kafka<span>8</span></a></li> <li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li> <li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li> <li><a href="/tags/partition/">partition<span>1</span></a></li> <li><a href="/tags/topic/">topic<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

@@ -1,0 +1,646 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Page 17 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 <div class="page-header page-header-inverse ">
+  <h1 class="title title-inverse ">Hexo</h1>
+</div>
+
+<div class="row page">
+
+	
+	<div class="col-md-9">
+	
+
+		<div class="slogan">
+      <i class="fa fa-heart"></i>
+      Yet another bootstrap theme.
+</div>    
+		<div id="top_search"></div>
+		<div class="mypage">
+		
+		<!-- title and entry -->
+        <!-- render top articles firstly -->
+        
+        <!-- render other articles -->
+        
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-30 </div>
+			<div class="article-title"><a href="/2010/12/30/linux-fork-test/" >fork函数小测试</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>本篇文章还是beta版,由于本人对这个函数的了解还不是非常清晰,暂时只知道返回值有两个,返回两次.一个是,表示创建的子进程,一个是创建的子进程的id.如果返回-1表示创建失败,下面就不考虑了.下面的函数是测试用代码.</p>
+<p>代码如下:</p>
+<p><div class="source" style="background-color: #2f4f4f; font-family: 'Courier New','Consolas','Lucida Console'; color: #f5deb3;"><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <unistd.h></unistd.h></span><br><span style="color: #eeee00;">#include <systypes.h></systypes.h></span></div><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span>(<span style="color: #98fb98; font-weight: bold;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #98fb98; font-weight: bold;">int</span> p;<br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“main——</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>    p <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">fork</span>();<span style="color: #da70d6;">//调用fork函数</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“after-fork<strong><em>*</em></strong></span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>    <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> p)<br>       <span style="color: #f5deb3;">{</span><br>          <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“child  %d—–ppid-&gt;%d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span><span style="color: #f5deb3;">(),</span><span style="color: #f5deb3;">getppid</span>());<br>       <span style="color: #f5deb3;">}</span><br>    <span style="color: #b0c4de; font-weight: bold;">else</span><br>       <span style="color: #f5deb3;">{</span><br>          <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“parent %d—</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br>       <span style="color: #f5deb3;">}</span><br>   <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“over—<em>*</em></span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>   <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></p>
+<p>结果如下:</p>
+<p>main——</p>
+<p>after-fork<strong><em>*</em></strong></p>
+<p>child  2579—–ppid-&gt;2578</p>
+<p>over—<em>*</em></p>
+<p>after-fork<strong><em>*</em></strong></p>
+<p>parent 2578—</p>
+<p>over—<em>*</em></p>
+<p>上述结果说明一些事情:首先是前面我说的.还有就是fork函数后面的都会被子进程和父进程都执行.还有一个是说这两个是并行的,也就是说可能先执行父进程再进行子进程,不过暂时结果没见过.等进一步了解之后,再来更新本篇文章.</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-30 </div>
+			<div class="article-title"><a href="/2010/12/30/wordpress-clickchar-plugin/" >wordpress之clickchar插件--不一样的提交按钮</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<pre><code>在[哑熊大牛](http://dumbear.com/blog/)的博客上看到这个插件,感觉很给力.于是就问了下,哑熊大牛一下就回复了.在此感谢下,哈哈.原来是个clickchar插件,话说这个插件不仅有提交按钮的作用,还有验证码的作用,而且样式也不错.于是就安装了,顺便在这推荐下。效果在本文的评论框下面
+</code></pre><p>关于安装:wordpress 2.7以上版本可以直接在添加新插件那搜索clickchar就OK了,记得要设置API keys才可以用</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-23 </div>
+			<div class="article-title"><a href="/2010/12/23/linux-grub-encrypt/" >Linux Grub加密</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>上一篇文章中说到最好给grub也加密,由于我自己也没加密过,所以搜了下,方法如下 本人试验过可用<br>为grub密分为二种，一是明文，二是采用MD5算法的加密。<br>明文加密：编辑 grub.conf文件<br>vi /boot/grub/grub.conf 在default=0下面加一行 password=1234567890(这个就是明文密码)</p>
+<p>MD5加密：先要命令 grub-md5-crypt计算出MD5的值，然后复制这个值到grub.conf文件中 password –md5$BYxEn$e5X/xOTS2pTpPPWtgIMhU1(这个就是用MD5加密后的值)<br>转载自：<a href="http://blog.csdn.net/magicbreaker/archive/2008/11/23/3357209.aspx" target="_blank" rel="external">http://blog.csdn.net/magicbreaker/archive/2008/11/23/3357209.aspx
+</a>另外可以参照:<a href="http://linux.chinaitlab.com/safe/798285.html" target="_blank" rel="external">http://linux.chinaitlab.com/safe/798285.html</a>[说的比较好]</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-23 </div>
+			<div class="article-title"><a href="/2010/12/23/linux-single-user-config/" >Linux下单用户模式修改错误配置文件</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>晚上同学发过来一条消息说他的Linux出问题了,让我看看,如图</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/未命名.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/未命名.jpg" alt="" title="未命名"></a>root前面多了个sarwar<br>一开始我以为他他改的PS1,让他推出用root登录下再改PS1,可是他说他的密码错误了,这个就尴尬了,然后问他进行了什么操作,他说改了/etc/passwd这个文件.这就是问题所在了。到这里一般有两种方法解决,一是重装,因为是装载虚拟机里面,重装也不是什么很大的事,不过Red Hat9装起来还是比较麻烦的。二是通过单用户来修改错误配置,下面就讲下怎么通过单用户来修改错误配置首先来到grub项的时候如下图</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/grub1.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/grub1-300x285.jpg" alt="" title="grub1"></a></p>
+<p>这时按下e然后出现下面的界面</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/grub2.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/grub2-300x284.jpg" alt="" title="grub2"></a></p>
+<p>这时选中第二项再按下e会出现如下界面</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/grub3.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/grub3-300x284.jpg" alt="" title="grub3"></a></p>
+<p>在这里输入空格加1[空格是必需的,1代表单用户模式]然后回车出现如下界面</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/grub4.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/grub4-300x283.jpg" alt="" title="grub4"></a></p>
+<p>这时再按下b然后系统就会重启,重启后就是以单用户模式启动了.于是你就可以在这里修改错误的配置文件了.所以一般来说不需要知道别人的密码也可以进入他的Linux系统,因为用如上方式可以修改密码,而且不需要知道原来的密码.所以一般最好给grub也加上密码.这样就可以了</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-22 </div>
+			<div class="article-title"><a href="/2010/12/22/linux-shell-problem/" >Linux Shell遇到的问题</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>今天上实验课,遇到了一些Shell的问题,有些是帮同学解决问题时遇到的,有时是自己遇到的,也让我对某些命令有了个更好的了解.写此文章纯属备份.</p>
+<p> 挂载U盘的方法.</p>
+<p>1)插入U盘,fdisk -l得到U盘对应的分区.</p>
+<p>2)新建一个文件夹,一般建在/mnt下,名字一般加usb.[mkdir usb]</p>
+<p>3)挂载.mount  <span style="color: #ff0000;">/dev/sdb1  <span style="color: #000000;">/mnt/usb[红色的地方是你机器上查出来的分区]</span></span></p>
+<p><span style="color: #ff0000;"><span style="color: #000000;">卸载就直接用umount /dev/sdb1或者umount /mnt/usb</span></span></p>
+<p><span style="color: #ff0000;"><span style="color: #000000;">还有就是shell里面的x=x+1的写法,一开始由于这个导致我的程序各种无语,要不就是死循环,要不就是找不到命令.后来一个命令一个命令的分开试,然后再组起来.才发现是这句话的错误,原因是我的’+’两边没加空格.这还是自己写的少的原因.x=x+1有两种写法, x=$(($x + 1))和x=<code>expr $x + 1</code>[是反引号]</span></span></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-16 </div>
+			<div class="article-title"><a href="/2010/12/16/wordpress-link-order/" >WordPress链接自定义排序[不用插件]</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>wordpress的链接默认排序是按字典序的,这点有些不爽,有时需要自己改变某些顺序,可是改不了.这就让人很郁闷了,今天上网搜了下,发现原来wordpress是提供的,具体的如下</p>
+<p>打开sidebar.php,找到wp_list_bookmarks,然后用orderby=””[后面填你想用的排序方式]</p>
+<p>orderby： 显示链接的排序方式，默认是 name，要自定义排序，就用这个参数</p>
+<p>取值范围：</p>
+<p>‘id’ – 链接的后台ID编号<br>‘url’ – 链接的URL地址<br>‘name’ – 链接的网站名称<br>‘target’ – 链接的打开方式<br>‘description’ – 链接的描述<br>‘owner’ – 链接的创建者<br>‘rating’ – 链接的分级<br>‘updated’ – 链接的发布时间<br>‘rel’ – 链接与本站的关系 (XFN).<br>‘notes’ – 链接的备注<br>‘rss’   – 链接的feed地址<br>‘length’ – 链接的网站名称的字符串长度<br>‘rand’ – 随机排序</p>
+<p>limit:  显示的链接个数，默认是 -1（全部），要限制显示条数，就用这个参数</p>
+<p>order: 排序的升降， 默认是 升序 ASC， 如果降序，用 DESC<br>参考<a href="http://www.mxyge.cn/?p=1123" target="_blank" rel="external">这位博主的</a></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-15 </div>
+			<div class="article-title"><a href="/2010/12/15/xampp-apache-cant-work-80-port/" >xampp的apache无法启动【无软件占用80端口】</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>非常郁闷的事情,xampp的apache一直无法启动,以为是其他什么软件占用了80端口,一顿狂扫,发现遨游在用,于是乎关掉遨游,可是奇怪的是关掉之后,还是不行.netstat一下发现没人在用80端口,可是xampp就一直报错,去网上找啊找,有人说改tcp/ip的属性,好吧,那就试试,可是改了还是不行,那就继续找解决办法呗,找到一个说是oracle10g引起的,于是想起前几天我刚装oracle,就试试吧,可是找不到环境变量中的perl5lib，那就把oracle的服务一个一个关掉,果然关掉之后就可以启动了,一起顺利,啦啦啦～～～</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-15 </div>
+			<div class="article-title"><a href="/2010/12/15/vmware-redhat9-cant-mount/" >VMware 安装RedHat9时光盘无法挂载</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>昨天,同学把我叫过去,让我帮他装RedHat9.以前我也没装过RedHat9,不过我想应该很容易的,和其他的Linux系统应该没什么差别.不过中间还是遇到了一个小问题。问题如下 当第一个ISO文件安装完成后,得换盘.这时问题来了,换了盘之后出现无法挂载(could not mount).这个原因其实是VMware造成的.也就是说,当你的第一个ISO完成安装后,VMware把它弹出来了,这时它会断掉CD connection.如下图:[红色的地方]</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/vware.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/vware-300x194.jpg" alt="" title="vware"></a></p>
+<p>这时红色箭头所指的地方是没勾上的.也就是会出线无法挂载的问题.只要勾上就行了,然后换盘就可以继续安装了。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-14 </div>
+			<div class="article-title"><a href="/2010/12/14/red-hat9-command-messy-code/" >Red Hat9命令台乱码</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>我的Red Hat9装在虚拟机上,安装时手痒,选了默认语言为中文,今天实验课的时候,在命令控制台发现ls -l命令居然出现乱码[是total变成了乱码,也就是说英文居然变成了乱码,这下蛋疼了],上网搜了下,没找到,有些人说,是由于内核版本和默认语言的问题决定的.后来再搜一条命令的时候,无意中看到了这个.就记录了下来 vi /etc/sysconfig/i18n 然后把LC_ALL=POSIX加在最后面就行了.退出重新登陆就OK了。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2010-12-14 </div>
+			<div class="article-title"><a href="/2010/12/14/linux-rename/" >Linux命令 rename</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>首先声明一点:Ubuntu下的rename和Red Hat9下的是不一样的,就连man出来的也是不一样的.具体的可以自己操作看一下. Ubuntu下的似乎还需要了解Perl语法,不然会报语法错误.- -|| 不过Red Hat9下的就好多了,可以man一下,大致能了解是什么意思了. rename 表达式1 表达式2 表达式3 其中表达式1是要改变的字符串,表达式2是你要改为的字符串,表达式3相当于一个判断式一样的,也就是把所有符合表达式3的文件名中表达式1改成表达式2.表达式3可含通配符。比如Red Hat9的例子.把所有的htm文件的文件名改成html,命令如下 rename .htm .html *.htm 上面的意思是把所有的以.htm结尾的文件中htm改成html</p>
+
+	
+	</div>
+</div>
+
+           
+		
+
+		</div>
+
+		<!-- pagination -->
+		<div>
+  		<center>
+		<div class="pagination">
+<ul class="pagination">
+	 
+		
+    	<li class="prev"><a href="/page/16/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+  		
+
+        <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+
+		
+		   <li class="next"> <a href="/page/18/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+        
+	
+</ul>
+</div>
+
+  		</center>
+		</div>
+
+		
+		
+	</div> <!-- col-md-9 -->
+
+	
+		<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+	<div class="widget">
+		<h4>Categories</h4>
+		<ul class="tag_box inline list-unstyled">
+		
+			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+		
+			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+		
+			<li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+		
+			<li><a href="/categories/Linux/TeX/">TeX<span>1</span></a></li>
+		
+			<li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+		
+			<li><a href="/categories/Uncategorized/">Uncategorized<span>3</span></a></li>
+		
+			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+		
+			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
+		
+			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/成长/">成长<span>3</span></a></li>
+		
+			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+		
+			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
+		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+		</ul>
+	</div>
+
+		
+			
+	<div class="widget">
+		<h4>Tag Cloud</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
+		
+			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+		
+			<li><a href="/tags/learning/">learning<span>1</span></a></li>
+		
+			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
+		
+			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
+		
+			<li><a href="/tags/append/">append<span>2</span></a></li>
+		
+			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
+		
+			<li><a href="/tags/svm/">svm<span>1</span></a></li>
+		
+			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
+		
+			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
+		
+			<li><a href="/tags/tree/">tree<span>1</span></a></li>
+		
+			<li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
+		
+			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
+		
+			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
+		
+			<li><a href="/tags/go/">go<span>1</span></a></li>
+		
+			<li><a href="/tags/git/">git<span>4</span></a></li>
+		
+			<li><a href="/tags/vundle/">vundle<span>1</span></a></li>
+		
+			<li><a href="/tags/network/">network<span>1</span></a></li>
+		
+			<li><a href="/tags/project/">project<span>1</span></a></li>
+		
+			<li><a href="/tags/火柴棍式程序题/">火柴棍式程序题<span>1</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>260</span></a></li>
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>Recent Posts</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
+      </li>
+    
+      <li>
+        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>Links</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="https://github.com/wzpan/freemind/" title="Freemind's Github repository." target="_blank"]);">Freemind</a></li>
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/wzpan" title="My Github account." target="_blank"]);">My Github</a></li>
+	
+		<li><i class="fa fa-linkedin"></i><a href="http://www.linkedin.com/in/hahack" title="My Linkin account." target="_blank"]);">My LinkedIn</a></li>
+	
+	</ul>
+</div>
+
+
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+	
+	
+</div> <!-- row-fluid -->
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

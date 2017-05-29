@@ -1,0 +1,265 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>POJ 1704 博弈 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="传送门
+这题看懂了就是一个staircase nim,没看懂就比较难做了.对于staircase nim的理解,你可以这样想.把每两个chess的距离算出来,那么移动任何一个chess的话,会同时改变和这个chess相关的两个距离,左边的减少,右边的增加,这样你就可以把右边的看成是低的梯子,左边是高">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="POJ 1704 博弈"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> POJ 1704 博弈</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><a href="http://poj.org/problem?id=1704" target="_blank" rel="external">传送门</a></p>
+<p>这题看懂了就是一个staircase nim,没看懂就比较难做了.对于staircase nim的理解,你可以这样想.把每两个chess的距离算出来,那么移动任何一个chess的话,会同时改变和这个chess相关的两个距离,左边的减少,右边的增加,这样你就可以把右边的看成是低的梯子,左边是高的梯子.然后用staircase nim来解决就OK了,staircase nim只与奇数层的梯子上的石子数有关,这个可以用P-positon和N-position的定义归纳来证明[每一个P-position只能到达N-position和每个N-position都能达到至少一个P-position].具体关系就是把所有的奇数层上的石子单独拿出来,做一般的nim游戏,如果某个点使P-position的话,那么还原之后的这个staircase nim也处于一个P-position的状态上.反之亦然.<br>代码如下:</p>
+<div class="source" style="background-color: #2f4f4f; font-family: 'Courier New','Consolas','Lucida Console'; color: #f5deb3;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">ID:qcx97811</span><br><span style="color: #da70d6;">LANG:C</span><br><span style="color: #da70d6;">TASK:POJ_1704</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><span style="color: #eeee00;">#include <math.h></math.h></span><br><br><span style="color: #98fb98; font-weight: bold;">int</span> n<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">t</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1006</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">nim</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1006</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">idx</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">cmp</span>(<span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span><span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;"></span>b)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #b0c4de; font-weight: bold;">if</span>((<span style="color: #f5deb3;"><em></em></span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">a</span>) <span style="color: #f5deb3;">&gt;</span> (<span style="color: #f5deb3;"><em></em></span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;"></span>)b))<br>        <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">1</span><br>    <span style="color: #b0c4de; font-weight: bold;">if</span>((<span style="color: #f5deb3;"><em></em></span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">a</span>) <span style="color: #f5deb3;">&lt;</span> (<span style="color: #f5deb3;"><em></em></span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;"></span>)b))<br>        <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>    <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span>(<span style="color: #98fb98; font-weight: bold;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">t</span>);<br>    <span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">–</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>n);<br>            <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span>n;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]);</span><br>            <span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span>n<span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>            <span style="color: #f5deb3;">qsort</span>(<span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">,</span>n<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]),</span><span style="color: #f5deb3;">cmp</span>);<br>            <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span>n<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&gt;;</span><span style="color: #add8e6;">0</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">–</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">nim</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>            <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">j</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">+=</span><span style="color: #add8e6;">2</span>)<br>                <span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">^=</span><span style="color: #f5deb3;">nim</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>            <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">k</span>)<br>                <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“Bob will win</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>            <span style="color: #b0c4de; font-weight: bold;">else</span><br>                <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“Georgia will win</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2011/03/18/usaco-4-4-1-shuttle-puzzle/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2011/03/16/usaco-4-4-2-pollutant-control/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2011-03-17 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

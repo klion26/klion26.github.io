@@ -1,0 +1,280 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Spark Streaming 中使用 zookeeper 保存 offset 并重用（二） | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="上一篇文章中，我们讲了如何在将 offset 保存在 zk 中，以及进行重用，但是程序中有个小问题“如果程序停了很长很长一段后再启动，zk 中保存的 offset 已经过期了，那会怎样呢？”本文将解决这个问题
+如果 kafka 上的 offset 已经过期，那么就会报 OffsetOutOfRang">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Spark Streaming 中使用 zookeeper 保存 offset 并重用（二）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Spark Streaming 中使用 zookeeper 保存 offset 并重用（二）</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><a href="http://www.klion26.com/spark-streaming-save-offset-to-zookeeper.html" target="_blank" rel="external">上一篇文章</a>中，我们讲了如何在将 offset 保存在 zk 中，以及进行重用，但是程序中有个小问题“如果程序停了很长很长一段后再启动，zk 中保存的 offset 已经过期了，那会怎样呢？”本文将解决这个问题</p>
+<p>如果 kafka 上的 offset 已经过期，那么就会报 OffsetOutOfRange 的异常，因为之前保存在 zk 的 offset 已经 topic 中找不到了。所以我们需要在 从 zk 找到 offset 的这种情况下增加一个判断条件，如果 zk 中保存的 offset 小于当前 kafka topic 中最小的 offset，则设置为 kafka topic 中最小的 offset。假设我们上次保存在 zk 中的 offset 值为 123（某一个 partition），然后程序停了一周，现在 kafka topic 的最小 offset 变成了 200，那么用前文的代码，就会得到 OffsetOutOfRange 的异常，因为 123 对应的数据已经找不到了。下面我们给出，如何获取 <topic, parition=""> 的最小 offset，这样我们就可以进行对比了</topic,></p>
+<p><div class="code panel pdl conf-macro output-block" data-hasbody="true" data-macro-name="code"></div></p>
+<p><div class="codeContent panelContent pdl"></div></p>
+<p><div class="syntaxhighlighter sh-confluence nogutter scala"></div></p>
+<p><pre class="lang:scala decode:true ">val partitionOffset = zkClient.readData<a href="s&quot;${topicDirs.consumerOffsetDir}/${i}&quot;">String</a><br>val tp = TopicAndPartition(topic, i)</pre></p>
+<p>val requestMin = OffsetRequest(Map(tp -&gt; PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))<br>val consumerMin = new SimpleConsumer(“broker_host”, 9092, 10000, 10000, “getMinOffset”)  //注意这里的 broker_host，因为这里会导致查询不到，解决方法在下面<br>val curOffsets = consumerMin.getOffsetsBefore(requestMin).partitionErrorAndOffsets(tp).offsets<br>var nextOffset = partitionOffset.toLong<br>if (curOffsets.length &gt; 0 &amp; nextOffset &lt; curOffsets.head) {  // 通过比较从 kafka 上该 partition 的最小 offset 和 zk 上保存的 offset，进行选择<br>  nextOffset = curOffsets.head<br>}<br>fromOffsets += (tp -&gt; nextOffset) //设置正确的 offset，这里将 nextOffset 设置为 0（0 只是一个特殊值），可以观察到 offset 过期的现象<br>但是上面的代码有一定的问题，因为我们从 kafka 上获取 offset 的时候，需要寻找对应的 leader，从 leader 来获取 offset，而不是 broker，不然可能得到的 curOffsets 会是空的（表示获取不到）。下面的代码就是获取不同 partition 的 leader 相关代码</p>
+<p><pre class="lang:scala decode:true">val topic_name = “topic_name”     //topic_name 表示我们希望获取的 topic 名字<br>val topic2 = List(topic_name)<br>val req = new TopicMetadataRequest(topic2, 0)<br>val getLeaderConsumer = new SimpleConsumer(“broker_host”, 9092, 10000, 10000, “OffsetLookup”)  // 第一个参数是 kafka broker 的host，第二个是 port<br>val res = getLeaderConsumer.send(req)<br>val topicMetaOption = res.topicsMetadata.headOption<br>val partitions = topicMetaOption match {<br>  case Some(tm) =&gt;<br>    tm.partitionsMetadata.map(pm =&gt; (pm.partitionId, pm.leader.get.host)).toMap[Int, String]  // 将结果转化为 partition -&gt; leader 的映射关系<br>  case None =&gt;<br>    Map<a href="">Int, String</a><br>}</pre><br>上面的代码能够得到所有 partition 的 leader 地址，然后将 leader 地址替换掉上面第一份代码中的 broker_list 即可。</p>
+<p>到此，在 spark streaming 中将 kafka 的 offset 保存到 zk，并重用的大部分情况都覆盖到了</p>
+<p><br><br><br>&nbsp;</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2016/08/27/spark-streaming-kafka-read-binlog-to-json/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2016/07/14/spark-streaming-save-offset-to-zookeeper/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2016-07-15 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/kafka/">kafka<span>8</span></a></li> <li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li> <li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li> <li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li> <li><a href="/tags/zookeeper/">zookeeper<span>2</span></a></li> <li><a href="/tags/offset/">offset<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

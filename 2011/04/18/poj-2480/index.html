@@ -1,0 +1,263 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>POJ 2480 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="传送门题意就是求Σgcd(i,n)[1&amp;lt;=i&amp;lt;=n].首先我们知道,如果枚举的话肯定是会超时的.那么现在我们可以这么想.假设k=gcd(i,n).f1=i/k.f2=n/k;那么gcd(f1,f2)=1&amp;amp;f1&amp;lt;f2.看到这是不是想起什么.欧拉函数？对.就是它了.OK.我们再">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="POJ 2480"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> POJ 2480</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><a href="http://poj.org/problem?id=2480" target="_blank" rel="external">传送门</a><br>题意就是求Σgcd(i,n)[1&lt;=i&lt;=n].首先我们知道,如果枚举的话肯定是会超时的.那么现在我们可以这么想.假设k=gcd(i,n).f1=i/k.f2=n/k;那么gcd(f1,f2)=1&amp;f1&lt;f2.看到这是不是想起什么.欧拉函数？对.就是它了.OK.我们再从头开始.现在,假设某个k|n.那么f2=n/k.则存在phi(f2)个数和n的gcd=k.这样的话,这题就好做了.我们只需要求Σk*phi(f2);其中k|n,f2=n/k;到了这一步之后,还有一点就是不能直接枚举所有的k.这样也是会超时的.我们只要筛出n的所有素因子,然后dfs就ok了.这里的素数只需要筛到2^16次就OK了.而且一个&lt;=2^31的数的素因子的个数最多是10个.这样的话,dfs就会非常快了.下面是我的代码:</p>
+<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">ID:klion26</span><br><span style="color: #da70d6;">LANG:C</span><br><span style="color: #da70d6;">TASK:POJ_2480 欧拉函数</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="color: #eeee00;">#include <math.h></math.h></span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> n;<br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">46500</span><span style="color: #f5deb3;">];</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">5200</span><span style="color: #f5deb3;">];</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">20</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">total</span><br><span style="font-weight: bold; color: #b0c4de;">__int64</span> <span style="color: #f5deb3;">ans</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">init</span>(<span style="font-weight: bold; color: #98fb98;">int</span> n)<span style="color: #da70d6;">//n是需要求欧拉函数的最大值</span><br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//结果存在eular数组中</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">eular</span>));<br>    <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><br>    <span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span>n;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//i是素数</span><br>                    <span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">i</span><br>                    <span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">++</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;=</span>n;<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">i</span>)<span style="color: #da70d6;">//j从i到n</span><br>                        <span style="color: #f5deb3;">{</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">])</span><br>                                <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">j</span><br>                            <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">/</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;"><em></em></span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>);<br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">get_eular</span>(<span style="font-weight: bold; color: #98fb98;">int</span> n)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">ret</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(n<span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">46342</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span>n<span style="color: #f5deb3;">];</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">idx</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> (n<span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]))</span><br>                <span style="font-weight: bold; color: #b0c4de;">break</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">idx</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">return</span> n<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>    <span style="color: #f5deb3;">k</span> <span style="color: #f5deb3;">=</span> n<span style="color: #f5deb3;">/</span><span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> (<span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]))</span><br>        <span style="color: #f5deb3;">ret</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">get_eular</span>(<span style="color: #f5deb3;">k</span>);<br>    <span style="font-weight: bold; color: #b0c4de;">else</span><br>        <span style="color: #f5deb3;">ret</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>)<span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">get_eular</span>(<span style="color: #f5deb3;">k</span>);<br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">ret</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">make</span>(<span style="font-weight: bold; color: #98fb98;">int</span> n)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="color: #f5deb3;">total</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">idx</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> (n<span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]))</span><br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">total</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                    <span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>                    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> (n<span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]))</span><br>                        <span style="color: #f5deb3;">{</span><br>                            n <span style="color: #f5deb3;">/=</span> <span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                            <span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span><br>                        <span style="color: #f5deb3;">}</span><br>                    <span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">total</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">j</span><br>                    <span style="color: #f5deb3;">total</span><span style="color: #f5deb3;">++</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">==</span> n)<br>                <span style="font-weight: bold; color: #b0c4de;">break</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(n<span style="color: #f5deb3;">&gt;</span><span style="color: #add8e6;">1</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">total</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span>n;<br>            <span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">total</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><br>            <span style="color: #f5deb3;">total</span><span style="color: #f5deb3;">++</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> ;<br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">dfs</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">now</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">dep</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">dep</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">total</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">get_eular</span>(n<span style="color: #f5deb3;">/</span><span style="color: #f5deb3;">now</span>);<br>            <span style="color: #f5deb3;">ans</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">now</span><br>            <span style="font-weight: bold; color: #b0c4de;">return</span> ;<br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">dep</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">];</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">now</span> <span style="color: #f5deb3;"><em>=</em></span> <span style="color: #f5deb3;">j</span><br>            <span style="color: #f5deb3;">dfs</span>(<span style="color: #f5deb3;">now</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">dep</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>);<br>            <span style="color: #f5deb3;">now</span> <span style="color: #f5deb3;">/=</span> <span style="color: #f5deb3;">j</span><br>            <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">dep</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">];</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">work</span>(<span style="font-weight: bold; color: #98fb98;">int</span> n)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">make</span>(n);<br>    <span style="color: #f5deb3;">ans</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>    <span style="color: #f5deb3;">dfs</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span>);<br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%I64d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">ans</span>);<br><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">main</span>(<span style="font-weight: bold; color: #98fb98;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">init</span>(<span style="color: #add8e6;">46341</span>);<br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #f5deb3;">EOF</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>n))<br>        <span style="color: #f5deb3;">work</span>(n);<br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2011/04/19/eular-function-hdu-3307/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2011/04/15/eular-function-2/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2011-04-18 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

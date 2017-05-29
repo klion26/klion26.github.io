@@ -1,0 +1,587 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>实时计算 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+<!-- title -->
+<div class="page-header page-header-inverse ">
+  <h1 class="archive-title-category title title-inverse ">实时计算</h1>
+</div>
+
+<div class="row page">
+  <!-- cols -->
+  
+  <div class="col-md-9">
+	
+
+	  <div id="top_search"></div>
+
+      
+
+      <div class="mypage">
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2016-12-02 </div>
+			<div class="article-title"><a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" >Spark Streaming 从指定时间戳开始消费 kafka 数据</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>从指定时间戳（比如 2 小时）开始消费 Kafka 数据</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>我们知道通过 Kafka 的 API 可以得到指定时间戳对应数据所在的 segment 的起始 offset。那么就可以通过这个功能来粗略的实现需求。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>我们知道 <code>KafkaUitls.createDirectStream</code> 这个接口可以指定起始点的 offset，那么我们需要做的就变成如下三步：</p>
+<ol>
+<li>获取 <code>topic</code> 对应的 <code>TopicAndPartitions</code>，得到当前 topic 有多少 partition</li>
+<li>从 Kafka 获取每个 partition 指定时间戳所在 segment 的起始 offset</li>
+<li>将步骤 2 中的 offset 作为参数传入 <code>createDirectStream</code> 即可<br>通过查看源码，我们知道步骤 1 和步骤 2 中的功能在 <code>org.apache.spark.streaming.kafka.KafkaCluster</code> 中都已经有现成的函数了：<code>getPartitions</code> 和 <code>getLeaderOffsets</code>，分别表示获取指定 topic 的 partition 以及获取 partition 指定时间戳所在的 segment 的起始 offset，那么我们需要做的就是如何调用这两个函数实现我们的功能了。</li>
+</ol>
+<p>我们知道 <code>KafkaCluster</code> 的作用域是 <code>private[spark]</code> 所以我们需要在自己的代码中使用 <code>package org.apache.spark(.xxx ... .yyy)</code>(小括号中表示可以省略）来限定自己的代码，因此我们可以将步骤 1 和步骤 2 中的功能实现如下：</p>
+<pre><code>package org.apache.spark.streaming.kafka
+......      //省略其他不相关的代码
+
+def getPartitions(kafkaParams: Map[String, String], topics: Set[String]): Either[Err, Set[TopicAndPartition]] = {
+        val kc = new KafkaCluster(kafkaParams)
+        kc.getPartitions(topics)    //我们可以在这里处理错误，也可以将错误继续往上传递
+    }
+
+    def getLeaderOffsets(kafkaParams: Map[String, String], topicAndPartitions: Set[TopicAndPartition], before: Long) : Map[TopicAndPartition, Long]  = {
+        val kc = new KafkaCluster(kafkaParams)
+        val leaderOffsets = kc.getLeaderOffsets(topicAndPartitions, before)
+        if (leaderOffsets.isLeft) {  //在本函数内部处理错误，如果有错误抛出异常
+            throw new RuntimeException(s&quot;### Exception when MTKafkaUtils#getLeaderOffsets ${leaderOffsets.left.get} ###&quot;)
+        }
+
+        leaderOffsets.right.get.map { case (k, v) =&gt; (k, v.offset)}  //将 Map[TopicAndPartition, LeaderOffset] 转变为 Map[TopicAndPartition, Long]（Long 为对应 partition 的 offset，从 LeaderOffset 中获取）
+    }
+</code></pre><p>步骤 3 直接传入参数即可，就可以从指定时间戳开始消费 Kafka 数据了</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2016-11-26 </div>
+			<div class="article-title"><a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" >Spark Streaming 往 HDFS 写文件，自定义文件名</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<div class="markdown-body">
+
+<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将 kafka 上的数据实时同步到 HDFS，不能有太多小文件</p>
+<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><p>Spark Streaming 支持 RDD#saveAsTextFile，将数据以 <strong>纯文本</strong> 方式写到 HDFS，我们查看 RDD#saveAsTextFile 可以看到</p>
+<pre><code>RDD.rddToPairRDDFunctions(r)(nullWritableClassTag, textClassTag, null)
+      .saveAsHadoopFile[TextOutputFormat[NullWritable, Text]](path)
+`&lt;/pre&gt;
+从上面这句话我们可以知道，首先将 RDD 转化为 PariRDD（PariRDD 的数据是 (K,V) 类型的），然后再调用 saveAsHadoopFile 函数进行实际的操作。上面的语句中 `r` 是原始 RDD，`nullWritableClassTag` 和 `textClassTag` 表示所写数据的类型（分别代表 PariRDD 的 K 和 V 的类型），使用 `nullWritableClassTag` 是因为 HDFS 不会将 PairRDD 的 key 进行实际写入，从效果上看就只写入了 PariRDD 的 V 字段。`TextOutputFormat` 是一个格式化函数，后面我们再来看这个函数，`NullWritable` 则表示一个占位符，同样是这个字段不需要实际写入 HDFS，`Text` 表示我们将写入文本类型的数据。
+
+我们看到 `TextOutputFormat` 这个类中有一个函数是 `RecordWriter` 用于操作没一条记录的写入，代码如下
+&lt;pre&gt;`public RecordWriter&lt;K, V&gt; getRecordWriter(FileSystem ignored, JobConf job, String name, Progressable progress) throws IOException {
+        boolean isCompressed = getCompressOutput(job);
+        String keyValueSeparator = job.get(&quot;mapreduce.output.textoutputformat.separator&quot;, &quot;\t&quot;);
+        if(!isCompressed) {
+            Path codecClass1 = FileOutputFormat.getTaskOutputPath(job, name);
+            FileSystem codec1 = codecClass1.getFileSystem(job);
+            FSDataOutputStream file1 = codec1.create(codecClass1, progress);
+            return new TextOutputFormat.LineRecordWriter(file1, keyValueSeparator);
+        } else {
+            Class codecClass = getOutputCompressorClass(job, GzipCodec.class);
+            CompressionCodec codec = (CompressionCodec)ReflectionUtils.newInstance(codecClass, job);
+            Path file = FileOutputFormat.getTaskOutputPath(job, name + codec.getDefaultExtension());
+            FileSystem fs = file.getFileSystem(job);
+            FSDataOutputStream fileOut = fs.create(file, progress);
+            return new TextOutputFormat.LineRecordWriter(new DataOutputStream(codec.createOutputStream(fileOut)), keyValueSeparator);
+        }
+    }
+</code></pre><p></p></div><br>从上面的代码中我们可以的知道，首先打开需要的文件，获得对应的 Stream，然后直接往里面写数据就行了。接下来我们需要做还有：1）自定义文件名；2）往文件追加数据<p></p>
+<p>而这两个需求都可以在 RecordWriter 中进行实现。</p>
+<p>对于自定义文件名，重写下面这句话就行了</p>
+<p><pre class="lang:default decode:true">Path codecClass1 = FileOutputFormat.getTaskOutputPath(job, name);</pre><br>其中 name 就是文件名，我们自定义 name 就 OK 了</p>
+<p>如果希望往文件追加数据的话（不然会有很多小文件）：</p>
+<p>我们可以在获取文件流的时候，传入已经存在的文件，然后往里面追加就行了。而且将 creat 函数换成 append 即可，具体参考下面的代码：</p>
+<p><pre class="lang:default decode:true  ">override def getRecordWriter(ignored: FileSystem, job: JobConf, name: String, progress: Progressable): RecordWriter[K, V] = {<br>        val isCompressed: Boolean = FileOutputFormat.getCompressOutput(job)<br>        val keyValueSeparator: String = job.get(“mapreduce.output.textoutputformat.separator”, “\t”)<br>        val iname = name + System.currentTimeMillis() / HDFSService.getBatchInteral<br>        if (!isCompressed) {<br>            val file: Path = FileOutputFormat.getTaskOutputPath(job, iname)<br>            val fs: FileSystem = file.getFileSystem(job)<br>            val newFile : Path = new Path(FileOutputFormat.getOutputPath(job), iname)<br>            val fileOut : FSDataOutputStream = if (fs.exists(newFile)) {<br>                fs.append(newFile)<br>            } else {<br>                fs.create(file, progress)<br>            }<br>            new TextOutputFormat.LineRecordWriter<a href="fileOut, keyValueSeparator">K, V</a><br>        } else {<br>            val codecClass: Class[_ &lt;: CompressionCodec] = FileOutputFormat.getOutputCompressorClass(job, classOf[GzipCodec])<br>            // create the named codec<br>            val codec: CompressionCodec = ReflectionUtils.newInstance(codecClass, job)<br>            // build the filename including the extension<br>            val file: Path = FileOutputFormat.getTaskOutputPath(job, iname + codec.getDefaultExtension)<br>            val fs: FileSystem = file.getFileSystem(job)<br>            val newFile : Path = new Path(FileOutputFormat.getOutputPath(job), iname + codec.getDefaultExtension)</pre></p>
+<pre><code>        val fileOut: FSDataOutputStream = if (fs.exists(newFile)) {
+            fs.append(newFile)
+        } else {
+            fs.create(file, progress)
+        }
+        new TextOutputFormat.LineRecordWriter[K, V](new DataOutputStream(codec.createOutputStream(fileOut)), keyValueSeparator)
+    }
+}&lt;/pre&gt;
+</code></pre><p>&nbsp;</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2016-11-01 </div>
+			<div class="article-title"><a href="/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/" >Spark Streaming 自适应上游 kafka topic partition 数目变化</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<div class="markdown-body"><br><br>## 背景<br><br>Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。<br><br>## 思考过程<br><br>为了作业能够长时间的运行，一开始遇到这种情况的时候，想到两种方案：<br><br>1.  感知上游 topic 的 partition 数目变化，然后发送报警，让用户重启<br>2.  直接在作业内部自适应上游 topic partition 的变化，完全不影响作业<br>方案 1 是简单直接，第一反应的结果，但是效果不好，需要用户人工介入，而且需要删除 checkpoint 文件<br><br>方案 2 从根本上解决问题，用户不需要关心上游 partition 数目的变化，但是第一眼会觉得较难实现。<br><br>方案 1 很快被 pass 掉，因为人工介入的成本太高，而且实现起来很别扭。接下来考虑方案 2.<br><br>Spark Streaming 程序中使用 Kafka 的最原始方式为 <code>KafkaUtils.createDirectStream</code> 通过源码，我们找到调用链条大致是这样的<br><br><span style="color: #0000ff;"><strong><code>KafkaUtils.createDirectStream</code></strong></span>   –&gt;   <strong><span style="color: #0000ff;"><code>new DirectKafkaInputDStream</code></span></strong> –&gt; 最终由 <code>DirectKafkaInputDStream#compute(validTime : Time)</code> 函数来生成 KafkaRDD。<br><br>而 KafkaRDD 的 partition 数和 <strong><span style="color: #0000ff;">作业开始运行时</span></strong> topic 的 partition 数一致，topic 的 partition 数保存在 currentOffsets 变量中，currentOffsets 是一个 Map[TopicAndPartition, Long]类型的变量，保存每个 partition 当前消费的 offset 值，但是作业运行过程中 currentOffsets 不会增加 key，就是说不会增加 KafkaRDD 的 partition，这样导致每次生成 KafkaRDD 的时候都使用 <span style="color: #0000ff;"><strong>作业开始运行时</strong></span> topic 的 partition 数作为 KafkaRDD 的 partition 数，从而会造成数据的丢失。<br><br>## 解决方案<br><br>我们只需要在每次生成 KafkaRDD 的时候，将 currentOffsets 修正为正常的值（往里面增加对应的 partition 数，总共 B-A 个，以及每个增加的 partition 的当前 offset 从零开始）。<br><br><em>   第一个问题出现了，我们不能修改 Spark 的源代码，重新进行编译，因为这不是我们自己维护的。想到的一种方案是继承 DirectKafkaInputDStream。我们发现不能继承 DirectKafkaInputDStream 该类，因为这个类是使用 <code>private[streaming]</code> 修饰的。
+</em>   第二个问题出现了，怎么才能够继承 DirectKafkaInputDStream，这时我们只需要将希望继承 DirectKafkaInputDStream 的类放到一个单独的文件 F 中，文件 F 使用 <code>package org.apache.spark.streaming</code> 进行修饰即可，这样可以绕过不能继承 DirectKafkaInputDStream 的问题。这个问题解决后，我们还需要修改 <code>Object KafkaUtils</code>，让该 Object 内部调用我们修改后的 DirectKafkaInputDStream（我命名为 MTDirectKafkaInputDStream)<br><em>   第三个问题如何让 Spark 调用 MTDirectKafkaInputDStream，而不是 DirectKafkaInputDStream，这里我们使用简单粗暴的方式，将 KafkaUtils 的代码 copy 一份，然后将其中调用 DirectKafkaInputDStream 的部分都修改为 MTDirectKafkaInputDStream，这样就实现了我们的需要。当然该文件也需要使用 <code>package org.apache.spark.streaming</code> 进行修饰
+</em>   第二个和第三个问题的解决方案在  中国 Spark 技术峰会 2016  上，广点通的 林立伟 有提及，后续会进行尝试<br>总结下，我们需要做两件事<br><br>1.  修改 DirectKafkaInputDStream#compute 使得能够自适应 topic 的 partition 变更<br>2.  修改 KafkaUtils，使得我们能够调用修改过后的 DirectKafkaInputDStream<br><br>## 代码<br><br>    package org.apache.spark.streaming.kafka.mt<br><br>    import com.meituan.data.util.Constants<br>    import com.meituan.service.inf.kms.client.Kms<br>    import kafka.common.{ErrorMapping, TopicAndPartition}<br>    import kafka.javaapi.{TopicMetadata, TopicMetadataRequest}<br>    import kafka.javaapi.consumer.SimpleConsumer<br>    import kafka.message.MessageAndMetadata<br>    import kafka.serializer.Decoder<br>    import org.apache.spark.streaming.{StreamingContext, Time}<br>    import org.apache.spark.streaming.kafka.{DirectKafkaInputDStream, KafkaRDD}<br><br>    import scala.collection.JavaConverters.<em><br>    import scala.util.control.Breaks.</em><br>    import scala.reflect.ClassTag<br><br>    /<strong><br>      <em> Created by qiucongxian on 10/27/16.
+      </em>/<br>    class MTDirectKafkaInputDStream<a href="@transient ssc_ : StreamingContext,
+        val MTkafkaParams: Map[String, String],
+        val MTfromOffsets: Map[TopicAndPartition, Long],
+        messageHandler: MessageAndMetadata[K, V] =&gt; R"><br>      K: ClassTag,<br>      V: ClassTag,<br>      U &lt;: Decoder[K]: ClassTag,<br>      T &lt;: Decoder[V]: ClassTag,<br>      R: ClassTag</a> extends DirectKafkaInputDStream<a href="ssc_, MTkafkaParams , MTfromOffsets, messageHandler">K, V, U, T, R</a> {<br>        private val kafkaBrokerList : String = “host1:port1,host2:port2,host3:port3” //根据自己的情况自行修改<br><br>        override def compute(validTime: Time) : Option[KafkaRDD[K, V, U, T, R]] = {<br>          /</strong><br>            <em> 在这更新 currentOffsets 从而做到自适应上游 partition 数目变化
+            </em>/<br>            updateCurrentOffsetForKafkaPartitionChange()<br>            super.compute(validTime)<br>        }<br><br>        private def updateCurrentOffsetForKafkaPartitionChange() : Unit = {<br>          val topic = currentOffsets.head.<em>1.topic<br>          val nextPartitions : Int = getTopicMeta(topic) match {<br>              case Some(x) =&gt; x.partitionsMetadata.size()<br>              case </em> =&gt; 0<br>          }<br>          val currPartitions = currentOffsets.keySet.size<br><br>          if (nextPartitions &gt; currPartitions) {<br>            var i = currPartitions<br>            while (i &lt; nextPartitions) {<br>               currentOffsets = currentOffsets + (TopicAndPartition(topic, i) -&gt; 0)<br>               i = i + 1<br>            }<br>          }<br>          logInfo(s”######### ${nextPartitions}  currentParttions ${currentOffsets.keySet.size} ########”)<br>        }<br><br>        private def getTopicMeta(topic: String) : Option[TopicMetadata] = {<br>            var metaData : Option[TopicMetadata] = None<br>            var consumer : Option[SimpleConsumer] = None<br><br>            val topics = List<a href="topic">String</a><br>            val brokerList = kafkaBrokerList.split(“,”)<br>            brokerList.foreach(<br>              item =&gt; {<br>                val hostPort = item.split(“:”)<br>                try {<br>                  breakable {<br>                      for (i &lt;- 0 to 3) {<br>                          consumer = Some(new SimpleConsumer(host = hostPort(0), port = hostPort(1).toInt,<br>                                                soTimeout = 10000, bufferSize = 64 * 1024, clientId = “leaderLookup”))<br>                          val req : TopicMetadataRequest = new TopicMetadataRequest(topics.asJava)<br>                          val resp = consumer.get.send(req)<br><br>                          metaData = Some(resp.topicsMetadata.get(0))<br>                          if (metaData.get.errorCode == ErrorMapping.NoError) break()<br>                      }<br>                  }<br>                } catch {<br>                  case e =&gt; logInfo(s” ###### Error in MTDirectKafkaInputDStream ${e} ######”)<br>                }<br>              }<br>            )<br>            metaData<br>        }<br>    }<br><br>在修改过后的 KafkaUtils 文件中，将所有的 <code>DirectKafkaInputDStream</code> 都替换为 <code>MTDirectKafkaInputDStream</code> 即可<br><br></div>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2016-08-27 </div>
+			<div class="article-title"><a href="/2016/08/27/spark-streaming-kafka-read-binlog-to-json/" >Spark Streaming 从 Kafka 读取 binlog 转换成 Json</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>在开发 Spark Streaming 的公共组件过程中，需要将 binlog 的数据(Array[Byte])转换为 Json 格式，供用户使用，本文提供一种转换的思路。另外我们会用到几个辅助类，为了行文流畅，我们将辅助类的定义放在文章的最后面。如果</p>
+<p>如果本文有讲述不详细，或者错误指出，肯请指出，谢谢</p>
+<p>对于 binlog 数据，每一次操作(INSERT/UPDATE/DELETE 等）都会作为一条记录写入 binlog 文件，但是同一条记录可能包含数据库中的几行数据（这里比较绕，可以看一个具体的例子）</p>
+<p>在数据库中，有 id, name，age 三个字段，其中 id 为主键，name 随意, age 随意。有两行数据如下</p>
+<p>[table caption=”示例数据库”width=”500” colwidth=”100|200|200” colalign=”left|left|left”]</p>
+<p>id, name, age</p>
+<p>1, john, 30</p>
+<p>2,john, 40</p>
+<p>[/table]</p>
+<p>那么你进行操作</p>
+<p><pre class="lang:tsql decode:true  ">update table set age = 50 where name = “john”</pre><br>的时候，就会将两行的数据都进行更改，这两行更改的数据会在同一个 binlog 记录中，这一点会在后面的实现中有体现。</p>
+<p>下面，我们给出具体的代码，然后对代码进行分析</p>
+<p><pre class="lang:scala decode:true">def desirializeByte(b: (String, Array[Byte])) : (String, String) = {<br>  val binlogEntry = BinlogEntryUtil.serializeToBean(b._2)   //将 Array[Byte] 数据转换成 com.meituan.data.binlog.BinlogEntry 类，相关类定义参考附录</pre></p>
+<p>  val pkeys = binlogEntry.getPrimaryKeys.asScala   //获取主键，这里的 asScala 将 Java 的 List 转换为 Scala 的 List<br>  val rowDatas : List[BinlogRow] = binlogEntry.getRowDatas.asScala.toList  //获取具体的信息<br>  val strRowDatas = rowDatas.map(a =&gt; {            //将获取到的具体信息进行转换，这里主要是将没一条信息的内容，转换 [(K1:V1,K2:V2…Kn:Vn)] 的形式，方面后面进行 Json 化<br>    val b = a.getBeforeColumns.asScala    //获取 beforColumns<br>    val c = a.getAfterColumns.asScala     //获取 afterColumns<br>    val mb = b.map(d =&gt; (d._1, d._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值<br>    val mc = c.map(c =&gt; (c._1, c._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值<br>    (mb, mc) //返回转换后的 beforeColumns 和 afterColumns<br>  })<br>  //下面利用 json4s 进行 Json 化<br>  (binlogEntry.getEventType, compact(“rowdata” -&gt; strRowDatas.map{<br>    w =&gt; List(“row_data” -&gt; (“before” -&gt; w._1.toMap) ~ (“after” -&gt; w._2.toMap))  //这里的两个 toMap 是必要的，不然里层会变成 List，这个地方比较疑惑的是，<br>                                                                                 //w._1 按理是 Map类型，为什么还需要强制转换成 Map<br>                                                                              //而且用 strRowDatas.foreach(x =&gt; println(s”${x._1}  ${x._2}”)打印的结果表名是 Map<br>  }))<br>desirializeByte 函数传入 topic 中的一条记录，返回参数自己确定，我这里为了测试，返回一个 (String, String) 的 Tuple，第一个字段表示该条记录的 EventType（Insert/Update/Delete 等），第二个字段为 Json 化后的数据。</p>
+<p>BinlogEntryUtil.serilizeToBean 是一个辅助类，将 binlog 数据转化为一个 Java bean 类。</p>
+<p>第 4 行，我们得到表对应的主键，第 5 行获得具体的数据</p>
+<p>第 6 行到第 12 行是 Json 化之前的辅助工作，将所有不需要的东西给剔除掉，只留下字段，以及字段对应的值。</p>
+<p>第 14， 15 行就是具体的 Json 工作了（使用了 json4s 包进行 Json 化）</p>
+<p>这个过程中有一点需要注意的是，在 Json 化的时候，记得为 w._1 和 w._2 加 toMap 操作，不然会变成 List（很奇怪，我将 w._1 和 w._2 打印出来看，都是 Map 类型）或者你可以在第 7，8 行的末尾加上 .toMap 操作。这个我查了 API，进行了实验，暂时怀疑是在和 json4s 组合的时候，出现了问题，有待验证。</p>
+<p>利用上述代码，我们可以得到下面这样 Json 化之后的字符串(我进行了排版，程序返回的 Json 串是不换行的）</p>
+<p><pre class="font-size:8 lang:default decode:true">{“rowdata”:<br>   [{“row_data”:<br>       {“before”:{“param_name”:”creator”,”param_value”:”chenqiang05”,”horigindb_etl_id”:”2532”,”utime”:”2016-07-26 15:07:16”,”id”:”15122”,”status”:”0”,”ctime”:”2016-07-25 17:06:01”},<br>        “after”:{“param_name”:”creator”,”param_value”:”chendayao”,”horigindb_etl_id”:”2532”,”utime”:”2016-08-01 10:32:01”,”id”:”15122”,”status”:”0”,”ctime”:”2016-07-25 17:06:01”}<br>       }<br>    }]<br>}”</pre><br>到这里，基本就完成了一种将 binlog 数据 Json 化的代码。</p>
+<p>附录代码，由于这些代码是从其他工程里面抠出来的，可能读起来会不顺畅，还请见谅。</p>
+<p><pre class="lang:java decode:true ">public static BinlogEntry serializeToBean(byte[] input) {<br>      BinlogEntry binlogEntry = null;<br>      Entry entry = deserializeFromProtoBuf(input);//从 protobuf 反序列化<br>      if(entry != null) {<br>         binlogEntry = serializeToBean(entry);<br>      }<br>      return binlogEntry;<br>    }</pre></p>
+<p>public static Entry deserializeFromProtoBuf(byte[] input) {<br>        Entry entry = null;</p>
+<pre><code>try {
+    entry = Entry.parseFrom(input);
+</code></pre><p>//com.alibaba.otter.canal.protocol.CanalEntry#Entry 类的方法，由 protobuf 生成<br>        } catch (InvalidProtocolBufferException var3) {<br>            logger.error(“Exception:” + var3);<br>        }</p>
+<pre><code>    return entry;
+}
+</code></pre><p>//将 Entry 解析为一个 bean 类<br>public static BinlogEntry serializeToBean(Entry entry) {<br>        RowChange rowChange = null;</p>
+<pre><code>    try {
+        rowChange = RowChange.parseFrom(entry.getStoreValue());
+    } catch (Exception var8) {
+        throw new RuntimeException(&quot;parse event has an error , data:&quot; + entry.toString(), var8);
+    }
+
+    BinlogEntry binlogEntry = new BinlogEntry();
+    String[] logFileNames = entry.getHeader().getLogfileName().split(&quot;\\.&quot;);
+    String logFileNo = &quot;000000&quot;;
+    if(logFileNames.length &gt; 1) {
+        logFileNo = logFileNames[1];
+    }
+
+    binlogEntry.setBinlogFileName(logFileNo);
+    binlogEntry.setBinlogOffset(entry.getHeader().getLogfileOffset());
+    binlogEntry.setExecuteTime(entry.getHeader().getExecuteTime());
+    binlogEntry.setTableName(entry.getHeader().getTableName());
+    binlogEntry.setEventType(entry.getHeader().getEventType().toString());
+    Iterator primaryKeysList = rowChange.getRowDatasList().iterator();
+
+    while(primaryKeysList.hasNext()) {
+        RowData rowData = (RowData)primaryKeysList.next();
+        BinlogRow row = new BinlogRow(binlogEntry.getEventType());
+        row.setBeforeColumns(getColumnInfo(rowData.getBeforeColumnsList()));
+        row.setAfterColumns(getColumnInfo(rowData.getAfterColumnsList()));
+        binlogEntry.addRowData(row);
+    }
+
+    if(binlogEntry.getRowDatas().size() &gt;= 1) {
+        BinlogRow primaryKeysList1 = (BinlogRow)binlogEntry.getRowDatas().get(0);
+        binlogEntry.setPrimaryKeys(getPrimaryKeys(primaryKeysList1));
+    } else {
+        ArrayList primaryKeysList2 = new ArrayList();
+        binlogEntry.setPrimaryKeys(primaryKeysList2);
+    }
+
+    return binlogEntry;
+}
+</code></pre><p>public class BinlogEntry implements Serializable {<br>    private String binlogFileName;<br>    private long binlogOffset;<br>    private long executeTime;<br>    private String tableName;<br>    private String eventType;<br>    private List<string> primaryKeys;<br>    private List<binlogrow> rowDatas = new ArrayList();<br>}<br>public class BinlogRow implements Serializable {<br>    public static final String EVENT_TYPE_INSERT = “INSERT”;<br>    public static final String EVENT_TYPE_UPDATE = “UPDATE”;<br>    public static final String EVENT_TYPE_DELETE = “DELETE”;<br>    private String eventType;<br>    private Map<string, binlogcolumn=""> beforeColumns;<br>    private Map<string, binlogcolumn=""> afterColumns;<br>}<br>public class BinlogColumn implements Serializable {<br>    private int index;<br>    private String mysqlType;<br>    private String name;<br>    private boolean isKey;<br>    private boolean updated;<br>    private boolean isNull;<br>    private String value;<br>}<br>&nbsp;</string,></string,></binlogrow></string></p>
+
+	
+	</div>
+</div>
+
+	  
+      </div>
+	  <div>
+	    <center>
+	    <div class="pagination">
+<ul class="pagination">
+	 
+</ul>
+</div>
+
+        </center>
+	    </div>	
+      
+
+</div> <!-- col-md-9/col-md-12 -->
+
+
+<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+	<div class="widget">
+		<h4>Categories</h4>
+		<ul class="tag_box inline list-unstyled">
+		
+			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+		
+			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+		
+			<li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+		
+			<li><a href="/categories/Linux/TeX/">TeX<span>1</span></a></li>
+		
+			<li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+		
+			<li><a href="/categories/Uncategorized/">Uncategorized<span>3</span></a></li>
+		
+			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+		
+			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
+		
+			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/成长/">成长<span>3</span></a></li>
+		
+			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+		
+			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
+		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+		</ul>
+	</div>
+
+		
+			
+	<div class="widget">
+		<h4>Tag Cloud</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/test/">test<span>1</span></a></li>
+		
+			<li><a href="/tags/DFS/">DFS<span>2</span></a></li>
+		
+			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
+		
+			<li><a href="/tags/米聊/">米聊<span>1</span></a></li>
+		
+			<li><a href="/tags/数学/">数学<span>5</span></a></li>
+		
+			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+		
+			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
+		
+			<li><a href="/tags/network/">network<span>1</span></a></li>
+		
+			<li><a href="/tags/how/">how<span>1</span></a></li>
+		
+			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
+		
+			<li><a href="/tags/array/">array<span>1</span></a></li>
+		
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
+		
+			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
+		
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
+		
+			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+		
+			<li><a href="/tags/插件/">插件<span>1</span></a></li>
+		
+			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
+		
+			<li><a href="/tags/hash/">hash<span>1</span></a></li>
+		
+			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
+		
+			<li><a href="/tags/MST/">MST<span>1</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>260</span></a></li>
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>Recent Posts</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
+      </li>
+    
+      <li>
+        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>Links</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="https://github.com/wzpan/freemind/" title="Freemind's Github repository." target="_blank"]);">Freemind</a></li>
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/wzpan" title="My Github account." target="_blank"]);">My Github</a></li>
+	
+		<li><i class="fa fa-linkedin"></i><a href="http://www.linkedin.com/in/hahack" title="My Linkin account." target="_blank"]);">My LinkedIn</a></li>
+	
+	</ul>
+</div>
+
+
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

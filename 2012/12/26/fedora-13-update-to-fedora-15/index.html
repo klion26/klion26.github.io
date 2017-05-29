@@ -1,0 +1,284 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Fedora13 升级到Fedora 15 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="在开学的时候装了Fedora 13,然后一直用着，感觉也还可以，虽然现在Fedora都出18了。前两天不知道那根神经一短路然后就想着升级Fedora，一开始想升级到16的（担心17,18还不那么稳定，到时出了问题找不到解决方案）。然后就用下面的命令执行呗 。
+sudo yum install pre">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Fedora13 升级到Fedora 15"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Fedora13 升级到Fedora 15</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>在开学的时候装了Fedora 13,然后一直用着，感觉也还可以，虽然现在Fedora都出18了。前两天不知道那根神经一短路然后就想着升级Fedora，一开始想升级到16的（担心17,18还不那么稳定，到时出了问题找不到解决方案）。然后就用下面的命令执行呗 。</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">sudo yum install preupgrade<br>preupgrade</div><br>执行preupgrade需要输入root命令，照着做就行了，然后就可以选择你想升级到的版本，有14,15,16,17，当然你还可以列出那些unstable版本。选择之后，就一直下一步就行了，然后等着下载所需要的软件包吧（时间根据你的网速不同而不同，我大概用了20分钟左右）。我一开始选择的版本是16,然后下完之后，提醒需要reboot来完成升级，好，那就reboot呗。</p>
+<p>reboot之后，你会发现屏幕一直是一个光标在那跳动，啥也不可以做，这个时候你只需要等待就行了，应该是在配置些啥东西吧。别重启了，实在没事干就出喝杯咖啡吧，等好了之后，结果发现提示说Fedora 16只能通过14,15升级而来，也就是不能跨太多的版本升级。好吧。那就重启升级到15再说吧。然后照着做之后，发现尼妈居然又是自动升级到16,然后一顿折腾之后，我把/var/cache/yum/下面所有和preupgrade有关的文件夹全都删掉了（其实应该做个备份更好，万一删错了还可以还原）。然后继续升级到Fedora 15.然后就可以了，没出现啥问题，刚好装Fedora 15的时候老师叫开会，然后开会回来之后发现已经装好了。而且还不错。</p>
+<p>现在你已经装好了Fedora 15了，当然还是可以访问Fedora 13的。然后说说接下来你需要做的事情吧。或许你可以在网上搜一篇叫做《Fedora 15安装之后需要做的×件事》，不过很多你可能不需要，我这里大致写下我做的一些事情吧</p>
+<p>1.安装gnome-tweak-tool，因为现在你的桌面是没有任何东西的，而且右击也没用，装这个东西就是解决这些事的，装好之后，用命令gnome-tweak-tool执行出来一个配置界面，选中File Manager。把右边的“Have file manager handle the desktop该陈ON就行了，现在你的桌面有东西了，而且可以右击了。</p>
+<p>2.在上一步中的Tweak tool中打开选中左边的Shell栏目，然后把右边的Arrangement of buttons on the titlebar选项改为All，这样尼会看到你的cmd窗口上面有最小化，最大化和关闭按钮了，默认的是只有关闭按钮的。</p>
+<p>3.解决按下Del不能删除文件的事情，首先用命令</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gsettings <span style="color: #b0c4de; font-weight: bold;">set </span>org.gnome.desktop.interface can-change-accels <span style="color: #b0c4de; font-weight: bold;">true</span></div><br>设置可以改变相应的快捷方式映射</p>
+<p>然后打开一个文件夹，选中随便一个文件然后点击菜单Edit，把鼠标放到“Move to Trash”上，然后按<span style="color: #ff0000;">两次<span style="color: #000000;">Del键就行了，接下来你可以用命令</span></span></p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gsettings <span style="color: #b0c4de; font-weight: bold;">set </span>org.gnome.desktop.interface can-change-accels <span style="color: #b0c4de; font-weight: bold;">false</span></div><br>来关闭快捷方式的映射。</p>
+<p>4.中文输入法的问题，由于我是由Fedora 13升级来的，系统没有自动安装ibus输入法，还是保留了我在13上安装的fcitx，可是奇怪的事情发生了，fcitx输入法只能在浏览器下使用，其他任何地方都不能使用。这个也太坑爹了。然后google，百度结果没有发现什么解决办法，又说是gnome3的问题，又说是配置的问题， 有说直接换ibus的。可是换了ibus结果还是用不了，不知为何（应该不是和fcitx冲突的问题，我在装ibus之前卸载了fcitx）。然后最后发现有个帖子的配置和其他人的配置有个小小的区别，那就是试试吧，结果就TM可以了。我一开始的配置是（下面语句放在～/.bashrc文件中）</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">XMODIFIERS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“@im=fcitx”</span><br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">QT_IM_MODULE</span><span style="color: #f5deb3;">=</span>xim<br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">GTK_IM_MODULE</span><span style="color: #f5deb3;">=</span>xim</div><br>然后另外那个人的配置是把两个xim改成了fcitx也就是</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">XMODIFIERS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“@im=fcitx”</span><br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">QT_IM_MODULE</span><span style="color: #f5deb3;">=</span>fcitx<br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">GTK_IM_MODULE</span><span style="color: #f5deb3;">=</span>fcitx</div><br>然后奇迹发生了，重登录之后结果就可以了，这中间我各种重装，反正都不知道是为什么，<span style="color: #ff0000;">如果你也遇到了这样的问题，但是上面的方案没有帮到你的话，我只能说声遗憾了，因为我也不知道是为什么了。</span></p>
+<p>最后再吐嘈下Fedora 15的界面，感觉用起来总是没有13那么爽，gnome3或许炫一点，但是现在打开软件的方式有点不爽，也没有下面的任务栏了，而且最上面的panel也没了，现在变成了“Your favorites”，反正就是现在暂时还不适应这种界面，接下来慢慢适应吧。</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2012/12/27/too-many-levels-of-symbolic-links/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2012/12/12/fedora-13-texlive2012-install-chinese-configure/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2012-12-26 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/linux/">linux<span>24</span></a></li> <li><a href="/tags/fedora/">fedora<span>15</span></a></li> <li><a href="/tags/fcitx/">fcitx<span>1</span></a></li> <li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li> <li><a href="/tags/update/">update<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

@@ -1,0 +1,829 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Page 8 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 <div class="page-header page-header-inverse ">
+  <h1 class="title title-inverse ">Hexo</h1>
+</div>
+
+<div class="row page">
+
+	
+	<div class="col-md-9">
+	
+
+		<div class="slogan">
+      <i class="fa fa-heart"></i>
+      Yet another bootstrap theme.
+</div>    
+		<div id="top_search"></div>
+		<div class="mypage">
+		
+		<!-- title and entry -->
+        <!-- render top articles firstly -->
+        
+        <!-- render other articles -->
+        
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-11-06 </div>
+			<div class="article-title"><a href="/2012/11/06/chrome-https-connection/" >Chrome强制https连接某些网站</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>最近一段时间google貌似非常的不稳定,不知道是不是那个什么”多少大”马上就要开的原因。有时上google首页也许要翻墙，而且有时https连接下也打不开。今早看到<a href="http://www.williamlong.info/archives/3270.html" target="_blank" rel="external">月光博客</a>上说，https在某些情况下是用http打开的，所以就会时不时断网了。下面是教你怎么用chrome强制https连接。</p>
+<p>你需要的就是chrome浏览器，然后有可能需要翻墙[我在自己电脑上实验的时候，有时不翻墙不行]，翻墙可以参照<span style="color: #ff0000;"><a href="http://www.klion26.com/user-chrome-cross-gfw.html" target="_blank" rel="external"><span style="color: #ff0000;">这里</span></a></span>。然后接下来你只需要在chrome的新建标签页里面输入”chrome://net-internals/“会出来如下界面:</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/11/hsts.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/11/hsts-300x165.jpg" alt="" title="hsts"></a>看到上图的倒数第二个HSTS没，点开这个，然后Add domain下填写www.google.com，如果你需要google的子域名也用https的话，就勾上下面的Include subdomains选项框。不过勾上这个的话貌似translate就不能用了，反正我这translate不管怎样都不能用https访问，翻墙也不行，translate.google.com都不行，直接跳到traslate.google.cn去了。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-11-05 </div>
+			<div class="article-title"><a href="/2012/11/05/display-views-count-without-plugin/" >wordpress文章浏览量-非插件实现</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>刚开始弄我wordpress的时候，想加个浏览量的插件来着，同学推荐了一个叫WP-PostViews 的插件，装了一段时间之后就给卸载了，因为文章的浏览量会无辜增加好多，你刷新一下就可能发现文章的浏览量增加了几十甚至上百。这样就没什么意思了。最近实验室的同学也在弄wordpress,然后添加了一个浏览量的插件，然后突然想不用插件来实现这个，因为插件一多速度就不行了 。然后同学给了一个链接，可是加的代码一直出错，没办法，最后搜索出错信息的时候，发现了<a href="http://bacsoftwareconsulting.com/blog/index.php/wordpress-cat/how-to-track-and-display-post-views-count-in-wordpress-without-a-plugin/" target="_blank" rel="external">这篇文章</a>，刚好是不用插件实现这个功能的。然后就自己添加，而且这篇文章写的非常好，英文也很简单，我这里再简单说以下我添加的过程。首先我把上面那篇文章中的code-1的代码添加到functions.php的最后面，最好是先copy到本地的编辑器，然后确定没有全角符之类的，再复制到functions.php里面。然后再在single.php里面添加上文所说的CODE-2。至于所说的The-Loop其实就是那段处理每篇文章的代码，也就是说这段代码没篇文章都会用到，简单点就是你可以搜索文章作者，或者文章时间，然后查到相应的位置，接下来你在刚在搜索到地方加入CODE-2，就行了。</p>
+<p><span style="color: red;">——————————-追加——————–</span></p>
+<p><span style="color: red;">保存的PHP文件不能是UTF-8的，不然会出错，可以选择自己手动输入代码(别copy-paste)，或者下载下来，改完之后再传上去。</span></p>
+<p><span style="color: red;"><br><span style="color: #0000ff;">PS. 不同的主题可能会在不同的位置改这些东西，不过大致思路相同</span><br><span style="color: #0000ff;"> PSS. 不要再主页添加那段添加到single.php的代码，那样的话，你刷新主页也会把每一篇文章的浏览量加1，这一点可以自己参考CODE-1。你每次刷新文章界面也会增加浏览量</span><br><span style="color: #0000ff;"> PSSS.浏览量是从你添加代码才开始计算了，所以你很早以前的文章也会显示浏览量为0</span><br></span></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-10-23 </div>
+			<div class="article-title"><a href="/2012/10/23/google-adsense/" >Google Adsense</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>在很早以前，就注册了google adsense了。可是一直没有放上来，总觉得找不到合适的位置，最近和朋友聊天的时候，有扯到了google adsense这东西了，才发现原来很早以前我就已经注册了这东西，自己都给忘了。现在，在每篇文章的最下方都加了一个广告，先试试效果再说，其实页面的右下方也可以放的，那里一直空着，等这个实验一段时间之后，再考虑在右边是否添加广告。广告还请各位多多支持，哈哈。</p>
+<p>对于如何申请和投放google adsense，在<a href="https://www.google.com/adsense/support/bin/answer.py?answer=10192topic=8434&amp;sourceid=aso&amp;subid=ww-zh_CN-et-asblog_2008-2-20&amp;medium=link" target="_blank" rel="external">这里</a>可以看到相应的操作。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-10-23 </div>
+			<div class="article-title"><a href="/2012/10/23/structure-and-interpretation-of-computer-programs-1-3/" >Structure and Interpretation of Computer Programs 1.3</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>看了这么久，终于把这本书的第一章看完了，估计第三节看的时间比前两节加起来还长了。不过第三节确实讲了很多东西。这一节主要讲的就是抽象，抽象，抽象，再抽象。。。最后你也变得抽象了。</p>
+<p>1.3.1讲了把procedure作为参数传个另外的procedure[在scheme里面procedure的参数可以使任何你想传的东西，返回值也是任何你想返回的东西]。主要是把类似功能的procedure写成一个模板，然后参数是procedure，这样多个功能的procedure都可以用这个procedure来实现了。简单地说就是一个procedure计算a+b，另外一个procedure计算a*b，第三个procedure计算a-b。那么我们就可以写一个procedure，参数是运算符和相应的两个参数，这样就可以省去了很多重复的操作。</p>
+<p>1.3.2主要介绍了lambda和let。为了后面做准备，lambda就是匿名procedure，define也会用到它。let是作为局部变量用的。</p>
+<p>1.3.3这一小节也是说抽象，主要是用匿名表达式来写代码和let来表示局部变量。这一节里面说到了求一个函数的零点和一个函数的不动点。求f(x)零点的时候就是假设f(a)&gt;0 f(b)&lt;0那么在[a,b]中间至少存在一个零点，可以通过不停的二分来找到这个零点(当然f(x)是连续的，所以不能找到一个很准确的值，只能找一个误差比较小的)。求不动点的时候，就是首先猜测一个值，然后不停的计算当前值的函数值，知道函数值和自变量的差很小为止(关于这个比较的时候，如果自变量很小或者很大都不能直接用(x-f(x))来比较这样是很可能造成死循环，可以用比值来代替简单的减法)，还有就是有些函数，如果你直接用f(x)去替换x的话，也会造成死循环，这样你可以用average(x,f(x))来代替x，当然有些函数你一次average还不行，就必须用到多次average，这个在习题里面有体现。</p>
+<p>1.3.4这一小节看上去很厉害的样子，看了我好久啊，现在我都变得抽象了，有木有啊！！！</p>
+<p>这一节中主要讲的知识是procedure作为procedure的返回值，这个就比较有意思了，这样我们又可以把procedure再一次抽象化 了。这样我们也可以把procedure更加的分离开来，这样所有的procedure之间的耦合度就再次降低了有木有啊。把一个procedure作为返回值的话，需要用到lambda这一匿名过程表达式。比如下面这个</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">average-damp</span> <span style="color: #d8bfd8;">f</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">x</span>) (<span style="color: #ffffff;">average</span> <span style="color: #d8bfd8;">x</span> (<span style="color: #ffffff;">f</span> <span style="color: #d8bfd8;">x</span>))))</div><br>这个procedure的返回值是一个procedure，返回的这个procedure的返回值是average( x,f(x)),这样如果我们需要计算不同函数的average的话，那么我们只需要把相应的procedure作为参数传进去就行了</p>
+<p>然后这一小节讲了Newton’s method，具体看<a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-12.html#%_sec_1.3.4" target="_blank" rel="external">这个链接吧</a>。可以通过不动点就零点，同样可以反过来求，里面用到微分，微分的具体区间得自己取。然后最后面又讲了一种抽象(我表示现在看到神马都是抽象啊！！！)，把average和f函数分开传个相应的procedure。具体见下面这个procedure:</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">fixed-point-of-transform</span> <span style="color: #d8bfd8;">g</span> <span style="color: #d8bfd8;">transform</span> <span style="color: #d8bfd8;">guess</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #ffffff;">fixed-point</span> (<span style="color: #ffffff;">transform</span> <span style="color: #d8bfd8;">g</span>) <span style="color: #d8bfd8;">guess</span>))</div><br>这里(transform g)就是fixed-point中的转移函数，我们这里又可以定义不同的转移方式。scheme最后表示反正你想怎么搞，它都能实现出来，无论你长得多抽象，它都不嫌弃了！！！</p>
+<p>下面是习题的相关分析和解答：</p>
+<p>1.29 计算<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-29.gif" alt="">，其中<em>h</em> = (<em>b</em> - <em>a</em>)/<em>n，<em>y</em><sub><em>k</em></sub> = <em>f</em>(<em>a</em> + <em>k__h</em>)，</em>a和b是这个区间，这个用1.3.1里面的sum函数可以很好的求出结果，分成4块，第一项，最后一项，剩下的按奇数偶数分开就成</p>
+<p>1.30 把1.3.1节中的sum写成iterative的，这个比较简单，都写了好多次了</p>
+<p>1.31要求仿照sum写product的procedure。然后要求计算<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-30.gif" alt="">，product的procedure完全可以照着sum的procedure写就行了。后面的也好写。接着你需要把你当product的procedure改成iterative的(如果你一开始的是recursive的)，反之亦反。</p>
+<p>1.32再次抽象sum和product的procedure，写一个更加抽象的procedure，形如(accumulate combiner null-value term a next b)，其中accumulate是名字，combiner是组合器，null-value是最末尾的值(递归的终止条件下的值) 剩下的和sum中的几个意思一样。这里也可以仿照sum来写，不过把相应的改成抽象就行了。</p>
+<p>1.33把上一题中的procedure再加一个参数，即filter。表示从a到b中满足filter条件的才计算。这个只需要在上面一题的procedure中判断下是否满足条件即可。然后写filter的时候自己仔细写</p>
+<p>1.34给一个procedure：</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">f</span> <span style="color: #d8bfd8;">g</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #ffffff;">g</span> <span style="color: #add8e6;">2</span>))</div><br>然后你求(f f)的值，给出说明。首先结果是会出错。然后说明：(f f)–&gt;(f 2)-&gt;(2 2)然后就出错了。</p>
+<p>1.35用1.3小节中的fixed-point procedure来计算黄金分割率。这个只要写出相应的变换函数就行了，如下</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">y</span>) (<span style="color: #b0c4de; font-weight: bold;">+ </span><span style="color: #add8e6;">1</span> (<span style="color: #b0c4de; font-weight: bold;">/ </span><span style="color: #add8e6;">1</span> <span style="color: #d8bfd8;">y</span>)))</div><br>1.36首先修改fixed-point，从而可以打印出所有的guess数，这个好办，直接display就行了。另外写一个procedure，计算x^x=N,其中N是给定的数，求x，这个也即是求x-&gt;log_x{N}的的一个不动点。函数关系出来之后，procedure就好写了，对于log_x{N}可以用log_e{N}/log_e{x}，刚好scheme里面的log就是log_e的。</p>
+<p>1.37给出连分数的形式，然后写一个procedure来计算k层连分数的值，而且所有的分子分母不一定是一样的，然后接着改成iterative的(如果一开始是recurrence的)，反之亦然。我的代码如下：</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">cont-frac</span> n <span style="color: #d8bfd8;">d</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">02 </span>  (<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">frac</span> <span style="color: #d8bfd8;">i</span>)<br><span style="color: #da70d6;">03 </span>    (<span style="color: #b0c4de; font-weight: bold;">if </span>(<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">i</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">04 </span>        (<span style="color: #b0c4de; font-weight: bold;">/ </span>(n <span style="color: #d8bfd8;">i</span>) (<span style="color: #ffffff;">d</span> <span style="color: #d8bfd8;">i</span>))<br><span style="color: #f810b0;">05 </span>        (<span style="color: #b0c4de; font-weight: bold;">/ </span>(n <span style="color: #d8bfd8;">i</span>) (<span style="color: #b0c4de; font-weight: bold;">+ </span>(<span style="color: #ffffff;">d</span> <span style="color: #d8bfd8;">i</span>) (<span style="color: #ffffff;">frac</span> (<span style="color: #b0c4de; font-weight: bold;">+ </span><span style="color: #d8bfd8;">i</span> <span style="color: #add8e6;">1</span>))))<br><span style="color: #da70d6;">06 </span>     )<br><span style="color: #da70d6;">07 </span>   )<br><span style="color: #da70d6;">08 </span>  (<span style="color: #ffffff;">frac</span> <span style="color: #add8e6;">1</span>)<br><span style="color: #da70d6;">09 </span>)<br><span style="color: #f810b0;">10 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">cont-iter</span> n <span style="color: #d8bfd8;">d</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">11 </span>  (<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">iter</span> <span style="color: #d8bfd8;">ret</span> <span style="color: #d8bfd8;">idx</span>)<br><span style="color: #da70d6;">12 </span>    (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">13 </span>        <span style="color: #da70d6;">((= 1 idx)   ret)</span><br><span style="color: #da70d6;">14 </span>        ((<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">idx</span> <span style="color: #add8e6;">0</span>)   <span style="color: #d8bfd8;">ret</span>)<br><span style="color: #f810b0;">15 </span>        (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #ffffff;">iter</span> (<span style="color: #b0c4de; font-weight: bold;">/ </span>(n <span style="color: #d8bfd8;">idx</span>) (<span style="color: #b0c4de; font-weight: bold;">+ </span>(<span style="color: #ffffff;">d</span> <span style="color: #d8bfd8;">idx</span>) <span style="color: #d8bfd8;">ret</span>)) (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">idx</span> <span style="color: #add8e6;">1</span>) ))<br><span style="color: #da70d6;">16 </span>     )<br><span style="color: #da70d6;">17 </span>  )<br><span style="color: #da70d6;">18 </span>  (<span style="color: #ffffff;">iter</span> <span style="color: #add8e6;">0</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">19 </span>)</div><br>1.38用连分数求出e - 2的值，其中e是自然对数的底。题中给出了连分数相应的分子分母值的函数，具体实现还是比较容易的。</p>
+<p>1.39<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-36.gif" alt="">给出这么个东西，然后需要你写一个procedure，而且由用户确定深度，这个就是连分数的变形，不过相应的分子分母通项需要自己求出来而已。</p>
+<p>1.40写一个cubic的procedure，通过用(newtons-method (cubic a b c) 1)来计算x^3+a<em>x^2+b</em>x+c=0的解。这个只需要写那个procedure容易了。就是传入a，b，c返回x^3+a<em>x^2+b</em>x+c就行了</p>
+<p>1.41定义一个叫做double的procedure。传入一个procedure，返回执行这个procedure两次之后的procedure。这个定义还算好写：</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">double</span> <span style="color: #d8bfd8;">f</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">x</span>)<br><span style="color: #da70d6;">3 </span>    (<span style="color: #ffffff;">f</span> (<span style="color: #ffffff;">f</span> <span style="color: #d8bfd8;">x</span>))<br><span style="color: #da70d6;">4 </span>  )<br><span style="color: #f810b0;">5 </span>)</div><br>接下来的就纠结了。求(((double (double double)) inc) 5)的值，其中inc是把一个数加1的procedure。一开始想着是13(=5+8)，可以运行出来结果是21(=5+16)。想不通啊想不通，调试也没找到什么理由，最后在网上找了答案，<a href="http://wiki.drewhess.com/wiki/SICP_exercise_1.41" target="_blank" rel="external">这里</a>写的很详细，自己照着手动执行一次，就会清楚很多东西，而且遇到类似的也再也不怕了。最后还知道了如果把inc放最里面的话，结果是13.<span style="color: #ff0000;">此题强烈建议手动执行</span></p>
+<p>1.42写一个compose的procedure，传入两个procedure，分别是f和g，然后先执行f，再执行g，这个可以仿照double的写法来上一个。</p>
+<p>1.43写一个名叫repeated的procedure，传入一个procedure，和一个数值n，表示把传入的procedure执行n次，最后让你用写出来的repeated的procedure来计算((repeated square 2) 5)，从而验证。</p>
+<p>提示给出了可以用compose，当然也可以用double了。也就是前两个习题的的procedure。不过也可以不用前两个东西:</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">repeated</span> <span style="color: #d8bfd8;">f</span> n)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">repeat</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">3 </span>  (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">4 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">k</span> <span style="color: #add8e6;">1</span>)  <span style="color: #d8bfd8;">f</span>)<br><span style="color: #f810b0;">5 </span>    (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">x</span>) (<span style="color: #ffffff;">f</span> ((<span style="color: #ffffff;">repeat</span> (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">k</span> <span style="color: #add8e6;">1</span>)) <span style="color: #d8bfd8;">x</span>))))   <span style="color: #da70d6;">关键是参数x必须先传到最里面的procedure才可以</span><br><span style="color: #da70d6;">6 </span>   )<br><span style="color: #da70d6;">7 </span>  )<br><span style="color: #da70d6;">8 </span>  (<span style="color: #ffffff;">repeat</span> n)<br><span style="color: #da70d6;">9 </span>)</div><br>关于log_2{N}的写法就是不等于1的时候，可以利用double来进行加速，类似快速幂的方法。</p>
+<p>1.44写一个smooth的procedure，参数是一个叫做f的procedure，然后返回(f(x)+f(x-dx)+f(x+dx))/3的一个procedure。然后利用smooth和上一题的repeated来写一个nth-smooth，表示smootn次。写第一个procedure的时候比较简单，一下就出来了，第二个也不难，就写成(repeated smooth n)就变成了nth-smooth了。最后自己再检测下写的是否正确。</p>
+<p>1.45 给出一系列说明，说求sqrt和3次根的时候，average-damp只需要用一次，然后求4次根的时候用2次，让你通过实验得出一个求n次根的抽象procedure。这里首先你必须得知道对于n次根，需要用多少次average-damp。实验4,5,6,7的时候都是2次，但是8的时候是3次，大致可以猜测需要的是floor(log_2{n})次average-damp。算出这个次数之后，程序就变得非常好写了。如下</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">nth-root</span> n <span style="color: #d8bfd8;">x</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #ffffff;">fixed-point</span> ((<span style="color: #ffffff;">repeated</span> <span style="color: #d8bfd8;">average-damp</span> (<span style="color: #b0c4de; font-weight: bold;">floor </span>(<span style="color: #ffffff;">log2</span> n)))<br><span style="color: #da70d6;">3 </span>                (<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">y</span>) (<span style="color: #b0c4de; font-weight: bold;">/ </span><span style="color: #d8bfd8;">x</span> (<span style="color: #ffffff;">pow</span> <span style="color: #d8bfd8;">y</span> (<span style="color: #b0c4de; font-weight: bold;">- </span>n <span style="color: #add8e6;">1</span>)))))<br><span style="color: #da70d6;">4 </span>               <span style="color: #add8e6;">1.0</span>)<br><span style="color: #f810b0;">5 </span>)</div><br>其中log2是一个自定义的procedure，表示以2为底n的对数，pow也是一个自定义的procedure，计算y的(n-1)次。</p>
+<p>1.46因为前面有很多procedure是传入两个procedure，其中一个是good-enough?，因外一个是improve，现在你需要写一个抽象的procedure，传入这两个procedure，然后传回一个procedure，传回的procedure有一个参数guess。这个过程还是比较绕的，不过在做过前面的几个习题之后，会发现这个习题也是可做的。代码如下：</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">iterative-improve</span> <span style="color: #d8bfd8;">g</span> <span style="color: #d8bfd8;">f</span>)<br><span style="color: #da70d6;">02 </span>    (<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">guess</span>)<br><span style="color: #da70d6;">03 </span>        (<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">iter</span> <span style="color: #d8bfd8;">guess</span>)<br><span style="color: #da70d6;">04 </span>            (<span style="color: #b0c4de; font-weight: bold;">let </span>((<span style="color: #ffffff;">next</span> (<span style="color: #ffffff;">f</span> <span style="color: #d8bfd8;">guess</span>)))<br><span style="color: #f810b0;">05 </span>                (<span style="color: #b0c4de; font-weight: bold;">if </span>(<span style="color: #ffffff;">g</span> <span style="color: #d8bfd8;">guess</span> <span style="color: #d8bfd8;">next</span>)<br><span style="color: #da70d6;">06 </span>                    <span style="color: #d8bfd8;">next</span><br><span style="color: #da70d6;">07 </span>                    (<span style="color: #ffffff;">iter</span> <span style="color: #d8bfd8;">next</span>))))<br><span style="color: #da70d6;">08 </span>        (<span style="color: #ffffff;">iter</span> <span style="color: #d8bfd8;">guess</span>)<br><span style="color: #da70d6;">09 </span>    )<br><span style="color: #f810b0;">10 </span>)</div><br>这个procedure，看起来很简单,但是写起来不那么简单，不过题目已经给你打好框架了，你只需要填写lambda里面的东西。写了前面的一些题，会发现，差不多都是这样，里面调用一个procedure，然后多次调用这个里面的procedure就完事了。</p>
+<p>终于把第一章看完了，继续加油。好好学习，天天向上。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-10-17 </div>
+			<div class="article-title"><a href="/2012/10/17/structure-and-interpretation-of-computer-programs-1-2/" >Structure and Interpretation of Computer Programs 1.2</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>1.2 <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#%_sec_1.2.6" target="_blank" rel="external"> Procedures and the Processes They Generate</a></p>
+<p>一开始用阶乘讲解了Linear Recursion和Iteration，Linear Recursion实现阶乘的时候如下所示:<br>(factorial 6)<br>(<em> 6 (factorial 5))<br>(</em> 6 (<em> 5 (factorial 4)))<br>(</em> 6 (<em> 5 (</em> 4 (factorial 3))))<br>(<em> 6 (</em> 5 (<em> 4 (</em> 3 (factorial 2)))))<br>(<em> 6 (</em> 5 (<em> 4 (</em> 3 (<em> 2 (factoral 1))))))<br>(</em> 6 (<em> 5 (</em> 4 (<em> 3 (</em> 2 1)))))<br>(<em> 6 (</em> 5 (<em> 4 (</em> 3 2))))<br>(<em> 6 (</em> 5 (<em> 4 6)))<br>(</em> 6 (<em> 5 24))<br>(</em> 6 120)<br>720<br>但是Iteration的方式是下面这样的<br>(factorial 6)<br>(fact-iter 1 1 6)<br>(fact-iter 1 2 6)<br>(fact-iter 2 3 6)<br>(fact-iter 6 4 6)<br>(fact-iter 24 5 6)<br>(fact-iter 120 6 6)<br>(fact-iter 720 7 6)<br>720<br>这里可以看出后面一种基本不要什么多余的空间消耗，但是第一种是要消耗多余的空间的，第二种貌似就是尾递归。</p>
+<p>1.2.2讲述了树递归，用的是fibonacci数列的例子。首先给出一张图，直观的看到算fib[5]的时候需要算哪些值，而且很多都重复的算了很多次。然后给出fibonacci数列的每一项都近似于Φ^n/sqrt(5).其中<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-14.gif" alt="">，然后还把fibonacci数列的求值改了方式，变成了O(n)的。</p>
+<p>接下来讲了一个分钱的例子。给你100块，然后你手上有50,25,10,5,1块的足够多，问你用这些面值的钱可以由多少种方式来换这100块。这个你可以选中1中钱币，然后看是否需要，如果需要，就看到底要多少个，不用的话，就只剩下其他的其中钱币了。这样就可以解决这个问题</p>
+<p>1.2.3大致讲了函数的增长趋势，也就是传说中是算法复杂度。这个讲的比较简略，具体参看算法书籍</p>
+<p>1.2.4讲了快速幂的想法，就是通过二进制一直求，这样得到复杂度是log_2(n)的其中n是指数。</p>
+<p>1.25 求最大公约数，用欧几里得算法</p>
+<p>1.26 找一个数的最小因子，费马小定理判定一个数是否是素数<br>习题如下:</p>
+<p>1.9 给出a+b的两种不同实现，然后让你写具体的执行步骤，这个一步一步写就行了，最后你得到的第一种就Linear Recursion，第二种是Iteration。</p>
+<p>1.10 给出Ackermann’s function的procedure，然后让你算几个Ackermann 值，当然你可以直接执行就可以了，也可以自己手动算，然后又几个定义：<br>(define (f n) (A 0 n))                (1)<br>(define (g n) (A 1 n))               (2)<br>(define (h n) (A 2 n))              (3)<br>(define (k n) (<em> 5 n n))           (4)   其中procedure A就是Ackermann’s function<br>这里你可以看到(1)==&gt;2n    (2)===&gt;2^n           (3)===&gt;2^2^….^2(n次)             (4)===&gt;5</em>n^2</p>
+<p>1.11给一个函数定义<em>f</em>(<em>n</em>) = <em>n</em> if <em>n</em>&lt;3 and <em>f</em>(<em>n</em>) = <em>f</em>(<em>n</em> - 1) + 2<em>f</em>(<em>n</em> - 2) + 3<em>f</em>(<em>n</em> - 3)让你写一个procedure，这个可以仿照fibonacci就行</p>
+<p>1.12写一个求<em>Pascal’s triangle </em>的第i行第j列的procedure。只要照着C[n,m]=C[n-1,m-1]+C[n-1,m]就行了，另外注意下边界</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span><span style="color: #da70d6;">Exercise 1.12</span><br><span style="color: #da70d6;">02 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">pascal</span> <span style="color: #d8bfd8;">r</span> <span style="color: #d8bfd8;">c</span>)<br><span style="color: #da70d6;">03 </span>  (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">04 </span>    ((<span style="color: #b0c4de; font-weight: bold;">&gt; </span><span style="color: #d8bfd8;">c</span> <span style="color: #d8bfd8;">r</span>) <span style="color: #add8e6;">0</span>)<br><span style="color: #f810b0;">05 </span>    ((<span style="color: #b0c4de; font-weight: bold;">&lt; </span><span style="color: #d8bfd8;">c</span> <span style="color: #add8e6;">0</span>) <span style="color: #add8e6;">0</span>)<br><span style="color: #da70d6;">06 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">c</span> <span style="color: #add8e6;">1</span>) <span style="color: #add8e6;">1</span>)<br><span style="color: #da70d6;">07 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">r</span> <span style="color: #d8bfd8;">c</span>) <span style="color: #add8e6;">1</span>)<br><span style="color: #da70d6;">08 </span>    (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #b0c4de; font-weight: bold;">+ </span>(<span style="color: #ffffff;">pascal</span> (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">r</span> <span style="color: #add8e6;">1</span>) <span style="color: #d8bfd8;">c</span>) (<span style="color: #ffffff;">pascal</span> (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">r</span> <span style="color: #add8e6;">1</span>) (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">c</span> <span style="color: #add8e6;">1</span>))))<br><span style="color: #da70d6;">09 </span>    <span style="color: #da70d6;">pascal[r,c] = pascal[r-1,c]+pascal[r-1,c-1]</span><br><span style="color: #f810b0;">10 </span>  )<br><span style="color: #da70d6;">11 </span>)</div><br>1.13 证明<em>F<strong>i</strong>b</em>(<em>n</em>) = (<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-11.gif" alt=""><sup><em>n</em></sup> - <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-12.gif" alt=""><sup><em>n</em></sup>)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5 其中<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-11.gif" alt=""> = (1 + <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/2   <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-12.gif" alt=""> = (1 - <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/2，我们可以计算F[0],F[1],F[2]得到F[0],F[1],F[2]满足条件，然后假设对于所有的k<n都满足上面的式子，由_f__i__b_(_n_) =="" (![](http:="" mitpress.mit.edu="" sicp="" full-text="" book="" book-z-g-d-11.gif)<sup=""><em>n</em> - <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-12.gif" alt=""><sup><em>n</em></sup>)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5可以知道F[i]可以表示成(A+B*<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5 对所有的i都成立，那么我们可以假设F[n-2]=(A+B<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5(其中A,B是常数)，那么我们可以得到F[n-1]=((A+5B)+(A+B)<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/2.再根据F[n]=F[n-1]+F[n-2]可以得到F[n]，和用(<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-11.gif" alt=""><sup><em>n</em></sup> - <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-12.gif" alt=""><sup><em>n</em></sup>)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5计算得到的一样，这样就得证了。也可以看<a href="http://community.schemewiki.org/?sicp-ex-1.13" target="_blank" rel="external">这里</a>和<a href="http://sicp.org.ua/sicp/Exercise1-13" target="_blank" rel="external">这里</a></n都满足上面的式子，由_f__i__b_(_n_)></p>
+<p>1.14要你写出11个cents分解成其他钱币值的具体过程，这个可以看<a href="http://telegraphics.com.au/~toby/sicp/ex1-14.svg" target="_blank" rel="external">这个链接</a>，画的很好</p>
+<p>1.15给出<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-19.gif" alt="">，和相应的procedure，然后让你求sin x的值。问你求sin 12.15的时候，具体的步骤如何，这个一步步慢慢做就行了。另外让你求这个函数的复杂度，可以分析得到是log_3(n)的，可以类似二分那样分析，二分的时候，除以2，所以得到log_2(n)，这里除以3，所以是log_3(n)</p>
+<p>1.16用successive squaring求a^b而且要求复杂度是log级别的。</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">get-expt</span> b n)                     <span style="color: #da70d6;">求最后结果</span><br><span style="color: #da70d6;">02 </span>  (<span style="color: #ffffff;">my-expt</span> <span style="color: #add8e6;">1</span> b n)<br><span style="color: #da70d6;">03 </span> )<br><span style="color: #da70d6;">04 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">my-expt</span> <span style="color: #d8bfd8;">a</span> b n)                   <span style="color: #da70d6;">求b^n 结果保存在a中</span><br><span style="color: #f810b0;">05 </span>  (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">06 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>n <span style="color: #add8e6;">0</span>) <span style="color: #d8bfd8;">a</span>)<br><span style="color: #da70d6;">07 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>n <span style="color: #add8e6;">1</span>) (<span style="color: #ffffff;">my-expt</span> (<span style="color: #b0c4de; font-weight: bold;"><em> </em></span><span style="color: #d8bfd8;">a</span> b) b (<span style="color: #b0c4de; font-weight: bold;">- </span>n <span style="color: #add8e6;">1</span>) ) )<br><span style="color: #da70d6;">08 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>n <span style="color: #add8e6;">2</span>) (<span style="color: #ffffff;">my-expt</span> (<span style="color: #b0c4de; font-weight: bold;"> </span><span style="color: #d8bfd8;">a</span> b b) b (<span style="color: #b0c4de; font-weight: bold;">- </span>n <span style="color: #add8e6;">2</span>))  )<br><span style="color: #da70d6;">09 </span>    ((<span style="color: #b0c4de; font-weight: bold;">even? </span>n) (<span style="color: #ffffff;">my-expt</span> <span style="color: #d8bfd8;">a</span> (<span style="color: #ffffff;">my-expt</span> <span style="color: #add8e6;">1</span> b (<span style="color: #b0c4de; font-weight: bold;">/ </span>n <span style="color: #add8e6;">2</span>)) <span style="color: #add8e6;">2</span>))<br><span style="color: #f810b0;">10 </span>    (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #ffffff;">my-expt</span> (<span style="color: #b0c4de; font-weight: bold;"><em> </em></span><span style="color: #d8bfd8;">a</span> b) b (<span style="color: #b0c4de; font-weight: bold;">- </span>n <span style="color: #add8e6;">1</span>)))<br><span style="color: #da70d6;">11 </span>   )<br><span style="color: #da70d6;">12 </span>)<br><span style="color: #da70d6;">13 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #b0c4de; font-weight: bold;">even? </span>n)                         <span style="color: #da70d6;">判断一个数是否是偶数</span><br><span style="color: #da70d6;">14 </span>  (<span style="color: #b0c4de; font-weight: bold;">if </span>(<span style="color: #b0c4de; font-weight: bold;">= </span>(<span style="color: #b0c4de; font-weight: bold;">remainder </span>n <span style="color: #add8e6;">2</span>) <span style="color: #add8e6;">0</span>)<br><span style="color: #f810b0;">15 </span>      <span style="color: #7fffd4;">#t</span><br><span style="color: #da70d6;">16 </span>      <span style="color: #7fffd4;">#f</span><br><span style="color: #da70d6;">17 </span>   )<br><span style="color: #da70d6;">18 </span> )</div><br>1.17 只用+ ，double， halve写一个procedure实现ab，要求步数是log级别的。</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">fast-multiply</span> <span style="color: #d8bfd8;">a</span> b)                     <span style="color: #da70d6;">快速a*b</span><br><span style="color: #da70d6;">02 </span>  (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">03 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>b <span style="color: #add8e6;">1</span>) <span style="color: #d8bfd8;">a</span>)<br><span style="color: #da70d6;">04 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>b <span style="color: #add8e6;">0</span>) <span style="color: #add8e6;">0</span>)<br><span style="color: #f810b0;">05 </span>    ((<span style="color: #b0c4de; font-weight: bold;">even? </span>b) (<span style="color: #ffffff;">fast-multiply</span> (<span style="color: #ffffff;">double</span> <span style="color: #d8bfd8;">a</span>) (<span style="color: #ffffff;">halve</span> b)))<br><span style="color: #da70d6;">06 </span>    (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #b0c4de; font-weight: bold;">+ </span><span style="color: #d8bfd8;">a</span> (<span style="color: #ffffff;">fast-multiply</span> <span style="color: #d8bfd8;">a</span> (<span style="color: #b0c4de; font-weight: bold;">- </span>b <span style="color: #add8e6;">1</span>))))<br><span style="color: #da70d6;">07 </span>  )<br><span style="color: #da70d6;">08 </span>)<br><span style="color: #da70d6;">09 </span><br><span style="color: #f810b0;">10 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">halve</span> n)                                <span style="color: #da70d6;">求一个数的一半</span><br><span style="color: #da70d6;">11 </span>  (<span style="color: #b0c4de; font-weight: bold;">/ </span>n <span style="color: #add8e6;">2</span>)<br><span style="color: #da70d6;">12 </span>)</div><br>1.18让你用1.16和1.17的相关知识，写一个procedure，来实现两个数相乘，也是用log级别的步数，我认为代码和1.17类似</p>
+<p>1.19给出fibonacci数列的一种转移，然后让你推一个公式，这个自己认真推导下就行了，我推出的是p’=(+ (<em> q q) (</em> p q))       q’=(+ (<em> 2 q p) (</em> q q))</p>
+<p>1.20用两种(normal-order 和applicative-order)不同的方式，要得到GCD（206,40）的具体步骤，步数有点多，具体请<a href="http://community.schemewiki.org/?sicp-ex-1.20" target="_blank" rel="external">移步这里</a>，只要知道normal-order和applicative-order的区别就行了，具体的问题分析起来还是比较容易的</p>
+<p>1.21用书中给出的smallest-divisor procedure求出199，1999和19999的最小因子，这个直接求就行</p>
+<p>1.22算procedure运行的时间，这个时间我运行的时候是不稳定的，在DrRacket里面没有runtime这个原语。我用的是time和apply-time。然后分别让你求大于100，1000,10000,100000的最小的3个素数，然后看运行时间。这个时间也不是固定的，每次都会变，而且很多时候都是0。另外，实现的时候，我自己2了好久，(+ cnt 2)是不会改变cnt的值的，一般改变一个变量的值用set!。</p>
+<p>1.23 求最小因子的procedure中，如果2不是n的最小因子，那么所有偶数都不可能是n的因子，因此我们可以略掉所有的偶数。这里就是需要你写这样一个procedure。这里只要把每次的(+ test 1)改变成(next test)而next是一个procedure，如果test==2，那么(next test)返回3，其他的返回test+2，小于2则出错(对于这题来说)。</p>
+<p>1.24测试费马小定理测素数所用的时间。用类似1.22中的方法</p>
+<p>1.25我认为会溢出(以前C/C++中这样会溢出，受数据类型的限制)，不过在scheme中却不会溢出，不过是时间用的比较多一点而已。</p>
+<p>1.26 把1.24中的procedure改了，改成(remainder (* (expmod base (/ exp 2) m)                       (expmod base (/ exp 2) m))    m))，也就是会算两次(expmod base (/ exp 2) m),这样的话复杂度就变成了O(n)的了</p>
+<p>1.27 测试Carmichael数，测试所有的a&lt;n a^n % n是否等于n。对于Carmichael数，费马小定理肯定是可以通过的，这样就Fool了费马小定理的测试。然后可以通过改变素数测试的参数，来得到最后的输出，看是否Fool了费马小定理的测试。可以<a href="http://community.schemewiki.org/?sicp-ex-1.27" target="_blank" rel="external">围观这里</a></p>
+<p>1.28素数检测的<em>Miller-Rabin</em>测试,要求写出相应的procedure。看以google相应的<em>Miller-Rabin </em>知识，然后写出procedure。这个测试可以把Carmichael刷选出来。可以<a href="http://sicp.org.ua/sicp/Exercise1-28" target="_blank" rel="external">到这里围观procedure</a></p>
+<p>表示这一节看了好久，继续加油。好好学习，天天向上。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-10-16 </div>
+			<div class="article-title"><a href="/2012/10/16/structure-and-interpretation-of-computer-programs-1-1/" >Structure and Interpretation of Computer Programs 1.1</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>这几天没啥事的时候就看看这本书，感觉这书看上去就5章，可是每一章都好多内容，习题也不少，以前还打算每一章写一次习题报告，现在改变想法了，每一节写一下相关知识点习题解答，有些习题解答不怎么好描述，就在网上找了相关的链接放在这里。</p>
+<p>1.1 <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1" target="_blank" rel="external">The Elements of Programming</a></p>
+<p>主要介绍了一些基本东西，然后还介绍了一些scheme的基本语法之类的，分为3个方面讲: 1.<strong>primitive expressions; 2.<strong>means of combination; 3.<strong>means of abstraction. </strong></strong></strong>这个过程中讲解了scheme的一些基本语法，scheme的procedure怎么跑的，怎么写基本的procedure，以保证读者可以用scheme来完成接下来的习题。</p>
+<p>另外讲述了用Newton方法求平方根以及一些优化，Newton方法求平方根就是首先猜测一个值，然后看这个值是否足够好(平方之后是否和这个数相差很小)，然后如果不足够好的话，就用(y+x/y)/2来更新y，其中y是猜测的值，x是我们需要求平方根的值。</p>
+<p>函数/过程再调用的时候应该是一个黑箱操作，也就是我们只需要知道参数是什么，会返回什么，但是我们不需要知道里面的具体实现是什么。相应的，在实现函数/过程的时候，参数的取名就尽量取得有意义些，让调用这个函数/过程的人能够更好的使用它。</p>
+<p>下面是1.1节习题以及简要说明</p>
+<p>1.1 要读者写出每条语句会输出的答案，这个题目看过前面的知识之后，就没问题了，可以看<a href="http://community.schemewiki.org/?sicp-ex-1.1" target="_blank" rel="external">这里</a>对照答案</p>
+<p>1.2 把一个算术表达式转化为前缀表达式，(/ (+ 5 4 (- 2 (- 3 (+ 6 (/ 1 3))))) (* 3 (- 6 2) (- 2 7))), 注意括号</p>
+<p>1.3 定义一个procedure，接受3个参数，然后返回其中2个较大的值的平方和 我的程序:</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span>(define (square-larger x y z)   </span></span></li>
+<li><span>   (</span><span class="keyword">if</span><span> (&gt; x y)   </span></li>
+<li><span>      (</span><span class="keyword">if</span><span> (&gt; z y)   </span></li>
+<li><span>         (+ (square x) (square z))   </span></li>
+<li><span>         (+ (square x) (square y))   </span></li>
+<li><span>      )   </span></li>
+<li><span>      (</span><span class="keyword">if</span><span> (&gt; z x)   </span></li>
+<li><span>         (+ (square y) (square z))   </span></li>
+<li><span>         (+ (square y) (square x))   </span></li>
+<li><span>      )   </span></li>
+<li><span>   )   </span></li>
+<li><span>)  </span><br></li></ol></div><br>可以在<a href="http://community.schemewiki.org/?sicp-ex-1.3" target="_blank" rel="external">这里</a>看到更多种方法来解决这个问题
+
+<p>1.4给出一个procedure，让你解释这个procedure。”如果b &gt; 0 那么返回a+b 否则返回a-b”</p>
+<p>1.5给出一个procedure和调用procedure的语句，然后让你用applicative-order和normal-order分析这个procedure会输出什么，你看过applicative-order和normal-order的知识之后，就基本可以得到了，applicative-order是每次参数是procedure的话，就会调用procedure得到相应的答案，所以这里的话就会出现死循环了，但是normal-order的话就不管这么多了，等到需要这个procedure的返回值的时候，它才会去调用相应的procedure，所以这里就返回0</p>
+<p>1.6给你一个代替if的new-if  procedure，然后让你判断用new-if写出来的Newton方法在scheme下运行会输出什么。这个就用到了1.5中的相关知识了，因为scheme解释器用的是applicative-order，所以会死循环。</p>
+<p>1.7Newton求平方根的时候，怎么判断足够好，请你给出一个足够好的判断函数。这里可以通过判断每次更新的猜测值后更新前的猜测值之间的关系来判断(用y^2-x的差值来判断的话，对于很小的x和很大的x就会出现大误差)，比如更新后的猜测值和更新后的猜测值相差比小于0.01%等，也可以<a href="http://community.schemewiki.org/?sicp-ex-1.7" target="_blank" rel="external">查看这里</a>。</p>
+<p>1.8 给你一个更新函数，让你用Newton方法求一个数的三次方根，这个直接可以通过平方根的程序改编而来，当然判断足够好的函数还是需要自己来斟酌的。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-10-08 </div>
+			<div class="article-title"><a href="/2012/10/08/scheme-and-the-little-scheme/" >Scheme &amp; The Little Scheme</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>很早前就想学一门脚本语言来玩玩，看了一段时间的python，可是没有继续好好的学下去，导致现在python基<br>本不会。暑假的时候看到<a href="http://blog.sina.com.cn/yinwang0" target="_blank" rel="external">王垠</a>的博客写了一篇文章，推荐了Scheme语言和SICP这本书，上网搜了下后面这本书，发现评论非常好，评价非常高，可以和TAOCP相比了。就打算看看这本神书，顺便做做后面的习题，网上很多大神已经写过题解，不过都是Scheme语言写的，所以就打算先学学Scheme语言。暑假看了《The Little Scheme》和《teach yourself scheme in fixnum days》的一部分，前面一本书是以Scheme语言为基础，主讲递归的思想(个人觉得讲的非常好，不过后面的章节需要一定的scheme语言基础)<br>后面这本书就是一本介绍scheme的书，比较薄，不过作为入门书还是可以的(用的scheme版本是R5RS)。<br>t-y Scheme里面首先也是讲数据类型 有boolean number string real等。在scheme里面最基本的东西就属<br>括号了，每一个过程都是用括号来表示，所以scheme的程序会有非常多的括号。而且表达式是前缀表达式，形如(+ 3 2)计算3+2的值，字符使用#\后面加上相应的字母来表示的，其他的和C语言差不多，<br>第三章讲述的是过程，类似于C语言中的函数，下面是一个例子</p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<ol>
+<li><span><span>(define area                                          ;定义过程 名字叫做area   </span></span></li>
+<li><span>   (lambda (length breadth)                           ;两个参数 分别是length 和breadth   </span></li>
+<li><span>      (* length breadth)                              ;计算并返回   </span></li>
+<li><span>   )   </span></li>
+<li><span>)   </span></li>
+<li><p><span>(area </span><span class="number">4</span><span> </span><span class="number">6</span><span>)                                            ;用area过程求值 结果为</span><span class="number">24</span><span>=</span><span class="number">4</span><span>*</span><span class="number">6</span><span>  </span><br></p></li></ol></div><br>过程可以用匿名过程，就是没有define那一行，其他地方都一样<br>第四章讲述的是各种判断，if、when等<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define p </span><span class="number">80</span><span>)   </span></span></p>
+</li>
+<li><span>(</span><span class="keyword">if</span><span> (&gt; p </span><span class="number">70</span><span>)   </span></li>
+<li><span>    ‘safe         ;如果p &gt; </span><span class="number">70</span><span>  </span></li>
+<li><span>    ‘unsafe       ;</span><span class="keyword">else</span><span>  </span></li>
+<li><p><span>)  </span><br></p></li></div><br>;unless 貌似是不会循环的 ，我试验的结果是只运行了一次<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(unless (&gt; p </span><span class="number">90</span><span>)   </span></span></p>
+</li>
+<li><span> ; (begin   </span></li>
+<li><span>    (set! p (+ p </span><span class="number">1</span><span>))    ;   </span></li>
+<li><span>    (display p)   </span></li>
+<li><span>  ;  )   </span></li>
+<li><p><span> )  </span><br></p></li></div><br>when和unless类似，另外我们可以用过程来写递归或者循环，这里面的递归貌似都是尾递归的。不过循环还有<br>一种表达方式就是do表达式，语法如下<br>(do ((var1 val1 update1)…)(test res …) exp …)<br>;说明：类似于C语言的for循环。先将val1赋值给var1,…之后循环开始，在每次循环的开始，先执行表达式<br>test,<br>;如果返回布尔值真，则循环终止，并返回结果res，如果表达式test返回#f，则运行表达式exp…，之后依次<br>;用update1…的值来为变量var1…重新赋值<br>例子如下：<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define </span><span class="keyword">do</span><span>-test                                 ;定义过程   </span></span></p>
+</li>
+<li><span>  (lambda (n)                                   ;一个参数 为n   </span></li>
+<li><span>    (</span><span class="keyword">do</span><span> ((sum </span><span class="number">0</span><span> (+ sum i)) (i </span><span class="number">1</span><span> (+ i </span><span class="number">1</span><span>)) )      ;sum 和i都赋初值，然后每次循环分别用 (+ sum i)和   </span>(+ i <span class="number">1</span>)来改变</li>
+<li><span>         ((&gt; i n) sum)                          ;如果i &gt; n则推出循环 返回sum   </span></li>
+<li><span>         (display sum)                          ;如果i &lt;= n 则循环    </span></li>
+<li><span>       )   </span></li>
+<li><span>      )   </span></li>
+<li><p><span>    )  </span><br></p></li></div><br>第五章讲的是变量的作用域，一般定义的是全局变量，在函数里面定义的只能在函数里面用，而且会屏蔽全局<br>同名变量，可以用let和let<em>来确定一个变量的作用域，let里面局部变量赋初值的时候不能用let里面定义的<br>变量，但是let</em>里面定义的局部变量可以用let*前面已经定义的局部变量来赋初值。例子如下<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define x </span><span class="number">20</span><span>)   </span></span></p>
+</li>
+<li><span>(let (   </span></li>
+<li><span>      (x </span><span class="number">2</span><span>)   </span></li>
+<li><span>      (y x)         </span> ;let:a reference to x in the initialization will refer to the global,not the local x</li>
+<li><span>      )   </span></li>
+<li><span>  (+ x y)                         ;结果是</span><span class="number">20</span><span>+</span><span class="number">2</span><span>  </span></li>
+<li><span>  )   </span></li>
+<li><span>(let* (   </span></li>
+<li><span>       (x </span><span class="number">1</span><span>)   </span></li>
+<li><span>       (z </span><span class="number">2</span><span>)   </span></li>
+<li><span>       (y x)   </span></li>
+<li><span>       )   </span></li>
+<li><span>  (+ x y)                         ;结果是</span><span class="number">1</span><span>+</span><span class="number">1</span><span>  </span></li>
+<li><p><span>  )  </span><br></p></li></div><br>第六章里面讲了多个函数相互调用的递归和letrec，letrec和let，let<em>的功能类似，不过let</em>里面的赋初值<br>只能用前面已经出现过的局部变量，但是不能用没有出现过的，letrec却可以用后面才出现的局部变量和局部<br>过程。例子如下：<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(letrec ((local-even? (lambda (n) (</span><span class="keyword">if</span><span> (= n </span><span class="number">0</span><span>) #t (local-odd? (- n </span><span class="number">1</span><span>)))))   </span></span></p>
+</li>
+<li><span>      ;如果用let* 那么上面的local-odd?过程就会是未定义的   </span></li>
+<li><span>         (local-odd? (lambda (n) (</span><span class="keyword">if</span><span> (= n </span><span class="number">0</span><span>) #f (local-even? (- n </span><span class="number">1</span><span>))))))   </span></li>
+<li><p><span>      (list (local-even? </span><span class="number">23</span><span>) (local-odd? </span><span class="number">23</span><span>)))  </span><br></p></li></div><br>这一章还讲了一个用来翻转list的过程，不过由于R6RS中已经不能用set-cdr!了，所以只能用R5RS来实现，过<br>程如下:<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define reverse!   </span></span></p>
+</li>
+<li><span>  (lambda (s)   </span></li>
+<li><span>    (let loop ((s s) (r ‘()))  ;定义s 和r 并赋初值   </span></li>
+<li><span>      (</span><span class="keyword">if</span><span> (</span><span class="keyword">null</span><span>? s) r   </span></li>
+<li><span>          (let ((d (cdr s)))   ;定义d 并赋初值   </span></li>
+<li><span>            (set-cdr! s r)   </span></li>
+<li><span>            (loop d s)   </span></li>
+<li><span>            )   </span></li>
+<li><span>          )   </span></li>
+<li><span>      )   </span></li>
+<li><span>    )   </span></li>
+<li><p><span>  )  </span><br></p></li></div><br>还有for-each 和 map两个东西，例子如下<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(</span><span class="keyword">for</span><span>-each display   </span></span></p>
+</li>
+<li><span>          (list </span><span class="string">“one”</span><span> </span><span class="string">“two”</span><span> </span><span class="string">“buckle my shoe”</span><span>)         ;输出onetwobuckle my shoe   </span></li>
+<li><span> )   </span></li>
+<li><p><span>(display (map cons ‘(</span><span class="number">1</span><span> </span><span class="number">2</span><span> </span><span class="number">3</span><span> </span><span class="number">4</span><span>) ‘(</span><span class="number">10</span><span> </span><span class="number">20</span><span> </span><span class="number">30</span><span> ())))        ;输出((</span><span class="number">1.10</span><span>) (</span><span class="number">2.20</span><span>) (</span><span class="number">3.30</span><span>) (</span><span class="number">4</span><span>));注意这里连接的两部分元素必须一样多  </span><br></p></li></div><br>第七章讲述了文件的基本操作，默认打开的是控制台，可以用open-input-file filename来打开输入文件，<br>open-output-file filename来打开输出文件，最后一定要关闭，不然操作的数据不会对文件进行相应的操作(<br>特指写功能)，可以用call-with-input-file  call-with-output-file来代替，这样的话可以不需要自己关<br>闭文件，处理完当前的任务就会自动关闭相应的文件，如果用open-output-file打开一个已经存在的文件的时<br>候，不加其他参数的话，是会报错的，如果想打开已经存在的文件可以加参数 #:extis ‘update/‘truncate<br>update的话是直接在原文件上从头开始修改，而truncate则是删掉旧文件，重新建一个新文件。例子如下<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define i (open-input-file </span><span class="string">“hello.txt”</span><span>))           ;打开文件   </span></span></p>
+</li>
+<li><span>(read-</span><span class="keyword">char</span><span> i)                                      ;读取一个字符   </span></li>
+<li><span>(define j (read i))                                ;定义j为读取剩下的所有字符的一个字符串   </span></li>
+<li><span>(define o (open-output-file </span><span class="string">“greeting.txt”</span><span> #:exists ‘update))      ;以update方式打开一个文件   </span></li>
+<li><span>(display </span><span class="string">“hello”</span><span> o)                                ;输出hello   </span></li>
+<li><span>(write-</span><span class="keyword">char</span><span> #\space o)                             ;输出空格   </span></li>
+<li><span>(display ‘world o)                                 ;输出world   </span></li>
+<li><span>(newline o)                                        ;输出空行  </span><br></li></div><br>如果greeting.txt文件里面的文字原来是”abcdefthijklmn”的话,那么上述操作会使得文件的内容变成”hello<br>worldlmn”,但是如果用truncate方式打开的话，那么就会变成”hello world”
+
+<p>顺便把The Little Scheme的commandment贴在这</p>
+<p><span style="color: #ff0000;">First</span>: When recurring on a list of atoms, lat, ask two questions about it: (null? lat) and else.<br>When recurring on a number, n, ask two questions about it: (zero? n) and else.<br>When recurring on a list of S-expressions, l, ask three questions about it: (null? l), (atom? (car l)), and else.</p>
+<p><span style="color: #ff0000;">Second</span>: Use cons to build lists.</p>
+<p><span style="color: #ff0000;">Third</span>: When building a list, describe the first typical element, and then cons it onto the natural recursion.</p>
+<p><span style="color: #ff0000;">Fourth</span>: Always change at least one argument while recurring .When recurring on a list of atoms, lat, use(cdr lat). When recurring on a number, n, user (sub1 n). And when recurring on a list of S-expressions, l, use (car l) and (cdr l) if neither (null? l) nor (atom? (car l)) are true.<br>It must be changed to be closer to termination. The changing argument must be tested in the termination condition:<br>when using cdr, test termination with null? and<br>when using sub1, test termination with zero?.</p>
+<p><span style="color: #ff0000;">Fifth</span>: When building a value with + , always use 0 for the value of the terminating line, for adding 0 does not change the value of an addition.<br>When building a value with x[multiply] , always use 1 for the value of the terminating line, for multiplying by 1 does not change the value of a multiplication.<br><span style="color: #ff0000;">Sixth</span>: Simplify only after the function is correct.</p>
+<p><span style="color: #ff0000;">Seventh</span>: Recur on the subparts that are of the smae nature:<br>On the sublists of a list.<br>On the subexpressions of an arithmetic expression.</p>
+<p><span style="color: #ff0000;">Eighth</span>: Use help functions to abstract from representations.</p>
+<p><span style="color: #ff0000;">Ninth</span>:  Abstract common patterns with a new function.</p>
+<p><span style="color: #ff0000;">Tenth</span>:  Build functions to collect more than one value at a time.<br>这书断断续续的看了一段时间，打算现在开始边看t-y-scheme边看SICP，然后把SICP的每一章课后习题都做了<br>，也好督促自己好好学习。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-09-27 </div>
+			<div class="article-title"><a href="/2012/09/27/concrete-mathematics-chapter-1-homework-exercises/" >具体数学第一章习题</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>对于《具体数学》的所有问题，欢迎邮件联系讨论 Email:qcx978132955#gmail.com</p>
+<p>上一篇已经写了第一章大致的内容，这里写一下第一章的Homework Exercises的习题简单分析，有些是参考了后面的习题解答。</p>
+<p>8.可以自己推出Q[0],Q[1],Q[2],Q[3],Q[4],Q[5],Q[6],然后就可以看到循环了。</p>
+<p>9. a)直接把x[n]=(x[1]+…x[n-1])/(n-1)代入两边，然后化简之后就可以得到P[n-1]了</p>
+<p>b)x[1]<em>…</em>x[n]&lt;=((x[1]+…x[n])/n*(x[n+1]+…x[2n])/n)^2n<br>&lt;=((x[1]+…+x[2n])/2n)^2n         ====&gt;这里用到了P[2]</p>
+<p>c)不是很懂，<del>一开始以为不能用a)的那个式子，后来找了好多加看了习题解貌似是承认a)中的那个式子的</del>，对于a)中的那个其实是成立的，只不过a)中给出来，让我们更好证明一些(对于a中的证明，我们需要考虑的是x[1]*…x[n-1]&lt;=((x[1]+…+x[n-1]/(n-1))^(n-1)  首先我们知道P[n]是对x[n]为任意数成立的，那么我们就可以设x[n]=(x[1]+…+x[n-1])/(n-1)，然后就证明了)然后P[2]-&gt;P[4], P[4]-&gt;P[3],P[3]P[2]-&gt;P[5],依次类推，就可以知道所有的P[n]都成立。</p>
+<p>10.照着前面汉诺塔的模式推导就OK了</p>
+<p>11.a)假设最后所需的是T[n]，那么T[n]=T[n-1]+2+T[n-1]{首先把上面2n-2个放到第2个柱子上，然后把最下面两个放到第3个柱子上，因为不用考虑顺序，所以这样放就行了，最后把第2个柱子上的2n-2个移到第3个柱子上就行了}，最后得到T[n]=2^(n+1)+2<br>b)假设最后所需要的是S[n],首先我们从a)中可以知道如下一个结论，也就是在a)的规则中，最后只有最下面两个是互换顺寻的，上面的n-1对中，相同大小的Hanoi是没有换位置的(移了2次，第一次之后换了位置，然后第二次又换回来了).那么我们就可以的得到S[n]=T[n-1]+2+T[n-1]+2+S<a href="先把上面2n-2个移到第3个柱子上，然后把最下面的两个移到第2个柱子上，此时这两个的顺序是颠倒的，然后把上面2n-2个移会第1个柱子上，然后再把最下面的2个移到第3个柱子上，最后把上面2n-2个移到第3个柱子上">n-1</a>。</p>
+<p>12可以由11.a)扩展得到 如果所有的m[k]&gt;0,那么A(m[1],…m[n])=A(m[1],…,m[n-1])+m[n],另外如果最后顺序不能颠倒的话用B(m[1],…m[n])表示，那么最后B(m[1],…m[n])的表达式为<br>{                      A(m[1],….m[n])               if  m[n]=1<br>B(m[1],…m[n])       =    {                      2<em>m[n]-1                              if   n=1<br>{                      2</em>A(m[1],…m[n-1])+2*m[n]+B(m[1],…m[n-1])   if  n&gt;1 &amp; m[n]&gt;1</p>
+<p>13.照着书上给的那个射线的样子分析就行了，这里在ZZ[n-1]的情况下，然后考虑加入第n条ZZ线，可以知道只有让第n条ZZ线的3条”线”和前面的n-1条ZZ线都相交这样得到的区域最多，然后第n条ZZ线自己可以多出几个区域(因为是ZZ型的，注意拐角两边的区域是同一个区域，不要多算了)，这样就得到一个通式ZZ[n]=ZZ[n-1]+9*n-8</p>
+<p>14.这个最后得到1维是C(n,0)+C(n,1)  2维是C(n,0)+C(n,1)+C(n,2)   3维是C(n,0)+C(n,1)+C(n,2)+C(n,3)</p>
+<p>15.可以照着书上第15页那个展开式来写，这样的话只要考虑最后I[n]中n必须大于1，I(1)没有意义。另外可以按照书上Josephus Problem最开始的解法那样，写出递推式,然后可以解出来或者写出1-16(上限大一点好看规律，当然这也可以退出来)。然后可以得到最后的I(3<em>2^n+l)=2</em>l+1 其中m&gt;=0 &amp; 0&lt;=l&lt;3*2^m &amp;&amp; I(2) = 2</p>
+<p>16.由repertoire method我们可以假设g[n]=α<em>A[n]+β[0]</em>B[n]+β[1]<em>C[n]+γ</em>D[n].但是我一直只能找到两个式子，g[n]=1和g[n]=2这两个式子会得到  A[n]-2<em>B[n]-2</em>C[n]=1 &amp; A[n]+C[n]-D[n]=n，但是当我去解g[n]=n^2或者g[n]=1/n等其他的时候总是得到一些矛盾的东西，后来看了书后的解答，可以没有看出其中的奥秘，然后在网上各种搜题解，看到<a href="http://blog.wakatta.jp/blog/2012/01/14/concrete-mathematics-repertoire-method/" target="_blank" rel="external">这里</a>和<a href="http://ishare.iask.sina.com.cn/f/33662431.html" target="_blank" rel="external">这里</a>,才发现自己对那个repertoire method还是没有完全了解，照着上面给的两个链接我们可以得到最后的结果。</p>
+<p>继续加油，好好努力，天天向上。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-09-26 </div>
+			<div class="article-title"><a href="/2012/09/26/concrete-mathmatics-chapter-1/" >具体数学第一章</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>具体数学都买了好久了，买的第一本英文版的书，可以一直没有看下去，看了N次还是第一章。现在刚好有同学一起看这本书，就打算从头开始好好的看一遍，然后把每一章的Homeword Exercises都做了，顺便再博客里面写下来，这次希望有人一起看的情况下，把这本书好好的看完一次。</p>
+<p>第一章作者用几个例子来讲述递归式，第一个是汉诺塔，第二个是N条直线可以把平面最多分成多少个区域，第三个是Josephus Problem.这里面在汉诺塔的时候，通过T[n]&lt;=2<em>T[n-1]+1 &amp; T[n]&gt;=2</em>T[n-1]+1从而得到T[n]=2<em>T[n-1]+1.其中第一个是足够性，即T[n]在最多2</em>T[n-1]+1步中一定可以做完(首先你把上面的N-1个移到第2个柱子上，然后把第N个移到第3个柱子上，最后再把第2个柱子上的移到第3个柱子上)，T[n]&gt;=2*T[n-1]+1则是必须性，(在你移动第N个的时候，那么上面的N-1个一定在第2个柱子上，这里至少需要T[n]次,然后移动第N个需要1次，另外把第2个柱子上的移动到第3个柱子上至少需要T[n-1]次)。</p>
+<p>第二个问题，就讲了一下一个扩展，就是每条直线变成了两条共起点射线，然后问最多分成多少个区域，这个问题，可以先延长是的变成2*n条直线，最后再减去多出的部分就行了</p>
+<p>第三个问题，主要讲述了repertoire method,对于书上的一开始没看懂，对于没看懂的同学可以借鉴下这里</p>
+<p><a href="http://blog.wakatta.jp/blog/2012/01/14/concrete-mathematics-repertoire-method/" target="_blank" rel="external">Concrete Mathematics Repertoire Method</a>和<a href="http://wenku.baidu.com/view/d9d35f07e87101f69e319592.html" target="_blank" rel="external">repertoire</a>。我的想法就是这个方法就是确定α,β,γ和A[n],B[n],C[n]无关，当然这个你可以证明出来是无关的，不过关键是你在毫不知情的时候想到这个。知道这些无关之后，那么你就可以另f[n]=某些特定的值，那样的话，α,β,γ会得到特定的值(α,β,γ组和f[n]是对应的)，然后你就可以得到A[n],B[n],C[n]的。最后就得到一个通式了。接下来可能还会把做的习题以文章的形式写出来。</p>
+<p>表示好久都没看书了，看这书看的好慢啊！！！</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-09-21 </div>
+			<div class="article-title"><a href="/2012/09/21/wordpress-fatal-error/" >Wordpress Fatal Error</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>这博客好久都没更新了，最近登录后台的时候出现了”WordPress Fatal error: Allowed memory size of 33554432 bytes exhausted (tried to allocate 30720 bytes)”错误，怎么都进不了后台，网上一查才知道需要修改一个文件，好使的WP_MEMORY更大一些，具体的操作，就是通过ftp修改/www下的wp_config.php文件，然后在最开始的地方加上一句{define(‘WP_MEMORY_LIMIT’,’64M’);}这里的64M应该就是最大可以达到的内存了吧，如果还不够的话自己继续增加。好久都没更新博客了，这篇就当是除草了。。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+
+		</div>
+
+		<!-- pagination -->
+		<div>
+  		<center>
+		<div class="pagination">
+<ul class="pagination">
+	 
+		
+    	<li class="prev"><a href="/page/7/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+  		
+
+        <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+
+		
+		   <li class="next"> <a href="/page/9/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+        
+	
+</ul>
+</div>
+
+  		</center>
+		</div>
+
+		
+		
+	</div> <!-- col-md-9 -->
+
+	
+		<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+	<div class="widget">
+		<h4>Categories</h4>
+		<ul class="tag_box inline list-unstyled">
+		
+			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+		
+			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+		
+			<li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+		
+			<li><a href="/categories/Linux/TeX/">TeX<span>1</span></a></li>
+		
+			<li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+		
+			<li><a href="/categories/Uncategorized/">Uncategorized<span>3</span></a></li>
+		
+			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+		
+			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
+		
+			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/成长/">成长<span>3</span></a></li>
+		
+			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+		
+			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
+		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+		</ul>
+	</div>
+
+		
+			
+	<div class="widget">
+		<h4>Tag Cloud</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+		
+			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
+		
+			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
+		
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+		
+			<li><a href="/tags/trident/">trident<span>1</span></a></li>
+		
+			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
+		
+			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
+		
+			<li><a href="/tags/fork/">fork<span>2</span></a></li>
+		
+			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
+		
+			<li><a href="/tags/sap/">sap<span>1</span></a></li>
+		
+			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
+		
+			<li><a href="/tags/command/">command<span>1</span></a></li>
+		
+			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
+		
+			<li><a href="/tags/python/">python<span>1</span></a></li>
+		
+			<li><a href="/tags/append/">append<span>2</span></a></li>
+		
+			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
+		
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
+		
+			<li><a href="/tags/thinking/">thinking<span>1</span></a></li>
+		
+			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
+		
+			<li><a href="/tags/kafka/">kafka<span>8</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>260</span></a></li>
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>Recent Posts</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
+      </li>
+    
+      <li>
+        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>Links</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="https://github.com/wzpan/freemind/" title="Freemind's Github repository." target="_blank"]);">Freemind</a></li>
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/wzpan" title="My Github account." target="_blank"]);">My Github</a></li>
+	
+		<li><i class="fa fa-linkedin"></i><a href="http://www.linkedin.com/in/hahack" title="My Linkin account." target="_blank"]);">My LinkedIn</a></li>
+	
+	</ul>
+</div>
+
+
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+	
+	
+</div> <!-- row-fluid -->
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

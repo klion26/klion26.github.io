@@ -1,0 +1,885 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Algorithm | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+<!-- title -->
+<div class="page-header page-header-inverse ">
+  <h1 class="archive-title-category title title-inverse ">Algorithm</h1>
+</div>
+
+<div class="row page">
+  <!-- cols -->
+  
+  <div class="col-md-9">
+	
+
+	  <div id="top_search"></div>
+
+      
+
+      <div class="mypage">
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-01-17 </div>
+			<div class="article-title"><a href="/2015/01/17/recursion/" >Recursion</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://en.wikipedia.org/wiki/Recursion" target="_blank" rel="external">递归</a>（Recursion）是一种不停的调用自身的过程。比如下面这个故事就是一个递归的例子</p>
+<p>从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？「从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？『从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？……』」</p>
+<p>本文说的递归，讲的是递归函数，也就是一个函数不停的调用自己而形成的。</p>
+<p>首先，递归函数都满足两个性质</p>
+<ol>
+<li>有一个 base case。base case 可以理解为可以直接得到结果的一个状态或者说是终止状态。</li>
+<li>每一次函数调用都往 base case 靠拢，否则会形成 infinite loop<br>这里我们用阶乘函数 f(n) = n! 来进行说明。对于阶乘函数我们写出的递归函数大致是下面的样子</li>
+</ol>
+<pre class="lang:c decode:true ">int fac(int n)
+{
+  if(n<0) base="" case="" return="" 0;="" if(n<2)="" 1;="" n*fac(n-1);="" 调用="" fac(n-1)，往="" 靠拢="" }<="" pre=""> 
+
+<p>这个函数中前面两个 if 语句组成了 base case。也就是说如果 n&lt;0,那么 n 的阶乘是0，如果 n 是 0 或者 1，那么阶乘是1。这两种情况就组成了阶乘函数的 base case。剩下的 return 语句就是先计算 (n-1) 的阶乘（调用函数 fac(n-1))，然后再乘上 n [n!= n*(n-1)!]，得到最终的结果 n!。</p>
+<p>对于递归函数，刚开始的时候难就难在栈状态的理解，首先可以不考虑栈，把递归函数看成一个数学上的递归式，比如上面的阶乘，f(n) = f*f(n-1).那么如果我们想要求 f(n)，首先就需要知道 f(n-1).刚好这就是函数 fac()所解决的问题。对于刚开始学习递归的时候，可以手动模拟代码是怎么跑的，在纸上画出来，方便自己理解。假设我们要求 6！，就会变成下面的状态</p>
+<p>1 —&gt; fac(6)</p>
+<p>2 —&gt;  6*fac(5)   //6&gt;=2，所以执行最后一句话</p>
+<p>3 —&gt; 6<em>(5</em>fac(4)) //5&gt;=2 这里在 5*fac(4)这一层加上括号表示调用 fac(5)的时候，6是被屏蔽掉的，可以理解成”看不见”</p>
+<p>4 —&gt; 6<em>(5</em>(4*fac(3))) //4 &gt;=2</p>
+<p>5—&gt; 6<em>(5</em>(4<em>(3</em>fac(2)))) //3&gt;=2</p>
+<p>6 —&gt; 6<em>(5</em>(4<em>(3</em>(2*fac(1))))) //2&gt;=2</p>
+<p>7 —&gt; 6<em>(5</em>(4<em>(3</em>(2*(1)))))      //1 &lt; 2 所以返回1，这里在 1 的外面加上括号表示 1 是一个函数调用过程。</p>
+<p>8 —&gt; 6<em>(5</em>(4<em>(3</em>2)))      //这里的2表示是调用 fac(2)返回的结果，最里面的 3<em>2 是调用 fac(3)时 最后依据 n</em>fac(n-1)的具体化</p>
+<p>9—&gt; 6<em>(5</em>(4<em>6))    //4</em>6 表示的是调用 fac(4) 时执行的最后一句，其中 6 是 fac(4-1) 的结果</p>
+<p>10 —&gt; 6<em>(5</em>24)     // 5*24 表示的是调用 fac(5) 时执行的最后一句，其中 24 是 fac(5-1) 的结果</p>
+<p>11 —&gt; 6<em>120   // 6</em>120 表示的是调用 fac(6) 时执行的组后一句，其中 120 是 fac(6-1) 的结果</p>
+<p>12 —&gt; 720 // 调用 fac(6) 返回的结果</p>
+<p>每一行中，如果有函数就先计算函数的值，如果没有函数，那么就计算最里面一层括号中的值。对于每一次函数调用都会开辟一块新的栈空间，在相应的栈空间上进行操作， 就算同一个函数，两次不同的调用操作，也会在不同的栈空间上进行操作。这里一开始可以把函数看成一个黑盒子，盒子的输入就是 n， 盒子的输出是 n!,不用去考虑具体的栈空间什么的，这样会比较好一点。</p>
+<p>对于阶乘来说，如果传入的参数 n&lt;2 就表示是 base case（&lt;0 的情况是特例需要处理），其它的情况，每次都会调用 fac(n-1)，每次 n 都会减1，这样会往1靠拢，也就是往 base case 靠拢。刚好满足上面两个性质。</p>
+<p>在<a href="http://www.klion26.com/dynamic-programming.html" target="_blank" rel="external">动态规划</a>这篇文章里面，最开始的代码也是用的递归写的，base case 就是前面两个 if 语句判断（base case 一般都是用 if 特判），剩下的就是把其它的状态状态为 base case。比如有名的 <a href="http://en.wikipedia.org/wiki/Tower_of_Hanoi" target="_blank" rel="external">Hanoi 塔</a>问题，就可以用来测试自己是否理解了递归。Fibonacci 数列和 Euclid’s GCD 也可以用递归来写，还有一个<a href="http://www.algorithmist.com/index.php/Coin_Change" target="_blank" rel="external">找零钱</a>问题，也可以用递归来写。很多代码用递归写出来之后会变得很简洁。不过如果递归的层数比较深的话，可能会导致栈溢出的问题。</p>
+<p>熟悉递归之后，就还有尾递归的消除，至于怎么消除尾递归（有些语言里面会自带尾递归的消除），<a href="http://blog.moertel.com/tags/recursion-to-iteration%20series.html" target="_blank" rel="external">这个系列</a>讲的很详细，可以参考参考。</p>
+</0)></pre>
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-01-05 </div>
+			<div class="article-title"><a href="/2015/01/05/dynamic-programming/" >Dynamic Programming</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://en.wikipedia.org/wiki/Dynamic_programming" target="_blank" rel="external">Dynamic Programming</a>（动态规划）是一种以<span style="color: #0000ff;">空间换时间</span>的算法，可以用来解决的问题都有一个共性：<span style="color: #0000ff;">重叠子问题</span>。用通俗的话说就是记忆化搜索。也就是说，所有的动态规划都是可以用搜索去写的，但是用简单的搜索写，会发现时间复杂度太高，从而达不到要求，因为在搜索的过程中我们重复计算了很多以前已经计算过的问题（重叠子问题），这里就会浪费大量的时间。</p>
+<p>下面借助一个经典的入门题<a href="http://acm.hdu.edu.cn/showproblem.php?pid=2084" target="_blank" rel="external">数塔</a>来讲解具体的过程：</p>
+<p>数塔的大致意思如下：在一棵二叉树中，每个节点都有一个权值，现在你的任务是需要求从根出发到树的最底层的任何一条路径中（每一次都只能往下走），所经过的节点权值加起来最大（或者最小）的一条路径，并输出这个最大值（最小值）。下图中，9是树的根，需要求的是从9出发，最后到达｛19, 7, 10, 4, 16} 这一层的所有路径中，权值加起来最大的那一条。这里是{9-12-10-18-10}最大值为59.<a href="http://www.klion26.com/wp-content/uploads/2015/01/2084-1.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2015/01/2084-1-300x148.jpg" alt="2084-1"></a>我们在看到这个题目的时候，最开始可能想到的是用搜索直接求解，写一个递归函数解决之。因为每个节点只能往下走，所以每个节点的路径必然是经过左儿子或者右儿子节点，那么最大路径也必然从左儿子或右儿子中间选取。如果我们写一个函数叫做 f(i, j) 用来求每个点到最底层的最大路径和的话，那么这个函数的大致轮廓就可以写成：</p>
+<pre class="lang:c mark:7,8 decode:true ">int f(int i, int j)
+{
+if(i>MAX) //超过层数
+ return 0;
+if(j>i) //每一层的边界
+ return 0;
+int a = f(i+1, j); //左儿子
+int b = f(i+1, j+1); //右儿子
+if(a>b)
+ return a+num[i][j];
+else
+ return b+num[i][j];
+}</pre> 
+
+<p>写出这个代码之后，对于层数不多的时候，我们是可以求出最终的答案的，不过当层数比较多的时候，就会发现，求结果所需要的时间太多了。每一条路径可能会计算好几次，路径{18-10}就会被计算3次，分别是{12-10-18-10},{12-6-18-10}和{15-6-18-10},其中有两次是浪费的，因为前面我们计算过一次，如果能够保存下来的话，那么就可以直接查询就行了。那么接下来我们来看是否可以改进上面的代码。</p>
+<p>我们发现对于每个节点，都需要计算它的左儿子和右儿子到底层的最大路径和，这个路径是会重叠的，比如路径{9-12-6-18-10}和路径{9-15-6-18-10}的后面一段{6-18-10}就是重合的，也就是说用上面的代码我们会计算两次这条路径的值。这就造成了资源上的浪费，耗费了很多不必要的时间。那么现在我们用一个二维数组 dp[][] 记录下每个节点到底层的最大路径和，在第一次计算的时候，将这个结果赋值给二维数组 dp[][] 中相应的单元格，在后面需要的时候直接从 二维数组 dp[][] 里面取就行了，于是就有了下面的代码</p>
+<pre class="lang:c++ mark:7,8,9,10 decode:true ">int f(int i, int j)
+{
+if(i>MAX)
+  return 0;
+if(j<0 ||="" j="">i)
+  return 0;
+if(dp[i][j] == -1)//dp[][]数组初始化为-1，因为所有路径和都是正数，所以这里-1表示未计算过
+  dp[i+1][j] = f(i+1, j);
+if(dp[i+1][j+1] == -1)
+  dp[i+1][j+1] = f(i+1, j+1);
+if(dp[i+1][j]>dp[i+1][j+1])
+  return dp[i+1][j]+num[i][j];
+else
+  return dp[i+1][j+1]+num[i][j];
+}</0></pre> 
+
+<p>这段代码和第一段代码的区别就是用二维数组 dp[][] 保存下了每一个状态，这样每一条路径我们就只会计算一次，对于一棵节点很多的树来说，这节省下来的时间是非常多的，可以自己生成一个符合条件的二叉树，用上面两段代码同时计算所需要的结果，最后对比运行时间。<br>到这里差不多动态规划的思想就出来了：<span style="color: #0000ff;">空间换时间。<span style="color: #000000;">从而解决有<span style="color: #0000ff;">重叠子问题</span>的问题。</span><span style="color: #000000;">某些路径我们会计算很多次，那么就把这些结果保存下来，供后面需要的时候查询。当然本文的第二段代码，很多人叫做记忆化搜索，实际上思想是一样的，都是<span style="color: #0000ff;">用空间换时间</span>。当然接下来我们还可以继续把第二段代码写成非递归的，甚至对非递归的写法继续优化，这里就不涉及相应的内容了，这里给出一个优化版的非递归版本：（从底层开始计算，最后计算到树根结束，这样空间只需要 O(n) ），代码如下</span></span></p>
+<pre class="lang:c++ mark:10 decode:true ">int f(int i, int j)
+{
+int dp[MAX];//保存结果
+for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int="" i="MAX-2;">=0; --i)
+{
+ for(int j=0; j<=i; ++j)="" {="" dp[j]="max(dp[j]," dp[j+1])="" +="" num[i][j];="" 最大值是由自己的左儿子和右儿子的最大路径和构成="" }="" return="" dp[0];="" }<="" pre=""> 
+
+<p>在动态规划里面，还有两个术语叫做“<span style="color: #0000ff;">状态</span>”和“<span style="color: #0000ff;">转移方程</span>”，通俗的说“状态”就是表示某一情况下的结果，比如本文第二段代码中 dp[i][j] 就表示的是 (i,j)这个节点的状态，而“转移方程”就阐述了如何从一个“状态”变化到“另外一个状态”，比如上面第三段代码中的第10行 dp[j] = max(dp[j], dp[j+1]) + num[i][j]，表示了当前节点怎么从左儿子和右儿子的状态变化而来. 到这里，基本的动态规划问题，应该是能够理解了，当然能够理解不代表就能够解出新的题目，对于<span style="color: #0000ff;">怎么选取状态</span>，<span style="color: #0000ff;">怎么找出转移方程</span>，这些问题都需要通过<span style="color: #0000ff;">不停的训练</span>才能够获得。动态规划里面最难的就是<span style="color: #0000ff;">状态的选取</span>以及<span style="color: #0000ff;">转移方程</span>，当然利用其譬如优先队列等东西优化就属于更高级的东西了，如果能够知道怎么表达状态，以及写出相应的转移方程，那么剩下的就只是苦力活了。</p>
+<p>至于经典的最长公共子序列，最长上升子序列，背包问题等都是可以用上述思路来解</p>
+<p>至于自己想找题目练习的话，我推荐 Topcoder，至于其他的 OJ，可以自行搜索。<a href="http://community.topcoder.com/tc?module=ProblemArchivesr=&amp;er=&amp;sc=&amp;sd=&amp;class=&amp;cat=Dynamic+Programming&amp;div1l=&amp;div2l=&amp;mind1s=&amp;mind2s=&amp;maxd1s=&amp;maxd2s=&amp;wr=" target="_blank" rel="external">这里</a>是 Topcoder 上所有的动态规划题目集合，可以自行选择相应的难度。另外推荐一篇讲动态规划的英文版的<a href="http://www.topcoder.com/tc?d1=tutorials&amp;d2=dynProg&amp;module=Static" target="_blank" rel="external">文章</a>，也来自 Topcoder。网上还有人总结的 <a href="http://www.cppblog.com/doer-xee/archive/2009/12/05/102629.html" target="_blank" rel="external">DP46 题</a>，也可以看看。</p>
+<p>当然如果有什么地方讲解不详细，或者有错误的话，欢迎讨论:)</p>
+</=i;></max;></pre>
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-01-03 </div>
+			<div class="article-title"><a href="/2015/01/03/algorithm-series/" >Algorithm series</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>最近突然有想把自己知道的，学过的算法写成一个系列的想法，即可以理清自己的思路，督促自己学习(复习)相关知识，也可以帮助一部分人，暂时的想法是在自己的能力范围之内，把一些算法尽量的讲解透彻，做到从零开始，也可算是一个入门级别的吧，所以很多东西会讲的很基础，简单。当然由于自己水平有限，如果有些东西讲的不是很详细，明白的话，可以相互讨论，我会尽己所能，把自己想要讲解的东西，写出来。由于每一篇可能都会比较长，所以这个系列的更新频率会比较低，争取一周一篇。现在的预拟的目录如下（可能随着时间的推移而更改）：</p>
+<p>1. <a href="http://www.klion26.com/dynamic-programming.html" target="_blank" rel="external">Dynamic Programming</a></p>
+<p>2. Tree {Binary Tree, 2-3-4 Tree, Red Black Tree, AVL Tree, B/B+ Tree}</p>
+<p>3. Greedy {Huffman encoding, Minimum spanning Tree}</p>
+<p>4. Graph {shortest path, Minimum spanning tree, strongly connected components}</p>
+<p>5. Hash</p>
+<p>6. String {Longest common subsequence, String matching}</p>
+<p>7. Sorting {Bubble sort, Quick sort, Merge sort, Insertion sort, Shell sort, Heap sort}</p>
+<p>8. Searching {DFS, BFS, Binary search}</p>
+<p>9. Bit</p>
+<p>10. Data Compression</p>
+<p>11. Linked list</p>
+<p>12. <a href="http://www.klion26.com/recursion.html" target="_blank" rel="external">Recursion</a></p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-11-02 </div>
+			<div class="article-title"><a href="/2014/11/02/least-recently-used-algorithm/" >Least Recently Used Algorithm</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>LRU（_<a href="http://en.wikipedia.org/wiki/Cache_algorithms#LRU" target="_blank" rel="external">Least Recently Used</a>）_算法是操作系统中的一种页面置换（在缓存系统中也会用到），思想就是：每次都把<span style="color: #0000ff;">最近最少</span>使用的那个页面置换出去，这个思想基于，当前使用的页面在不久的将来也会使用。</p>
+<p>比如在内存为 3 的情况下，依次请求如下页面2，3，4，2，1，3，7，5，4，3.那么内存中保存的依次保存的页面会变成如下所示（每一行表示当前页面请求之后，内存中的页面情况，左边的页面比右边页面旧（也就是最后一次访问的时间早），<a href="http://www.youtube.com/watch?v=I9_BpSXBodU" target="_blank" rel="external">这里</a>有一个动态视频，给出每一次的情况（需要翻墙）</p>
+<ol>
+<li>2</li>
+<li>2 3</li>
+<li>2 3 4</li>
+<li>3 4 2</li>
+<li>4 2 1</li>
+<li>2 1 3</li>
+<li>1 3 7</li>
+<li>3 7 5</li>
+<li>7 5 4</li>
+<li>5 4 3<br>到这里基本想法就结束了，剩下的就是怎么实现的问题了。对于不同的要求，有不同的实现。</li>
+</ol>
+<p>第一种：最简单的模拟，用一个单链表表示 LRU 的大小，表头存最旧的页面，表尾存最新的页面，然后每次 get 和 put 的时候，都遍历一次单链表进行相应操作。由于每次都要遍历单链表，所以每次操作都是 O（L）的复杂度，其中 L 表示 LRU 的大小。代码如下</p>
+<pre class="lang:c++ decode:true ">typedef struct {
+    int key;
+    int val;
+} elem;
+class LRUCache{
+public:
+    elem *arr;  // lru cache
+    int sz; // total number of elements in the list currently.
+    int cap; //capacity
+    LRUCache(int capacity) {  //init LRUCache
+        arr = new elem[capacity];  //
+        sz = 0;
+        cap = capacity;
+ }
+ /* move the used element to the end of list */
+ void adjust(int a) {
+     if (a == sz - 1) {//the last one
+        return ;
+     }
+     elem cur = arr[a];
+     for (int i = a; i lt; sz - 1; i ++) {
+        arr[i] = arr[i + 1]; // move all elements after position a 1 step left
+     }
+     arr[sz - 1] = cur; // move arr[a] to the end
+ }
+ //get the value of key, return -1 if it doesn't exit
+ int get(int key) {
+     //iterate the whole list to find if the key exits
+     for (int i = 0; i lt; sz; i ++) {
+         if (arr[i].key == key) {
+            int a = arr[i].val;
+            adjust(i);
+            return a; // existent key
+         }
+    }
+    return -1;
+ }
+ //update the key/value
+ void set(int key, int value) {
+     for (int i = 0; i lt; sz; i ++) {
+         if (arr[i].key == key) { // existent
+            arr[i].val = value; //update value ,and adjust the list
+            adjust(i);
+            return;
+         }
+     }
+     if (sz == cap) { // check if reach the capacity
+         for (int i = 0; i lt; sz - 1; i ++) {
+             arr[i] = arr[i + 1]; // delete the least used element
+         }
+         arr[sz - 1].key = key;
+         arr[sz - 1].val = value;
+     } else {
+         arr[sz].key = key;
+         arr[sz].val = value;
+         sz ++; // increase the size
+     }
+ }
+};</pre> 
+
+<p>第二种写法就是用双链表存 LRU 中保存的实际内容，然后用 HASH 表保存每一个 key 所对应的内容在双链表中的位置，其中双链表还是表头存最旧的，表尾存最新的，用 HASH 就可以加速查找，用双链表则是更新的时候可以达到 O(1)[单链表不能获得前驱节点的信息]，<span style="color: #0000ff;">如果这里用 map 实现，而不是 hash_map 的话，那么复杂度是 log(L)，这个是由 map 的复杂度决定的</span>。代码如下：</p>
+<pre class="lang:c++ decode:true ">#include <iostream>
+#include <vector>
+#include <hash_map>
+
+using namespace std;
+using namespace stdext;
+
+template<class k,="" class="" t="">
+struct LRUCacheEntry
+{
+    K key;
+    T data;
+    LRUCacheEntry* prev;
+    LRUCacheEntry* next;
+};
+
+template<class k,="" class="" t="">
+class LRUCache
+{
+private:
+    hash_map< K, LRUCacheEntry&lt;K,T>* &gt; _mapping;
+    vector< LRUCacheEntry&lt;K,T>* &gt; _freeEntries;
+    LRUCacheEntry<k,t> * head;
+    LRUCacheEntry<k,t> * tail;
+    LRUCacheEntry<k,t> * entries;
+public:
+    LRUCache(size_t size){
+    entries = new LRUCacheEntry<k,t>[size];
+    for (int i=0; i<size; i++)="" _freeentries.push_back(entries+i);="" head="new" lrucacheentry<k,t="">;
+    tail = new LRUCacheEntry<k,t>;
+    head->prev = NULL;
+    head->next = tail;
+    tail->next = NULL;
+    tail->prev = head;
+ }
+ ~LRUCache()
+ {
+    delete head;
+    delete tail;
+    delete [] entries;
+ }
+ void put(K key, T data)
+ {
+    LRUCacheEntry<k,t>* node = _mapping[key];
+    if(node)
+      {
+        // refresh the link list
+        detach(node);
+        node->data = data;
+        attach(node);
+      }
+    else{
+       if ( _freeEntries.empty() )
+         {// lru cache is full
+             node = tail->prev;
+             detach(node);//delete a node
+             _mapping.erase(node->key);
+             node->data = data;
+             node->key = key;
+             _mapping[key] = node;
+             attach(node);//add the new node
+         }
+       else{
+             node = _freeEntries.back();
+             _freeEntries.pop_back();
+             node->key = key;
+             node->data = data;
+             _mapping[key] = node;
+             attach(node);
+           }
+       }
+ }
+
+ T get(K key)
+ {
+      LRUCacheEntry<k,t>* node = _mapping[key];
+      if(node)
+        {//if node is already in, refresh the double-link-list
+           detach(node);
+           attach(node);
+           return node->data;
+        }
+       else return NULL;
+ }
+
+private:
+    void detach(LRUCacheEntry<k,t>* node)
+    {// delete the node from the double-link-list
+         node->prev-&gt;next = node-&gt;next;
+         node->next-&gt;prev = node-&gt;prev;
+    }
+    void attach(LRUCacheEntry<k,t>* node)
+    {//add node to the head of double-link-list
+         node->next = head-&gt;next;
+         node->prev = head;
+         head->next = node;
+         node->next-&gt;prev = node;
+    }
+};</k,t></k,t></k,t></k,t></k,t></size;></k,t></k,t></k,t></k,t></class></class></hash_map></vector></iostream></pre> 
+
+<p>第二种方法利用双链表保存实际的 cache 内容，然后用 hash 来加速查找，hash 存的是每一个 key/value 的地址，这样就可以直接找到相应的 key/value 元素了。这种方法中，查找的复杂度是 O(1)，更新的复杂度，只需要进行一次查找，一次 detach，一次 attach，所以也是 O(1)的，较之第一种方法的优势就体现出来了。</p>
+<p>最后，如果你想看下自己写的 LRU 是否正确，速度如何，可以在 Leetcode 上进行提交，地址：<a href="https://oj.leetcode.com/problems/lru-cache/" target="_blank" rel="external">https://oj.leetcode.com/problems/lru-cache/</a>，提交之后可以查看是否正确，正确的话，查看用时多少（第一种方法，可能可以在 Leetcode 上通过，也可能会得到一个 <strong>Time Limit Exceeded </strong>的结果，这个就看你人品了）</p>
+<p>Reference</p>
+<p><a href="http://www.cs.uml.edu/~jlu1/doc/codes/lruCache.html" target="_blank" rel="external">Implement a LRU Cache in C++</a></p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-05-17 </div>
+			<div class="article-title"><a href="/2014/05/17/srm-620-randomgraph/" >SRM 620 RandomGraph</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://community.topcoder.com/stat?c=problem_statementpm=13143&amp;rd=15853" target="_blank" rel="external">题目链接</a></p>
+<p>题目大意：给你一个图无向图G，G有n个顶点，所有的边<i,j>都是以概率p存在。然后给定 n 和 p, 问图 G 中至少有一个联通子图含有4个以上（包括4个）顶点的概率。其中 2&lt;= n &lt;= 50</i,j></p>
+<p>这个题目还是比较有意思的。</p>
+<p>首先我们可以把4个以上转化为<span style="color: #ff0000;">不超过4个</span>，也就是说变成求这个问题的一个互补问题，因为转化之后的问题情况就变得少了很多，从而能够更好的求解</p>
+<p>接下来我们考虑怎么求图 G 中所有联通子图的顶点数都不超过4个的概率。首先不超过4个的情况只有如下几种<a href="http://www.klion26.com/wp-content/uploads/2014/05/graph1svg.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2014/05/graph1svg-300x115.png" alt="" title="graph1svg"></a></p>
+<p>第一种情况就是只有一个点在子图中，第二种情况是有两个顶点在图中，第三种和第四种是有3个顶点在子图中。我们可以把一个图中 第一种情况的个数设为 a,第二种情况的个数设为 b, 第三种和第四种情况的个数设为 c, 那么我们要求的就是图中只有这四种情况的概率。我们设<span style="color: #ff0000;"> f(r, a, b, c)</span> 表示 r 个顶点中 a 个第一种情况，b 个第二种情况，c个第三和第四种情况的概率。那么我们要求的就是 f(n, a, b, c) 且 a + 2b + 3c == n 的概率（其中 n 是图 G 的顶点个数）。那么接下来就是怎么算 f(r, a, b, c) 的事情了。</p>
+<p>我们假设现在有一个图 T，其中有 a 个第一种情况， b 个第二种情况， c 个第三和第四种情况。那么我们再加入一个顶点的时候，会发生什么呢？</p>
+<ol>
+<li>我们加入的点单独成为一个子图，也就是说不和任何的点有边连接，变成<span style="color: #ff0000;"> f(r+1, a+1, b, c),</span> 那么这种情况的概率是 (1-p)^(a+2b+3c)</li>
+<li>我们和第一种情况中的任何一个点有连接，那么就变成了<span style="color: #ff0000;"> f(r+1, a-1, b+1, c)</span>, 这样情况的概率是 (a<em>p)</em>(1-p)^(a-1)*(1-p)^(2b+3c)，首先是从 a 个点中选择一个，然后算概率</li>
+<li>我们和第一种情况种的任何两个点连接，变成一个第三种情况，那么就变成了<span style="color: #ff0000;"> f(r+1, a-2, b, c+1)</span>, 概率为 (a<em>(a-1))/2</em>p^2 <em> (1-p)^(a-2)</em>(1-p)^(2b+3c)</li>
+<li>我们和第二种情况种的某一个点连接，把连接的这个第二种情况变成第<span style="color: #ff0000;">三</span>种情况，也就是<span style="color: #ff0000;"> f(r+1, a, b-1, c+1)</span>, 概率为 (1-p)^a <em> <span style="color: #0000ff;">(2b)</span></em>p<em>(1-p)^(2b-1) </em> (1-p)^3c,其中标记出来的是从第二种情况种选择一个点进行连接，然后算的概率</li>
+<li>我们和第二种情况种的两个点进行连接，从而变成第<span style="color: #ff0000;">四</span>种情况（<span style="color: #ff0000;">注意这里和上面的区别</span>），也就是<span style="color: #ff0000;"> f(r+1, a, b-1, c+1)</span>, 概率为 (1-p)^a <em> b </em> p^2 <em> (1-p)^(2b-2)</em>(1-p)^3c.<br>接下来就可以用动态规划的思想来计算所有的 f(r, a, b, c) 了，然后计算出来之后我们求的所有 a+2b+3c == n 的 f(n, a, b, c)，记这个为 s 的话，那么我们最终要求的结果就是 1-s。到这里结束了</li>
+</ol>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-01-07 </div>
+			<div class="article-title"><a href="/2014/01/07/binary-tree-traversal-without-recursive/" >二叉树的非递归遍历</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>对于二叉树，如果我们需要对它进行遍历的话（不管是前序，中序还是后序，下面如果不特指的话，那么就是对三种遍历的统称）。如果用递归的方法，那么就非常简单了，我们只需要写下类似的代码即可</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">work</span>(<span style="color: #f5deb3;">TreeNode</span> <span style="color: #f5deb3;">*</span><span style="color: #f5deb3;">root</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">   if</span>(<span style="color: #b0c4de; font-weight: bold;">NULL</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">root</span>)<br><span style="color: #b0c4de; font-weight: bold;">       return</span> ;<br><span style="color: #f5deb3;">   work</span>(<span style="color: #f5deb3;">root</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">left</span>);<br><span style="color: #f5deb3;">   work</span>(<span style="color: #f5deb3;">root</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">right</span>);<br><span style="color: #f5deb3;">}</span></div><br>这样我们的三种遍历，只需要在这个函数里面进行一些细微的更改就可以达到了（把当前点的输出位置放在不同的地方）。不过这里主要讲的将是如何用非递归的方法进行二叉树的遍历。</p>
+<p>首先，我们来看树的前序遍历，我们需要先输出当前节点，然后处理左子树，然后再处理右子树。这里我们可以用桟来保存每个节点，但是我们需要处理每个节点的左右子树，如果我们只把每个节点压桟一次的话，那么每次我们不知道如果处理右子树（处理左子树的时候会把当前节点弹出桟）。这里就有问题了，但是我们可以考虑把每个节点压桟两次，也就是说第一次我们弹出的时候处理左子树，第二次弹出的时候，我们处理右子树。那么上面的这个问题就解决了，只不过桟的空间需要会大一点。不过已经可以工作了，至于怎么判断是第一次还是第二次弹出的话，我们可以把弹出的节点和桟里面最上面的节点做比较，相等的话就是第一次弹出，不相等就是第二次弹出。具体代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Binary-Tree-Preorder-Traversal.cpp" target="_blank" rel="external">参考这里</a>。</p>
+<p>然后我们考虑树的中序，可以把上面的代码进行一些细微的更改就好了，大致的框架我们不需要更改，具体的代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Binary-Tree-Inorder-Traversal.cpp" target="_blank" rel="external">参考这里</a>。</p>
+<p>接下来是后序，我们发现上面的算法不行了，因为我们必须在处理完了左右子树之后，才能够输出当前节点，但是按照上面的算法，我们在处理完左右子树之后，已经<span style="color: #ff0000;">找不到当前节点了</span>，这就是问题的所在，或许我们想可以把每个节点压桟3次，这样的话也是可以的，在第一次的时候处理左子树，第二次的时候处理右子树，第三次处理当前节点。不过我们可以看出上面的要不是压桟2次，要不是压桟3次，那么我们可以把压桟的数据更改一下，我们把桟保存的元素变成一个pair<treenode*,int>，这样的话后面的int保存的是这个节点在桟里面的次数，比如说前序遍历中，我们压桟的时候把pair后面的参数改成1（有0和1两种可能）,然后弹出一次就把后面的int值减1。对于后序遍历的话，我们把后面的int值设为2（有0,1和2三种可能），每次出桟的时候，如果int值为2就处理左子树，然后把int值减1再次压桟；如果int值为1的话，就处理右子树，然后把int值设为0,再次压桟；如果int值为0的话，那么就输出当前节点。这样的话我们可以比较好的处理二叉树的后序遍历了。具体的代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Binary-Tree-Postorder-Traversal.cpp" target="_blank" rel="external">参考这里</a>。</treenode*,int></p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-01-04 </div>
+			<div class="article-title"><a href="/2014/01/04/reverse-linked-list/" >有关链表逆序</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>给你一个链表，然后需要把链表给逆序输出，而且不能用交换链表的值或者新建一个链表的方式。</p>
+<p>1. 把一个链表从头到尾全部逆序，这个应该算这一些列问题里面最基本的东西了。大致思路就是每次把一个链表的当前node和next node给反过来，然后你需要记录下一个处理的节点是哪个，也就是处理完当前节点，需要往后移动一个。直接上代码：</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;">p<span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">root</span><span style="color: #da70d6;">//root是链表的头节点</span><br><span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">root</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span>;<span style="color: #da70d6;">//这里我们假定链表是非空的</span><br><span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #b0c4de; font-weight: bold;">NULL</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">q</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">t</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span>;<span style="color: #da70d6;">//记录下q的next，移动到下一个处理的地方要用到</span><br><span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span> <span style="color: #f5deb3;">=</span> p;<span style="color: #da70d6;">//链表逆序</span><br>p <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">q</span><span style="color: #da70d6;">//移动到下一个节点</span><br><span style="color: #f5deb3;">q</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">t</span><span style="color: #da70d6;">//用上面记录下来的q-&gt;;next更新q，因为q-&gt;next会变成p。</span><br><span style="color: #f5deb3;">}</span></div><br>上面的代码就是把链表逆序的核心代码了，当然最后你还需要处理链表的头节点什么的。首先我们用p和q两个指针指向当前节点，和原链表中的下一个节点，如果下一个节点为NULL的话，我们就直接退出循环了，因为这里不需要逆序了。对于p和q，我们首先记录下q的下一个节点t，因为待会我们会把q的next指针更新为p也就是逆序，如果不记录下q的下一个节点，那么这个节点我们就再也访问不到了。然后将q的next指针指向p（对链表进行逆序），然后将p更新为q，q更新为t，也就是说处理原链表中p的下一个节点。这个处理完了之后，链表基本已经逆序了，为什么说基本呢？可以看一个例子：1-&gt;2-&gt;3-&gt;4，用上述算法处理完成之后将变成1-&gt;2, 2-&gt;1, 3-&gt;2, 4-&gt;3，也就是说1和3都指向2，而没有指针指向4，但是4现在是表头。所以这里我们需要对原链表的表头和表尾进行处理。</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">root</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span> <span style="color: #f5deb3;">=</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span>;<br><span style="color: #f5deb3;">root</span> <span style="color: #f5deb3;">=</span> p;</div><br>这里root是原链表的表头，也就是新链表的表尾，所以它的next就是NULL，同时更新表头节点，经过while循环之后，p指向的是原链表的最后一个节点，当然就是新链表的头节点了。到此，链表逆序也就完成了。不过这只是基本的链表逆序而已，下面有两个变种。</p>
+<p>2. 给定一个链表，然后给定两个数m和n，1&lt;=m&lt;=n&lt;=length，length是链表的长度。你需要把链表中从第m个到第n个元素给逆序。这里大致思路还是和上面的差不多，不过处理的是链表的一部分，而不是全部，这个会比上面稍微的麻烦一点。上面我们在while循环之后加了两句话用来更新头节点和尾节点，那么同样我们这里需要更新类似的“头节点”和“尾节点”，比如1-&gt;2-&gt;3-&gt;4-&gt;5，m=2，n=4，的话，我们要在逆序之后，使得1指向4，而2指向5，这就是我们这里的“头节点”和“尾节点”，对于2指向5这个问题还是比较好处理的，因为我们能够找到2和5，这样的话直接加上一句就行了，然后把1指向4的话，我们需要保存节点2的<span style="color: #ff0000;">前一个</span>节点，这里我们需要保存每个节点的前一个节点，这样的话，我们才能够使得最后让1（2的前一个节点）指向4.不过这里有一个小小的trick，也就是说如果当前节点没有前一个节点（m=1），那么我们需要特殊处理一下，同样我们需要更新链表的头节点。具体的代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Reverse-Linked-List-II.cpp" target="_blank" rel="external">参照这里</a>。</p>
+<p>3. 如果给定一个链表，然后给定一个数n，让你把链表分成n个节点一段，每一段里面进行逆序，如果最后没有n个节点的话，那么就保持原样，比如1-&gt;2-&gt;3-&gt;4-&gt;5，然后n=2，处理完之后应该是2-&gt;1-&gt;4-&gt;3-&gt;5.这个问题，比上面两个要更复杂，首先你不能顺序依次处理过去，因为如果依次处理过去的话，段之间的链接就不对了，可以用笔画一下，依次处理过去的时候，2的下一个节点是不好指向4的，因为3-&gt;4这一段还没有逆序，但是最后我们需要的是2指向4，而不是3.这里就需要我们从后往前处理了，也就是说我们必须把当前段后面的所有段都已经处理完成了，然后再处理当前段，比如我们处理3-&gt;4的时候，5必须处理好（单个节点不需要好处理），然后处理1-&gt;2的时候，3-&gt;4-&gt;5必须处理好了，也就是变成了4-&gt;3-&gt;5.这样就满足递归的性质了，我们可以把这个问题用递归的方法写出来，先找到一段，然后处理这一段的后面所有段，然后再处理当前段，这样的话，我们就保证了处理当前段的时候，后面的已经是处理好了。具体代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Reverse-Nodes-in-K-Group.cpp" target="_blank" rel="external">参考这里</a>。</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-12-25 </div>
+			<div class="article-title"><a href="/2013/12/25/string-to-integer-atoi/" >String to Integer (atoi) </a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>题目大意：给你一个字符串，需要把这个字符串转化成int值。<a href="http://oj.leetcode.com/problems/string-to-integer-atoi/" target="_blank" rel="external">链接在此</a></p>
+<p>思路：直接模拟即可，不过有很多坑，需要非常的仔细。首先要考虑正负号问题，一般来说大家习惯的处理负号，但是会忘掉正好，这个到也好改；然后接下来的问题是，可能字符串的一开始是一堆空格，需要跳过；接下来如果开始的字符不是数字的话，那么int值就置为0,然后直接退出，这个和接下来的同理；处理数字的过程中，如果遇到了<span style="color: #ff0000;">非数字字符</span>，那么就<span style="color: #ff0000;">直接退出</span>，因为int值已经确定了；然后接下来就是取值范围问题了，题目的要求是<span style="color: #ff0000;">超过int的</span>，<span style="color: #ff0000;">设置为INT_MAX</span>，<span style="color: #ff0000;">小于INT_MIN的设置为INT_MIN</span>，这样的话，我们可以用unsigned int来算中间结果，然后最后再把unsinged int转化为int，不过中间可能就超过了INT_MAX，比如字符串“1234567891234”，这个字符串转成int之后的值已经超过了INT_MAX，这就需要在处理的过程中进行判断了，我的判断方式是如果上一次的结果&gt;(INT_MAX/10)的话，那么将上一次的结果×10然后加上当前这个字符所代表的数，然后当作结果。当处理完之后，就只要把结果往int的范围内压缩就行了，然后再进行正负判断即可。思路挺简单的，不过坑不少。</p>
+<p><a href="https://github.com/klion26/LeetCode/blob/master/String-to-Integer(atoi" target="_blank" rel="external">代码在这里</a>.cpp)</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-12-22 </div>
+			<div class="article-title"><a href="/2013/12/22/spiral-matrix/" >Spiral Matrix</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>题目大意：给你一个矩形，然后要你将之螺旋输出。从[0,0]开始。<br>题目链接：<a href="http://oj.leetcode.com/problems/spiral-matrix/" target="_blank" rel="external">Spiral Matrix</a></p>
+<p>看上去是一个挺简单的题目，以前也做过类似的，不过当时做的时候规定是正方形而已。没有好好的想就直接code，然后发现各种bug。慢慢调了好久才最后通过，好久没写算法题了，还是生疏了。</p>
+<p>大致思路如下：首先我们要判断是不是空的矩形，空矩形直接返回一个空的vector即可，如果不是空矩形的话，那么我们可以设多个变量，left，right，top，button分别表示当前矩形还未被输出的部分的最左，最右，最上，最下。然后我们在原始矩阵中进行螺旋访问，输出每一个元素。可以把这个螺旋访问看成是一层一层的剖洋葱，一层一层的来，每一层先处理最上面的一行，然后是最右边的一列，接下来是最下面的一行，最后是最左边的一列。然后在途中不断更新left，right，top和button四个变量值即可。</p>
+<p>到这里已经大致OK了，不过还是有问题，因为不是正方形，可能导致某些元素输出多次，这样的话就不行了，这里可以对输出的元素进行计数，如果已经全部输出完毕，那么就直接退出就行了。</p>
+<p><a href="https://github.com/klion26/LeetCode/blob/master/Spiral-Matrix.cpp" target="_blank" rel="external">代码在这里</a></p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-12-20 </div>
+			<div class="article-title"><a href="/2013/12/20/level-order-of-a-tree/" >树的按层输出顺序</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>题目大意：给你一个二叉树，然后要你按层输出这棵树，同层的节点按从左到右的顺序。</p>
+<p><a href="http://oj.leetcode.com/problems/binary-tree-level-order-traversal/" target="_blank" rel="external">仔细描述在这里</a>还有<a href="http://oj.leetcode.com/problems/binary-tree-level-order-traversal-ii/" target="_blank" rel="external">这里</a></p>
+<p>这里写下我做这两道题的思路和想法，由于很久没碰算法题了，所以下面的思路还是可以借鉴借鉴的（从最容易慢慢扩展而来）。</p>
+<p>第一种方法：</p>
+<p>我们可以把二叉树的每个节点进行标号，根节点的序号为1，每个节点i的左儿子节点为2i，右儿子为2i+1.这样的话我们可以先对这棵树进行一次遍历，也就是对每个顶点进行标号。当然我们用一个map来存每个节点的实际值和我们所标记的值，而且map会自动帮我们进行排序，树的遍历完成之后，我们对map进行一次遍历，根据编号计算出所在的层数，然后按顺序添加即可。每个节点所在的层数为log2(i)（其中i是编号）。</p>
+<p>第二种方法：</p>
+<p>其实对于上面的方法，我们再仔细想想，发现map是可以不用的，也就是在对树进行遍历的时候，就可以确定每个点所在的层数（由编号所得），而且我们可以确保每一层的节点都是按照从左到右的顺序添加的（树的遍历确保了这一点，先访问左子树，后访问右子树）。这样的话我们可以省略掉map结构，直接得到结果。</p>
+<p>上面两种方法的代码<a href="https://github.com/klion26/LeetCode/blob/master/Binary-Tree-Level-Order-Traversal.cpp" target="_blank" rel="external">在这里</a></p>
+<p>第三种方法：</p>
+<p>上面两种方法其实已经不错了，按理说时间复杂度，空间复杂度什么的也不大，不过有一个问题，那就是我们的<span style="color: #ff0000;">编号</span>，我们每次都是乘2处理的，这样的话，如果<span style="color: #ff0000;">树的高度很高</span>的话，那么这个编号是存不下来的，这里就出现问题了。其实解决这个问题也很容易，就是把乘2换成+1就行了，而且这样还省略了间接求每个点所在层数的花销。这样就得到了第三种方法。</p>
+<p>第三种算法的代码<a href="https://github.com/klion26/LeetCode/blob/master/Binary-Tree-Level-Order-Traversal-II.cpp" target="_blank" rel="external">在这里</a></p>
+<p>对于算法熟的人，可能第一眼就能想到第三种方法了，不过如果能够一步一步的想到第三种算法，那也是不错的哦。</p>
+
+	
+	</div>
+</div>
+
+	  
+      </div>
+	  <div>
+	    <center>
+	    <div class="pagination">
+<ul class="pagination">
+	 
+		
+          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+        
+
+        <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+
+		
+		   <li class="next"> <a href="/categories/Algorithm/page/2/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+        
+	
+</ul>
+</div>
+
+        </center>
+	    </div>	
+      
+
+</div> <!-- col-md-9/col-md-12 -->
+
+
+<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+	<div class="widget">
+		<h4>Categories</h4>
+		<ul class="tag_box inline list-unstyled">
+		
+			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+		
+			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+		
+			<li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+		
+			<li><a href="/categories/Linux/TeX/">TeX<span>1</span></a></li>
+		
+			<li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+		
+			<li><a href="/categories/Uncategorized/">Uncategorized<span>3</span></a></li>
+		
+			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+		
+			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
+		
+			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/成长/">成长<span>3</span></a></li>
+		
+			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+		
+			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
+		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+		</ul>
+	</div>
+
+		
+			
+	<div class="widget">
+		<h4>Tag Cloud</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+		
+			<li><a href="/tags/插件/">插件<span>1</span></a></li>
+		
+			<li><a href="/tags/https/">https<span>1</span></a></li>
+		
+			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
+		
+			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
+		
+			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
+		
+			<li><a href="/tags/数学/">数学<span>5</span></a></li>
+		
+			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
+		
+			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
+		
+			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
+		
+			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
+		
+			<li><a href="/tags/partition/">partition<span>1</span></a></li>
+		
+			<li><a href="/tags/spark-streaming/">spark_streaming<span>2</span></a></li>
+		
+			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
+		
+			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
+		
+			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
+		
+			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
+		
+			<li><a href="/tags/alibaba/">alibaba<span>1</span></a></li>
+		
+			<li><a href="/tags/stack/">stack<span>1</span></a></li>
+		
+			<li><a href="/tags/update/">update<span>1</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>260</span></a></li>
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>Recent Posts</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
+      </li>
+    
+      <li>
+        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>Links</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="https://github.com/wzpan/freemind/" title="Freemind's Github repository." target="_blank"]);">Freemind</a></li>
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/wzpan" title="My Github account." target="_blank"]);">My Github</a></li>
+	
+		<li><i class="fa fa-linkedin"></i><a href="http://www.linkedin.com/in/hahack" title="My Linkin account." target="_blank"]);">My LinkedIn</a></li>
+	
+	</ul>
+</div>
+
+
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

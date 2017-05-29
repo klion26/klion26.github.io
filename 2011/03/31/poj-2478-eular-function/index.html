@@ -1,0 +1,271 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>POJ 2478 欧拉函数 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="题目这题的实际就是求欧拉函数,也就是给你一个n,然后求从2-n的所有数的欧拉函数的和,至于不知道欧拉函数的还请google之.下面给出两个求欧拉函数的模板,一个是求从1-n的所有数的欧拉函数,一个是求单个数的欧拉函数.这两个函数都是由phi(n)=n(p1-1)(p2-1)……(pn-1)/(p1p">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="POJ 2478 欧拉函数"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> POJ 2478 欧拉函数</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><a href="http://poj.org/problem?id=2478" target="_blank" rel="external">题目</a><br>这题的实际就是求欧拉函数,也就是给你一个n,然后求从2-n的所有数的欧拉函数的和,至于不知道欧拉函数的还请google之.下面给出两个求欧拉函数的模板,一个是求从1-n的所有数的欧拉函数,一个是求单个数的欧拉函数.这两个函数都是由phi(n)=n<em>(p1-1)</em>(p2-1)<em>……</em>(pn-1)/(p1<em>p2</em>……*pn)这个式子来的.<br>第一个求所有数的欧拉函数</p>
+<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">eular</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="color: #f5deb3;">memset</span>(p<span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(p));<br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">1000001</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">i</span><span style="color: #da70d6;">//初始化</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">1000001</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">==</span>p<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">–</span><span style="color: #da70d6;">//如果是素数 那么等于n-1</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">1000001</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">+=</span><span style="color: #f5deb3;">i</span>)<br>                        <span style="color: #f5deb3;">{</span><br>                            p<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #da70d6;">//这里就是那个公式的应用,这里的P[j]数组是表示这个数是否是素数</span><br>                            <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>);<br>                            <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">/=</span><span style="color: #f5deb3;">i</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span></div><br>第二个,求单个数的欧拉函数:<br><div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">eular</span>(<span style="font-weight: bold; color: #98fb98;">int</span> n)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span>n;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(n<span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">==</span><span style="color: #add8e6;">0</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    n<span style="color: #f5deb3;">/=</span><span style="color: #f5deb3;">i</span><br>                    <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>                    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">==</span>n<span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">i</span>)<br>                        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//这里还是那个公式的应用</span><br>                            n<span style="color: #f5deb3;">/=</span><span style="color: #f5deb3;">i</span><br>                            <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;"><em>=</em></span><span style="color: #f5deb3;">i</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(n<span style="color: #f5deb3;">&gt;</span><span style="color: #add8e6;">1</span>)<span style="color: #da70d6;">//如果剩下的n是素数</span><br>        <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span>n<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">ret</span><br><span style="color: #f5deb3;">}</span></div>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2011/04/02/pointers-on-c-11-dynamical-memory/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2011/03/30/pointers-on-c-10-struct-union/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2011-03-31 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

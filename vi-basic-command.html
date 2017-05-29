@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>VI的一些基本命令之一 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="在Fedora下虽然写C/C++代码可以用Code::blocks，但是还是用VI来的顺手，尤其是VI用熟了之后，发现真是太好用了，如果想自己好好的学习下有关VI的一些命令的话，那么最好还是从网上下一个Tutorial，英文中文版随便，英文版的也很好懂的。下面记录下我看Tutorial时记下的命令，">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="VI的一些基本命令之一"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> VI的一些基本命令之一</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row page">
+	<!-- cols -->
+	
+	<div class="col-md-12">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>在Fedora下虽然写C/C++代码可以用Code::blocks，但是还是用VI来的顺手，尤其是VI用熟了之后，发现真是太好用了，如果想自己好好的学习下有关VI的一些命令的话，那么最好还是从网上下一个Tutorial，英文中文版随便，英文版的也很好懂的。下面记录下我看Tutorial时记下的命令，比如移动光标这样的命令，这里就没有了，所以如果想找一篇入门的文章的话，或许这里不适合你。</p>
+<p>na<em>&lt;ESC&gt;命令会输入n个</em>,这句命令可以理解为，首先是a*,然后前面的n表示执行n次，然后&lt;ESC&gt;是退到normal模式。<br>s    和x的功能差不多，不过是删除当前字符之后进入到Insert模式，另外c命令和d命令的区别就类似与s和x的区别<br>^    跳到当前行的第一个非空字符<br>fx   从当前字符开始，在当前行查找第一次出现x字符的位置，并跳到x所在的地方，比如你有文本abcdefg。当前光标位置在a处，那么fe，则会把光标跳到e所在的位置，可以在f前面加上数字表示查找第多少个。相同功能的还有F,t,T，其中F是从后往前找，t/T是找到x所在位置前面的一个字符。这样还可以和d，y等命令结合使用<br>CTRL-U/CTRL-D/CTRL-B/CTRL-F   向上滚半屏，向下滚半屏，向上滚一屏，向下滚一屏<br>. 执行最后一次删除或者修改命令操作<br>J     把当前行和接下来的行合并在一起，nJ表示合并n行（包括当前行）n》=2<br>r     表示修改一个字符，nr [表示任意你想换成的字符]，表示替换从当前字符开始的n个字符，并都替换成。<br>～   改变当前字符的大小写 ，当然你也可以在前面加上数字，这条命令，在你不小心按下了Caps键的时候还是很有用的<br>可以用q来录制宏，然后保存在某一个字母所对应的宏区里面，以后可以用。比如你的C 语言头文件有如下一些</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">stdio</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><br><span style="color: #f5deb3;">fcntl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><br><span style="color: #f5deb3;">unistd</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><br><span style="color: #f5deb3;">stdlib</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span></div><br>那么你可以通过如下的命令来快速的完成头文件的录入，首先我们可以把每行都相同的东西不录入（这就是宏的好处，待会可以一次性录入）。然后先录入所有的不同出，也就是先录入如下的几行</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">stdio</span><br><span style="color: #f5deb3;">fcntl</span><br><span style="color: #f5deb3;">unistd</span><br><span style="color: #f5deb3;">stdlib</span></div><br>然后把光标移动到第一行，也就是stdio所在的行，然后退出到Normal模式，接下来就是录制宏了。按下qa，表示把接下来的宏录制在a所对应的宏区。然后依次输入I#include &lt;&lt;ESC&gt;A.h&gt;&lt;ESC&gt;jq,解释下这条命令吧，首先I表示进入Insert模式，而且是从行头开始，然后依次输入#include &lt;这些字符，&lt;ESC&gt;表示退出到Normal模式，然后A表示进入插入模式，不过是从行末开始，然后输入.h&gt;表示头文件的后面几个字符，然后&lt;ESC&gt;表示退出到Normal模式，接下来的j表示移到下一行，q表示宏录制结束。到这里你的宏已经录制在a里面了，接下来就是使用了，把光标移动到fcntl所在的行，然后退出到Normal模式，接下来按下3@a.发现接下来的3行也全部写好了吧，是不是简化了很多工作呢？这里的3表示需要调用3次。</p>
+<p>在VI中如果需要输入一些特殊字符怎么办呢？当然可以解决的啦，可以通过命令(在Normal模式下)输入:digraphs来得到对应的命令，然后在Insert模式下用CTRL-K+刚才得到的两个字符来完成特殊字符的输入</p>
+<p>VI中如果用搜索的话，那么.*[]^%/\?~$这些字符是有特殊意义的，也就是不代表自己本身的，是转意字符，如果想搜这些转意字符，需要在他们前面加上反斜线\来去掉他们的转意性质。另外，搜索模式是有历史记录的，你可以通过在Normal模式输入/进入搜索模式然后通过上下按键来选择历史命令。</p>
+<p>一般搜索到的字符都是高亮的，但是我第二次打开其他的文件也是会高亮上一次搜索的字符，如果我不想高亮怎么办，首先可以通过搜索一个本文件没有的字符或者词来解决，还有就是可以通过命令:set nohlsearch设置不显示高亮，当然:set hlsearch表示显示高亮<br>如果我想在我输入每一个字符的同时，VI自动匹配我已经输入的字符，怎么办，用命令设置:set incsearch.这样VI就会在你输入每一个字符的时候，匹配当前已经输入的字符。<br>ma       在当前位置添加一个名为a的标志<br>`a         跳到名字万为a的mark位置<br>‘a          跳到名字为a的mark的行首<br>:marks         会列出所有的mark 另外mark可以和d，y等命令一起组合使用，另外，每次打开文件的时候，会自动有一些mark。<br>!!command           用command命令的执行结果代替当前行，这个在加入日期什么的还是很方便的<br>set autowrite/noautowrite      设置自动保存和不自动保存的，默认是不自动保存的<br>v/V/CTRL-v        进入Visual模式，v是可以单个字符的，然后V是整行整行的，CTRL-v是矩形形式的。这个对于改变一大片文字什么的也是很有用的<br><span style="color: #ff0000;">由于我这也是记录式的，顺便加上一些自己操作之后的感想，所以很多东西建议读者看Tutorial，那才是王道，下一篇《VI的基本命令之二》会接着这篇写</span></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+	
+	<!-- comment -->
+	
+	</div> <!-- col-md-9/col-md-12 -->
+		
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

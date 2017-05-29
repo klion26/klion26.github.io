@@ -1,0 +1,296 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>storm 分组方式实验结果 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="打算把自己学习实时计算的相关东西写出来，形成一个从零开始学实时计算的系列，由于我也是刚开始接触，系列文中的描述或概念有不当的地方，还请不吝指教。在此谢过。
+本文对 storm 的几种分组方式进行测试，加深对每一种分组方式的理解。首先，storm 包含下面七种分组方式：
+
+Shuffle groupi">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="storm 分组方式实验结果"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> storm 分组方式实验结果</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><span style="color: #ff0000;">打算把自己学习实时计算的相关东西写出来，形成一个从零开始学实时计算的系列，由于我也是刚开始接触，系列文中的描述或概念有不当的地方，还请不吝指教。在此谢过。</span></p>
+<p>本文对 storm 的几种分组方式进行测试，加深对每一种分组方式的理解。首先，storm 包含下面七种分组方式：</p>
+<ul>
+<li><strong><span style="color: #0000ff;">Shuffle grouping</span>:</strong> Tuples are randomly distributed across the bolt’s tasks in a way such that each bolt is guaranteed to get an equal number of tuples.</li>
+<li><span style="color: #0000ff;"><strong>Fields grouping</strong></span>: The stream is partitioned by the fields specified in the grouping. For example, if the stream is grouped by the “user-id” field, tuples with the same “user-id” will always go to the same task, but tuples with different “user-id”‘s may go to different tasks.</li>
+<li><span style="color: #000000;"><strong>Partial Key grouping</strong></span>: The stream is partitioned by the fields specified in the grouping, like the Fields grouping, but are load balanced between two downstream bolts, which provides better utilization of resources when the incoming data is skewed. <a href="https://melmeric.files.wordpress.com/2014/11/the-power-of-both-choices-practical-load-balancing-for-distributed-stream-processing-engines.pdf" target="_blank" rel="external">This paper</a> provides a good explanation of how it works and the advantages it provides.</li>
+<li><span style="color: #0000ff;"><strong>All grouping</strong></span>: The stream is replicated across all the bolt’s tasks. Use this grouping with care.</li>
+<li><span style="color: #0000ff;"><strong>Global grouping</strong>:</span> The entire stream goes to a single one of the bolt’s tasks. Specifically, it goes to the task with the lowest id.</li>
+<li><span style="color: #0000ff;"><strong>None grouping</strong>:</span> This grouping specifies that you don’t care how the stream is grouped. Currently, none groupings are equivalent to shuffle groupings. Eventually though, Storm will push down bolts with none groupings to execute in the same thread as the bolt or spout they subscribe from (when possible).</li>
+<li><strong>Direct grouping</strong>: This is a special kind of grouping. A stream grouped this way means that the producer of the tuple decides which task of the consumer will receive this tuple. Direct groupings can only be declared on streams that have been declared as direct streams. Tuples emitted to a direct stream must be emitted using one of the <a href="/javadoc/apidocs/backtype/storm/task/OutputCollector.html#emitDirect(int, int, java.util.List">emitDirect</a> methods. A bolt can get the task ids of its consumers by either using the provided<a href="https://storm.apache.org/javadoc/apidocs/backtype/storm/task/TopologyContext.html" target="_blank" rel="external">TopologyContext</a> or by keeping track of the output of the <code>emit</code> method in <a href="https://storm.apache.org/javadoc/apidocs/backtype/storm/task/OutputCollector.html" target="_blank" rel="external">OutputCollector</a> (which returns the task ids that the tuple was sent to).<br>由于测试环境种没有 Partial Key grouping 方式，Direct grouping 方式使用不同的消息发送方式。这里只对其他五种方式进行了测试。</li>
+</ul>
+<p>测试环境为：</p>
+<ul>
+<li>Spout 一个，循环发送一百个单词，配置了一个线程</li>
+<li><p>Bolt 一个，统计单词数目，配置了两个线程<br>测试结果为（<span style="color: #ff0000;">下面出现的阿拉伯数字为单词重复的次数</span>）：</p>
+</li>
+<li><p>Shuffle 从第<span style="color: #0000ff;">一百零八</span>个统计数据出现 2，后面还会穿插出现 1</p>
+</li>
+<li>Field 从第<span style="color: #0000ff;">一百零一</span>个统计数据出现 2，出现方式为一百个个1，然后一百个个 2，然后一百个3….</li>
+<li>Global 从第<span style="color: #0000ff;">一百零一</span>个统计数据出现2，出现方式与 Field grouping 方式一样</li>
+<li>All 从第<span style="color: #0000ff;">二百零一</span>个统计数据出现2，然后是两百个2，接着是两百个3….</li>
+<li>None 从第<span style="color: #0000ff;">一百</span>个统计数据出现 2，后面会穿插着出现 1，次数随机出现，与 Shuffle grouping 方式一样<br>其中 Shuffle 和 None 都是随机模式，会随机的发送给下一个 Bolt 的任何一个 task。Field 方式会把相同字段的分到同一个 task 上（<span style="color: #ff0000;">不同字段的也可以在相同 task 上</span>），Global 方式效果和 Field 一样，根据官方文档，每次都发送给 id 小的 task，All 会发送给 Bolt 上的所有 task（所有上述例子的循环长度为二百），这种方式会浪费比较多的资源。</li>
+</ul>
+<p>另外根据文档说明，<strong>Partial Key grouping 是在 Field 的基础上进行了压力均衡；Direct 方式需要使用 emitDirect 发送数据。</strong></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/07/26/redis-pqsort-c/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/07/16/a-brief-view-of-storm/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-07-17 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/storm/">storm<span>3</span></a></li> <li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li> <li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li> <li><a href="/tags/grouping/">grouping<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

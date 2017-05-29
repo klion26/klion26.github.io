@@ -1,0 +1,272 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>HDU_2857_计算几何 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="这题就是一个反射的题,给出光源和反射之后的一个点,输出反射点.VC时我一直用高中的方法去搞,而且没有考虑特殊情况,导致浪费了很多时间.回来就搜了下,发现这题基本就是一系列模板套上去就OK了,首先是点关于直线的对称点,然后是两条直线的交点,OK手工.下面给出我的代码:
+1.  #include    ">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="HDU_2857_计算几何"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> HDU_2857_计算几何</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>这题就是一个反射的题,给出光源和反射之后的一个点,输出反射点.VC时我一直用高中的方法去搞,而且没有考虑特殊情况,导致浪费了很多时间.回来就搜了下,发现这题基本就是一系列模板套上去就OK了,首先是点关于直线的对称点,然后是两条直线的交点,OK手工.下面给出我的代码:</p>
+<div class="dp-highlighter"><br><br>1.  <span><span class="preprocessor">#include <stdio.h> </stdio.h></span><span>  </span></span><br>2.  <span> </span><span class="preprocessor">#include <string.h> </string.h></span><span>  </span><br>3.  <span class="preprocessor">#include <stdlib.h> </stdlib.h></span><span>  </span><br>4.  <span class="preprocessor">#include <math.h> </math.h></span><span>  </span><br>5.  <span>  </span><br>6.  <span class="keyword">typedef</span><span> </span><span class="keyword">struct</span><span>  </span><br>7.  <span>{   </span><br>8.  <span>    </span><span class="datatypes">double</span><span> x,y;   </span><br>9.  <span>}TPoint;   </span><br>10.  <span>  </span><br>11.  <span class="keyword">typedef</span><span> </span><span class="keyword">struct</span><span>  </span><br>12.  <span>{   </span><br>13.  <span>    </span><span class="datatypes">double</span><span> a,b,c;   </span><br>14.  <span>}TLine;   </span><br>15.  <span>  </span><br>16.  <span>TPoint src,end,sym,ref;   </span><br>17.  <span>TPoint mirr_point[2];   </span><br>18.  <span>TLine mirr;   </span><br>19.  <span class="comment">/<em>通过直线上的两个点得到直线的一般式</em>/</span><span>  </span><br>20.  <span>TLine get_line(TPoint p1,TPoint p2)   </span><br>21.  <span>{   </span><br>22.  <span>    TLine ret;   </span><br>23.  <span>    ret.a = p1.y-p2.y;   </span><br>24.  <span>    ret.b = p2.x-p1.x;   </span><br>25.  <span>    ret.c = p1.x<em>p2.y-p2.x</em>p1.y;   </span><br>26.  <span>    </span><span class="keyword">return</span><span> ret;   </span><br>27.  <span>}   </span><br>28.  <span class="comment">/<em>返回一个数的平方</em>/</span><span>  </span><br>29.  <span class="datatypes">double</span><span> squ(</span><span class="datatypes">double</span><span> a)   </span><br>30.  <span>{   </span><br>31.  <span>    </span><span class="keyword">return</span><span> a<em>a;   </em></span><br>32.  <span>}   </span><br>33.  <span class="comment">/得到p关于l的对称点<em>/</em></span><span>  </span><br>34.  <span>TPoint symmetric_point(TPoint p,TLine l)   </span><br>35.  <span>{   </span><br>36.  <span>    TPoint ret;   </span><br>37.  <span>    </span><span class="datatypes">double</span><span> d = squ(l.a)+squ(l.b);   </span><br>38.  <span>    ret.x = (squ(l.b)p.x-squ(l.a)<em>p.x-2</em>l.a<em>l.b</em>p.y-2<em>l.a</em>l.c)/d;   </span><br>39.  <span>    ret.y = (squ(l.a)<em>p.y-squ(l.b)</em>p.y-2<em>l.a</em>l.b<em>p.x-2</em>l.b<em>l.c)/d;   </em></span><br>40.  <span>    </span><span class="keyword">return</span><span> ret;   </span><br>41.  <span>}   </span><br>42.  <span class="comment">/返回<p1,p2>和&lt;p1,p3&gt;的叉积<em>/</em></p1,p2></span><span>  </span><br>43.  <span class="datatypes">double</span><span> cross(TPoint p1,TPoint p2,TPoint p3)   </span><br>44.  <span>{   </span><br>45.  <span>    </span><span class="keyword">return</span><span> (p2.x-p1.x)(p3.y-p1.y)-(p2.y-p1.y)<em>(p3.x-p1.x);   </em></span><br>46.  <span>}   </span><br>47.  <span>  </span><br>48.  <span class="comment">/用叉积得到两条直线的交点[前提是直线规范相交]<em>/</em></span><span>  </span><br>49.  <span class="keyword">void</span><span> work()   </span><br>50.  <span>{   </span><br>51.  <span>    </span><span class="comment">/求直线 <a,b>和&lt;c,d&gt;的交点p的方法 </a,b></span><br>52.  <span><span class="comment">      首先是得到4个叉积 </span> </span><br>53.  <span><span class="comment">      s1 = cross(a,b,c); </span> </span><br>54.  <span><span class="comment">      s2 = cross(a,b,d); </span> </span><br>55.  <span><span class="comment">      s3 = cross(c,d,a); </span> </span><br>56.  <span><span class="comment">      s4 = cross(c,d,b); </span> </span><br>57.  <span><span class="comment">      p.x = (c.x<em>s2-d.x</em>s1)/(s2-s1); </span> </span><br>58.  <span><span class="comment">      p.y = (s.y<em>s2-d.y</em>s1)/(s2-s1); </span> </span><br>59.  <span><span class="comment">      推导用定比分点 </span> </span><br>60.  <span><span class="comment">     <em>/</em></span><span>  </span></span><br>61.  <span>    </span><span class="datatypes">double</span><span> s1,s2,s3,s4;   </span><br>62.  <span>    s1 = cross(end,sym,mirr_point[0]);   </span><br>63.  <span>    s2 = cross(end,sym,mirr_point[1]);   </span><br>64.  <span>    s3 = cross(mirr_point[0],mirr_point[1],end);   </span><br>65.  <span>    s4 = cross(mirr_point[0],mirr_point[1],sym);   </span><br>66.  <span>    ref.x = (mirr_point[0].xs2-mirr_point[1].x<em>s1)/(s2-s1);   </em></span><br>67.  <span>    ref.y = (mirr_point[0].ys2-mirr_point[1].y*s1)/(s2-s1);   </span><br>68.  <span>    printf(</span><span class="string">“%.3f %.3f\n”</span><span>,ref.x,ref.y);   </span><br>69.  <span>    </span><span class="keyword">return</span><span> ;   </span><br>70.  <span>}   </span><br>71.  <span>  </span><br>72.  <span class="datatypes">int</span><span> main(</span><span class="keyword">void</span><span>)   </span><br>73.  <span>{   </span><br>74.  <span>    </span><span class="datatypes">int</span><span> t;   </span><br>75.  <span>    scanf(</span><span class="string">“%d”</span><span>,t);   </span><br>76.  <span>    </span><span class="keyword">while</span><span>(t–)   </span><br>77.  <span>        {   </span><br>78.  <span>            scanf(</span><span class="string">“%lf%lf”</span><span>,mirr_point[0].x,&amp;mirr_point[0].y);   </span><br>79.  <span>            scanf(</span><span class="string">“%lf%lf”</span><span>,mirr_point[1].x,&amp;mirr_point[1].y);   </span><br>80.  <span>            scanf(</span><span class="string">“%lf%lf”</span><span>,src.x,&amp;src.y);   </span><br>81.  <span>            scanf(</span><span class="string">“%lf%lf”</span><span>,end.x,&amp;end.y);   </span><br>82.  <span>            mirr = get_line(mirr_point[0],mirr_point[1]);   </span><br>83.  <span>            sym = symmetric_point(src,mirr);   </span><br>84.  <span>            work();   </span><br>85.  <span>        }   </span><br>86.  <span>    </span><span class="keyword">return</span><span> 0;   </span><br>87.  <span>}   </span><br></div>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2011/05/08/gcj-2011-klion26/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2011/05/04/permalink-change/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2011-05-05 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

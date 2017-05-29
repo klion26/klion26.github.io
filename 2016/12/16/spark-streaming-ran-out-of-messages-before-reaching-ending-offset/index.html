@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Spark Streaming Ran out of messages before reaching ending offset 异常 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="现象Spark Streaming 处理数据过程中遇到 Ran out of messages before reaching ending offset 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）
+分析通过异常栈信息，我们知道异常从 KafkaRDD.scala#21">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Spark Streaming Ran out of messages before reaching ending offset 异常"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Spark Streaming Ran out of messages before reaching ending offset 异常</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>Spark Streaming 处理数据过程中遇到 <code>Ran out of messages before reaching ending offset</code> 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）</p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>通过异常栈信息，我们知道异常从 KafkaRDD.scala#211 行抛出，下面是相应代码</p>
+<pre><code>206 override def getNext(): R = {
+      if (iter == null || !iter.hasNext) {
+208        iter = fetchBatch
+      }
+210      if (!iter.hasNext) {
+211        assert(requestOffset == part.untilOffset, errRanOutBeforeEnd(part))
+212        finished = true
+        null.asInstanceOf[R]
+      } else {
+        val item = iter.next()
+        if (item.offset &gt;= part.untilOffset) {
+217          assert(item.offset == part.untilOffset, errOvershotEnd(item.offset, part))
+          finished = true
+          null.asInstanceOf[R]
+        } else {
+          requestOffset = item.nextOffset
+          messageHandler(new MessageAndMetadata(
+            part.topic, part.partition, item.message, item.offset, keyDecoder, valueDecoder))
+        }
+      }
+226    }
+`&lt;/pre&gt;
+通过分析，我们知道这个地方是实际从 Kafka 读取数据的逻辑，首先会调用 `fetchBatch` 函数（208 行），然后进行逻辑判断，数据是否读取完毕，是否发生异常
+
+其中 211 行的异常表示还未读取到 part.untilOffset 但是当前迭代器中没有数据了；217 行表示当前读取的数据如果超过了 part.untilOffset ，那么在这个时候退出当前 batch（offset 从 fromOffset 逐次加一增加的，正常的逻辑肯定会和 part.untilOffset 相等）
+
+我们知道异常从 211 行抛出来的，也知道了异常的最直接原因，那么这个原因是什么造成的呢？
+
+211 行的代码执行了，也就是 210 行的 if 语句未 true，这样的话，207 行的逻辑也应该为 true。这样的话 iter 就是 fetchBatch 返回的迭代器了。接下来我们看看 fetchBatch 的代码
+&lt;pre&gt;`188 private def fetchBatch: Iterator[MessageAndOffset] = {
+189      val req = new FetchRequestBuilder()
+190        .addFetch(part.topic, part.partition, requestOffset, kc.config.fetchMessageMaxBytes)
+        .build()
+192      val resp = consumer.fetch(req)
+      handleFetchErr(resp)
+      // kafka may return a batch that starts before the requested offset
+      resp.messageSet(part.topic, part.partition)
+196       .iterator
+        .dropWhile(_.offset &lt; requestOffset)
+    }
+`&lt;/pre&gt;
+我们发现 192 行会通过 consumer 从 kafka 获取数据，本次从哪获取数据，以及获取多少分别由 190 行的 `topic`, `partition` 和 `kc.config.fetchMessageMaxBytes` 指定。我们查看 `kc.config.fetchMessageMaxBytes`，发现默认使用的是 1M
+&lt;pre&gt;`ConsumerConfig.scala
+29 val FetchSize = 1024 * 1024
+
+114 val fetchMessageMaxBytes = props.getInt(&quot;fetch.message.max.bytes&quot;, FetchSize)
+`&lt;/pre&gt;
+从这里我们知道每次从 kafka 上最多获取 1M 的数据（这也是为什么需要在 `KafkaRDD.getNext` 函数的开头通过 `iter.hasNext()` 来判断是否需要调用 `fetchBatch`
+
+然后看到 fetchBatch 函数对应的 196 行，获取迭代器作为返回值，查看相应代码，跳转到 `ByteBufferMessageSet.scala`
+&lt;pre&gt;`139 override def iterator: Iterator[MessageAndOffset] = internalIterator()
+145 private def internalIterator(isShallow: Boolean = false): Iterator[MessageAndOffset] = {
+    new IteratorTemplate[MessageAndOffset] {
+        ......
+152      def makeNextOuter: MessageAndOffset = {
+        // if there isn&apos;t at least an offset and size, we are done
+        if (topIter.remaining &lt; 12)
+          return allDone()
+        val offset = topIter.getLong()
+        val size = topIter.getInt()
+        if(size &lt; Message.MinHeaderSize)
+          throw new InvalidMessageException(&quot;Message found with corrupt size (&quot; + size + &quot;)&quot;)
+
+ 160       // we have an incomplete message
+ 161       if(topIter.remaining &lt; size)
+ 162         return allDone()
+       ....
+ 185     }
+</code></pre><p>从 161 行我们可以看出，如果读取的消息是一条不完整的，那么本次不处理，默认本次消息读取完成。</p>
+<p>上面所有的链条穿起来就抛出了我们文章开始的异常。</p>
+<ol>
+<li>从 kafka 读取 1M 的数据（默认大小）</li>
+<li>发现读取的数据不完整（这个消息的大小大于 1M），所以本次读取的 迭代器 为空</li>
+<li>发现迭代器为空，但是当前的 offset 和 part.untilOffset 不想等，抛出异常</li>
+</ol>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过设置 kafkaParam 的参数 <code>fetch.message.max.bytes</code> 就行了，我们设置成 2M（大于一条数据的最大值即可），就能够运行成功了</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2016-12-16 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/kafka/">kafka<span>8</span></a></li> <li><a href="/tags/spark/">spark<span>3</span></a></li> <li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li> <li><a href="/tags/exception/">exception<span>1</span></a></li> <li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

@@ -1,0 +1,388 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>语言学习 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+<!-- title -->
+<div class="page-header page-header-inverse ">
+  <h1 class="archive-title-category title title-inverse ">语言学习</h1>
+</div>
+
+<div class="row page">
+  <!-- cols -->
+  
+  <div class="col-md-9">
+	
+
+	  <div id="top_search"></div>
+
+      
+
+      <div class="mypage">
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-12-29 </div>
+			<div class="article-title"><a href="/2014/12/29/show-me-the-code/" >Show me the code</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>想着好好的学习下 Python，只看书当然是不行的，就在网上找一些项目做，想找合适的项目太难的，每个人的情况不一样，对 A 是合适的，对 B 就不一定合适，后来找到 <a href="https://github.com/karan/Projects" target="_blank" rel="external">100 project </a>和 <a href="https://github.com/Yixiaohan/show-me-the-code" target="_blank" rel="external">show-me-the-code </a>这两个 Github 上的 repo，想着自己先做做，等逐渐熟练了之后，再去解决其他的问题。期间问了一个美团公司的工程师有什么可以推荐的不，他建议找自己想解决的问题，我当时想着在桌面写一个<a href="http://www.meituan.com/lottery/past?mtt=1.index%2Ffloor.rd.1.i49jroiy" target="_blank" rel="external">美团网自动抽奖</a>的程序，由于自己不熟悉前端，有些地方不懂，问了好几个搞前端的同学，也没搞定。想着干脆先照着前面两个 repo 写，另外写个爬虫，熟悉下。等自己熟悉那个抽奖系统的链接跳转之后，再去搞定它。</p>
+<p>下面是我做这些 project 时遇到的一些问题，这里会逐渐更新，所有的代码都放到<a href="https://github.com/klion26/Projects" target="_blank" rel="external">这个库中</a>。</p>
+<p>1. 在图片的右上角加一个红色的数字（类似 QQ 消息的信息数目提示），直接用 PIL 库可以解决，不过由于在 windows 确实某个库 _imagingft  C，照着网上的安装之后还是不行，不能更改字体，导致添加的数字字体太小。另外应该可以用 PyQt 或者 Opencv来解决。</p>
+<p>2. 生成一个定长的随机字符串：这个学到了好几种方法，个人觉得较好的是 a)跑 for 循环，每次生成一个字符; b) 用 random.sample ；c)用 random.shuffle。写这个的时候，以及其他一些东西的时候，自己还是用 c/c++ 的思想在写 python，另外一个比较明显的例子是交换两个数，这个要慢慢改过来。</p>
+<p>至于用生成的随机字符串生成验证码，也可以用 PIL 库解决，将字符串画到图片上，再在图片上画一些黑点/黑线，然后对图片进行扭曲操作，不过不要操作过头了，导致用户都不认识。</p>
+<p>3. 找出 html 文件中的正文，链接，或者下载某个页面中的所有图片。自己用的正则表达式处理，正文直接匹配的 <body[\s\s]*&lt; body="">，这里中间用 “[\s\S]”表示所有字符，不用通配符 <em>，是因为会有换行等特殊字符在里面；链接用的是 href=\”[^\”]</em>\”, 至于下载某个页面中的所有图片，首先利用正则表达式 src=\”http[^\”]*jpg\”（这里需要考虑多种图片格式），找出所有图片的 url，然后用urllib.urlretrieve() 函数将远程的图片下载到本地。</body[\s\s]*&lt;></p>
+<p>4. 对密码进行加密，直接用 hashlib 库就行了，可以用不同的加密函数，至于加密密码的时候，需要添加 salt，salt可以由用户提供，也可以用 uuid 生成一个随机的字符串，最后把 salt 添加到 hash 后的密码后面，为了后面验证需要。</p>
+<p>未完待续…</p>
+
+	
+	</div>
+</div>
+
+	  
+      </div>
+	  <div>
+	    <center>
+	    <div class="pagination">
+<ul class="pagination">
+	 
+</ul>
+</div>
+
+        </center>
+	    </div>	
+      
+
+</div> <!-- col-md-9/col-md-12 -->
+
+
+<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+	<div class="widget">
+		<h4>Categories</h4>
+		<ul class="tag_box inline list-unstyled">
+		
+			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+		
+			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+		
+			<li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+		
+			<li><a href="/categories/Linux/TeX/">TeX<span>1</span></a></li>
+		
+			<li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+		
+			<li><a href="/categories/Uncategorized/">Uncategorized<span>3</span></a></li>
+		
+			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+		
+			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
+		
+			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/成长/">成长<span>3</span></a></li>
+		
+			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+		
+			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
+		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+		</ul>
+	</div>
+
+		
+			
+	<div class="widget">
+		<h4>Tag Cloud</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
+		
+			<li><a href="/tags/6-824/">6.824<span>2</span></a></li>
+		
+			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
+		
+			<li><a href="/tags/how/">how<span>1</span></a></li>
+		
+			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
+		
+			<li><a href="/tags/json/">json<span>1</span></a></li>
+		
+			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
+		
+			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+		
+			<li><a href="/tags/network/">network<span>1</span></a></li>
+		
+			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
+		
+			<li><a href="/tags/kafka/">kafka<span>8</span></a></li>
+		
+			<li><a href="/tags/notes/">notes<span>0</span></a></li>
+		
+			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
+		
+			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
+		
+			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
+		
+			<li><a href="/tags/火柴棍式程序题/">火柴棍式程序题<span>1</span></a></li>
+		
+			<li><a href="/tags/于娟/">于娟<span>1</span></a></li>
+		
+			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
+		
+			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
+		
+			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>260</span></a></li>
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>Recent Posts</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
+      </li>
+    
+      <li>
+        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>Links</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="https://github.com/wzpan/freemind/" title="Freemind's Github repository." target="_blank"]);">Freemind</a></li>
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/wzpan" title="My Github account." target="_blank"]);">My Github</a></li>
+	
+		<li><i class="fa fa-linkedin"></i><a href="http://www.linkedin.com/in/hahack" title="My Linkin account." target="_blank"]);">My LinkedIn</a></li>
+	
+	</ul>
+</div>
+
+
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

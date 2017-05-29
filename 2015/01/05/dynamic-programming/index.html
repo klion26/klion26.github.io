@@ -1,0 +1,316 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Dynamic Programming | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="Dynamic Programming（动态规划）是一种以空间换时间的算法，可以用来解决的问题都有一个共性：重叠子问题。用通俗的话说就是记忆化搜索。也就是说，所有的动态规划都是可以用搜索去写的，但是用简单的搜索写，会发现时间复杂度太高，从而达不到要求，因为在搜索的过程中我们重复计算了很多以前已经计算">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Dynamic Programming"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Dynamic Programming</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><a href="http://en.wikipedia.org/wiki/Dynamic_programming" target="_blank" rel="external">Dynamic Programming</a>（动态规划）是一种以<span style="color: #0000ff;">空间换时间</span>的算法，可以用来解决的问题都有一个共性：<span style="color: #0000ff;">重叠子问题</span>。用通俗的话说就是记忆化搜索。也就是说，所有的动态规划都是可以用搜索去写的，但是用简单的搜索写，会发现时间复杂度太高，从而达不到要求，因为在搜索的过程中我们重复计算了很多以前已经计算过的问题（重叠子问题），这里就会浪费大量的时间。</p>
+<p>下面借助一个经典的入门题<a href="http://acm.hdu.edu.cn/showproblem.php?pid=2084" target="_blank" rel="external">数塔</a>来讲解具体的过程：</p>
+<p>数塔的大致意思如下：在一棵二叉树中，每个节点都有一个权值，现在你的任务是需要求从根出发到树的最底层的任何一条路径中（每一次都只能往下走），所经过的节点权值加起来最大（或者最小）的一条路径，并输出这个最大值（最小值）。下图中，9是树的根，需要求的是从9出发，最后到达｛19, 7, 10, 4, 16} 这一层的所有路径中，权值加起来最大的那一条。这里是{9-12-10-18-10}最大值为59.<a href="http://www.klion26.com/wp-content/uploads/2015/01/2084-1.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2015/01/2084-1-300x148.jpg" alt="2084-1"></a>我们在看到这个题目的时候，最开始可能想到的是用搜索直接求解，写一个递归函数解决之。因为每个节点只能往下走，所以每个节点的路径必然是经过左儿子或者右儿子节点，那么最大路径也必然从左儿子或右儿子中间选取。如果我们写一个函数叫做 f(i, j) 用来求每个点到最底层的最大路径和的话，那么这个函数的大致轮廓就可以写成：</p>
+<pre class="lang:c mark:7,8 decode:true ">int f(int i, int j)
+{
+if(i>MAX) //超过层数
+ return 0;
+if(j>i) //每一层的边界
+ return 0;
+int a = f(i+1, j); //左儿子
+int b = f(i+1, j+1); //右儿子
+if(a>b)
+ return a+num[i][j];
+else
+ return b+num[i][j];
+}</pre> 
+
+<p>写出这个代码之后，对于层数不多的时候，我们是可以求出最终的答案的，不过当层数比较多的时候，就会发现，求结果所需要的时间太多了。每一条路径可能会计算好几次，路径{18-10}就会被计算3次，分别是{12-10-18-10},{12-6-18-10}和{15-6-18-10},其中有两次是浪费的，因为前面我们计算过一次，如果能够保存下来的话，那么就可以直接查询就行了。那么接下来我们来看是否可以改进上面的代码。</p>
+<p>我们发现对于每个节点，都需要计算它的左儿子和右儿子到底层的最大路径和，这个路径是会重叠的，比如路径{9-12-6-18-10}和路径{9-15-6-18-10}的后面一段{6-18-10}就是重合的，也就是说用上面的代码我们会计算两次这条路径的值。这就造成了资源上的浪费，耗费了很多不必要的时间。那么现在我们用一个二维数组 dp[][] 记录下每个节点到底层的最大路径和，在第一次计算的时候，将这个结果赋值给二维数组 dp[][] 中相应的单元格，在后面需要的时候直接从 二维数组 dp[][] 里面取就行了，于是就有了下面的代码</p>
+<pre class="lang:c++ mark:7,8,9,10 decode:true ">int f(int i, int j)
+{
+if(i>MAX)
+  return 0;
+if(j<0 ||="" j="">i)
+  return 0;
+if(dp[i][j] == -1)//dp[][]数组初始化为-1，因为所有路径和都是正数，所以这里-1表示未计算过
+  dp[i+1][j] = f(i+1, j);
+if(dp[i+1][j+1] == -1)
+  dp[i+1][j+1] = f(i+1, j+1);
+if(dp[i+1][j]>dp[i+1][j+1])
+  return dp[i+1][j]+num[i][j];
+else
+  return dp[i+1][j+1]+num[i][j];
+}</0></pre> 
+
+<p>这段代码和第一段代码的区别就是用二维数组 dp[][] 保存下了每一个状态，这样每一条路径我们就只会计算一次，对于一棵节点很多的树来说，这节省下来的时间是非常多的，可以自己生成一个符合条件的二叉树，用上面两段代码同时计算所需要的结果，最后对比运行时间。<br>到这里差不多动态规划的思想就出来了：<span style="color: #0000ff;">空间换时间。<span style="color: #000000;">从而解决有<span style="color: #0000ff;">重叠子问题</span>的问题。</span><span style="color: #000000;">某些路径我们会计算很多次，那么就把这些结果保存下来，供后面需要的时候查询。当然本文的第二段代码，很多人叫做记忆化搜索，实际上思想是一样的，都是<span style="color: #0000ff;">用空间换时间</span>。当然接下来我们还可以继续把第二段代码写成非递归的，甚至对非递归的写法继续优化，这里就不涉及相应的内容了，这里给出一个优化版的非递归版本：（从底层开始计算，最后计算到树根结束，这样空间只需要 O(n) ），代码如下</span></span></p>
+<pre class="lang:c++ mark:10 decode:true ">int f(int i, int j)
+{
+int dp[MAX];//保存结果
+for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int="" i="MAX-2;">=0; --i)
+{
+ for(int j=0; j<=i; ++j)="" {="" dp[j]="max(dp[j]," dp[j+1])="" +="" num[i][j];="" 最大值是由自己的左儿子和右儿子的最大路径和构成="" }="" return="" dp[0];="" }<="" pre=""> 
+
+<p>在动态规划里面，还有两个术语叫做“<span style="color: #0000ff;">状态</span>”和“<span style="color: #0000ff;">转移方程</span>”，通俗的说“状态”就是表示某一情况下的结果，比如本文第二段代码中 dp[i][j] 就表示的是 (i,j)这个节点的状态，而“转移方程”就阐述了如何从一个“状态”变化到“另外一个状态”，比如上面第三段代码中的第10行 dp[j] = max(dp[j], dp[j+1]) + num[i][j]，表示了当前节点怎么从左儿子和右儿子的状态变化而来. 到这里，基本的动态规划问题，应该是能够理解了，当然能够理解不代表就能够解出新的题目，对于<span style="color: #0000ff;">怎么选取状态</span>，<span style="color: #0000ff;">怎么找出转移方程</span>，这些问题都需要通过<span style="color: #0000ff;">不停的训练</span>才能够获得。动态规划里面最难的就是<span style="color: #0000ff;">状态的选取</span>以及<span style="color: #0000ff;">转移方程</span>，当然利用其譬如优先队列等东西优化就属于更高级的东西了，如果能够知道怎么表达状态，以及写出相应的转移方程，那么剩下的就只是苦力活了。</p>
+<p>至于经典的最长公共子序列，最长上升子序列，背包问题等都是可以用上述思路来解</p>
+<p>至于自己想找题目练习的话，我推荐 Topcoder，至于其他的 OJ，可以自行搜索。<a href="http://community.topcoder.com/tc?module=ProblemArchivesr=&amp;er=&amp;sc=&amp;sd=&amp;class=&amp;cat=Dynamic+Programming&amp;div1l=&amp;div2l=&amp;mind1s=&amp;mind2s=&amp;maxd1s=&amp;maxd2s=&amp;wr=" target="_blank" rel="external">这里</a>是 Topcoder 上所有的动态规划题目集合，可以自行选择相应的难度。另外推荐一篇讲动态规划的英文版的<a href="http://www.topcoder.com/tc?d1=tutorials&amp;d2=dynProg&amp;module=Static" target="_blank" rel="external">文章</a>，也来自 Topcoder。网上还有人总结的 <a href="http://www.cppblog.com/doer-xee/archive/2009/12/05/102629.html" target="_blank" rel="external">DP46 题</a>，也可以看看。</p>
+<p>当然如果有什么地方讲解不详细，或者有错误的话，欢迎讨论:)</p>
+</=i;></max;></pre>	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/01/17/recursion/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/01/03/algorithm-series/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-01-05 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/algorithm/">algorithm<span>14</span></a></li> <li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li> <li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li> <li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

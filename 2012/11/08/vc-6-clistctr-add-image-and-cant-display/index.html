@@ -1,0 +1,312 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>VC++ 6 CListCtr添加图片以及不显示文字的问题 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="用CListCtrl的时候添加图片首先把CListCtrl的样式改成热破让他，默认是ICON。然后你需要把下面这段代码添加到InsertItem之前
+
+
+
+//在report样式下得先加列,不然不会显示   
+m_lsCListCtrl.InsertColumn(0,_T(“文件名 “),LVCFM">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="VC++ 6 CListCtr添加图片以及不显示文字的问题"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> VC++ 6 CListCtr添加图片以及不显示文字的问题</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>用CListCtrl的时候添加图片首先把CListCtrl的样式改成热破让他，默认是ICON。<br>然后你需要把下面这段代码添加到InsertItem之前</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span class="comment">//在report样式下得先加列,不然不会显示 </span><span>  </span></span></li>
+<li><span>m_lsCListCtrl.InsertColumn(</span><span class="number">0</span><span>,_T(</span><span class="string">“文件名 “</span><span>),LVCFMT_RIGHT);   </span></li>
+<li><span>m_lsCListCtrl.InsertColumn(</span><span class="number">1</span><span>,_T(</span><span class="string">“仪器类别”</span><span>),LVCFMT_RIGHT);   </span></li>
+<li><span>m_lsCListCtrl.InsertColumn(</span><span class="number">2</span><span>,_T(</span><span class="string">“项目类别”</span><span>),LVCFMT_LEFT);   </span></li>
+<li><span class="comment">//设置列宽 </span><span>  </span></li>
+<li><span class="keyword">for</span><span>(k = </span><span class="number">0</span><span>k&lt;</span><span class="number">3</span><span>;++k)   </span></li>
+<li><span>m_lsCListCtrl.SetColumnWidth(k,</span><span class="number">100</span><span>);   </span></li>
+<li><span>  </span></li>
+<li><span class="comment">//下面是为了添加图片用的 </span><span>  </span></li>
+<li><span class="comment">//其中m_ImageList是可以全局访问的，保证随时都可以访问到 </span><span>  </span></li>
+<li><span>m_ImageList.Create(</span><span class="number">16</span><span>,</span><span class="number">16</span><span>,ILC_COLOR24,</span><span class="number">5</span><span>,</span><span class="number">1</span><span>);   </span></li>
+<li><span>CBitmap bitmap;</span><span class="comment">//创建一个CBitmap对象 </span><span>  </span></li>
+<li><span>bitmap.LoadBitmap(IDB_TIME);</span><span class="comment">//IDB_TIME是一个bitmap资源的ID，可以自己添加 ID自取 </span><span>  </span></li>
+<li><span>m_ImageList.Add(bitmap,RGB(</span><span class="number">0</span><span>,</span><span class="number">128</span><span>,</span><span class="number">128</span><span>));</span><span class="comment">//把bitmap加到m_ImageList中 </span><span>  </span></li>
+<li><span>bitmap.Detach();</span><span class="comment">//释放位图 然后添加IDB_TICK </span><span>  </span></li>
+<li><span>bitmap.LoadBitmap(IDB_TICK);   </span></li>
+<li><span>m_ImageList.Add(bitmap,RGB(</span><span class="number">0</span><span>,</span><span class="number">128</span><span>,</span><span class="number">128</span><span>));   </span></li>
+<li><span class="comment">//设置m_lsCListCtrl的属性 这里m_lsCListCtrl是CListCtrl的control类型的变量 </span><span>  </span></li>
+<li><span>m_lsCListCtrl.SetExtendedStyle(LVS_EX_CHECKBOXES |LVS_EX_GRIDLINES|LVS_EX_FULLROWSELECT | LVS_EX_SUBITEMIMAGES);   </span></li>
+<li><span>m_lsCListCtrl.SetImageList(m_ImageList,LVSIL_SMALL);</span><span class="comment">//把m_ImageList关联给m_lsCListCtrl控件 </span><span>  </span></li>
+<li><span>  </span></li>
+<li><span class="comment">//下面是添加内容 </span><span>  </span></li>
+<li><span class="keyword">int</span><span> ret = m_lsCListCtrl.InsertItem(</span><span class="number">0</span><span>,</span><span class="string">“HELLO”</span><span>);</span><span class="comment">//默认会添加到第一列 </span><span>  </span></li>
+<li><span>m_lsCListCtrl.SetItemText(</span><span class="number">0</span><span>,</span><span class="number">0</span><span>,</span><span class="string">“HELL”</span><span>); </span><span class="comment">//在第一行的第一列修改 </span><span>  </span></li>
+<li><span>m_lsCListCtrl.SetItemText(</span><span class="number">0</span><span>,</span><span class="number">1</span><span>,</span><span class="string">“HPLL”</span><span>); </span><span class="comment">//在第一行的第二列加修 </span><span>  </span></li>
+<li><span class="comment">// m_lsCListCtrl.SetItem(ret,0,LVIF_IMAGE,NULL,0,0,0,0); </span><span>  </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">1</span><span>,</span><span class="string">“HELLO”</span><span>,</span><span class="number">0</span><span>);   </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">2</span><span>,</span><span class="string">“HELLO”</span><span>,</span><span class="number">1</span><span>);   </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">3</span><span>,</span><span class="string">“HELLO”</span><span>,</span><span class="number">0</span><span>);   </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">4</span><span>,</span><span class="string">“HELLO”</span><span>); </span><span class="comment">//没有加图片的某人添加ID为0的图片 相当于第三个参数是0 </span><span>  </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">5</span><span>,</span><span class="string">“HELLO”</span><span>);   </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">6</span><span>,</span><span class="string">“HELLO”</span><span>);  </span><br></li></ol></div><br>对于新手来说，可能添加图片之后，发现图片不能显示，连文字也不能显示。这其实只是你<span style="color: #ff0000;">没有设置列而已，<span style="color: #000000;">对于report样式的CListCtrl，首先需要设置列头，就是InsertColumn。然后才会显示。</span></span>
+
+<p>好好学习，天天向上。</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2012/11/13/fedora-13-opengl/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2012/11/06/chrome-https-connection/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2012-11-08 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/windows/">windows<span>4</span></a></li> <li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li> <li><a href="/tags/VC6/">VC6<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

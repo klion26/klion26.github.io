@@ -1,0 +1,307 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Algorithms第五章 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="第五章讲的是贪心算法，主要通过最小生成树的Kruskal算法来讲解，另外还讲到了prim算法和huffman算法和horn formulas以及set cover。下面就顺着书上的顺序大致记录下。
+首先讲了MST(minimum spanning trees)问题，从而引出kruskal。对于一个图">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Algorithms第五章"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Algorithms第五章</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>第五章讲的是贪心算法，主要通过最小生成树的Kruskal算法来讲解，另外还讲到了prim算法和huffman算法和horn formulas以及set cover。下面就顺着书上的顺序大致记录下。</p>
+<p>首先讲了MST(minimum spanning trees)问题，从而引出kruskal。对于一个图来说我们知道如下性质是成立的</p>
+<p>1. 从一个环里面移除一条边并不会导致这个图变得不联通</p>
+<p>对于MST问题，我们要求的就是求出最少的边，使得图依旧联通，而且weight(G’)即所有被选中的边的和是所有可能的选择方案中最小的。这就是MST需要解决的问题。kruskal算法的基本思想如下</p>
+<p>不停的添加权值最小的边到当前的G中，当然加入的边有一个条件：不能形成环。</p>
+<p>这是一个贪心算法，因为每一步都是考虑<strong>当前情况下</strong>最好的选择，下图是一个kruskal算法的列子，来自《Algorithms》</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2013/09/figure5.1.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/09/figure5.1-300x70.jpg" alt="" title="figure5.1"></a></p>
+<p>对于树还有几条性质如下：</p>
+<p>2. 一棵有n个节点的树有n-1条边。这个是显然的，因为我们首先可以把n个节点都看成是独立的，然后每次选择两个没有联通的点直接加上一条边，这样的话每一次都会减少一个独立的点/或块[连起来之后算成一块]，最后变成了一整块，那么我们需要连n-1次，也就是有n-1条边[因为树是无环的，所以上面加边的时候我们就有一定的保证和限制]，当然反过来也是成立的</p>
+<p>3. 任何联通的无向图G=(V,E)如果，|E|=|V|-1的话，那么就是一棵树。这里我们只需要证明G无环就行了，首先我们假设有环，那么我们可以通过删掉环中的一条边破坏这个环，这样G的联通性还是没有被破坏的，假设删掉所有的环之后的边数为E’’,那么我们有|E’’| = |V|-1[因为删掉环之后是树了，由性质2可得]。那么我们知道|E’’| == |E|也就是说图G是一棵树。所以我们也可以通过判断一个联通无向图的边数来判断是否是一棵树</p>
+<p>4.一个无向图是一棵树的话当且仅当每两个节点之间的路径唯一。首先我们知道如果一个图是一棵树的话，那么每两个点之间的路径肯定唯一[因为无环]；另外，如果一个图每两个节点间的路径唯一的话，每两个节点之间是联通的，又因为路径唯一，所以表示无环，这样的话这个图就是一棵树了。</p>
+<p>在引出kruskal之前，讲了一个叫做cut property的东西。表述如下：</p>
+<p>cut property: 如果边的集合X是图G=(V,E)的MST的一部分，任选图G的一个子图S，只要X不跨越S和V-S，也就是X在S内或者在V-S内；假设边e是连接S和V-S两部分的权值最小的边，那么X∪{e}也一定是G的MST的一部分。</p>
+<p>Kruskal算法的基本框架如下：</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">procedure</span> <span style="color: #f5deb3;">kruskal</span>(<span style="color: #f5deb3;">G</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">w</span>)<br><span style="color: #4682b4; font-weight: bold;">Input:</span>        <span style="color: #f5deb3;">A</span> <span style="color: #f5deb3;">connected</span> <span style="color: #f5deb3;">undirecte</span> <span style="color: #f5deb3;">graph</span> <span style="color: #f5deb3;">G</span><span style="color: #f5deb3;">=</span>(<span style="color: #f5deb3;">V</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">E</span>) <span style="color: #f5deb3;">with</span> <span style="color: #f5deb3;">edge</span> <span style="color: #f5deb3;">weights</span> <span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">]</span><br><span style="color: #4682b4; font-weight: bold;">Output:</span>        <span style="color: #f5deb3;">A</span> <span style="color: #f5deb3;">minimum</span> <span style="color: #f5deb3;">spanning</span> <span style="color: #f5deb3;">tree</span> <span style="color: #f5deb3;">defined</span> <span style="color: #f5deb3;">by</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">edges</span> <span style="color: #f5deb3;">X</span><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">u</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">V</span><span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">makeset</span>(<span style="color: #f5deb3;">u</span>)<span style="color: #f5deb3;">X</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">{}</span><br><span style="color: #f5deb3;">Sort</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">edges</span> <span style="color: #f5deb3;">E</span> <span style="color: #f5deb3;">by</span> <span style="color: #f5deb3;">weight</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">edges</span> <span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">v</span><span style="color: #f5deb3;">}</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">E</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">increasing</span> <span style="color: #f5deb3;">order</span> <span style="color: #f5deb3;">of</span> <span style="color: #f5deb3;">weight</span><span style="color: #f5deb3;">:</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">find</span>(<span style="color: #f5deb3;">u</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">find</span>(<span style="color: #f5deb3;">v</span>)<span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">add</span> <span style="color: #f5deb3;">edge</span> <span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">v</span><span style="color: #f5deb3;">}</span>  <span style="color: #f5deb3;">to</span> <span style="color: #f5deb3;">X</span><br><span style="color: #b0c4de; font-weight: bold;">union</span>(<span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">v</span>)</div><br>其中makeset(x): 创建一个单独的集合只包含自己；find(x)：查找x属于哪一个集合；union(x,y): 把包含x和y的两个集合合并。</p>
+<p>上叙算法一共用了|V|的makeset时间，2|E|的find时间和|V|-1的union时间。讲完这个算法框架之后，我们需要知道其中的makeset, find, union是怎么实现的。或者什么数据结构。这里就引出了并查集。首先给出makeset, find, union三个方法的框架，如下</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">procedure</span> <span style="color: #f5deb3;">makeset</span>(<span style="color: #f5deb3;">x</span>)<br><span style="color: #f5deb3;">par</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">x</span><br><span style="color: #f5deb3;">rank</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">procedure</span> <span style="color: #f5deb3;">find</span>(<span style="color: #f5deb3;">x</span>)<br><span style="color: #b0c4de; font-weight: bold;">while</span> <span style="color: #f5deb3;">x</span> <span style="color: #f5deb3;">=/=</span> <span style="color: #f5deb3;">par</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">x</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">par</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">]</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">procedure</span> <span style="color: #b0c4de; font-weight: bold;">union</span>(<span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">y</span>)<br><span style="color: #f5deb3;">rx</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">find</span>(<span style="color: #f5deb3;">x</span>)<br><span style="color: #f5deb3;">ry</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">find</span>(<span style="color: #f5deb3;">y</span>)<br><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">rx</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">ry</span><span style="color: #f5deb3;">:</span><br><span style="color: #b0c4de; font-weight: bold;">return</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">rx</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">ry</span><span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">par</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">ry</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">rx</span><br><span style="color: #4682b4; font-weight: bold;">else:</span><br><span style="color: #f5deb3;">par</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rx</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ry</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">rx</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">ry</span><span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">rank</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">ry</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">rank</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">ry</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span></div><br>其中par[]用来表示每个节点属于哪个组，rank[]是一个辅助数组，它的作用后面会说到。对于rank数组有如下几个性质</p>
+<p>1. 对所有的点x，rank[x] &lt; rank[par[x]]。对于这一点我们只需要看union的实现就行了，每次合并的时候，把rank值小的往大的那边合并，如果一样的话那么就随便，但是父节点的rank会加1.这样还是父节点的rank会大。</p>
+<p>2. 任何rank为k的根节点，这棵树至少有2^k个节点。这个可以用归纳法证明，首先每个节点是只有自己，rank为0，有1=2^0个节点。对于union的时候，如果是rank不相等的话，那么肯定是符合这个情况的，如果rank相等的话，那么两个rank为t的合并之后根节点的rank为t+1.总节点&gt;=2^t+2^t=2^(t+1)也符合情况</p>
+<p>3.如果一棵树有n个节点，那么rank为k的节点最多有n/2^k个，这个可以有性质2推出来。然后这样的话对于含有n个节点的树，rank的最大值为log[n]。这样的话find和union的上届就是log[n]了。</p>
+<p>到这里为之，我们的kruskal算法的整个时间为排序的时间O(|E|log|V|)(这里我们当log[E] = log[V])再加上另外一个O(Elog[V])这是find和union所花费的时间。排序的时间基本不能改善了，那么我们是否还可以改善后面的时间呢？事实上是可以的。最简单的方法就是在find的过程中进行路径压缩，那么find就变成了如下</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">function</span> <span style="color: #f5deb3;">find</span>(<span style="color: #f5deb3;">x</span>)<br><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">x</span> <span style="color: #f5deb3;">=/=</span> <span style="color: #f5deb3;">par</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">par</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">find</span>(<span style="color: #f5deb3;">par</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">])</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">par</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">]</span></div><br>这样的话，只要对x进行一次查找之后，那么x就直接指向了这个集合的根节点，而且x和根节点之间的所有点也直接指向了根节点，下一次如果需要查找这些点的时候，查找的时间就会大大减少。基本可以看成是O(1)的了，而不是O(log[n])[log[n]是树的深度]。当然还可以优化到更好，不过实现起来就更麻烦，如果想具体了解，请参看Algorithms第147页。</p>
+<p>接下来的Prim算法就简单了。基本思想和Dijkstra算法类似，不过每次的最短长度是更新的到已知树的，而不是到源点的。而且cut property保证了这个算法的正确性。算法如下</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">procedure</span>  <span style="color: #f5deb3;">prim</span>(<span style="color: #f5deb3;">G</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">w</span>)<br><span style="color: #4682b4; font-weight: bold;">Input:</span>        <span style="color: #f5deb3;">A</span> <span style="color: #f5deb3;">connected</span> <span style="color: #f5deb3;">undirected</span> <span style="color: #f5deb3;">graph</span> <span style="color: #f5deb3;">G</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">E</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">V</span>) <span style="color: #f5deb3;">with</span> <span style="color: #f5deb3;">edge</span> <span style="color: #f5deb3;">weights</span> <span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">]</span><br><span style="color: #4682b4; font-weight: bold;">Output:</span>        <span style="color: #f5deb3;">A</span> <span style="color: #f5deb3;">minimum</span> <span style="color: #f5deb3;">spanning</span> <span style="color: #f5deb3;">tree</span> <span style="color: #f5deb3;">defined</span> <span style="color: #f5deb3;">by</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">array</span> <span style="color: #f5deb3;">prev</span><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">v</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">V</span><br><span style="color: #f5deb3;">cost</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">inf</span><br><span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">nil</span><br><span style="color: #f5deb3;">pick</span> <span style="color: #f5deb3;">any</span> <span style="color: #f5deb3;">initial</span> <span style="color: #f5deb3;">node</span> <span style="color: #f5deb3;">u0</span><br><span style="color: #f5deb3;">cost</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">u0</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">H</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">makequeue</span>(<span style="color: #f5deb3;">V</span>) (<span style="color: #f5deb3;">priority</span> <span style="color: #f5deb3;">queue</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">using</span> <span style="color: #f5deb3;">cost</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">values</span> <span style="color: #f5deb3;">as</span> <span style="color: #f5deb3;">keys</span>)<br><span style="color: #b0c4de; font-weight: bold;">while</span> <span style="color: #f5deb3;">H</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">not</span> <span style="color: #f5deb3;">empty</span><span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">v</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">deletemin</span>(<span style="color: #f5deb3;">H</span>)<br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">each</span> <span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">v</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">z</span><span style="color: #f5deb3;">}</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">E</span><span style="color: #f5deb3;">:</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">cost</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">z</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">v</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">z</span><span style="color: #f5deb3;">]</span><br><span style="color: #f5deb3;">cost</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">z</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">v</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">z</span><span style="color: #f5deb3;">]</span><br><span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">z</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">v</span><br><span style="color: #f5deb3;">decreasekey</span>(<span style="color: #f5deb3;">H</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">z</span>)</div><br>接下来是Huffman encoding算法。Huffman算法由如下事例引出。假设我们需要对一个包含ABCD四个字母的一长串字符串进行01编码，那么怎样的编码使得编码后的长度最短呢，最直接的想法当然是用log<a href="以2为底">n</a>个bit来进行编码，这样的话我们可以表示最少n个字母[因为前面的log需要向上取整]，这样的编码简单，但是并不是最好的，比如说其中某些字母非常的多，但是其他的字母非常的少。这样的话我们就没有很好的利用这些已知的信息，也就是我们默认的把所有字母出现的次数看成是一样的。这当然是不好的。那么编码只需要需要满足几个条件每个编码能<strong>唯一</strong>的表示一个字母，任何编码<strong>不是</strong>其他编码的<strong>前缀。</strong>这样我们可以生成一棵这样的树，树是一棵二叉树，每个节点的左字节点值为0，右字节点值为1，所有的字母在叶子节点，从根节点到叶子节点所路过的所有值组成这个字母的编码。下图是一个列子</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2013/09/figure5.10.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/09/figure5.10-300x119.jpg" alt="" title="figure5.10"></a></p>
+<p>这个图的左边是各个字母的编码，右边是编码树，其中非叶子节点是我们构造出来的。右图中的括号内数字是改字母出现的次数，对于构造出来的节点处的括号内数字，表示这个节点会被访问的次数。我们可以算出，整棵树的cost是Σfi*(depth of ith symbol in tree).其中fi表示每个字母出现的次数。我们知道这个结果和所有的括号内数字的和是相等的。对于上图我们知道等于70+60+23+37+3+20.这样的话，所有叶子节点的值的和是不变，那么我们只需要使得我们构造出来的所有节点的权值和最小就行了。那么算法就变成了下面这样</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">procedure</span> <span style="color: #f5deb3;">Huffman</span>(<span style="color: #f5deb3;">f</span>)<br><span style="color: #4682b4; font-weight: bold;">Input:</span>        <span style="color: #f5deb3;">An</span> <span style="color: #f5deb3;">array</span> <span style="color: #f5deb3;">f</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1.</span><span style="color: #f5deb3;">..</span>n<span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">of</span> <span style="color: #f5deb3;">frequencies</span><br><span style="color: #4682b4; font-weight: bold;">Output:</span>        <span style="color: #f5deb3;">An</span> <span style="color: #f5deb3;">encoding</span> <span style="color: #f5deb3;">tree</span> <span style="color: #f5deb3;">with</span> n <span style="color: #f5deb3;">leaves</span><span style="color: #f5deb3;">let</span> <span style="color: #f5deb3;">H</span> <span style="color: #f5deb3;">be</span> <span style="color: #f5deb3;">a</span> <span style="color: #f5deb3;">priority</span> <span style="color: #f5deb3;">queue</span> <span style="color: #f5deb3;">of</span> <span style="color: #f5deb3;">integers</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ordered</span> <span style="color: #f5deb3;">by</span> <span style="color: #f5deb3;">f</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">to</span> n<span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">insert</span>(<span style="color: #f5deb3;">H</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">i</span>)<span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">=</span>n<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">to</span> <span style="color: #add8e6;">2</span>n<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">deletemin</span>(<span style="color: #f5deb3;">H</span><span style="color: #f5deb3;">),</span> <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">deletemin</span>(<span style="color: #f5deb3;">H</span>)<br><span style="color: #f5deb3;">create</span> <span style="color: #f5deb3;">a</span> <span style="color: #f5deb3;">node</span> <span style="color: #f5deb3;">numbered</span> <span style="color: #f5deb3;">k</span> <span style="color: #f5deb3;">with</span> <span style="color: #f5deb3;">children</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br><span style="color: #f5deb3;">f</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">f</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">f</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><br><span style="color: #f5deb3;">insert</span>(<span style="color: #f5deb3;">H</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">k</span>)</div><br>接下来讲的是Horn formulas。也就是给出很多Implications和negative clauses。其中Implilcations是像这样的：(z^W)=&gt;u.negative clauses则是这样的：((not u) or (not v) or (not y))问你有没有可能存在一种可能使得所有的式子都为真。具体的贪心算法如下：</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">procedure</span> <span style="color: #f5deb3;">Horn</span> <span style="color: #f5deb3;">formulas</span><br><span style="color: #4682b4; font-weight: bold;">Input:</span>   <span style="color: #f5deb3;">a</span> <span style="color: #f5deb3;">Horn</span> <span style="color: #f5deb3;">formula</span><br><span style="color: #4682b4; font-weight: bold;">Output:</span>  <span style="color: #f5deb3;">a</span> <span style="color: #f5deb3;">satisfying</span> <span style="color: #f5deb3;">assignment</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">one</span> <span style="color: #f5deb3;">exists</span><span style="color: #f5deb3;">set</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">variables</span> <span style="color: #f5deb3;">to</span> <span style="color: #b0c4de; font-weight: bold;">false</span><br><span style="color: #b0c4de; font-weight: bold;">while</span> <span style="color: #f5deb3;">there</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">an</span> <span style="color: #f5deb3;">implication</span> <span style="color: #f5deb3;">that</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">not</span> <span style="color: #f5deb3;">satisfied</span><span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">set</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">right</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">hand</span> <span style="color: #f5deb3;">variable</span> <span style="color: #f5deb3;">of</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">implication</span> <span style="color: #f5deb3;">to</span> <span style="color: #b0c4de; font-weight: bold;">true</span><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">pure</span> <span style="color: #f5deb3;">negative</span> <span style="color: #f5deb3;">clauses</span> <span style="color: #f5deb3;">are</span> <span style="color: #f5deb3;">satisfied</span><span style="color: #f5deb3;">:</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">assignment</span><br><span style="color: #4682b4; font-weight: bold;">else:</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #7fffd4;">“formula is not satisfiable.”</span></div></p>
+<p><br>这个算法的准确性是可以证明的，在while循环结束的时候保证了所有的Implicatons都为真，如果还有negative clauses为假的话[所有变量初值设为false，在这里就有作用了，取反之后就变成了true]。那么就不能可能有符合的情况。当然这个算法还可以进一步进行优化，即类似于把Implications链成一条链，这个可以自行google。</p>
+<p>下面是set cover。不过书上给的是一个近似的贪心算法，不保证能得到最优值，不过证明了和最优值的差距。问题是这样的：给你n个点，需要选去最少的基站个数，使得每个点到最近的基站距离不超过一个定值[如果基站在该店，那么距离为0]。先给出贪心算法：</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">procedure</span> <span style="color: #f5deb3;">Set</span> <span style="color: #f5deb3;">Cover</span><br><span style="color: #4682b4; font-weight: bold;">Input:</span>           <span style="color: #f5deb3;">A</span> <span style="color: #f5deb3;">set</span> <span style="color: #f5deb3;">of</span> <span style="color: #f5deb3;">elements</span> B; <span style="color: #f5deb3;">sets</span> <span style="color: #f5deb3;">S1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">…</span> <span style="color: #f5deb3;">Sm</span> <span style="color: #f5deb3;">in</span> B<br><span style="color: #4682b4; font-weight: bold;">Output:</span>         <span style="color: #f5deb3;">A</span> <span style="color: #f5deb3;">selection</span> <span style="color: #f5deb3;">of</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">Si</span> <span style="color: #f5deb3;">whose</span> <span style="color: #b0c4de; font-weight: bold;">union</span> <span style="color: #f5deb3;">is</span> B<br><span style="color: #4682b4; font-weight: bold;">Cost:</span>            <span style="color: #f5deb3;">Number</span> <span style="color: #f5deb3;">of</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">picked</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">Repeat</span> <span style="color: #f5deb3;">unitl</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">elements</span> <span style="color: #f5deb3;">of</span> B <span style="color: #f5deb3;">are</span> <span style="color: #f5deb3;">covered</span><span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">Pick</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">set</span> <span style="color: #f5deb3;">Si</span> <span style="color: #f5deb3;">with</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">largest</span> <span style="color: #f5deb3;">number</span> <span style="color: #f5deb3;">of</span> <span style="color: #f5deb3;">uncovered</span> <span style="color: #f5deb3;">elements</span><span style="color: #f5deb3;">.</span></div></p>
+<p><br>也就是最直观的想法，每次选择邻接点最多的点，直到所有节点都包含为止。但是这个算法不能保证最优，下图就是一个例子</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2013/09/figure5.11.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/09/figure5.11-300x116.jpg" alt="" title="figure5.11"></a></p>
+<p>上图中[右图的边表示两个节点的距离不超过某个定值]我们的算法会得到的是a,c,j,f/g但是实际上我们可以只用3个节点就行了：b,e,i。但是这个贪心算法可以保证比最优的不是坏很多。也就是说：</p>
+<p>Claim:  假设B有n个节点的话而且最少可以用k个集合达到要求的话，那么我们的贪心算法最多只会用k*lnn个集合[其中ln表示自然对数]。证明如下：</p>
+<p>我们假设n[t]表示在贪心算法中迭代t次之后还没有被覆盖的顶点数目（n[0]=n），因为剩下的顶点一定能被k个集合覆盖，所以某一个集合一定含有至少n[t]/k个顶点，也就是说n[t+1]&lt;=n[t]-n[t]/k = n<a href="1-1/k">t</a>这里我们得到n[t] &lt;= n[0]<em>(1-1/k)^t.又因为1-x&lt;=e^(-x)对所有x成立，x=0时取等号。那么n[t]&lt;=n[0]</em>(1-1/k)^t &lt; n<a href="e^(-1/k">0</a>)^t = ne^(-t/k)当t=klnn的时候，n[t]已经等于1了，也就是说所有顶点都被包含了。这样就得到证明了。</p>
+<p>贪心这一章比前两章写起来难多了，贪心最难的还是在证明，一般贪心算法简单，但是证明很难。但是这个怎么搞可能也只有多练习了。</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2013/10/16/algorithms-chapter-6-dynamic-programming/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2013/07/28/algorithms-chapter-4-and-some-exercises/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2013-09-11 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/algorithm/">algorithm<span>14</span></a></li> <li><a href="/tags/greedy-algorithm/">greedy algorithm<span>1</span></a></li> <li><a href="/tags/horn-formulas/">horn formulas<span>1</span></a></li> <li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li> <li><a href="/tags/kruskal/">kruskal<span>1</span></a></li> <li><a href="/tags/MST/">MST<span>1</span></a></li> <li><a href="/tags/prim/">prim<span>1</span></a></li> <li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

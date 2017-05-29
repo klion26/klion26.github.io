@@ -1,0 +1,300 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Recursion | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="递归（Recursion）是一种不停的调用自身的过程。比如下面这个故事就是一个递归的例子
+从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？「从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？『从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Recursion"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Recursion</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><a href="http://en.wikipedia.org/wiki/Recursion" target="_blank" rel="external">递归</a>（Recursion）是一种不停的调用自身的过程。比如下面这个故事就是一个递归的例子</p>
+<p>从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？「从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？『从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？……』」</p>
+<p>本文说的递归，讲的是递归函数，也就是一个函数不停的调用自己而形成的。</p>
+<p>首先，递归函数都满足两个性质</p>
+<ol>
+<li>有一个 base case。base case 可以理解为可以直接得到结果的一个状态或者说是终止状态。</li>
+<li>每一次函数调用都往 base case 靠拢，否则会形成 infinite loop<br>这里我们用阶乘函数 f(n) = n! 来进行说明。对于阶乘函数我们写出的递归函数大致是下面的样子</li>
+</ol>
+<pre class="lang:c decode:true ">int fac(int n)
+{
+  if(n<0) base="" case="" return="" 0;="" if(n<2)="" 1;="" n*fac(n-1);="" 调用="" fac(n-1)，往="" 靠拢="" }<="" pre=""> 
+
+<p>这个函数中前面两个 if 语句组成了 base case。也就是说如果 n&lt;0,那么 n 的阶乘是0，如果 n 是 0 或者 1，那么阶乘是1。这两种情况就组成了阶乘函数的 base case。剩下的 return 语句就是先计算 (n-1) 的阶乘（调用函数 fac(n-1))，然后再乘上 n [n!= n*(n-1)!]，得到最终的结果 n!。</p>
+<p>对于递归函数，刚开始的时候难就难在栈状态的理解，首先可以不考虑栈，把递归函数看成一个数学上的递归式，比如上面的阶乘，f(n) = f*f(n-1).那么如果我们想要求 f(n)，首先就需要知道 f(n-1).刚好这就是函数 fac()所解决的问题。对于刚开始学习递归的时候，可以手动模拟代码是怎么跑的，在纸上画出来，方便自己理解。假设我们要求 6！，就会变成下面的状态</p>
+<p>1 —&gt; fac(6)</p>
+<p>2 —&gt;  6*fac(5)   //6&gt;=2，所以执行最后一句话</p>
+<p>3 —&gt; 6<em>(5</em>fac(4)) //5&gt;=2 这里在 5*fac(4)这一层加上括号表示调用 fac(5)的时候，6是被屏蔽掉的，可以理解成”看不见”</p>
+<p>4 —&gt; 6<em>(5</em>(4*fac(3))) //4 &gt;=2</p>
+<p>5—&gt; 6<em>(5</em>(4<em>(3</em>fac(2)))) //3&gt;=2</p>
+<p>6 —&gt; 6<em>(5</em>(4<em>(3</em>(2*fac(1))))) //2&gt;=2</p>
+<p>7 —&gt; 6<em>(5</em>(4<em>(3</em>(2*(1)))))      //1 &lt; 2 所以返回1，这里在 1 的外面加上括号表示 1 是一个函数调用过程。</p>
+<p>8 —&gt; 6<em>(5</em>(4<em>(3</em>2)))      //这里的2表示是调用 fac(2)返回的结果，最里面的 3<em>2 是调用 fac(3)时 最后依据 n</em>fac(n-1)的具体化</p>
+<p>9—&gt; 6<em>(5</em>(4<em>6))    //4</em>6 表示的是调用 fac(4) 时执行的最后一句，其中 6 是 fac(4-1) 的结果</p>
+<p>10 —&gt; 6<em>(5</em>24)     // 5*24 表示的是调用 fac(5) 时执行的最后一句，其中 24 是 fac(5-1) 的结果</p>
+<p>11 —&gt; 6<em>120   // 6</em>120 表示的是调用 fac(6) 时执行的组后一句，其中 120 是 fac(6-1) 的结果</p>
+<p>12 —&gt; 720 // 调用 fac(6) 返回的结果</p>
+<p>每一行中，如果有函数就先计算函数的值，如果没有函数，那么就计算最里面一层括号中的值。对于每一次函数调用都会开辟一块新的栈空间，在相应的栈空间上进行操作， 就算同一个函数，两次不同的调用操作，也会在不同的栈空间上进行操作。这里一开始可以把函数看成一个黑盒子，盒子的输入就是 n， 盒子的输出是 n!,不用去考虑具体的栈空间什么的，这样会比较好一点。</p>
+<p>对于阶乘来说，如果传入的参数 n&lt;2 就表示是 base case（&lt;0 的情况是特例需要处理），其它的情况，每次都会调用 fac(n-1)，每次 n 都会减1，这样会往1靠拢，也就是往 base case 靠拢。刚好满足上面两个性质。</p>
+<p>在<a href="http://www.klion26.com/dynamic-programming.html" target="_blank" rel="external">动态规划</a>这篇文章里面，最开始的代码也是用的递归写的，base case 就是前面两个 if 语句判断（base case 一般都是用 if 特判），剩下的就是把其它的状态状态为 base case。比如有名的 <a href="http://en.wikipedia.org/wiki/Tower_of_Hanoi" target="_blank" rel="external">Hanoi 塔</a>问题，就可以用来测试自己是否理解了递归。Fibonacci 数列和 Euclid’s GCD 也可以用递归来写，还有一个<a href="http://www.algorithmist.com/index.php/Coin_Change" target="_blank" rel="external">找零钱</a>问题，也可以用递归来写。很多代码用递归写出来之后会变得很简洁。不过如果递归的层数比较深的话，可能会导致栈溢出的问题。</p>
+<p>熟悉递归之后，就还有尾递归的消除，至于怎么消除尾递归（有些语言里面会自带尾递归的消除），<a href="http://blog.moertel.com/tags/recursion-to-iteration%20series.html" target="_blank" rel="external">这个系列</a>讲的很详细，可以参考参考。</p>
+</0)></pre>	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/02/18/everything-about-2014/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/01/05/dynamic-programming/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-01-17 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/algorithm/">algorithm<span>14</span></a></li> <li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li> <li><a href="/tags/recursion/">recursion<span>1</span></a></li> <li><a href="/tags/递归/">递归<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

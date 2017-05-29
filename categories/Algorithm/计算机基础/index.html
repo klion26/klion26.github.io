@@ -1,0 +1,560 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>计算机基础 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+<!-- title -->
+<div class="page-header page-header-inverse ">
+  <h1 class="archive-title-category title title-inverse ">计算机基础</h1>
+</div>
+
+<div class="row page">
+  <!-- cols -->
+  
+  <div class="col-md-9">
+	
+
+	  <div id="top_search"></div>
+
+      
+
+      <div class="mypage">
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-11-02 </div>
+			<div class="article-title"><a href="/2014/11/02/least-recently-used-algorithm/" >Least Recently Used Algorithm</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>LRU（_<a href="http://en.wikipedia.org/wiki/Cache_algorithms#LRU" target="_blank" rel="external">Least Recently Used</a>）_算法是操作系统中的一种页面置换（在缓存系统中也会用到），思想就是：每次都把<span style="color: #0000ff;">最近最少</span>使用的那个页面置换出去，这个思想基于，当前使用的页面在不久的将来也会使用。</p>
+<p>比如在内存为 3 的情况下，依次请求如下页面2，3，4，2，1，3，7，5，4，3.那么内存中保存的依次保存的页面会变成如下所示（每一行表示当前页面请求之后，内存中的页面情况，左边的页面比右边页面旧（也就是最后一次访问的时间早），<a href="http://www.youtube.com/watch?v=I9_BpSXBodU" target="_blank" rel="external">这里</a>有一个动态视频，给出每一次的情况（需要翻墙）</p>
+<ol>
+<li>2</li>
+<li>2 3</li>
+<li>2 3 4</li>
+<li>3 4 2</li>
+<li>4 2 1</li>
+<li>2 1 3</li>
+<li>1 3 7</li>
+<li>3 7 5</li>
+<li>7 5 4</li>
+<li>5 4 3<br>到这里基本想法就结束了，剩下的就是怎么实现的问题了。对于不同的要求，有不同的实现。</li>
+</ol>
+<p>第一种：最简单的模拟，用一个单链表表示 LRU 的大小，表头存最旧的页面，表尾存最新的页面，然后每次 get 和 put 的时候，都遍历一次单链表进行相应操作。由于每次都要遍历单链表，所以每次操作都是 O（L）的复杂度，其中 L 表示 LRU 的大小。代码如下</p>
+<pre class="lang:c++ decode:true ">typedef struct {
+    int key;
+    int val;
+} elem;
+class LRUCache{
+public:
+    elem *arr;  // lru cache
+    int sz; // total number of elements in the list currently.
+    int cap; //capacity
+    LRUCache(int capacity) {  //init LRUCache
+        arr = new elem[capacity];  //
+        sz = 0;
+        cap = capacity;
+ }
+ /* move the used element to the end of list */
+ void adjust(int a) {
+     if (a == sz - 1) {//the last one
+        return ;
+     }
+     elem cur = arr[a];
+     for (int i = a; i lt; sz - 1; i ++) {
+        arr[i] = arr[i + 1]; // move all elements after position a 1 step left
+     }
+     arr[sz - 1] = cur; // move arr[a] to the end
+ }
+ //get the value of key, return -1 if it doesn't exit
+ int get(int key) {
+     //iterate the whole list to find if the key exits
+     for (int i = 0; i lt; sz; i ++) {
+         if (arr[i].key == key) {
+            int a = arr[i].val;
+            adjust(i);
+            return a; // existent key
+         }
+    }
+    return -1;
+ }
+ //update the key/value
+ void set(int key, int value) {
+     for (int i = 0; i lt; sz; i ++) {
+         if (arr[i].key == key) { // existent
+            arr[i].val = value; //update value ,and adjust the list
+            adjust(i);
+            return;
+         }
+     }
+     if (sz == cap) { // check if reach the capacity
+         for (int i = 0; i lt; sz - 1; i ++) {
+             arr[i] = arr[i + 1]; // delete the least used element
+         }
+         arr[sz - 1].key = key;
+         arr[sz - 1].val = value;
+     } else {
+         arr[sz].key = key;
+         arr[sz].val = value;
+         sz ++; // increase the size
+     }
+ }
+};</pre> 
+
+<p>第二种写法就是用双链表存 LRU 中保存的实际内容，然后用 HASH 表保存每一个 key 所对应的内容在双链表中的位置，其中双链表还是表头存最旧的，表尾存最新的，用 HASH 就可以加速查找，用双链表则是更新的时候可以达到 O(1)[单链表不能获得前驱节点的信息]，<span style="color: #0000ff;">如果这里用 map 实现，而不是 hash_map 的话，那么复杂度是 log(L)，这个是由 map 的复杂度决定的</span>。代码如下：</p>
+<pre class="lang:c++ decode:true ">#include <iostream>
+#include <vector>
+#include <hash_map>
+
+using namespace std;
+using namespace stdext;
+
+template<class k,="" class="" t="">
+struct LRUCacheEntry
+{
+    K key;
+    T data;
+    LRUCacheEntry* prev;
+    LRUCacheEntry* next;
+};
+
+template<class k,="" class="" t="">
+class LRUCache
+{
+private:
+    hash_map< K, LRUCacheEntry&lt;K,T>* &gt; _mapping;
+    vector< LRUCacheEntry&lt;K,T>* &gt; _freeEntries;
+    LRUCacheEntry<k,t> * head;
+    LRUCacheEntry<k,t> * tail;
+    LRUCacheEntry<k,t> * entries;
+public:
+    LRUCache(size_t size){
+    entries = new LRUCacheEntry<k,t>[size];
+    for (int i=0; i<size; i++)="" _freeentries.push_back(entries+i);="" head="new" lrucacheentry<k,t="">;
+    tail = new LRUCacheEntry<k,t>;
+    head->prev = NULL;
+    head->next = tail;
+    tail->next = NULL;
+    tail->prev = head;
+ }
+ ~LRUCache()
+ {
+    delete head;
+    delete tail;
+    delete [] entries;
+ }
+ void put(K key, T data)
+ {
+    LRUCacheEntry<k,t>* node = _mapping[key];
+    if(node)
+      {
+        // refresh the link list
+        detach(node);
+        node->data = data;
+        attach(node);
+      }
+    else{
+       if ( _freeEntries.empty() )
+         {// lru cache is full
+             node = tail->prev;
+             detach(node);//delete a node
+             _mapping.erase(node->key);
+             node->data = data;
+             node->key = key;
+             _mapping[key] = node;
+             attach(node);//add the new node
+         }
+       else{
+             node = _freeEntries.back();
+             _freeEntries.pop_back();
+             node->key = key;
+             node->data = data;
+             _mapping[key] = node;
+             attach(node);
+           }
+       }
+ }
+
+ T get(K key)
+ {
+      LRUCacheEntry<k,t>* node = _mapping[key];
+      if(node)
+        {//if node is already in, refresh the double-link-list
+           detach(node);
+           attach(node);
+           return node->data;
+        }
+       else return NULL;
+ }
+
+private:
+    void detach(LRUCacheEntry<k,t>* node)
+    {// delete the node from the double-link-list
+         node->prev-&gt;next = node-&gt;next;
+         node->next-&gt;prev = node-&gt;prev;
+    }
+    void attach(LRUCacheEntry<k,t>* node)
+    {//add node to the head of double-link-list
+         node->next = head-&gt;next;
+         node->prev = head;
+         head->next = node;
+         node->next-&gt;prev = node;
+    }
+};</k,t></k,t></k,t></k,t></k,t></size;></k,t></k,t></k,t></k,t></class></class></hash_map></vector></iostream></pre> 
+
+<p>第二种方法利用双链表保存实际的 cache 内容，然后用 hash 来加速查找，hash 存的是每一个 key/value 的地址，这样就可以直接找到相应的 key/value 元素了。这种方法中，查找的复杂度是 O(1)，更新的复杂度，只需要进行一次查找，一次 detach，一次 attach，所以也是 O(1)的，较之第一种方法的优势就体现出来了。</p>
+<p>最后，如果你想看下自己写的 LRU 是否正确，速度如何，可以在 Leetcode 上进行提交，地址：<a href="https://oj.leetcode.com/problems/lru-cache/" target="_blank" rel="external">https://oj.leetcode.com/problems/lru-cache/</a>，提交之后可以查看是否正确，正确的话，查看用时多少（第一种方法，可能可以在 Leetcode 上通过，也可能会得到一个 <strong>Time Limit Exceeded </strong>的结果，这个就看你人品了）</p>
+<p>Reference</p>
+<p><a href="http://www.cs.uml.edu/~jlu1/doc/codes/lruCache.html" target="_blank" rel="external">Implement a LRU Cache in C++</a></p>
+
+	
+	</div>
+</div>
+
+	  
+      </div>
+	  <div>
+	    <center>
+	    <div class="pagination">
+<ul class="pagination">
+	 
+</ul>
+</div>
+
+        </center>
+	    </div>	
+      
+
+</div> <!-- col-md-9/col-md-12 -->
+
+
+<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+	<div class="widget">
+		<h4>Categories</h4>
+		<ul class="tag_box inline list-unstyled">
+		
+			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+		
+			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+		
+			<li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+		
+			<li><a href="/categories/Linux/TeX/">TeX<span>1</span></a></li>
+		
+			<li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+		
+			<li><a href="/categories/Uncategorized/">Uncategorized<span>3</span></a></li>
+		
+			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+		
+			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
+		
+			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/成长/">成长<span>3</span></a></li>
+		
+			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+		
+			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
+		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+		</ul>
+	</div>
+
+		
+			
+	<div class="widget">
+		<h4>Tag Cloud</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/git/">git<span>4</span></a></li>
+		
+			<li><a href="/tags/教师/">教师<span>1</span></a></li>
+		
+			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
+		
+			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
+		
+			<li><a href="/tags/bellman-ford/">bellman-ford<span>1</span></a></li>
+		
+			<li><a href="/tags/prim/">prim<span>1</span></a></li>
+		
+			<li><a href="/tags/question/">question<span>1</span></a></li>
+		
+			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
+		
+			<li><a href="/tags/project/">project<span>1</span></a></li>
+		
+			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
+		
+			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
+		
+			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
+		
+			<li><a href="/tags/yum/">yum<span>1</span></a></li>
+		
+			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
+		
+			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
+		
+			<li><a href="/tags/read/">read<span>3</span></a></li>
+		
+			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
+		
+			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
+		
+			<li><a href="/tags/queue/">queue<span>1</span></a></li>
+		
+			<li><a href="/tags/json/">json<span>1</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>260</span></a></li>
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>Recent Posts</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
+      </li>
+    
+      <li>
+        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>Links</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="https://github.com/wzpan/freemind/" title="Freemind's Github repository." target="_blank"]);">Freemind</a></li>
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/wzpan" title="My Github account." target="_blank"]);">My Github</a></li>
+	
+		<li><i class="fa fa-linkedin"></i><a href="http://www.linkedin.com/in/hahack" title="My Linkin account." target="_blank"]);">My LinkedIn</a></li>
+	
+	</ul>
+</div>
+
+
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2017 John Doe
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>
