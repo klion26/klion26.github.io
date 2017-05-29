@@ -111,30 +111,6 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
-			<div class="date"> 2011-05-30 </div>
-			<div class="article-title"><a href="/2011/05/30/south-central-china-invite-competition-by-klion26/" >华中南邀请赛 by klion26</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>我们队的第二次正式比赛,下一次正式比赛应该就是省赛了.<br>[由于29号早上3点左右有欧冠决赛,所以我被吵醒了好几次,从3点到5点一直没睡着.]<br>下面是比赛记录.基本纯流水账.<br>首先是A F J,由于我们一开始开题不对(A),加上写A的不是对计算几何不是特别熟悉,所以我们的A是53’时过的,但是中间,知道J更容易,确没有及时的抢过机器来写.A是1A,然后是J,悲剧的是J不知为何TLE了,怎么想都不可能的事情啊.TLE两次之后就换人写了.3A.[J换人写一共浪费了两个人40’左右,加上罚时40’,也就是说J一共浪费了80’左右的时间],然后20分钟后,F 1A.还以为接下来就是我们的show time了,结果就悲剧了,一个G(gcd_depth),一个D(dp),一个H(找规律/组合)D由于认为不可能出成恶心的高精度,认为转移方程错了,放弃.H和G就不知道是为啥错了,后面3小时一直在调这两个题(赛后问了下裁判,思路基本是对的,看来又tm是实现问题).还有就是E居然就是一个裸的离散对数,而且a^x=b(mod c),c还是个素数,我去啊.不过这些都是后话了,比赛已经过去了.反正就是被各种踩,我们是各种送,送成狗了.<br>下面说点关于我的,其实J我也想早早的抢过机器来写,可是我又怕不1A,又怕耽误时间,反正就是各种怕,然后就只能干等着,关于J的两次TLE,我也不知道是怎么了,应该是我的程序风格的问题,但是队友检查时也没看出什么可以TLE的东西,可是tm的重写就过了,关于后面的E,在还有90’左右的时候,我看过榜之后,还是看了下E的,只是没有自己分析,不过心里知道,肯定是个裸的数论题,但是由于G的Wa,和其他一系列原因,就”忘”了E,只有在讲解题报告时才想起还有一道裸的离散对数,这tm和不知道离散对数不是一样的结果么.我觉得我最大的问题不是知识的不足,而是信心的不足,不知道从什么时候开始,已经没有了那种舍我其谁的霸气了,已经被完全钝化了,接下来的几个月,首要任务是找回那种霸气,其次才是弥补知识的不足.</p>
-<p>昨天,今天虐我的,明天我会虐回来的</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
 			<div class="date"> 2011-05-23 </div>
 			<div class="article-title"><a href="/2011/05/23/mon-monsterkill-xiangtan-by-klion26/" >Mon-monsterkill湘潭行by klion26</a></div>						
 		</h3>
@@ -377,6 +353,37 @@
 
            
 		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-05-02 </div>
+			<div class="article-title"><a href="/2011/05/02/ball-union-zoj-3350/" >球体积并[ZOJ_3350]</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://acm.zju.edu.cn/onlinejudge/showProblem.do?problemId=4343" target="_blank" rel="external">传送门</a></p>
+<p>题意就是给出两个球的参数,求这两个球的体积并.</p>
+<p>做法:积分.</p>
+<p>首先模拟球的体积积分,我们可以知道只需要算出球交的那一部分,然后用两个球冠的体积加就行了.不过中间我自己考虑到一点复杂的东西,一直以为会影响结果,其实是不会的,比如下图:</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2011/05/3350.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2011/05/3350-300x290.jpg" alt="klion26" title="3350"></a></p>
+<p>我是算AF和CF然后积分的,如果A和C[两个球心]在ED两边的话,肯定是AF+CF=dis[球心距],但是上面这个图,两球心在同一边呢?其实是没有影响的,因为我们用AF+CF=dis和AF^2-CF^2=r1^2-r2^2这里并没有什么不可逆的,如果出现上面的情况我们会得到AF是负的,这样照样会得到正确的结果.那么程序就简单了.</p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<p></p></div><p></p>
+
+	
+	</div>
+</div>
+
+           
+		
 
 		</div>
 
@@ -451,9 +458,9 @@
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -463,35 +470,31 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
-		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
-		
-			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
 		
 		</ul>
 	</div>
@@ -502,45 +505,45 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
+			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
 		
-			<li><a href="/tags/安全/">安全<span>1</span></a></li>
+			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
 		
-			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
+			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
 		
-			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
-		
-			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
-		
-			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
-		
-			<li><a href="/tags/c/">c++<span>1</span></a></li>
-		
-			<li><a href="/tags/方法/">方法<span>1</span></a></li>
-		
-			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
-		
-			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
+			<li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li>
 		
 			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
 		
 			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
 		
-			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
+			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
 		
-			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
-			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
+			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
 		
-			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
 		
-			<li><a href="/tags/i-o-multiplexing/">i/o multiplexing<span>1</span></a></li>
+			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
 		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+			<li><a href="/tags/command/">command<span>1</span></a></li>
 		
-			<li><a href="/tags/book/">book<span>1</span></a></li>
+			<li><a href="/tags/hash/">hash<span>1</span></a></li>
 		
-			<li><a href="/tags/office/">office<span>1</span></a></li>
+			<li><a href="/tags/zookeeper/">zookeeper<span>2</span></a></li>
+		
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+		
+			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+		
+			<li><a href="/tags/ln/">ln<span>1</span></a></li>
+		
+			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
+		
+			<li><a href="/tags/DFS/">DFS<span>2</span></a></li>
+		
+			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>260</span></a></li>
@@ -556,10 +559,6 @@
   <ul class="entry list-unstyled">
     
       <li>
-        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
-      </li>
-    
-      <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
       </li>
     
@@ -573,6 +572,10 @@
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>

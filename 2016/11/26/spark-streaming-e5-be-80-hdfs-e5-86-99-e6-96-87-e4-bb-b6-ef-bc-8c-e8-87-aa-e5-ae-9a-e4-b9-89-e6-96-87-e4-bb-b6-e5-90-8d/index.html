@@ -8,7 +8,7 @@
   
   <meta name="description" content="需求将 kafka 上的数据实时同步到 HDFS，不能有太多小文件
 实现过程Spark Streaming 支持 RDD#saveAsTextFile，将数据以 纯文本 方式写到 HDFS，我们查看 RDD#saveAsTextFile 可以看到
-RDD.rddToPairRDDFunctions(">
+12RDD.rddToPairRDDFunction">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -113,49 +113,17 @@ RDD.rddToPairRDDFunctions(">
 	<div class="mypage">		
 	  		
 
-	  <div class="markdown-body">
-
-<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将 kafka 上的数据实时同步到 HDFS，不能有太多小文件</p>
+	  <h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将 kafka 上的数据实时同步到 HDFS，不能有太多小文件</p>
 <h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><p>Spark Streaming 支持 RDD#saveAsTextFile，将数据以 <strong>纯文本</strong> 方式写到 HDFS，我们查看 RDD#saveAsTextFile 可以看到</p>
-<pre><code>RDD.rddToPairRDDFunctions(r)(nullWritableClassTag, textClassTag, null)
-      .saveAsHadoopFile[TextOutputFormat[NullWritable, Text]](path)
-`&lt;/pre&gt;
-从上面这句话我们可以知道，首先将 RDD 转化为 PariRDD（PariRDD 的数据是 (K,V) 类型的），然后再调用 saveAsHadoopFile 函数进行实际的操作。上面的语句中 `r` 是原始 RDD，`nullWritableClassTag` 和 `textClassTag` 表示所写数据的类型（分别代表 PariRDD 的 K 和 V 的类型），使用 `nullWritableClassTag` 是因为 HDFS 不会将 PairRDD 的 key 进行实际写入，从效果上看就只写入了 PariRDD 的 V 字段。`TextOutputFormat` 是一个格式化函数，后面我们再来看这个函数，`NullWritable` 则表示一个占位符，同样是这个字段不需要实际写入 HDFS，`Text` 表示我们将写入文本类型的数据。
-
-我们看到 `TextOutputFormat` 这个类中有一个函数是 `RecordWriter` 用于操作没一条记录的写入，代码如下
-&lt;pre&gt;`public RecordWriter&lt;K, V&gt; getRecordWriter(FileSystem ignored, JobConf job, String name, Progressable progress) throws IOException {
-        boolean isCompressed = getCompressOutput(job);
-        String keyValueSeparator = job.get(&quot;mapreduce.output.textoutputformat.separator&quot;, &quot;\t&quot;);
-        if(!isCompressed) {
-            Path codecClass1 = FileOutputFormat.getTaskOutputPath(job, name);
-            FileSystem codec1 = codecClass1.getFileSystem(job);
-            FSDataOutputStream file1 = codec1.create(codecClass1, progress);
-            return new TextOutputFormat.LineRecordWriter(file1, keyValueSeparator);
-        } else {
-            Class codecClass = getOutputCompressorClass(job, GzipCodec.class);
-            CompressionCodec codec = (CompressionCodec)ReflectionUtils.newInstance(codecClass, job);
-            Path file = FileOutputFormat.getTaskOutputPath(job, name + codec.getDefaultExtension());
-            FileSystem fs = file.getFileSystem(job);
-            FSDataOutputStream fileOut = fs.create(file, progress);
-            return new TextOutputFormat.LineRecordWriter(new DataOutputStream(codec.createOutputStream(fileOut)), keyValueSeparator);
-        }
-    }
-</code></pre><p></p></div><br>从上面的代码中我们可以的知道，首先打开需要的文件，获得对应的 Stream，然后直接往里面写数据就行了。接下来我们需要做还有：1）自定义文件名；2）往文件追加数据<p></p>
-<p>而这两个需求都可以在 RecordWriter 中进行实现。</p>
-<p>对于自定义文件名，重写下面这句话就行了</p>
-<p><pre class="lang:default decode:true">Path codecClass1 = FileOutputFormat.getTaskOutputPath(job, name);</pre><br>其中 name 就是文件名，我们自定义 name 就 OK 了</p>
-<p>如果希望往文件追加数据的话（不然会有很多小文件）：</p>
-<p>我们可以在获取文件流的时候，传入已经存在的文件，然后往里面追加就行了。而且将 creat 函数换成 append 即可，具体参考下面的代码：</p>
-<p><pre class="lang:default decode:true  ">override def getRecordWriter(ignored: FileSystem, job: JobConf, name: String, progress: Progressable): RecordWriter[K, V] = {<br>        val isCompressed: Boolean = FileOutputFormat.getCompressOutput(job)<br>        val keyValueSeparator: String = job.get(“mapreduce.output.textoutputformat.separator”, “\t”)<br>        val iname = name + System.currentTimeMillis() / HDFSService.getBatchInteral<br>        if (!isCompressed) {<br>            val file: Path = FileOutputFormat.getTaskOutputPath(job, iname)<br>            val fs: FileSystem = file.getFileSystem(job)<br>            val newFile : Path = new Path(FileOutputFormat.getOutputPath(job), iname)<br>            val fileOut : FSDataOutputStream = if (fs.exists(newFile)) {<br>                fs.append(newFile)<br>            } else {<br>                fs.create(file, progress)<br>            }<br>            new TextOutputFormat.LineRecordWriter<a href="fileOut, keyValueSeparator">K, V</a><br>        } else {<br>            val codecClass: Class[_ &lt;: CompressionCodec] = FileOutputFormat.getOutputCompressorClass(job, classOf[GzipCodec])<br>            // create the named codec<br>            val codec: CompressionCodec = ReflectionUtils.newInstance(codecClass, job)<br>            // build the filename including the extension<br>            val file: Path = FileOutputFormat.getTaskOutputPath(job, iname + codec.getDefaultExtension)<br>            val fs: FileSystem = file.getFileSystem(job)<br>            val newFile : Path = new Path(FileOutputFormat.getOutputPath(job), iname + codec.getDefaultExtension)</pre></p>
-<pre><code>        val fileOut: FSDataOutputStream = if (fs.exists(newFile)) {
-            fs.append(newFile)
-        } else {
-            fs.create(file, progress)
-        }
-        new TextOutputFormat.LineRecordWriter[K, V](new DataOutputStream(codec.createOutputStream(fileOut)), keyValueSeparator)
-    }
-}&lt;/pre&gt;
-</code></pre><p>&nbsp;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">RDD.rddToPairRDDFunctions(r)(nullWritableClassTag, textClassTag, null)</div><div class="line">      .saveAsHadoopFile[TextOutputFormat[NullWritable, Text]](path)</div></pre></td></tr></table></figure>
+<p>从上面这句话我们可以知道，首先将 RDD 转化为 PariRDD，然后再调用 saveAsHadoopFile 函数进行实际的操作。上面的语句中 <code>r</code> 是原始 RDD，<code>nullWritableClassTag</code> 和 <code>textClassTag</code> 表示所写数据的类型，使用 <code>nullWritableClassTag</code> 是因为 HDFS 不会将这个数据进行实际写入（pariRDD 是 (K,V) 类型， 我们只需要写入 V），从效果上看就只写如后面的一个字段。<code>TextOutputFormat</code> 是一个格式化函数，后面我们再来看这个函数，<code>NullWritable</code> 则表示一个占位符，同样是这个字段不需要实际写入 HDFS，<code>Text</code> 表示我们将写入文本类型的数据。</p>
+<p>我们看到 <code>TextOutputFormat</code> 这个类中有一个函数是 <code>RecordWriter</code> 用于操作没一条记录的写入，代码如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">public RecordWriter&lt;K, V&gt; getRecordWriter(FileSystem ignored, JobConf job, String name, Progressable progress) throws IOException &#123;</div><div class="line">	boolean isCompressed = getCompressOutput(job);</div><div class="line">	String keyValueSeparator = job.get(&quot;mapreduce.output.textoutputformat.separator&quot;, &quot;\t&quot;);</div><div class="line">	if(!isCompressed) &#123;</div><div class="line">	    Path codecClass1 = FileOutputFormat.getTaskOutputPath(job, name);</div><div class="line">		FileSystem codec1 = codecClass1.getFileSystem(job);</div><div class="line">		FSDataOutputStream file1 = codec1.create(codecClass1, progress);</div><div class="line">		return new TextOutputFormat.LineRecordWriter(file1, keyValueSeparator);</div><div class="line">	&#125; else &#123;</div><div class="line">	    Class codecClass = getOutputCompressorClass(job, GzipCodec.class);</div><div class="line">		CompressionCodec codec = (CompressionCodec)ReflectionUtils.newInstance(codecClass, job);</div><div class="line">		Path file = FileOutputFormat.getTaskOutputPath(job, name + codec.getDefaultExtension());</div><div class="line">		FileSystem fs = file.getFileSystem(job);</div><div class="line">		FSDataOutputStream fileOut = fs.create(file, progress);</div><div class="line">		return new TextOutputFormat.LineRecordWriter(new DataOutputStream(codec.createOutputStream(fileOut)), keyValueSeparator);</div><div class="line">		&#125;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>文件中分为两部分：1）压缩文件，2）非压缩文件。然后剩下的事情就是打开文件，往文件中写数据了。</p>
+<p>说到压缩文件，就和写 lzo 格式关联起来了，因为 lzo 格式就是压缩的，那么我们从哪拿到这个压缩的格式的呢？实际上 PariRDDFunctions#saveAsHadoopFile 还可以传入压缩格式类，函数原型如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">def saveAsHadoopFile[F &lt;: OutputFormat[K, V]](</div><div class="line">    path: String,</div><div class="line">    codec: Class[_ &lt;: CompressionCodec])(implicit fm: ClassTag[F]): Unit = self.withScope &#123;</div></pre></td></tr></table></figure>
+<p>这里第二个参数表示压缩的类。如果需要我们传入一个压缩类即可，如 <code>classOf[com.hadoop.compression.lzo.LzopCodec]</code> 最终这个参数会传给 <code>TextOutputFormat#RecordWriter</code>.</p>
+<p>至此，我们以及可以写 lzo 格式的文件了。但是还没有结束，因为会产生小文件，每个 RDD 的每个 partition 都会在 HDFS 上产生一个文件，而且这些文件大小非常小，就形成了很多小文件，这对 HDFS 的压力会非常大。我们需要解决这个问题</p>
 	  
 	</div>
 

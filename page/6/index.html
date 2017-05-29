@@ -111,69 +111,6 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
-			<div class="date"> 2013-06-21 </div>
-			<div class="article-title"><a href="/2013/06/21/linux-command-shell-scripts-3/" >Linux命令行和shell脚本编程笔记3</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>接<a href="http://www.klion26.com/linux-command-shell-script-2.html" target="_blank" rel="external">上篇</a>，接下来是讲处理用户输入，显示数据和脚本控制，创建函数以及在脚本中添加颜色，至于后面的sed，正则表达式和awk有时间的话会单独写出来。另外，这本书还是挺不错的，讲的东西不是太简单，也不是太难，同时还有不少的例子可以给你消化。</p>
-<p>处理用户输入</p>
-<p>在shell脚本中，用$0表示程序名称，然后后面可以用$n表示第n个参数，如果n大于9的话需要用大括号把n括起来，比如${10}.不过$0中保存的是程序的完整路径，而不仅仅是程序的名称。如果只想要程序的名称的话，可以用basename命令，比如</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #d8bfd8;">name</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;"><code>&lt;/span&gt;basename &lt;span style=&quot;color: #d8bfd8;&quot;&gt;$0&lt;/span&gt;&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span></div><br>那么name中存的就是程序名称了，而不是完整的路径。</p>
-<p>如果需要在脚本中使用参数的话，最好是先在使用之前对参数的个数进行检查，然后进行提示。</p>
-<p>在shell中如果想使用最后一个参数的话，有两种方法，分别是</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #d8bfd8;">params</span><span style="color: #f5deb3;">=</span><span style="color: #d8bfd8;">$#</span><br><span style="color: #b0c4de; font-weight: bold;">echo </span>The last parameter is <span style="color: #d8bfd8;">$params</span><br><span style="color: #b0c4de; font-weight: bold;">echo </span>The last parameter is <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #f5deb3;">!#</span><span style="color: #b0c4de; font-weight: bold;">}</span></div><br>其中第二种不用能${$#}，这样的话，会产生一个随机数。不过如果没有参数的话，上面两种还是不一样的，第一句会输出0，第二个会输出文件名。</p>
-<p>接下来是$<em>和$@表示所有的参数，但是$</em>把所有的参数看成一个参数，$@把所有参数看成同一个字符串中的多个单词处理。允许对其中的值进行迭代。</p>
-<p>还有就是shift移位操作，shift会把参数往左移一位，会用后面的覆盖前面的参数，而且不可恢复。</p>
-<p>接下来讲的是getopt和getopts的应用，这是两个用来方便处理参数的命令。命令格式如下:</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">getopt options optstring parameters<br><span style="color: #b0c4de; font-weight: bold;">getopts </span>optstring variable</div><br>然后是读入命令read</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">read</span> -t 5 -s -p <span style="color: #7fffd4;">“Please enter your name:”</span> name</div><br>上面的命令表示5s有效(-t 5), 不回显，就像Linux的登录密码一样(-s),其实这里是把前景颜色和背景颜色设成了一样，提示字符串(-p “…”)。另外还有就是-n后面接数字num，表示读入num个字符之后自动结束，这个可以用在读入yes/no的地方，比如</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">read</span> -n1 -p <span style="color: #7fffd4;">“Do you want to continue [Y/N]?”</span> answer</div><br>则会在你输入了一个字符之后自动执行接下来的语句，不用你输入回车表示输入结束。</p>
-<p>可以用cat filename | while read line来进行读取文件</p>
-<p>接下来是显示数据的一章，包括各种文件重定向等。</p>
-<p>首先我们Linux系统讲每个对象当成文件处理，使用文件描述符来标识文件对象，每个进程最多有9个打开文件的描述符，bash shell为特殊需要保留前3个文件描述服(0,1,2)，0表示标准读入，1表示标准输出，2表示标准错误输出[一般也是输出在终端，和1输出的位置一起]。我们可以用重定向符号来把这些文件描述符进行重定向，比如下面的几句</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">cat &lt; file                  表示把标准读入重定向到file文件，即从file中读入<br>ls -l &gt; test2               把标准输出重定向到test2，即输出到test2文件中<br>ls -l fjj fjkd 2&gt; error     把错误信息写到error文件中</div><br>如果用<span style="color: #ff0000;">&gt;&gt;</span>则表示附加，即在原有的文件末尾追加，否则会覆盖现有文件</p>
-<p>关于临时重定向和永久重定向。下面是例子</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“This is an error”</span> &gt;2  <span style="color: #da70d6;">#这事临时重定向</span><br><span style="color: #b0c4de; font-weight: bold;">exec </span>1&gt;textout        <span style="color: #da70d6;">#这事永久重定向，表示把输出重定向到文件textout中</span></div><br>在脚本中重定向还可以通过自己创建文件描述符来完成。自己创建的文件描述符还可以用来保存0，1，2这些系统文件描述符。如下面的例子</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">#!/bin/bash</span><br><span style="color: #b0c4de; font-weight: bold;">exec </span>3&gt;1        <span style="color: #da70d6;">#文件描述符3重定向到标准输出</span><br><span style="color: #b0c4de; font-weight: bold;">exec </span>1&gt;test14out  <span style="color: #da70d6;">#标准输出重定向到test14out文件</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“This should store in the output file”</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“along with this line.”</span><br><span style="color: #b0c4de; font-weight: bold;">exec </span>1&gt;3       <span style="color: #da70d6;">#文件描述符1重定向回标准输出</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“Now things should be back to normal”</span></div><br>可以用”exec 3&lt;&gt; testfile”打开一个读写文件描述符  “exec 3&gt;-“来关闭文件描述符3。可以用mktemp命令来创建临时文件和临时目录，”mktemp testing.XXXXXX”会创建一个临时文件，后面的X会被随机数所替代，当然可以加上-d选项来创建临时目录。</p>
-<p>命令tee会把数据发给两个地方，一个是STDOUT，一个是后面接的文件名。比如”who | tee testfile”会把who的执行结果显示在STDOUT中和文件testfile中。</p>
-<p>可以在脚本中捕获和移除信号，如下代码所示</p>
-<div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">
-
-<p><span style="color: #da70d6;">#!/bin/bash</span></p>
-<p><span style="color: #b0c4de; font-weight: bold;">trap</span> <span style="color: #7fffd4;">“echo byebye”</span> EXIT   <span style="color: #da70d6;">#捕获EXIT信号 如果捕获到了就执行echo byebye</span></p>
-<p><span style="color: #d8bfd8;">count</span><span style="color: #f5deb3;">=</span>1<br><span style="color: #b0c4de; font-weight: bold;">while</span> <span style="color: #f5deb3;">[</span> <span style="color: #d8bfd8;">$count</span> -le 5 <span style="color: #f5deb3;">]</span><br><span style="color: #b0c4de; font-weight: bold;">do</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“Loop #$count”</span><br>sleep 3<br><span style="color: #d8bfd8;">count</span><span style="color: #f5deb3;">=</span><span style="color: #d8bfd8;">$[</span> <span style="color: #d8bfd8;">$count</span> + 1 <span style="color: #f5deb3;">]</span><br><span style="color: #b0c4de; font-weight: bold;">done</span></p>
-<p><span style="color: #b0c4de; font-weight: bold;">trap</span> - EXIT        <span style="color: #da70d6;">#移除EXIT信号的捕获</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“I just removed the trap”</span></p>
-<p></p></div><br>另外书上还大致讲了jobs,nice,at,batch,cron命令的使用，这里就不对这些命令单独说了，<p></p>
-<p>接下来是创建函数。创建函数的格式如下</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">function </span>name <span style="color: #f5deb3;">{</span><br>commands<br><span style="color: #f5deb3;">}</span><br>或者<br>name() <span style="color: #f5deb3;">{</span><br>commands<br><span style="color: #f5deb3;">}</span></div><br>在函数中如果想返回一个数值的话，可以用return命令，不过返回的会被截取到[0,255]之间，而且要完成后尽快提取返回值。</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">#!/bin/bash</span><br><span style="color: #b0c4de; font-weight: bold;">function </span>db1 <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">read</span> -p <span style="color: #7fffd4;">“Enter a value: “</span> value<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“doubling the value”</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #d8bfd8;">$[</span> <span style="color: #d8bfd8;">$value</span> * 2 <span style="color: #f5deb3;">]</span><br><span style="color: #f5deb3;">}</span>db1<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The new value is $?”</span></div></p>
-<p><span style="color: #da70d6;">##下面是另外一种返回值的方式</span><br><span style="color: #b0c4de; font-weight: bold;">function </span>db1 <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">read</span> -p <span style="color: #7fffd4;">“Enter a value: “</span>value<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #d8bfd8;">$[</span> <span style="color: #d8bfd8;">$value</span> * 2 <span style="color: #f5deb3;">]</span>            <span style="color: #da70d6;">#注意这里的写法</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #d8bfd8;">result</span> <span style="color: #f5deb3;">=</span> <span style="color: #7fffd4;"><code>&lt;/span&gt;db1&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>        <span style="color: #da70d6;">#这里是反引号</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The new value is $result”</span></p>
-<p><br>上面的代码中给出了两种返回值的方式，这里可以自己进行选择。</p>
-<p>传递参数和前面讲的参数的使用基本一致，这里就不罗嗦了。接下来就是变量的作用域了，一般来说bash里面的所有变量都是全局的，当然可以用local来限定，不然全部用全局变量的话，会对变量带来一定的麻烦。</p>
-<p>下面的是给函数传函数和返回函数。</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">传数组可以用下面的方法<br><span style="color: #b0c4de; font-weight: bold;">function </span>testit <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">local </span>newarray<br><span style="color: #d8bfd8;">newarray</span><span style="color: #f5deb3;">=(</span><span style="color: #7fffd4;"><code>&lt;/span&gt;&lt;span style=&quot;color: #b0c4de; font-weight: bold;&quot;&gt;echo&lt;/span&gt; &lt;span style=&quot;color: #d8bfd8;&quot;&gt;$@&lt;/span&gt;&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>)<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The new array value is: ${newarray[*]}”</span><br><span style="color: #f5deb3;">}</span></div></p>
-<p><span style="color: #d8bfd8;">myarray</span><span style="color: #f5deb3;">=(</span>1 2 3 4 5)<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The original array is ${myarray[<em>]}”</em></span><br>testit <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #d8bfd8;">myarray</span><span style="color: #f5deb3;">[]</span><span style="color: #b0c4de; font-weight: bold;">}</span><br>下面的脚本会返回一个数组<br><span style="color: #b0c4de; font-weight: bold;">function </span>arraydblr <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">local </span>origarray<br><span style="color: #b0c4de; font-weight: bold;">local </span>newarray<br><span style="color: #b0c4de; font-weight: bold;">local </span>elements<br><span style="color: #b0c4de; font-weight: bold;">local </span>i<br><span style="color: #d8bfd8;">origarray</span><span style="color: #f5deb3;">=(</span><span style="color: #7fffd4;"><code>&lt;/span&gt;&lt;span style=&quot;color: #b0c4de; font-weight: bold;&quot;&gt;echo&lt;/span&gt; &lt;span style=&quot;color: #7fffd4;&quot;&gt;&quot;$@&quot;&lt;/span&gt;&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>)    <span style="color: #da70d6;">#得到传过来的数组</span><br><span style="color: #d8bfd8;">newarray</span><span style="color: #f5deb3;">=(</span><span style="color: #7fffd4;"><code>&lt;/span&gt;&lt;span style=&quot;color: #b0c4de; font-weight: bold;&quot;&gt;echo&lt;/span&gt; &lt;span style=&quot;color: #7fffd4;&quot;&gt;&quot;$@&quot;&lt;/span&gt;&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>)<br><span style="color: #d8bfd8;">elements</span><span style="color: #f5deb3;">=</span><span style="color: #d8bfd8;">$[</span> <span style="color: #d8bfd8;">$# </span>- 1<span style="color: #f5deb3;">]</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> ((<span style="color: #d8bfd8;">i</span> <span style="color: #f5deb3;">=</span> 0; i&lt;<span style="color: #f5deb3;">=</span><span style="color: #d8bfd8;">$elements</span> i++))<br><span style="color: #f5deb3;">{</span><br>newarray<span style="color: #f5deb3;">[</span><span style="color: #d8bfd8;">$i</span><span style="color: #f5deb3;">]=</span><span style="color: #d8bfd8;">$[</span> <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #d8bfd8;">origarray</span><span style="color: #f5deb3;">[</span><span style="color: #d8bfd8;">$i</span><span style="color: #f5deb3;">]</span><span style="color: #b0c4de; font-weight: bold;">}</span> <em> 2<span style="color: #f5deb3;">]</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #d8bfd8;">newarray</span><span style="color: #f5deb3;">[</span></em>]<span style="color: #b0c4de; font-weight: bold;">}</span>    <span style="color: #da70d6;">#返回一个数组</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #d8bfd8;">myarray</span><span style="color: #f5deb3;">=(</span>1 2 3 4 5)<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The original array is: ${myarray[<em>]}”</em></span><br><span style="color: #d8bfd8;">arg1</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">`</span><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #d8bfd8;">myarray</span><span style="color: #f5deb3;">[]</span><span style="color: #b0c4de; font-weight: bold;">}</span><span style="color: #7fffd4;"><code>&lt;/span&gt;
-result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <span style="color: #d8bfd8;">$arg1</span><span style="color: #7fffd4;">`</span>)    <span style="color: #da70d6;">#传一个数组给函数，并得到一个函数</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The new array is: ${result[*]}”</span><br>接下来是函数的递归，bash里面可以使用递归，使用的方式没有什么特别的，就和使用一般的函数一样。接下来可以创建函数库，然后通过”. funcname”来引入这个库，其中”.”表示source的意思。接下来就是可以在.bashrc里面创建函数或者导入自己的库函数，这样你就可以在任意的地方使用库函数里面的函数了。</p>
-<p>至于在terminal创建窗口，可以用select命令，dialog命令，KDE下的kdialog和GNOME下的gdialog，zenity。这些的具体用法可以自行搜索。</p>
-<p>到这里基本这本书除了sed，awk，脚本的介绍(zsh等)都讲完了，总体来说这本书还是挺不错的。有时间的话我会单独写sed和awk的一些用法。</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
 			<div class="date"> 2013-05-25 </div>
 			<div class="article-title"><a href="/2013/05/25/linux-command-shell-script-2/" >Linux命令行和Shell脚本编程2</a></div>						
 		</h3>
@@ -463,6 +400,42 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 
            
 		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-12-26 </div>
+			<div class="article-title"><a href="/2012/12/26/fedora-13-update-to-fedora-15/" >Fedora13 升级到Fedora 15</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>在开学的时候装了Fedora 13,然后一直用着，感觉也还可以，虽然现在Fedora都出18了。前两天不知道那根神经一短路然后就想着升级Fedora，一开始想升级到16的（担心17,18还不那么稳定，到时出了问题找不到解决方案）。然后就用下面的命令执行呗 。</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">sudo yum install preupgrade<br>preupgrade</div><br>执行preupgrade需要输入root命令，照着做就行了，然后就可以选择你想升级到的版本，有14,15,16,17，当然你还可以列出那些unstable版本。选择之后，就一直下一步就行了，然后等着下载所需要的软件包吧（时间根据你的网速不同而不同，我大概用了20分钟左右）。我一开始选择的版本是16,然后下完之后，提醒需要reboot来完成升级，好，那就reboot呗。</p>
+<p>reboot之后，你会发现屏幕一直是一个光标在那跳动，啥也不可以做，这个时候你只需要等待就行了，应该是在配置些啥东西吧。别重启了，实在没事干就出喝杯咖啡吧，等好了之后，结果发现提示说Fedora 16只能通过14,15升级而来，也就是不能跨太多的版本升级。好吧。那就重启升级到15再说吧。然后照着做之后，发现尼妈居然又是自动升级到16,然后一顿折腾之后，我把/var/cache/yum/下面所有和preupgrade有关的文件夹全都删掉了（其实应该做个备份更好，万一删错了还可以还原）。然后继续升级到Fedora 15.然后就可以了，没出现啥问题，刚好装Fedora 15的时候老师叫开会，然后开会回来之后发现已经装好了。而且还不错。</p>
+<p>现在你已经装好了Fedora 15了，当然还是可以访问Fedora 13的。然后说说接下来你需要做的事情吧。或许你可以在网上搜一篇叫做《Fedora 15安装之后需要做的×件事》，不过很多你可能不需要，我这里大致写下我做的一些事情吧</p>
+<p>1.安装gnome-tweak-tool，因为现在你的桌面是没有任何东西的，而且右击也没用，装这个东西就是解决这些事的，装好之后，用命令gnome-tweak-tool执行出来一个配置界面，选中File Manager。把右边的“Have file manager handle the desktop该陈ON就行了，现在你的桌面有东西了，而且可以右击了。</p>
+<p>2.在上一步中的Tweak tool中打开选中左边的Shell栏目，然后把右边的Arrangement of buttons on the titlebar选项改为All，这样尼会看到你的cmd窗口上面有最小化，最大化和关闭按钮了，默认的是只有关闭按钮的。</p>
+<p>3.解决按下Del不能删除文件的事情，首先用命令</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gsettings <span style="color: #b0c4de; font-weight: bold;">set </span>org.gnome.desktop.interface can-change-accels <span style="color: #b0c4de; font-weight: bold;">true</span></div><br>设置可以改变相应的快捷方式映射</p>
+<p>然后打开一个文件夹，选中随便一个文件然后点击菜单Edit，把鼠标放到“Move to Trash”上，然后按<span style="color: #ff0000;">两次<span style="color: #000000;">Del键就行了，接下来你可以用命令</span></span></p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gsettings <span style="color: #b0c4de; font-weight: bold;">set </span>org.gnome.desktop.interface can-change-accels <span style="color: #b0c4de; font-weight: bold;">false</span></div><br>来关闭快捷方式的映射。</p>
+<p>4.中文输入法的问题，由于我是由Fedora 13升级来的，系统没有自动安装ibus输入法，还是保留了我在13上安装的fcitx，可是奇怪的事情发生了，fcitx输入法只能在浏览器下使用，其他任何地方都不能使用。这个也太坑爹了。然后google，百度结果没有发现什么解决办法，又说是gnome3的问题，又说是配置的问题， 有说直接换ibus的。可是换了ibus结果还是用不了，不知为何（应该不是和fcitx冲突的问题，我在装ibus之前卸载了fcitx）。然后最后发现有个帖子的配置和其他人的配置有个小小的区别，那就是试试吧，结果就TM可以了。我一开始的配置是（下面语句放在～/.bashrc文件中）</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">XMODIFIERS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“@im=fcitx”</span><br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">QT_IM_MODULE</span><span style="color: #f5deb3;">=</span>xim<br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">GTK_IM_MODULE</span><span style="color: #f5deb3;">=</span>xim</div><br>然后另外那个人的配置是把两个xim改成了fcitx也就是</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">XMODIFIERS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“@im=fcitx”</span><br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">QT_IM_MODULE</span><span style="color: #f5deb3;">=</span>fcitx<br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">GTK_IM_MODULE</span><span style="color: #f5deb3;">=</span>fcitx</div><br>然后奇迹发生了，重登录之后结果就可以了，这中间我各种重装，反正都不知道是为什么，<span style="color: #ff0000;">如果你也遇到了这样的问题，但是上面的方案没有帮到你的话，我只能说声遗憾了，因为我也不知道是为什么了。</span></p>
+<p>最后再吐嘈下Fedora 15的界面，感觉用起来总是没有13那么爽，gnome3或许炫一点，但是现在打开软件的方式有点不爽，也没有下面的任务栏了，而且最上面的panel也没了，现在变成了“Your favorites”，反正就是现在暂时还不适应这种界面，接下来慢慢适应吧。</p>
+
+	
+	</div>
+</div>
+
+           
+		
 
 		</div>
 
@@ -537,9 +510,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -549,35 +522,31 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
-		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
-		
-			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
 		
 		</ul>
 	</div>
@@ -588,45 +557,45 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/memset/">memset<span>1</span></a></li>
+			<li><a href="/tags/chinese/">chinese<span>1</span></a></li>
 		
-			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
+			<li><a href="/tags/grub/">grub<span>2</span></a></li>
 		
-			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
+			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
 		
-			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
+			<li><a href="/tags/text-plain/">text/plain<span>1</span></a></li>
+		
+			<li><a href="/tags/compter-graphics/">compter graphics<span>1</span></a></li>
+		
+			<li><a href="/tags/vi/">vi<span>2</span></a></li>
+		
+			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
+		
+			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
+		
+			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
+		
+			<li><a href="/tags/方法/">方法<span>1</span></a></li>
+		
+			<li><a href="/tags/dag/">dag<span>1</span></a></li>
 		
 			<li><a href="/tags/scc/">scc<span>1</span></a></li>
 		
-			<li><a href="/tags/probability/">probability<span>1</span></a></li>
+			<li><a href="/tags/specify-timestamp/">specify_timestamp<span>1</span></a></li>
 		
-			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
+			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
 		
-			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
+			<li><a href="/tags/network/">network<span>1</span></a></li>
 		
-			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
 		
-			<li><a href="/tags/DP/">DP<span>1</span></a></li>
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
 		
-			<li><a href="/tags/ln/">ln<span>1</span></a></li>
+			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
 		
-			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
-		
-			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
-		
-			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
-		
-			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
-		
-			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
-		
-			<li><a href="/tags/apach/">apach<span>0</span></a></li>
-		
-			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
-		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
+			<li><a href="/tags/array/">array<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>260</span></a></li>
@@ -642,10 +611,6 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
   <ul class="entry list-unstyled">
     
       <li>
-        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
-      </li>
-    
-      <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
       </li>
     
@@ -659,6 +624,10 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>

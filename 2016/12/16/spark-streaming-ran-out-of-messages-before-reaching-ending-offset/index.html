@@ -114,82 +114,21 @@
 
 	  <h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>Spark Streaming 处理数据过程中遇到 <code>Ran out of messages before reaching ending offset</code> 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）</p>
 <h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>通过异常栈信息，我们知道异常从 KafkaRDD.scala#211 行抛出，下面是相应代码</p>
-<pre><code>206 override def getNext(): R = {
-      if (iter == null || !iter.hasNext) {
-208        iter = fetchBatch
-      }
-210      if (!iter.hasNext) {
-211        assert(requestOffset == part.untilOffset, errRanOutBeforeEnd(part))
-212        finished = true
-        null.asInstanceOf[R]
-      } else {
-        val item = iter.next()
-        if (item.offset &gt;= part.untilOffset) {
-217          assert(item.offset == part.untilOffset, errOvershotEnd(item.offset, part))
-          finished = true
-          null.asInstanceOf[R]
-        } else {
-          requestOffset = item.nextOffset
-          messageHandler(new MessageAndMetadata(
-            part.topic, part.partition, item.message, item.offset, keyDecoder, valueDecoder))
-        }
-      }
-226    }
-`&lt;/pre&gt;
-通过分析，我们知道这个地方是实际从 Kafka 读取数据的逻辑，首先会调用 `fetchBatch` 函数（208 行），然后进行逻辑判断，数据是否读取完毕，是否发生异常
-
-其中 211 行的异常表示还未读取到 part.untilOffset 但是当前迭代器中没有数据了；217 行表示当前读取的数据如果超过了 part.untilOffset ，那么在这个时候退出当前 batch（offset 从 fromOffset 逐次加一增加的，正常的逻辑肯定会和 part.untilOffset 相等）
-
-我们知道异常从 211 行抛出来的，也知道了异常的最直接原因，那么这个原因是什么造成的呢？
-
-211 行的代码执行了，也就是 210 行的 if 语句未 true，这样的话，207 行的逻辑也应该为 true。这样的话 iter 就是 fetchBatch 返回的迭代器了。接下来我们看看 fetchBatch 的代码
-&lt;pre&gt;`188 private def fetchBatch: Iterator[MessageAndOffset] = {
-189      val req = new FetchRequestBuilder()
-190        .addFetch(part.topic, part.partition, requestOffset, kc.config.fetchMessageMaxBytes)
-        .build()
-192      val resp = consumer.fetch(req)
-      handleFetchErr(resp)
-      // kafka may return a batch that starts before the requested offset
-      resp.messageSet(part.topic, part.partition)
-196       .iterator
-        .dropWhile(_.offset &lt; requestOffset)
-    }
-`&lt;/pre&gt;
-我们发现 192 行会通过 consumer 从 kafka 获取数据，本次从哪获取数据，以及获取多少分别由 190 行的 `topic`, `partition` 和 `kc.config.fetchMessageMaxBytes` 指定。我们查看 `kc.config.fetchMessageMaxBytes`，发现默认使用的是 1M
-&lt;pre&gt;`ConsumerConfig.scala
-29 val FetchSize = 1024 * 1024
-
-114 val fetchMessageMaxBytes = props.getInt(&quot;fetch.message.max.bytes&quot;, FetchSize)
-`&lt;/pre&gt;
-从这里我们知道每次从 kafka 上最多获取 1M 的数据（这也是为什么需要在 `KafkaRDD.getNext` 函数的开头通过 `iter.hasNext()` 来判断是否需要调用 `fetchBatch`
-
-然后看到 fetchBatch 函数对应的 196 行，获取迭代器作为返回值，查看相应代码，跳转到 `ByteBufferMessageSet.scala`
-&lt;pre&gt;`139 override def iterator: Iterator[MessageAndOffset] = internalIterator()
-145 private def internalIterator(isShallow: Boolean = false): Iterator[MessageAndOffset] = {
-    new IteratorTemplate[MessageAndOffset] {
-        ......
-152      def makeNextOuter: MessageAndOffset = {
-        // if there isn&apos;t at least an offset and size, we are done
-        if (topIter.remaining &lt; 12)
-          return allDone()
-        val offset = topIter.getLong()
-        val size = topIter.getInt()
-        if(size &lt; Message.MinHeaderSize)
-          throw new InvalidMessageException(&quot;Message found with corrupt size (&quot; + size + &quot;)&quot;)
-
- 160       // we have an incomplete message
- 161       if(topIter.remaining &lt; size)
- 162         return allDone()
-       ....
- 185     }
-</code></pre><p>从 161 行我们可以看出，如果读取的消息是一条不完整的，那么本次不处理，默认本次消息读取完成。</p>
-<p>上面所有的链条穿起来就抛出了我们文章开始的异常。</p>
-<ol>
-<li>从 kafka 读取 1M 的数据（默认大小）</li>
-<li>发现读取的数据不完整（这个消息的大小大于 1M），所以本次读取的 迭代器 为空</li>
-<li>发现迭代器为空，但是当前的 offset 和 part.untilOffset 不想等，抛出异常</li>
-</ol>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过设置 kafkaParam 的参数 <code>fetch.message.max.bytes</code> 就行了，我们设置成 2M（大于一条数据的最大值即可），就能够运行成功了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">206 override def getNext(): R = &#123;</div><div class="line">	  if (iter == null || !iter.hasNext) &#123;</div><div class="line">208        iter = fetchBatch</div><div class="line">      &#125;</div><div class="line">210      if (!iter.hasNext) &#123;</div><div class="line">211        assert(requestOffset == part.untilOffset, errRanOutBeforeEnd(part))</div><div class="line">212        finished = true</div><div class="line">           null.asInstanceOf[R]</div><div class="line">		&#125; else &#123;</div><div class="line">		   	val item = iter.next()</div><div class="line">			if (item.offset &gt;= part.untilOffset) &#123;</div><div class="line">217 	        assert(item.offset == part.untilOffset, errOvershotEnd(item.offset, part))</div><div class="line">				finished = true</div><div class="line">				null.asInstanceOf[R]</div><div class="line">			&#125; else &#123;</div><div class="line">				requestOffset = item.nextOffset</div><div class="line">				messageHandler(new MessageAndMetadata(</div><div class="line">				part.topic, part.partition, item.message, item.offset, keyDecoder, valueDecoder))</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">226    &#125;</div></pre></td></tr></table></figure>
+<p>通过分析，我们知道这个地方是实际从 Kafka 读取数据的逻辑，首先会调用 <code>fetchBatch</code> 函数（208 行），然后进行逻辑判断，数据是否读取完毕，是否发生异常</p>
+<p>其中 211 行的异常表示还未读取到 part.untilOffset 但是当前迭代器中没有数据了；217 行表示当前读取的数据如果超过了 part.untilOffset ，那么在这个时候退出当前 batch（offset 从 fromOffset 逐次加一增加的，正常的逻辑肯定会和 part.untilOffset 相等）</p>
+<p>我们知道异常从 211 行抛出来的，也知道了异常的最直接原因，那么这个原因是什么造成的呢？</p>
+<p>211 行的代码执行了，也就是 210 行的 if 语句未 true，这样的话，207 行的逻辑也应该为 true。这样的话 iter 就是 fetchBatch 返回的迭代器了。接下来我们看看 fetchBatch 的代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">188 private def fetchBatch: Iterator[MessageAndOffset] = &#123;</div><div class="line">189      val req = new FetchRequestBuilder()</div><div class="line">190         .addFetch(part.topic, part.partition, requestOffset, kc.config.fetchMessageMaxBytes)</div><div class="line">			.build()</div><div class="line">192      val resp = consumer.fetch(req)</div><div class="line">	   	 handleFetchErr(resp)</div><div class="line">		// kafka may return a batch that starts before the requested offset</div><div class="line">		 resp.messageSet(part.topic, part.partition)</div><div class="line">196       .iterator</div><div class="line">          .dropWhile(_.offset &lt; requestOffset)</div><div class="line">		&#125;</div></pre></td></tr></table></figure></p>
+<p>我们发现 192 行会通过 consumer 从 kafka 获取数据，本次从哪获取数据，以及获取多少分别由 190 行的 <code>topic</code>, <code>partition</code> 和 <code>kc.config.fetchMessageMaxBytes</code> 指定。我们查看 <code>kc.config.fetchMessageMaxBytes</code>，发现默认使用的是 1M</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">ConsumerConfig.scala</div><div class="line">29 val FetchSize = 1024 * 1024</div><div class="line"></div><div class="line">114 val fetchMessageMaxBytes = props.getInt(&quot;fetch.message.max.bytes&quot;, FetchSize)</div></pre></td></tr></table></figure>
+<p>从这里我们知道每次从 kafka 上最多获取 1M 的数据（这也是为什么需要在 <code>KafkaRDD.getNext</code> 函数的开头通过 <code>iter.hasNext()</code> 来判断是否需要调用 <code>fetchBatch</code> </p>
+<p>然后看到 fetchBatch 函数对应的 196 行，获取迭代器作为返回值，查看相应代码，跳转到 <code>ByteBufferMessageSet.scala</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">139 override def iterator: Iterator[MessageAndOffset] = internalIterator()</div><div class="line">145 private def internalIterator(isShallow: Boolean = false): Iterator[MessageAndOffset] = &#123;</div><div class="line">		    new IteratorTemplate[MessageAndOffset] &#123;</div><div class="line">				        ......</div><div class="line">152      def makeNextOuter: MessageAndOffset = &#123;</div><div class="line">             // if there isn&apos;t at least an offset and size, we are done</div><div class="line">			if (topIter.remaining &lt; 12)</div><div class="line">				return allDone()</div><div class="line">			    val offset = topIter.getLong()</div><div class="line">			    val size = topIter.getInt()</div><div class="line">		        if(size &lt; Message.MinHeaderSize)</div><div class="line">			         throw new InvalidMessageException(&quot;Message found with corrupt size (&quot; + size + &quot;)&quot;)</div><div class="line">					</div><div class="line">160       // we have an incomplete message</div><div class="line">161       if(topIter.remaining &lt; size)</div><div class="line">162         return allDone()</div><div class="line">		....</div><div class="line">185     &#125;</div></pre></td></tr></table></figure>
+<p>从 161 行我们可以看出，如果读取的消息是一条不完整的，那么本次不处理，默认本次消息读取完成。<br>上面所有的链条穿起来就抛出了我们文章开始的异常。</p>
+<pre><code>1. 从 kafka 读取 1M 的数据（默认大小）
+2. 发现读取的数据不完整（这个消息的大小大于 1M），所以本次读取的 迭代器 为空
+3. 发现迭代器为空，但是当前的 offset 和 part.untilOffset 不想等，抛出异常
+</code></pre><h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过设置 kafkaParam 的参数 <code>fetch.message.max.bytes</code> 就行了，我们设置成 2M（大于一条数据的最大值即可），就能够运行成功了</p>
 	  
 	</div>
 

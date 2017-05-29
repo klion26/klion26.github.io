@@ -122,24 +122,8 @@
 <li>将步骤 2 中的 offset 作为参数传入 <code>createDirectStream</code> 即可<br>通过查看源码，我们知道步骤 1 和步骤 2 中的功能在 <code>org.apache.spark.streaming.kafka.KafkaCluster</code> 中都已经有现成的函数了：<code>getPartitions</code> 和 <code>getLeaderOffsets</code>，分别表示获取指定 topic 的 partition 以及获取 partition 指定时间戳所在的 segment 的起始 offset，那么我们需要做的就是如何调用这两个函数实现我们的功能了。</li>
 </ol>
 <p>我们知道 <code>KafkaCluster</code> 的作用域是 <code>private[spark]</code> 所以我们需要在自己的代码中使用 <code>package org.apache.spark(.xxx ... .yyy)</code>(小括号中表示可以省略）来限定自己的代码，因此我们可以将步骤 1 和步骤 2 中的功能实现如下：</p>
-<pre><code>package org.apache.spark.streaming.kafka
-......      //省略其他不相关的代码
-
-def getPartitions(kafkaParams: Map[String, String], topics: Set[String]): Either[Err, Set[TopicAndPartition]] = {
-        val kc = new KafkaCluster(kafkaParams)
-        kc.getPartitions(topics)    //我们可以在这里处理错误，也可以将错误继续往上传递
-    }
-
-    def getLeaderOffsets(kafkaParams: Map[String, String], topicAndPartitions: Set[TopicAndPartition], before: Long) : Map[TopicAndPartition, Long]  = {
-        val kc = new KafkaCluster(kafkaParams)
-        val leaderOffsets = kc.getLeaderOffsets(topicAndPartitions, before)
-        if (leaderOffsets.isLeft) {  //在本函数内部处理错误，如果有错误抛出异常
-            throw new RuntimeException(s&quot;### Exception when MTKafkaUtils#getLeaderOffsets ${leaderOffsets.left.get} ###&quot;)
-        }
-
-        leaderOffsets.right.get.map { case (k, v) =&gt; (k, v.offset)}  //将 Map[TopicAndPartition, LeaderOffset] 转变为 Map[TopicAndPartition, Long]（Long 为对应 partition 的 offset，从 LeaderOffset 中获取）
-    }
-</code></pre><p>步骤 3 直接传入参数即可，就可以从指定时间戳开始消费 Kafka 数据了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">package org.apache.spark.streaming.kafka</div><div class="line">......      //省略其他不相关的代码</div><div class="line"></div><div class="line">def getPartitions(kafkaParams: Map[String, String], topics: Set[String]): Either[Err, Set[TopicAndPartition]] = &#123;</div><div class="line">        val kc = new KafkaCluster(kafkaParams)</div><div class="line">        kc.getPartitions(topics)    //我们可以在这里处理错误，也可以将错误继续往上传递</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    def getLeaderOffsets(kafkaParams: Map[String, String], topicAndPartitions: Set[TopicAndPartition], before: Long) : Map[TopicAndPartition, Long]  = &#123;</div><div class="line">        val kc = new KafkaCluster(kafkaParams)</div><div class="line">        val leaderOffsets = kc.getLeaderOffsets(topicAndPartitions, before)</div><div class="line">        if (leaderOffsets.isLeft) &#123;  //在本函数内部处理错误，如果有错误抛出异常</div><div class="line">            throw new RuntimeException(s&quot;### Exception when MTKafkaUtils#getLeaderOffsets $&#123;leaderOffsets.left.get&#125; ###&quot;)</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        leaderOffsets.right.get.map &#123; case (k, v) =&gt; (k, v.offset)&#125;  //将 Map[TopicAndPartition, LeaderOffset] 转变为 Map[TopicAndPartition, Long]（Long 为对应 partition 的 offset，从 LeaderOffset 中获取）</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>步骤 3 直接传入参数即可，就可以从指定时间戳开始消费 Kafka 数据了</p>
 	  
 	</div>
 

@@ -111,97 +111,6 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
-			<div class="date"> 2016-08-27 </div>
-			<div class="article-title"><a href="/2016/08/27/spark-streaming-kafka-read-binlog-to-json/" >Spark Streaming 从 Kafka 读取 binlog 转换成 Json</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>在开发 Spark Streaming 的公共组件过程中，需要将 binlog 的数据(Array[Byte])转换为 Json 格式，供用户使用，本文提供一种转换的思路。另外我们会用到几个辅助类，为了行文流畅，我们将辅助类的定义放在文章的最后面。如果</p>
-<p>如果本文有讲述不详细，或者错误指出，肯请指出，谢谢</p>
-<p>对于 binlog 数据，每一次操作(INSERT/UPDATE/DELETE 等）都会作为一条记录写入 binlog 文件，但是同一条记录可能包含数据库中的几行数据（这里比较绕，可以看一个具体的例子）</p>
-<p>在数据库中，有 id, name，age 三个字段，其中 id 为主键，name 随意, age 随意。有两行数据如下</p>
-<p>[table caption=”示例数据库”width=”500” colwidth=”100|200|200” colalign=”left|left|left”]</p>
-<p>id, name, age</p>
-<p>1, john, 30</p>
-<p>2,john, 40</p>
-<p>[/table]</p>
-<p>那么你进行操作</p>
-<p><pre class="lang:tsql decode:true  ">update table set age = 50 where name = “john”</pre><br>的时候，就会将两行的数据都进行更改，这两行更改的数据会在同一个 binlog 记录中，这一点会在后面的实现中有体现。</p>
-<p>下面，我们给出具体的代码，然后对代码进行分析</p>
-<p><pre class="lang:scala decode:true">def desirializeByte(b: (String, Array[Byte])) : (String, String) = {<br>  val binlogEntry = BinlogEntryUtil.serializeToBean(b._2)   //将 Array[Byte] 数据转换成 com.meituan.data.binlog.BinlogEntry 类，相关类定义参考附录</pre></p>
-<p>  val pkeys = binlogEntry.getPrimaryKeys.asScala   //获取主键，这里的 asScala 将 Java 的 List 转换为 Scala 的 List<br>  val rowDatas : List[BinlogRow] = binlogEntry.getRowDatas.asScala.toList  //获取具体的信息<br>  val strRowDatas = rowDatas.map(a =&gt; {            //将获取到的具体信息进行转换，这里主要是将没一条信息的内容，转换 [(K1:V1,K2:V2…Kn:Vn)] 的形式，方面后面进行 Json 化<br>    val b = a.getBeforeColumns.asScala    //获取 beforColumns<br>    val c = a.getAfterColumns.asScala     //获取 afterColumns<br>    val mb = b.map(d =&gt; (d._1, d._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值<br>    val mc = c.map(c =&gt; (c._1, c._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值<br>    (mb, mc) //返回转换后的 beforeColumns 和 afterColumns<br>  })<br>  //下面利用 json4s 进行 Json 化<br>  (binlogEntry.getEventType, compact(“rowdata” -&gt; strRowDatas.map{<br>    w =&gt; List(“row_data” -&gt; (“before” -&gt; w._1.toMap) ~ (“after” -&gt; w._2.toMap))  //这里的两个 toMap 是必要的，不然里层会变成 List，这个地方比较疑惑的是，<br>                                                                                 //w._1 按理是 Map类型，为什么还需要强制转换成 Map<br>                                                                              //而且用 strRowDatas.foreach(x =&gt; println(s”${x._1}  ${x._2}”)打印的结果表名是 Map<br>  }))<br>desirializeByte 函数传入 topic 中的一条记录，返回参数自己确定，我这里为了测试，返回一个 (String, String) 的 Tuple，第一个字段表示该条记录的 EventType（Insert/Update/Delete 等），第二个字段为 Json 化后的数据。</p>
-<p>BinlogEntryUtil.serilizeToBean 是一个辅助类，将 binlog 数据转化为一个 Java bean 类。</p>
-<p>第 4 行，我们得到表对应的主键，第 5 行获得具体的数据</p>
-<p>第 6 行到第 12 行是 Json 化之前的辅助工作，将所有不需要的东西给剔除掉，只留下字段，以及字段对应的值。</p>
-<p>第 14， 15 行就是具体的 Json 工作了（使用了 json4s 包进行 Json 化）</p>
-<p>这个过程中有一点需要注意的是，在 Json 化的时候，记得为 w._1 和 w._2 加 toMap 操作，不然会变成 List（很奇怪，我将 w._1 和 w._2 打印出来看，都是 Map 类型）或者你可以在第 7，8 行的末尾加上 .toMap 操作。这个我查了 API，进行了实验，暂时怀疑是在和 json4s 组合的时候，出现了问题，有待验证。</p>
-<p>利用上述代码，我们可以得到下面这样 Json 化之后的字符串(我进行了排版，程序返回的 Json 串是不换行的）</p>
-<p><pre class="font-size:8 lang:default decode:true">{“rowdata”:<br>   [{“row_data”:<br>       {“before”:{“param_name”:”creator”,”param_value”:”chenqiang05”,”horigindb_etl_id”:”2532”,”utime”:”2016-07-26 15:07:16”,”id”:”15122”,”status”:”0”,”ctime”:”2016-07-25 17:06:01”},<br>        “after”:{“param_name”:”creator”,”param_value”:”chendayao”,”horigindb_etl_id”:”2532”,”utime”:”2016-08-01 10:32:01”,”id”:”15122”,”status”:”0”,”ctime”:”2016-07-25 17:06:01”}<br>       }<br>    }]<br>}”</pre><br>到这里，基本就完成了一种将 binlog 数据 Json 化的代码。</p>
-<p>附录代码，由于这些代码是从其他工程里面抠出来的，可能读起来会不顺畅，还请见谅。</p>
-<p><pre class="lang:java decode:true ">public static BinlogEntry serializeToBean(byte[] input) {<br>      BinlogEntry binlogEntry = null;<br>      Entry entry = deserializeFromProtoBuf(input);//从 protobuf 反序列化<br>      if(entry != null) {<br>         binlogEntry = serializeToBean(entry);<br>      }<br>      return binlogEntry;<br>    }</pre></p>
-<p>public static Entry deserializeFromProtoBuf(byte[] input) {<br>        Entry entry = null;</p>
-<pre><code>try {
-    entry = Entry.parseFrom(input);
-</code></pre><p>//com.alibaba.otter.canal.protocol.CanalEntry#Entry 类的方法，由 protobuf 生成<br>        } catch (InvalidProtocolBufferException var3) {<br>            logger.error(“Exception:” + var3);<br>        }</p>
-<pre><code>    return entry;
-}
-</code></pre><p>//将 Entry 解析为一个 bean 类<br>public static BinlogEntry serializeToBean(Entry entry) {<br>        RowChange rowChange = null;</p>
-<pre><code>    try {
-        rowChange = RowChange.parseFrom(entry.getStoreValue());
-    } catch (Exception var8) {
-        throw new RuntimeException(&quot;parse event has an error , data:&quot; + entry.toString(), var8);
-    }
-
-    BinlogEntry binlogEntry = new BinlogEntry();
-    String[] logFileNames = entry.getHeader().getLogfileName().split(&quot;\\.&quot;);
-    String logFileNo = &quot;000000&quot;;
-    if(logFileNames.length &gt; 1) {
-        logFileNo = logFileNames[1];
-    }
-
-    binlogEntry.setBinlogFileName(logFileNo);
-    binlogEntry.setBinlogOffset(entry.getHeader().getLogfileOffset());
-    binlogEntry.setExecuteTime(entry.getHeader().getExecuteTime());
-    binlogEntry.setTableName(entry.getHeader().getTableName());
-    binlogEntry.setEventType(entry.getHeader().getEventType().toString());
-    Iterator primaryKeysList = rowChange.getRowDatasList().iterator();
-
-    while(primaryKeysList.hasNext()) {
-        RowData rowData = (RowData)primaryKeysList.next();
-        BinlogRow row = new BinlogRow(binlogEntry.getEventType());
-        row.setBeforeColumns(getColumnInfo(rowData.getBeforeColumnsList()));
-        row.setAfterColumns(getColumnInfo(rowData.getAfterColumnsList()));
-        binlogEntry.addRowData(row);
-    }
-
-    if(binlogEntry.getRowDatas().size() &gt;= 1) {
-        BinlogRow primaryKeysList1 = (BinlogRow)binlogEntry.getRowDatas().get(0);
-        binlogEntry.setPrimaryKeys(getPrimaryKeys(primaryKeysList1));
-    } else {
-        ArrayList primaryKeysList2 = new ArrayList();
-        binlogEntry.setPrimaryKeys(primaryKeysList2);
-    }
-
-    return binlogEntry;
-}
-</code></pre><p>public class BinlogEntry implements Serializable {<br>    private String binlogFileName;<br>    private long binlogOffset;<br>    private long executeTime;<br>    private String tableName;<br>    private String eventType;<br>    private List<string> primaryKeys;<br>    private List<binlogrow> rowDatas = new ArrayList();<br>}<br>public class BinlogRow implements Serializable {<br>    public static final String EVENT_TYPE_INSERT = “INSERT”;<br>    public static final String EVENT_TYPE_UPDATE = “UPDATE”;<br>    public static final String EVENT_TYPE_DELETE = “DELETE”;<br>    private String eventType;<br>    private Map<string, binlogcolumn=""> beforeColumns;<br>    private Map<string, binlogcolumn=""> afterColumns;<br>}<br>public class BinlogColumn implements Serializable {<br>    private int index;<br>    private String mysqlType;<br>    private String name;<br>    private boolean isKey;<br>    private boolean updated;<br>    private boolean isNull;<br>    private String value;<br>}<br>&nbsp;</string,></string,></binlogrow></string></p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
 			<div class="date"> 2016-07-15 </div>
 			<div class="article-title"><a href="/2016/07/15/spark-streaming-saving-offset-in-zookeeper-2/" >Spark Streaming 中使用 zookeeper 保存 offset 并重用（二）</a></div>						
 		</h3>
@@ -214,12 +123,10 @@
 	
 		<p><a href="http://www.klion26.com/spark-streaming-save-offset-to-zookeeper.html" target="_blank" rel="external">上一篇文章</a>中，我们讲了如何在将 offset 保存在 zk 中，以及进行重用，但是程序中有个小问题“如果程序停了很长很长一段后再启动，zk 中保存的 offset 已经过期了，那会怎样呢？”本文将解决这个问题</p>
 <p>如果 kafka 上的 offset 已经过期，那么就会报 OffsetOutOfRange 的异常，因为之前保存在 zk 的 offset 已经 topic 中找不到了。所以我们需要在 从 zk 找到 offset 的这种情况下增加一个判断条件，如果 zk 中保存的 offset 小于当前 kafka topic 中最小的 offset，则设置为 kafka topic 中最小的 offset。假设我们上次保存在 zk 中的 offset 值为 123（某一个 partition），然后程序停了一周，现在 kafka topic 的最小 offset 变成了 200，那么用前文的代码，就会得到 OffsetOutOfRange 的异常，因为 123 对应的数据已经找不到了。下面我们给出，如何获取 <topic, parition=""> 的最小 offset，这样我们就可以进行对比了</topic,></p>
-<p><div class="code panel pdl conf-macro output-block" data-hasbody="true" data-macro-name="code"></div></p>
-<p><div class="codeContent panelContent pdl"></div></p>
-<p><div class="syntaxhighlighter sh-confluence nogutter scala"></div></p>
-<p><pre class="lang:scala decode:true ">val partitionOffset = zkClient.readData<a href="s&quot;${topicDirs.consumerOffsetDir}/${i}&quot;">String</a><br>val tp = TopicAndPartition(topic, i)</pre></p>
-<p>val requestMin = OffsetRequest(Map(tp -&gt; PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))<br>val consumerMin = new SimpleConsumer(“broker_host”, 9092, 10000, 10000, “getMinOffset”)  //注意这里的 broker_host，因为这里会导致查询不到，解决方法在下面<br>val curOffsets = consumerMin.getOffsetsBefore(requestMin).partitionErrorAndOffsets(tp).offsets<br>var nextOffset = partitionOffset.toLong<br>if (curOffsets.length &gt; 0 &amp; nextOffset &lt; curOffsets.head) {  // 通过比较从 kafka 上该 partition 的最小 offset 和 zk 上保存的 offset，进行选择<br>  nextOffset = curOffsets.head<br>}<br>fromOffsets += (tp -&gt; nextOffset) //设置正确的 offset，这里将 nextOffset 设置为 0（0 只是一个特殊值），可以观察到 offset 过期的现象<br>但是上面的代码有一定的问题，因为我们从 kafka 上获取 offset 的时候，需要寻找对应的 leader，从 leader 来获取 offset，而不是 broker，不然可能得到的 curOffsets 会是空的（表示获取不到）。下面的代码就是获取不同 partition 的 leader 相关代码</p>
-<p><pre class="lang:scala decode:true">val topic_name = “topic_name”     //topic_name 表示我们希望获取的 topic 名字<br>val topic2 = List(topic_name)<br>val req = new TopicMetadataRequest(topic2, 0)<br>val getLeaderConsumer = new SimpleConsumer(“broker_host”, 9092, 10000, 10000, “OffsetLookup”)  // 第一个参数是 kafka broker 的host，第二个是 port<br>val res = getLeaderConsumer.send(req)<br>val topicMetaOption = res.topicsMetadata.headOption<br>val partitions = topicMetaOption match {<br>  case Some(tm) =&gt;<br>    tm.partitionsMetadata.map(pm =&gt; (pm.partitionId, pm.leader.get.host)).toMap[Int, String]  // 将结果转化为 partition -&gt; leader 的映射关系<br>  case None =&gt;<br>    Map<a href="">Int, String</a><br>}</pre><br>上面的代码能够得到所有 partition 的 leader 地址，然后将 leader 地址替换掉上面第一份代码中的 broker_list 即可。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">val partitionOffset = zkClient.readData[String](s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;i&#125;&quot;)</div><div class="line">val tp = TopicAndPartition(topic, i)</div><div class="line"></div><div class="line">val requestMin = OffsetRequest(Map(tp -&gt; PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))</div><div class="line">val consumerMin = new SimpleConsumer(&quot;broker_host&quot;, 9092, 10000, 10000, &quot;getMinOffset&quot;)  //注意这里的 broker_host，因为这里会导致查询不到，解决方法在下面</div><div class="line">val curOffsets = consumerMin.getOffsetsBefore(requestMin).partitionErrorAndOffsets(tp).offsets</div><div class="line">var nextOffset = partitionOffset.toLong</div><div class="line">if (curOffsets.length &gt; 0 &amp;amp; nextOffset &lt; curOffsets.head) &#123;  // 通过比较从 kafka 上该 partition 的最小 offset 和 zk 上保存的 offset，进行选择</div><div class="line">  nextOffset = curOffsets.head</div><div class="line">&#125;</div><div class="line">fromOffsets += (tp -&gt; nextOffset) //设置正确的 offset，这里将 nextOffset 设置为 0（0 只是一个特殊值），可以观察到 offset 过期的现象&lt;/pre&gt;</div></pre></td></tr></table></figure>
+<p>但是上面的代码有一定的问题，因为我们从 kafka 上获取 offset 的时候，需要寻找对应的 leader，从 leader 来获取 offset，而不是 broker，不然可能得到的 curOffsets 会是空的（表示获取不到）。下面的代码就是获取不同 partition 的 leader 相关代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">val topic_name = &quot;topic_name&quot;     //topic_name 表示我们希望获取的 topic 名字</div><div class="line">val topic2 = List(topic_name)       </div><div class="line">val req = new TopicMetadataRequest(topic2, 0)</div><div class="line">val getLeaderConsumer = new SimpleConsumer(&quot;broker_host&quot;, 9092, 10000, 10000, &quot;OffsetLookup&quot;)  // 第一个参数是 kafka broker 的host，第二个是 port</div><div class="line">val res = getLeaderConsumer.send(req)</div><div class="line">val topicMetaOption = res.topicsMetadata.headOption</div><div class="line">val partitions = topicMetaOption match &#123;</div><div class="line">  case Some(tm) =&gt;</div><div class="line">    tm.partitionsMetadata.map(pm =&gt; (pm.partitionId, pm.leader.get.host)).toMap[Int, String]  // 将结果转化为 partition -&amp;gt; leader 的映射关系</div><div class="line">  case None =&gt;</div><div class="line">    Map[Int, String]()</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的代码能够得到所有 partition 的 leader 地址，然后将 leader 地址替换掉上面第一份代码中的 broker_list 即可。</p>
 <p>到此，在 spark streaming 中将 kafka 的 offset 保存到 zk，并重用的大部分情况都覆盖到了</p>
 <p><br><br><br>&nbsp;</p>
 
@@ -247,51 +154,8 @@
 		<p>在 Spark Streaming 中消费 Kafka 数据的时候，有两种方式分别是 1）基于 Receiver-based 的 createStream 方法和 2）Direct Approach (No Receivers) 方式的 createDirectStream 方法，详细的可以参考 <a href="http://spark.apache.org/docs/latest/streaming-kafka-integration.html" target="_blank" rel="external">Spark Streaming + Kafka Integration Guide</a>，但是第二种使用方式中  kafka 的 offset 是保存在 checkpoint 中的，如果程序重启的话，会丢失一部分数据，可以参考  <a href="http://aseigneurin.github.io/2016/05/07/spark-kafka-achieving-zero-data-loss.html" target="_blank" rel="external">Spark  Kafka - Achieving zero data-loss</a>。</p>
 <p>本文主要讲在使用第二种消费方式（Direct Approach）的情况下，如何将 kafka 中的 offset 保存到 zookeeper 中，以及如何从 zookeeper 中读取已存在的 offset。</p>
 <p>大致思想就是，在初始化 kafka stream 的时候，查看 zookeeper 中是否保存有 offset，有就从该 offset 进行读取，没有就从最新/旧进行读取。在消费 kafka 数据的同时，将每个 partition 的 offset 保存到 zookeeper 中进行备份，具体实现参考下面代码</p>
-<p><pre class="lang:scala decode:true  ">val topic : String = “topic_name”   //消费的 topic 名字<br>    val topics : Set[String] = Set(topic)                    //创建 stream 时使用的 topic 名字集合</pre></p>
-<pre><code>val topicDirs = new ZKGroupTopicDirs(&quot;test_spark_streaming_group&quot;, topic)  //创建一个 ZKGroupTopicDirs 对象，对保存
-val zkTopicPath = s&quot;${topicDirs.consumerOffsetDir}&quot;          获取 zookeeper 中的路径，这里会变成 /consumers/test_spark_streaming_group/offsets/topic_name
-
-val zkClient = new ZkClient(&quot;10.4.232.77:2181&quot;)          //zookeeper 的host 和 ip，创建一个 client
-val children = zkClient.countChildren(s&quot;${topicDirs.consumerOffsetDir}&quot;)     //查询该路径下是否字节点（默认有字节点为我们自己保存不同 partition 时生成的）
-
-var kafkaStream : InputDStream[(String, String)] = null   
-var fromOffsets: Map[TopicAndPartition, Long] = Map()   //如果 zookeeper 中有保存 offset，我们会利用这个 offset 作为 kafkaStream 的起始位置
-
-if (children &gt; 0) {   //如果保存过 offset，这里更好的做法，还应该和  kafka 上最小的 offset 做对比，不然会报 OutOfRange 的错误
-    for (i &lt;- 0 until children) {
-      val partitionOffset = zkClient.readData[String](s&quot;${topicDirs.consumerOffsetDir}/${i}&quot;)
-      val tp = TopicAndPartition(topic, i)
-      fromOffsets += (tp -&gt; partitionOffset.toLong)  //将不同 partition 对应的 offset 增加到 fromOffsets 中
-      logInfo(&quot;@@@@@@ topic[&quot; + topic + &quot;] partition[&quot; + i + &quot;] offset[&quot; + partitionOffset + &quot;] @@@@@@&quot;)
-    }
-
-    val messageHandler = (mmd : MessageAndMetadata[String, String]) =&gt; (mmd.topic, mmd.message())  //这个会将 kafka 的消息进行 transform，最终 kafak 的数据都会变成 (topic_name, message) 这样的 tuple
-    kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParam, fromOffsets, messageHandler)
-}
-else {
-    kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParam, topics) //如果未保存，根据 kafkaParam 的配置使用最新或者最旧的 offset
-}
-
-var offsetRanges = Array[OffsetRange]()
-kafkaStream.transform{ rdd =&gt;
-  offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges //得到该 rdd 对应 kafka 的消息的 offset
-  rdd
-}.map(msg =&gt; msg._2).foreachRDD { rdd =&amp;gt;     
-  for (o &lt;- offsetRanges) {
-    val zkPath = s&quot;${topicDirs.consumerOffsetDir}/${o.partition}&quot;
-    ZkUtils.updatePersistentPath(zkClient, zkPath, o.fromOffset.toString)  //将该 partition 的 offset 保存到 zookeeper
-    logInfo(s&quot;@@@@@@ topic  ${o.topic}  partition ${o.partition}  fromoffset ${o.fromOffset}  untiloffset ${o.untilOffset} #######&quot;)
-  }
-
-  rdd.foreachPartition(
-    message =&gt; {
-      while(message.hasNext) {
-        logInfo(s&quot;@^_^@   [&quot; + message.next() + &quot;] @^_^@&quot;)
-      }
-    }
-  )
-}&lt;/pre&gt;
-</code></pre><p>使用上面的代码，我们可以做到 Spark Streaming 程序从 Kafka 中读取数据是不丢失</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">val topic : String = &quot;topic_name&quot;   //消费的 topic 名字</div><div class="line">   val topics : Set[String] = Set(topic)                    //创建 stream 时使用的 topic 名字集合</div><div class="line"></div><div class="line">   val topicDirs = new ZKGroupTopicDirs(&quot;test_spark_streaming_group&quot;, topic)  //创建一个 ZKGroupTopicDirs 对象，对保存</div><div class="line">   val zkTopicPath = s&quot;$&#123;topicDirs.consumerOffsetDir&#125;&quot;          获取 zookeeper 中的路径，这里会变成 /consumers/test_spark_streaming_group/offsets/topic_name</div><div class="line"></div><div class="line">   val zkClient = new ZkClient(&quot;10.4.232.77:2181&quot;)          //zookeeper 的host 和 ip，创建一个 client</div><div class="line">   val children = zkClient.countChildren(s&quot;$&#123;topicDirs.consumerOffsetDir&#125;&quot;)     //查询该路径下是否字节点（默认有字节点为我们自己保存不同 partition 时生成的）</div><div class="line"></div><div class="line">   var kafkaStream : InputDStream[(String, String)] = null   </div><div class="line">   var fromOffsets: Map[TopicAndPartition, Long] = Map()   //如果 zookeeper 中有保存 offset，我们会利用这个 offset 作为 kafkaStream 的起始位置</div><div class="line"></div><div class="line">   if (children &gt; 0) &#123;   //如果保存过 offset，这里更好的做法，还应该和  kafka 上最小的 offset 做对比，不然会报 OutOfRange 的错误</div><div class="line">       for (i &lt;- 0 until children) &#123;</div><div class="line">         val partitionOffset = zkClient.readData[String](s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;i&#125;&quot;)</div><div class="line">         val tp = TopicAndPartition(topic, i)</div><div class="line">         fromOffsets += (tp -&gt; partitionOffset.toLong)  //将不同 partition 对应的 offset 增加到 fromOffsets 中</div><div class="line">         logInfo(&quot;@@@@@@ topic[&quot; + topic + &quot;] partition[&quot; + i + &quot;] offset[&quot; + partitionOffset + &quot;] @@@@@@&quot;)</div><div class="line">       &#125;</div><div class="line"></div><div class="line">       val messageHandler = (mmd : MessageAndMetadata[String, String]) =&gt; (mmd.topic, mmd.message())  //这个会将 kafka 的消息进行 transform，最终 kafak 的数据都会变成 (topic_name, message) 这样的 tuple</div><div class="line">       kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParam, fromOffsets, messageHandler)</div><div class="line">   &#125;</div><div class="line">   else &#123;</div><div class="line">       kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParam, topics) //如果未保存，根据 kafkaParam 的配置使用最新或者最旧的 offset</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   var offsetRanges = Array[OffsetRange]()</div><div class="line">   kafkaStream.transform&#123; rdd =&gt;</div><div class="line">     offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges //得到该 rdd 对应 kafka 的消息的 offset</div><div class="line">     rdd</div><div class="line">   &#125;.map(msg =&gt; msg._2).foreachRDD &#123; rdd =&amp;gt;     </div><div class="line">     for (o &lt;- offsetRanges) &#123;</div><div class="line">       val zkPath = s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;o.partition&#125;&quot;</div><div class="line">       ZkUtils.updatePersistentPath(zkClient, zkPath, o.fromOffset.toString)  //将该 partition 的 offset 保存到 zookeeper</div><div class="line">       logInfo(s&quot;@@@@@@ topic  $&#123;o.topic&#125;  partition $&#123;o.partition&#125;  fromoffset $&#123;o.fromOffset&#125;  untiloffset $&#123;o.untilOffset&#125; #######&quot;)</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     rdd.foreachPartition(</div><div class="line">       message =&gt; &#123;</div><div class="line">         while(message.hasNext) &#123;</div><div class="line">           logInfo(s&quot;@^_^@   [&quot; + message.next() + &quot;] @^_^@&quot;)</div><div class="line">         &#125;</div><div class="line">       &#125;</div><div class="line">     )</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>使用上面的代码，我们可以做到 Spark Streaming 程序从 Kafka 中读取数据是不丢失</p>
 <p>欢迎阅读<a href="http://www.klion26.com/spark-streaming-saving-offset-in-zookeeper-2.html" target="_blank" rel="external">第二篇文章</a>，解决 offset out of range 的问题</p>
 
 	
@@ -633,26 +497,18 @@ kafkaStream.transform{ rdd =&gt;
 <li>View 的 primary 只能是当前 View 的 primary 或者前一个 View 的 backup（在 ViewService 初始化的时候，primary 是第一个连接进来的 Server）</li>
 <li>View 的 backup 可以是除 primary 之外的任何 Server，可为空<br>Part A 的要求实现如下三个函数：<br><pre class="lang:go decode:true ">func (vs <em>ViewServer) Ping(args </em>PingArgs, reply <em>PingReply) error {}<br>func (vs </em>ViewServer) Get(args <em>GetArgs, reply </em>GetReply) error {}<br>func (vs *ViewServer) tick() {}</pre><br>其中 Ping 接受 Server 发送过来的信息，并更新 View 的相应情况，Get 获取当前的 View，tick 则是一个回调函数，在固定时间内调用一次，检查 primary 和 backup 是否已经宕机，这里我实现的 Get 很简单，直接返回当前 View（在 ViewServer 里面定义一个字段 curView 用来表示当前 View），其他两个才是重点</li>
 </ol>
-<p>先把我定义的 ViewServer 贴一下（这个应该不算贴代码吧），下面能够更好的进行描述</p>
-<p><pre class="lang:go decode:true">type ViewServer struct {<br>    mu       sync.Mutex<br>    l        net.Listener<br>    dead     int32 // for testing<br>    rpccount int32 // for testing<br>    me       string</pre></p>
-<pre><code>// Your declarations here.
-lastPing map[string]time.Time  //记录 server 上次请求的时间，用来判断是否宕机
-curView  View                  //当前 View
-hasView bool                   //当前是否有 View 存在
-hasAcked bool                  //Primary 是否已经 ack 了当前 View
-secondBackup string            //将要被提升为 backup 的server
-</code></pre><p>}<br><br>先说 tick，在 tick 中，首先我们需要知道 primary 是否已经 ack 了当前 View，如果没有 ack，那么就直接返回即可，<span style="color: #0000ff;">如果 ack 过了当前 View</span>，那么就继续进行下面的操作（<span style="color: #0000ff;">下面的操作必须在 primary ack 过了当前 View 之后才能进行</span>）</p>
+<p>先把我定义的 ViewServer 贴一下（这个应该不算贴代码吧），下面能够更好的进行描述<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">type ViewServer struct &#123;</div><div class="line">	mu       sync.Mutex</div><div class="line">	l        net.Listener</div><div class="line">	dead     int32 // for testing</div><div class="line">	rpccount int32 // for testing</div><div class="line">	me       string</div><div class="line"></div><div class="line">	// Your declarations here.</div><div class="line">	lastPing map[string]time.Time  //记录 server 上次请求的时间，用来判断是否宕机</div><div class="line">	curView  View                  //当前 View</div><div class="line">	hasView bool                   //当前是否有 View 存在</div><div class="line">	hasAcked bool                  //Primary 是否已经 ack 了当前 View</div><div class="line">	secondBackup string            //将要被提升为 backup 的server</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>先说 tick，在 tick 中，首先我们需要知道 primary 是否已经 ack 了当前 View，如果没有 ack，那么就直接返回即可，<span style="color: #0000ff;">如果 ack 过了当前 View</span>，那么就继续进行下面的操作（<span style="color: #0000ff;">下面的操作必须在 primary ack 过了当前 View 之后才能进行</span>）</p>
 <ol>
 <li><p>判断 Primary 是否超时</p>
 <ol>
 <li><p>如果超时，则判断当前 View 是否存在 backup</p>
-<pre><code>1.  存在 backup，则将 backup 提升为 primary，然后将 primary 从 lastPing 中删除，并且将 hasAcked 置为 false
-</code></pre><ol>
-<li><p>不存在，将 hasView 置为 false</p>
+<ol>
+<li>存在 backup，则将 backup 提升为 primary，然后将 primary 从 lastPing 中删除，并且将 hasAcked 置为 false</li>
+<li>不存在，将 hasView 置为 false</li>
+</ol>
 </li>
 <li><p>不超时，不做操作</p>
-</li>
-</ol>
 </li>
 </ol>
 </li>
@@ -666,31 +522,43 @@ secondBackup string            //将要被提升为 backup 的server
 <ol>
 <li>没有，就将当前发送 Ping 的 Server 当成 Primary，然后返回</li>
 <li><p>有当前 View</p>
-<pre><code>1.  发送 Ping 的 Server 是 什么角色?
-
-        1.  是 primary，考虑 primary 是否重启
-
-                1.  重启（通过 ping 命令 请求参数是否为 0 判断），则判断当前 View 是否有 backup
-
-                        1.  有，将 backup 提升为 primary，然后将 primary 设置成 secondBackup（会在下次请求的时候加入到 View 中），&lt;span style=&quot;color: #0000ff;&quot;&gt;这样的实现，是否合理，是否需要直接将 primary 设置为 backup?&lt;/span&gt;
-        2.  没有，则将当前 View 的 Viewnum 加 1 即可
-
-                    2.  不是重启，则 ack 当前 View（&lt;span style=&quot;color: #0000ff;&quot;&gt;请求参数可能是 当前 View 的 Viewnum 和 0 之外的第三个值吗&lt;/span&gt;？）
-
-            2.  backup，考虑是否重启
-
-                1.  重启，将 backup 的角色切换到 secondBackup
-    2.  不是重启，则不做操作
-
-            3.  闲置的 Server，考虑当前 View 是否有 backup
-
-                1.  有，不做操作（&lt;span style=&quot;color: #0000ff;&quot;&gt;这里是否需要将当前 Server 加入到 secondBackup？&lt;/span&gt;）
-    2.  没有，则将当前 Server 加入到 secondBackup，等待下一次 primary 发送 ping 的时候，提升为 backup
-</code></pre><p><span style="color: #0000ff;"><del>当然，Ping 和 tick 函数 需要考虑加锁的问题，如果只为了通过测试，可以不加锁，测试都是串行的请求（有 goroutine）,如果不加锁，可能会遇到很诡异的问题</del></span></p>
+<ol>
+<li><p>发送 Ping 的 Server 是 什么角色?</p>
+<ol>
+<li><p>是 primary，考虑 primary 是否重启</p>
+<ol>
+<li><p>重启（通过 ping 命令 请求参数是否为 0 判断），则判断当前 View 是否有 backup</p>
+<ol>
+<li>有，将 backup 提升为 primary，然后将 primary 设置成 secondBackup（会在下次请求的时候加入到 View 中），<span style="color: #0000ff;">这样的实现，是否合理，是否需要直接将 primary 设置为 backup?</span></li>
+<li>没有，则将当前 View 的 Viewnum 加 1 即可</li>
+</ol>
+</li>
+<li><p>不是重启，则 ack 当前 View（<span style="color: #0000ff;">请求参数可能是 当前 View 的 Viewnum 和 0 之外的第三个值吗</span>？）</p>
+<ol>
+<li><p>backup，考虑是否重启</p>
+<ol>
+<li>重启，将 backup 的角色切换到 secondBackup</li>
+<li>不是重启，则不做操作</li>
+</ol>
+</li>
+<li><p>闲置的 Server，考虑当前 View 是否有 backup</p>
+<ol>
+<li>有，不做操作（<span style="color: #0000ff;">这里是否需要将当前 Server 加入到 secondBackup？</span>）</li>
+<li>没有，则将当前 Server 加入到 secondBackup，等待下一次 primary 发送 ping 的时候，提升为 backup</li>
+</ol>
+</li>
+</ol>
 </li>
 </ol>
 </li>
 </ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<p><span style="color: #0000ff;"><del>当然，Ping 和 tick 函数 需要考虑加锁的问题，如果只为了通过测试，可以不加锁，测试都是串行的请求（有 goroutine）,如果不加锁，可能会遇到很诡异的问题</del></span></p>
 <p>思路整理之后发现也不是太难，不过过程中还是有不少细节需要注意，如果可以，最好是自己进行思考，然后不断的调试，通过打印日志，思考是否符合自己的理解，然后进行代码的调整</p>
 <p>&nbsp;</p>
 
@@ -899,18 +767,8 @@ secondBackup string            //将要被提升为 backup 的server
 <p><span style="color: #ff0000;">|</span> 小于 pivot 的所有元素  <span style="color: #ff0000;">|</span>  等于 pivot 的所有元素  <span style="color: #ff0000;">|</span>  大于 pivot 的所有元素 <span style="color: #ff0000;">|</span></p>
 <p>这里就需要用到上面的 vecswap，就是两段数之间的交换。将所有等于 pivot 的元素放到中间，所有小于 pivot 的元素放到左边，所有大于 pivot 的元素放到右边</p>
 <p>2. 利用冒泡和插入排序。</p>
-<p>在本方法中，对于少于7个元素的都利用冒泡排序解决（7 是一个 Magical number），然后对于接近已排好序的数组，利用插入排序，我们知道快速排序对于已排好序的数组进行排序复杂度是很高的，因此在内部采用了插入排序解决这一问题</p>
-<p><pre class="lang:c decode:true ">if (swap_cnt == 0) {  /<em> Switch to insertion sort </em>/<br>        /** {a[0]}  {a[1]…a[k]}  {a[k+1]…a[n-1]}</pre></p>
-<pre><code>     * a[i] &lt; a[0]  for 1&amp;lt;= i &amp;lt; k+1
-     * a[i] &gt; a[0]  for k+1 &lt;= i &amp;lt; n
-     **/
-    for (pm = (char *) a + es; pm &lt; (char *) a + n * es; pm += es)
-        for (pl = pm; pl &gt; (char *) a &amp;amp; cmp(pl - es, pl) &amp;gt; 0; 
-             pl -= es)
-            swap(pl, pl - es);
-    return;
-}&lt;/pre&gt;
-</code></pre><p>这段代码中的 swap_cnt 是记录了在第一次排序过程中是否进行过交换，等于零表示没有进行过交换。</p>
+<p>在本方法中，对于少于7个元素的都利用冒泡排序解决（7 是一个 Magical number），然后对于接近已排好序的数组，利用插入排序，我们知道快速排序对于已排好序的数组进行排序复杂度是很高的，因此在内部采用了插入排序解决这一问题<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">if (swap_cnt == 0) &#123;  /* Switch to insertion sort */</div><div class="line">        /** &#123;a[0]&#125;  &#123;a[1]...a[k]&#125;  &#123;a[k+1]...a[n-1]&#125;</div><div class="line">         * a[i] &lt; a[0]  for 1&amp;lt;= i &amp;lt; k+1</div><div class="line">         * a[i] &gt; a[0]  for k+1 &lt;= i &amp;lt; n</div><div class="line">         **/</div><div class="line">		for (pm = (char *) a + es; pm &lt; (char *) a + n * es; pm += es)</div><div class="line">			for (pl = pm; pl &gt; (char *) a &amp;amp; cmp(pl - es, pl) &amp;gt; 0; </div><div class="line">			     pl -= es)</div><div class="line">				swap(pl, pl - es);</div><div class="line">		return;</div><div class="line">	&#125;</div></pre></td></tr></table></figure></p>
+<p>这段代码中的 swap_cnt 是记录了在第一次排序过程中是否进行过交换，等于零表示没有进行过交换。</p>
 <p>3. 找一个更合适的 pivot 这一点，本方法利用下面的方法来进行 pivot 的寻找，其中 pm 指向最终我们设定的 pivot</p>
 <p><pre class="lang:c decode:true">    pm = (char <em>) a + (n / 2) </em> es; /<strong> 首先用数组中间的那个元素做 pivot </strong>/<br>    if (n &gt; 7) { /<strong> 如果元素个数大于 7 </strong>/<br>        pl = (char <em>) a;/</em> 首元素 <em>/<br>        pn = (char </em>) a + (n - 1) <em> es; /</em> 末尾元素 <em>/<br>        if (n &gt; 40) { /<strong> 如果大于40个元素（40 也是一个 Magical Number） </strong>/<br>            d = (n / 8) </em> es; /<strong> 利用下面的 9 个数来近似整个数组的中位数 </strong>/<br>            pl = med3(pl, pl + d, pl + 2 <em> d, cmp); /</em> pl 这三个数里面的一个中位数 <em>/<br>            pm = med3(pm - d, pm, pm + d, cmp); /</em> pm 是这三个数的中位数 <em>/<br>            pn = med3(pn - 2 </em> d, pn - d, pn, cmp); /<em> pn 是这三个数的中位数 </em>/<br>        }<br>        pm = med3(pl, pm, pn, cmp); /<em> pm 是 pl pm pn 的中位数，近似整个数组的中位数 </em>/<br>    }</pre><br>这样找到的 pivot 不会偏向很严重，从而在快排的时候，不会导致某一边（大于 pivot 和小于 pivot 两边）的数据量比较大。</p>
 <p>另外在对数组的右半部分进行排序的时候，利用了 goto，而不是递归，这样可以节省栈空间。</p>
@@ -966,6 +824,49 @@ secondBackup string            //将要被提升为 backup 的server
 <li>None 从第<span style="color: #0000ff;">一百</span>个统计数据出现 2，后面会穿插着出现 1，次数随机出现，与 Shuffle grouping 方式一样<br>其中 Shuffle 和 None 都是随机模式，会随机的发送给下一个 Bolt 的任何一个 task。Field 方式会把相同字段的分到同一个 task 上（<span style="color: #ff0000;">不同字段的也可以在相同 task 上</span>），Global 方式效果和 Field 一样，根据官方文档，每次都发送给 id 小的 task，All 会发送给 Bolt 上的所有 task（所有上述例子的循环长度为二百），这种方式会浪费比较多的资源。</li>
 </ul>
 <p>另外根据文档说明，<strong>Partial Key grouping 是在 Field 的基础上进行了压力均衡；Direct 方式需要使用 emitDirect 发送数据。</strong></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-07-16 </div>
+			<div class="article-title"><a href="/2015/07/16/a-brief-view-of-storm/" >Storm 初探</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><span style="color: #ff0000;">打算把自己学习实时计算的相关东西写出来，形成一个从零开始学实时计算的系列，由于我也是刚开始接触，系列文中的描述或概念有不当的地方，还请不吝指教。在此谢过。</span></p>
+<p><a href="http://storm.apache.org/" target="_blank" rel="external">Storm</a> 是一个分布式实时计算框架，由 Twitter 开放并开源。用来处理无边界的流数据，进行实时处理。与 Hadoop 做批处理相对应。因为底层使用 Thrift 来定义和提交 Topology（Storm 中的一种结构），Storm 可以使用任何语言来进行编程。可以用来做实时计算，在线机器学习等等一系列事情。每秒可以每个节点可以处理百万级别的 Tuple（Storm 中的一种结构）。伸缩性好，容错好，并且保证所有数据都会被处理。</p>
+<p>首先介绍 Storm 中几个结构的定义，分别是 Tuples, Stream, Spout, Bolt, Topology, Task.</p>
+<ul>
+<li>其中 Tuple 是最基本的结构，是传输数据过程中的最小单元，可以当作为一个包装好的结构体</li>
+<li>Stream： 是无边界的 Tuple 组成的数据流，可以理解为 Tuple 的流动</li>
+<li>Spout： 是程序的数据来源，由用户指定，指定之后，所有的数据都从 spout 发出</li>
+<li>Bolt： 数据中转和处理的节点，负责经过数据的中转以及处理</li>
+<li>Topology： 是包括 spout，stream，bolt 的一个完整流程，表示数据从开始到结束的整个过程，每一个 Topology 定义了数据的来源，中间需要怎么转换，以及最后输出到哪</li>
+<li>Task： Spout 或者 Bolt 中实际处理数据的单元，每一个 Spout 或 Bolt 可以包含多个 Task<br>下面的图形象的表示了大部分结构，其中水龙头表示 Spout，写有 Tuple 字样的表示 Tuple，闪电状的结构是 Bolt，多个 Tuple 形成了 Stream，整张图可以看作是一个 Topology。这里没有细分出 Task 结构。</li>
+</ul>
+<p><img src="http://storm.apache.org/images/topology.png" alt="storm 基本结构图](http://storm.apache.org/images/topology.png)"> </p>
+<p>由于 Storm 是分布式的实时处理框架，所有需要一个分配任务的节点，在 Storm 中，这个任务由 Nimbus 担任，所有的 Topology 都是提交 Nimbus 中，由 Nimbus 进行任务分配，Nimbus 会在所有的 Supervisor 中查找最合适的（最空闲），然后把任务分发给它，但是 Nimbus 和 Supervisor 不是直接通信，而是由 <a href="http://zookeeper.apache.org/" target="_blank" rel="external">Zookeeper</a> 进行中间传话（Supervisor 可以理解为实际的机器，然后 Bolt 会在每一个 Supervisor 上跑，每一个 Supervisor 上有多个 Bolt存在），为什么不让 Nimbus 和 Supervisor 直接通信呢，因为这样可以减少 Nimbus 的负担，Nimbus 只需要把任务分配写到 Zookeeper 就行了，然后 Supervisor 去 Zookeeper 读，每一个 Supervisor 的状态（空闲等情况）也会写到 Zookeeper 上，由 Nimbus 去读。如果是直接通信的话，那么需要 Nimbus 和 Supervisor 同时有空才可以，这样是不太现实的。（比如 A 需要把黄金交给 B，只能直接给的话，必须 A 和 B 同时有空才行，但是总共由四种情况存在：1. A 有空，B 没空；2 A 有空，B有空；3 A没空，B没空；4A没空，B有空。那么只有情况2才可以进行交易，就可能导致 A 一直跑过去找 B，或者B 一直去找 A 的情况，会大大浪费时间）</p>
+<p>由于每个 Bolt 有多个 Task 存在，那么对于 Tuple 传给哪一个对应的 Task 处理，就需要进行控制了，这里就有 Grouping 的概念了，Grouping 表示在 Topology 中从上一个节点（Spout/Bolt）到下一个节点（Bolt）时怎么进行 Tuple 的传输（传给哪个 Task）Storm 中包含了 7 中 Grouping 的方式｛<span class="s1">Shuffle grouping；Fields grouping；Partial Key grouping；All grouping；Global grouping；None grouping；Direct grouping｝（</span>对于 Fields 方式，只需要相同字段的分到一组就行了，并不需要不同字段的分到不同组）</p>
+<p>基本概念差不多就这些了，我也是刚开始接触，本文内容结合下面几个链接以及自己理解进行书写，如果有错误的地方，还请不吝指教。</p>
+<p>References：</p>
+<p>1. Apache Storm：<a href="http://storm.apache.org/" target="_blank" rel="external">http://storm.apache.org/</a></p>
+<p>2. Storm Concepts：<a href="https://storm.apache.org/documentation/Concepts.html" target="_blank" rel="external">https://storm.apache.org/documentation/Concepts.html</a></p>
+<ol>
+<li><a href="http://xumingming.sinaapp.com/category/storm/" target="_blank" rel="external">http://xumingming.sinaapp.com/category/storm/</a></li>
+</ol>
 
 	
 	</div>
@@ -1047,9 +948,9 @@ secondBackup string            //将要被提升为 backup 的server
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -1059,35 +960,31 @@ secondBackup string            //将要被提升为 backup 的server
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
-		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
-		
-			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
 		
 		</ul>
 	</div>
@@ -1098,45 +995,45 @@ secondBackup string            //将要被提升为 backup 的server
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
+			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
 		
-			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
+			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
 		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
-		
-			<li><a href="/tags/code-interview/">code interview<span>1</span></a></li>
+			<li><a href="/tags/partition/">partition<span>1</span></a></li>
 		
 			<li><a href="/tags/spark/">spark<span>3</span></a></li>
 		
-			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
+			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
 		
-			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
+			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
 		
-			<li><a href="/tags/program/">program<span>1</span></a></li>
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
 		
-			<li><a href="/tags/how/">how<span>1</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
-			<li><a href="/tags/zookeeper/">zookeeper<span>2</span></a></li>
+			<li><a href="/tags/append/">append<span>2</span></a></li>
 		
-			<li><a href="/tags/方法/">方法<span>1</span></a></li>
+			<li><a href="/tags/prim/">prim<span>1</span></a></li>
 		
-			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
+			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
 		
-			<li><a href="/tags/problem-solve/">problem_solve<span>1</span></a></li>
+			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
 		
-			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
+			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
 		
-			<li><a href="/tags/数论/">数论<span>5</span></a></li>
+			<li><a href="/tags/topic/">topic<span>1</span></a></li>
 		
-			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
+			<li><a href="/tags/exercise/">exercise<span>8</span></a></li>
 		
-			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
+			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
 		
-			<li><a href="/tags/scc/">scc<span>1</span></a></li>
+			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
 		
-			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
+			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
 		
-			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
+			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
+		
+			<li><a href="/tags/tree/">tree<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>260</span></a></li>
@@ -1152,10 +1049,6 @@ secondBackup string            //将要被提升为 backup 的server
   <ul class="entry list-unstyled">
     
       <li>
-        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
-      </li>
-    
-      <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
       </li>
     
@@ -1169,6 +1062,10 @@ secondBackup string            //将要被提升为 backup 的server
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>

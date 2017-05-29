@@ -111,34 +111,6 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
-			<div class="date"> 2014-01-04 </div>
-			<div class="article-title"><a href="/2014/01/04/reverse-linked-list/" >有关链表逆序</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>给你一个链表，然后需要把链表给逆序输出，而且不能用交换链表的值或者新建一个链表的方式。</p>
-<p>1. 把一个链表从头到尾全部逆序，这个应该算这一些列问题里面最基本的东西了。大致思路就是每次把一个链表的当前node和next node给反过来，然后你需要记录下一个处理的节点是哪个，也就是处理完当前节点，需要往后移动一个。直接上代码：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;">p<span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">root</span><span style="color: #da70d6;">//root是链表的头节点</span><br><span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">root</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span>;<span style="color: #da70d6;">//这里我们假定链表是非空的</span><br><span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #b0c4de; font-weight: bold;">NULL</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">q</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">t</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span>;<span style="color: #da70d6;">//记录下q的next，移动到下一个处理的地方要用到</span><br><span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span> <span style="color: #f5deb3;">=</span> p;<span style="color: #da70d6;">//链表逆序</span><br>p <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">q</span><span style="color: #da70d6;">//移动到下一个节点</span><br><span style="color: #f5deb3;">q</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">t</span><span style="color: #da70d6;">//用上面记录下来的q-&gt;;next更新q，因为q-&gt;next会变成p。</span><br><span style="color: #f5deb3;">}</span></div><br>上面的代码就是把链表逆序的核心代码了，当然最后你还需要处理链表的头节点什么的。首先我们用p和q两个指针指向当前节点，和原链表中的下一个节点，如果下一个节点为NULL的话，我们就直接退出循环了，因为这里不需要逆序了。对于p和q，我们首先记录下q的下一个节点t，因为待会我们会把q的next指针更新为p也就是逆序，如果不记录下q的下一个节点，那么这个节点我们就再也访问不到了。然后将q的next指针指向p（对链表进行逆序），然后将p更新为q，q更新为t，也就是说处理原链表中p的下一个节点。这个处理完了之后，链表基本已经逆序了，为什么说基本呢？可以看一个例子：1-&gt;2-&gt;3-&gt;4，用上述算法处理完成之后将变成1-&gt;2, 2-&gt;1, 3-&gt;2, 4-&gt;3，也就是说1和3都指向2，而没有指针指向4，但是4现在是表头。所以这里我们需要对原链表的表头和表尾进行处理。</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">root</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span> <span style="color: #f5deb3;">=</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span>;<br><span style="color: #f5deb3;">root</span> <span style="color: #f5deb3;">=</span> p;</div><br>这里root是原链表的表头，也就是新链表的表尾，所以它的next就是NULL，同时更新表头节点，经过while循环之后，p指向的是原链表的最后一个节点，当然就是新链表的头节点了。到此，链表逆序也就完成了。不过这只是基本的链表逆序而已，下面有两个变种。</p>
-<p>2. 给定一个链表，然后给定两个数m和n，1&lt;=m&lt;=n&lt;=length，length是链表的长度。你需要把链表中从第m个到第n个元素给逆序。这里大致思路还是和上面的差不多，不过处理的是链表的一部分，而不是全部，这个会比上面稍微的麻烦一点。上面我们在while循环之后加了两句话用来更新头节点和尾节点，那么同样我们这里需要更新类似的“头节点”和“尾节点”，比如1-&gt;2-&gt;3-&gt;4-&gt;5，m=2，n=4，的话，我们要在逆序之后，使得1指向4，而2指向5，这就是我们这里的“头节点”和“尾节点”，对于2指向5这个问题还是比较好处理的，因为我们能够找到2和5，这样的话直接加上一句就行了，然后把1指向4的话，我们需要保存节点2的<span style="color: #ff0000;">前一个</span>节点，这里我们需要保存每个节点的前一个节点，这样的话，我们才能够使得最后让1（2的前一个节点）指向4.不过这里有一个小小的trick，也就是说如果当前节点没有前一个节点（m=1），那么我们需要特殊处理一下，同样我们需要更新链表的头节点。具体的代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Reverse-Linked-List-II.cpp" target="_blank" rel="external">参照这里</a>。</p>
-<p>3. 如果给定一个链表，然后给定一个数n，让你把链表分成n个节点一段，每一段里面进行逆序，如果最后没有n个节点的话，那么就保持原样，比如1-&gt;2-&gt;3-&gt;4-&gt;5，然后n=2，处理完之后应该是2-&gt;1-&gt;4-&gt;3-&gt;5.这个问题，比上面两个要更复杂，首先你不能顺序依次处理过去，因为如果依次处理过去的话，段之间的链接就不对了，可以用笔画一下，依次处理过去的时候，2的下一个节点是不好指向4的，因为3-&gt;4这一段还没有逆序，但是最后我们需要的是2指向4，而不是3.这里就需要我们从后往前处理了，也就是说我们必须把当前段后面的所有段都已经处理完成了，然后再处理当前段，比如我们处理3-&gt;4的时候，5必须处理好（单个节点不需要好处理），然后处理1-&gt;2的时候，3-&gt;4-&gt;5必须处理好了，也就是变成了4-&gt;3-&gt;5.这样就满足递归的性质了，我们可以把这个问题用递归的方法写出来，先找到一段，然后处理这一段的后面所有段，然后再处理当前段，这样的话，我们就保证了处理当前段的时候，后面的已经是处理好了。具体代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Reverse-Nodes-in-K-Group.cpp" target="_blank" rel="external">参考这里</a>。</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
 			<div class="date"> 2013-12-25 </div>
 			<div class="article-title"><a href="/2013/12/25/string-to-integer-atoi/" >String to Integer (atoi) </a></div>						
 		</h3>
@@ -585,6 +557,69 @@
 
            
 		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-06-21 </div>
+			<div class="article-title"><a href="/2013/06/21/linux-command-shell-scripts-3/" >Linux命令行和shell脚本编程笔记3</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>接<a href="http://www.klion26.com/linux-command-shell-script-2.html" target="_blank" rel="external">上篇</a>，接下来是讲处理用户输入，显示数据和脚本控制，创建函数以及在脚本中添加颜色，至于后面的sed，正则表达式和awk有时间的话会单独写出来。另外，这本书还是挺不错的，讲的东西不是太简单，也不是太难，同时还有不少的例子可以给你消化。</p>
+<p>处理用户输入</p>
+<p>在shell脚本中，用$0表示程序名称，然后后面可以用$n表示第n个参数，如果n大于9的话需要用大括号把n括起来，比如${10}.不过$0中保存的是程序的完整路径，而不仅仅是程序的名称。如果只想要程序的名称的话，可以用basename命令，比如</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #d8bfd8;">name</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;"><code>&lt;/span&gt;basename &lt;span style=&quot;color: #d8bfd8;&quot;&gt;$0&lt;/span&gt;&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span></div><br>那么name中存的就是程序名称了，而不是完整的路径。</p>
+<p>如果需要在脚本中使用参数的话，最好是先在使用之前对参数的个数进行检查，然后进行提示。</p>
+<p>在shell中如果想使用最后一个参数的话，有两种方法，分别是</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #d8bfd8;">params</span><span style="color: #f5deb3;">=</span><span style="color: #d8bfd8;">$#</span><br><span style="color: #b0c4de; font-weight: bold;">echo </span>The last parameter is <span style="color: #d8bfd8;">$params</span><br><span style="color: #b0c4de; font-weight: bold;">echo </span>The last parameter is <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #f5deb3;">!#</span><span style="color: #b0c4de; font-weight: bold;">}</span></div><br>其中第二种不用能${$#}，这样的话，会产生一个随机数。不过如果没有参数的话，上面两种还是不一样的，第一句会输出0，第二个会输出文件名。</p>
+<p>接下来是$<em>和$@表示所有的参数，但是$</em>把所有的参数看成一个参数，$@把所有参数看成同一个字符串中的多个单词处理。允许对其中的值进行迭代。</p>
+<p>还有就是shift移位操作，shift会把参数往左移一位，会用后面的覆盖前面的参数，而且不可恢复。</p>
+<p>接下来讲的是getopt和getopts的应用，这是两个用来方便处理参数的命令。命令格式如下:</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">getopt options optstring parameters<br><span style="color: #b0c4de; font-weight: bold;">getopts </span>optstring variable</div><br>然后是读入命令read</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">read</span> -t 5 -s -p <span style="color: #7fffd4;">“Please enter your name:”</span> name</div><br>上面的命令表示5s有效(-t 5), 不回显，就像Linux的登录密码一样(-s),其实这里是把前景颜色和背景颜色设成了一样，提示字符串(-p “…”)。另外还有就是-n后面接数字num，表示读入num个字符之后自动结束，这个可以用在读入yes/no的地方，比如</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">read</span> -n1 -p <span style="color: #7fffd4;">“Do you want to continue [Y/N]?”</span> answer</div><br>则会在你输入了一个字符之后自动执行接下来的语句，不用你输入回车表示输入结束。</p>
+<p>可以用cat filename | while read line来进行读取文件</p>
+<p>接下来是显示数据的一章，包括各种文件重定向等。</p>
+<p>首先我们Linux系统讲每个对象当成文件处理，使用文件描述符来标识文件对象，每个进程最多有9个打开文件的描述符，bash shell为特殊需要保留前3个文件描述服(0,1,2)，0表示标准读入，1表示标准输出，2表示标准错误输出[一般也是输出在终端，和1输出的位置一起]。我们可以用重定向符号来把这些文件描述符进行重定向，比如下面的几句</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">cat &lt; file                  表示把标准读入重定向到file文件，即从file中读入<br>ls -l &gt; test2               把标准输出重定向到test2，即输出到test2文件中<br>ls -l fjj fjkd 2&gt; error     把错误信息写到error文件中</div><br>如果用<span style="color: #ff0000;">&gt;&gt;</span>则表示附加，即在原有的文件末尾追加，否则会覆盖现有文件</p>
+<p>关于临时重定向和永久重定向。下面是例子</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“This is an error”</span> &gt;2  <span style="color: #da70d6;">#这事临时重定向</span><br><span style="color: #b0c4de; font-weight: bold;">exec </span>1&gt;textout        <span style="color: #da70d6;">#这事永久重定向，表示把输出重定向到文件textout中</span></div><br>在脚本中重定向还可以通过自己创建文件描述符来完成。自己创建的文件描述符还可以用来保存0，1，2这些系统文件描述符。如下面的例子</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">#!/bin/bash</span><br><span style="color: #b0c4de; font-weight: bold;">exec </span>3&gt;1        <span style="color: #da70d6;">#文件描述符3重定向到标准输出</span><br><span style="color: #b0c4de; font-weight: bold;">exec </span>1&gt;test14out  <span style="color: #da70d6;">#标准输出重定向到test14out文件</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“This should store in the output file”</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“along with this line.”</span><br><span style="color: #b0c4de; font-weight: bold;">exec </span>1&gt;3       <span style="color: #da70d6;">#文件描述符1重定向回标准输出</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“Now things should be back to normal”</span></div><br>可以用”exec 3&lt;&gt; testfile”打开一个读写文件描述符  “exec 3&gt;-“来关闭文件描述符3。可以用mktemp命令来创建临时文件和临时目录，”mktemp testing.XXXXXX”会创建一个临时文件，后面的X会被随机数所替代，当然可以加上-d选项来创建临时目录。</p>
+<p>命令tee会把数据发给两个地方，一个是STDOUT，一个是后面接的文件名。比如”who | tee testfile”会把who的执行结果显示在STDOUT中和文件testfile中。</p>
+<p>可以在脚本中捕获和移除信号，如下代码所示</p>
+<div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">
+
+<p><span style="color: #da70d6;">#!/bin/bash</span></p>
+<p><span style="color: #b0c4de; font-weight: bold;">trap</span> <span style="color: #7fffd4;">“echo byebye”</span> EXIT   <span style="color: #da70d6;">#捕获EXIT信号 如果捕获到了就执行echo byebye</span></p>
+<p><span style="color: #d8bfd8;">count</span><span style="color: #f5deb3;">=</span>1<br><span style="color: #b0c4de; font-weight: bold;">while</span> <span style="color: #f5deb3;">[</span> <span style="color: #d8bfd8;">$count</span> -le 5 <span style="color: #f5deb3;">]</span><br><span style="color: #b0c4de; font-weight: bold;">do</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“Loop #$count”</span><br>sleep 3<br><span style="color: #d8bfd8;">count</span><span style="color: #f5deb3;">=</span><span style="color: #d8bfd8;">$[</span> <span style="color: #d8bfd8;">$count</span> + 1 <span style="color: #f5deb3;">]</span><br><span style="color: #b0c4de; font-weight: bold;">done</span></p>
+<p><span style="color: #b0c4de; font-weight: bold;">trap</span> - EXIT        <span style="color: #da70d6;">#移除EXIT信号的捕获</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“I just removed the trap”</span></p>
+<p></p></div><br>另外书上还大致讲了jobs,nice,at,batch,cron命令的使用，这里就不对这些命令单独说了，<p></p>
+<p>接下来是创建函数。创建函数的格式如下</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">function </span>name <span style="color: #f5deb3;">{</span><br>commands<br><span style="color: #f5deb3;">}</span><br>或者<br>name() <span style="color: #f5deb3;">{</span><br>commands<br><span style="color: #f5deb3;">}</span></div><br>在函数中如果想返回一个数值的话，可以用return命令，不过返回的会被截取到[0,255]之间，而且要完成后尽快提取返回值。</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">#!/bin/bash</span><br><span style="color: #b0c4de; font-weight: bold;">function </span>db1 <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">read</span> -p <span style="color: #7fffd4;">“Enter a value: “</span> value<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“doubling the value”</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #d8bfd8;">$[</span> <span style="color: #d8bfd8;">$value</span> * 2 <span style="color: #f5deb3;">]</span><br><span style="color: #f5deb3;">}</span>db1<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The new value is $?”</span></div></p>
+<p><span style="color: #da70d6;">##下面是另外一种返回值的方式</span><br><span style="color: #b0c4de; font-weight: bold;">function </span>db1 <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">read</span> -p <span style="color: #7fffd4;">“Enter a value: “</span>value<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #d8bfd8;">$[</span> <span style="color: #d8bfd8;">$value</span> * 2 <span style="color: #f5deb3;">]</span>            <span style="color: #da70d6;">#注意这里的写法</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #d8bfd8;">result</span> <span style="color: #f5deb3;">=</span> <span style="color: #7fffd4;"><code>&lt;/span&gt;db1&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>        <span style="color: #da70d6;">#这里是反引号</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The new value is $result”</span></p>
+<p><br>上面的代码中给出了两种返回值的方式，这里可以自己进行选择。</p>
+<p>传递参数和前面讲的参数的使用基本一致，这里就不罗嗦了。接下来就是变量的作用域了，一般来说bash里面的所有变量都是全局的，当然可以用local来限定，不然全部用全局变量的话，会对变量带来一定的麻烦。</p>
+<p>下面的是给函数传函数和返回函数。</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">传数组可以用下面的方法<br><span style="color: #b0c4de; font-weight: bold;">function </span>testit <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">local </span>newarray<br><span style="color: #d8bfd8;">newarray</span><span style="color: #f5deb3;">=(</span><span style="color: #7fffd4;"><code>&lt;/span&gt;&lt;span style=&quot;color: #b0c4de; font-weight: bold;&quot;&gt;echo&lt;/span&gt; &lt;span style=&quot;color: #d8bfd8;&quot;&gt;$@&lt;/span&gt;&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>)<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The new array value is: ${newarray[*]}”</span><br><span style="color: #f5deb3;">}</span></div></p>
+<p><span style="color: #d8bfd8;">myarray</span><span style="color: #f5deb3;">=(</span>1 2 3 4 5)<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The original array is ${myarray[<em>]}”</em></span><br>testit <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #d8bfd8;">myarray</span><span style="color: #f5deb3;">[]</span><span style="color: #b0c4de; font-weight: bold;">}</span><br>下面的脚本会返回一个数组<br><span style="color: #b0c4de; font-weight: bold;">function </span>arraydblr <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">local </span>origarray<br><span style="color: #b0c4de; font-weight: bold;">local </span>newarray<br><span style="color: #b0c4de; font-weight: bold;">local </span>elements<br><span style="color: #b0c4de; font-weight: bold;">local </span>i<br><span style="color: #d8bfd8;">origarray</span><span style="color: #f5deb3;">=(</span><span style="color: #7fffd4;"><code>&lt;/span&gt;&lt;span style=&quot;color: #b0c4de; font-weight: bold;&quot;&gt;echo&lt;/span&gt; &lt;span style=&quot;color: #7fffd4;&quot;&gt;&quot;$@&quot;&lt;/span&gt;&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>)    <span style="color: #da70d6;">#得到传过来的数组</span><br><span style="color: #d8bfd8;">newarray</span><span style="color: #f5deb3;">=(</span><span style="color: #7fffd4;"><code>&lt;/span&gt;&lt;span style=&quot;color: #b0c4de; font-weight: bold;&quot;&gt;echo&lt;/span&gt; &lt;span style=&quot;color: #7fffd4;&quot;&gt;&quot;$@&quot;&lt;/span&gt;&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>)<br><span style="color: #d8bfd8;">elements</span><span style="color: #f5deb3;">=</span><span style="color: #d8bfd8;">$[</span> <span style="color: #d8bfd8;">$# </span>- 1<span style="color: #f5deb3;">]</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> ((<span style="color: #d8bfd8;">i</span> <span style="color: #f5deb3;">=</span> 0; i&lt;<span style="color: #f5deb3;">=</span><span style="color: #d8bfd8;">$elements</span> i++))<br><span style="color: #f5deb3;">{</span><br>newarray<span style="color: #f5deb3;">[</span><span style="color: #d8bfd8;">$i</span><span style="color: #f5deb3;">]=</span><span style="color: #d8bfd8;">$[</span> <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #d8bfd8;">origarray</span><span style="color: #f5deb3;">[</span><span style="color: #d8bfd8;">$i</span><span style="color: #f5deb3;">]</span><span style="color: #b0c4de; font-weight: bold;">}</span> <em> 2<span style="color: #f5deb3;">]</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #d8bfd8;">newarray</span><span style="color: #f5deb3;">[</span></em>]<span style="color: #b0c4de; font-weight: bold;">}</span>    <span style="color: #da70d6;">#返回一个数组</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #d8bfd8;">myarray</span><span style="color: #f5deb3;">=(</span>1 2 3 4 5)<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The original array is: ${myarray[<em>]}”</em></span><br><span style="color: #d8bfd8;">arg1</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">`</span><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #d8bfd8;">myarray</span><span style="color: #f5deb3;">[]</span><span style="color: #b0c4de; font-weight: bold;">}</span><span style="color: #7fffd4;"><code>&lt;/span&gt;
+result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <span style="color: #d8bfd8;">$arg1</span><span style="color: #7fffd4;">`</span>)    <span style="color: #da70d6;">#传一个数组给函数，并得到一个函数</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The new array is: ${result[*]}”</span><br>接下来是函数的递归，bash里面可以使用递归，使用的方式没有什么特别的，就和使用一般的函数一样。接下来可以创建函数库，然后通过”. funcname”来引入这个库，其中”.”表示source的意思。接下来就是可以在.bashrc里面创建函数或者导入自己的库函数，这样你就可以在任意的地方使用库函数里面的函数了。</p>
+<p>至于在terminal创建窗口，可以用select命令，dialog命令，KDE下的kdialog和GNOME下的gdialog，zenity。这些的具体用法可以自行搜索。</p>
+<p>到这里基本这本书除了sed，awk，脚本的介绍(zsh等)都讲完了，总体来说这本书还是挺不错的。有时间的话我会单独写sed和awk的一些用法。</p>
+
+	
+	</div>
+</div>
+
+           
+		
 
 		</div>
 
@@ -659,9 +694,9 @@
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -671,35 +706,31 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
-		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
-		
-			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
 		
 		</ul>
 	</div>
@@ -710,45 +741,45 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/thinking/">thinking<span>1</span></a></li>
+			<li><a href="/tags/compter-graphics/">compter graphics<span>1</span></a></li>
 		
-			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
+			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
 		
-			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+			<li><a href="/tags/databse/">databse<span>1</span></a></li>
 		
-			<li><a href="/tags/chinese/">chinese<span>1</span></a></li>
+			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
 		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
+			<li><a href="/tags/https/">https<span>1</span></a></li>
 		
-			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
+			<li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/sap/">sap<span>1</span></a></li>
 		
-			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
+			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
 		
-			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
 		
-			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
+			<li><a href="/tags/fork/">fork<span>2</span></a></li>
 		
-			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
+			<li><a href="/tags/book/">book<span>1</span></a></li>
 		
-			<li><a href="/tags/bit/">bit<span>0</span></a></li>
+			<li><a href="/tags/test/">test<span>1</span></a></li>
 		
-			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
+			<li><a href="/tags/错误配置/">错误配置<span>1</span></a></li>
 		
-			<li><a href="/tags/递归/">递归<span>1</span></a></li>
+			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
 		
-			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
+			<li><a href="/tags/read/">read<span>3</span></a></li>
 		
-			<li><a href="/tags/english/">english<span>1</span></a></li>
+			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
 		
-			<li><a href="/tags/scala/">scala<span>1</span></a></li>
+			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
 		
-			<li><a href="/tags/command/">command<span>1</span></a></li>
+			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
 		
-			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
+			<li><a href="/tags/concrete-mathematics/">concrete-mathematics<span>2</span></a></li>
 		
-			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
+			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>260</span></a></li>
@@ -764,10 +795,6 @@
   <ul class="entry list-unstyled">
     
       <li>
-        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
-      </li>
-    
-      <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
       </li>
     
@@ -781,6 +808,10 @@
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>

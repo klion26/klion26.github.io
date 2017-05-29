@@ -6,7 +6,8 @@
   <title>Spark Streaming 统一在每分钟的 00 秒消费 Kafka 数据的问题解决 | Hexo</title>
   <meta name="author" content="John Doe">
   
-  <meta name="description" content="## 现象一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据## 问题排查这一批作业的功能就是从 kafka 消费数据，进行转化后存储到外部可靠介质中。所有作业的 batchDuration 都设置为 60s。我们追踪代码可以得到在 JobGenerator ">
+  <meta name="description" content="现象一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据
+问题排查这一批作业的功能就是从 kafka 消费数据，进行转化后存储到外部可靠介质中。所有作业的 batchDuration 都设置为 60s。我们追踪代码可以得到在 JobGenerator 中有一个变">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -111,8 +112,14 @@
 	<div class="mypage">		
 	  		
 
-	  <div class="markdown-here-wrapper" style="font-size: 16px; line-height: 1.8em; letter-spacing: 0.1em;" data-md-url="http://www.klion26.com/wp-admin/post-new.php"><br><br>## 现象<br><br>一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据<br><br>## 问题排查<br><br>这一批作业的功能就是从 kafka 消费数据，进行转化后存储到外部可靠介质中。所有作业的 <code>batchDuration</code> 都设置为 60s。<br>我们追踪代码可以得到在 <code>JobGenerator</code> 中有一个变量 <code>timer : RecurringTimer</code>，改变量用于定时的启动 task 去消费数据。<br>从 <code>RecurringTimer#getStartTime</code> 我们可以得到作业第一个 batch 的启动时间，后续的 batch 启动时间则是在第一个 batch 的启动时间上加上 <code>batchDuration</code> 的整数倍。<br>第一个 batch 的起动时间实现如下：<br><code>(math.floor(clock.getTimeMillis().toDouble / period) + 1).toLong * period</code><br>其中 <code>clock.getTimeMillis()</code> 是当前时间，period 是<code>batchDuration</code> 的毫秒表示法。通过上述公式，我们可以知道作业的启动时间会对齐到 <code>batchDuration</code>，而我们把这一批作业的 <code>batchDuration</code> 都设置为 60s，因此都会在每分钟的 00 秒开始消费 kafka 数据。<br><br>## 问题解决<br><br>我们可以通过下面两种方式进行解决<br><br>1.  设置不同的 <code>batchDuration</code><br>2.  改写 <code>RecurringTimer#getStartTime</code> 的逻辑，在上述对齐的时间基础上加上一个 [0, period) 范围内的随机数<br><br>我们知道在上述两种解决方案中，第一种，不同作业还是会在某一时刻重合，而且这个重合的时间点不可控，可能是作业运行一小时后，可能是运行一天后，也可能是运行一周后。而第二种作业则是可控的，在作业启动时就决定了。因此这里我们采用第二种方案。<br><br></div>
-
+	  <h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据</p>
+<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><p>这一批作业的功能就是从 kafka 消费数据，进行转化后存储到外部可靠介质中。所有作业的 <code>batchDuration</code> 都设置为 60s。<br>我们追踪代码可以得到在 <code>JobGenerator</code> 中有一个变量 <code>timer : RecurringTimer</code>，改变量用于定时的启动 task 去消费数据。<br>从 <code>RecurringTimer#getStartTime</code> 我们可以得到作业第一个 batch 的启动时间，后续的 batch 启动时间则是在第一个 batch 的启动时间上加上 <code>batchDuration</code> 的整数倍。<br>第一个 batch 的起动时间实现如下：<br><code>(math.floor(clock.getTimeMillis().toDouble / period) + 1).toLong * period</code><br>其中 <code>clock.getTimeMillis()</code> 是当前时间，period 是<code>batchDuration</code> 的毫秒表示法。通过上述公式，我们可以知道作业的启动时间会对齐到 <code>batchDuration</code>，而我们把这一批作业的 <code>batchDuration</code> 都设置为 60s，因此都会在每分钟的 00 秒开始消费 kafka 数据。</p>
+<h2 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h2><p>我们可以通过下面两种方式进行解决</p>
+<ol>
+<li>设置不同的 <code>batchDuration</code></li>
+<li>改写 <code>RecurringTimer#getStartTime</code> 的逻辑，在上述对齐的时间基础上加上一个 [0, period) 范围内的随机数</li>
+</ol>
+<p>我们知道在上述两种解决方案中，第一种，不同作业还是会在某一时刻重合，而且这个重合的时间点不可控，可能是作业运行一小时后，可能是运行一天后，也可能是运行一周后。而第二种作业则是可控的，在作业启动时就决定了。因此这里我们采用第二种方案。</p>
 <p>本文采用了一种新的排版方式，在进行实验，如果效果好的好，后续大部分内容都会以这种形式进行发布</p>
 <div class="markdown-here-wrapper" style="font-size: 16px; line-height: 1.8em; letter-spacing: 0.1em;" data-md-url="http://www.klion26.com/wp-admin/post-new.php"></div>
 	  
@@ -123,9 +130,9 @@
 	<div class="pagination">
 <ul class="pagination">
 	 
-				
-    	<li class="prev"><a href="/2017/05/20/hello-world/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
-  		
+		
+          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+        
 
         <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
 

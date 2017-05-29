@@ -111,48 +111,6 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
-			<div class="date"> 2012-04-19 </div>
-			<div class="article-title"><a href="/2012/04/19/vmware-ubuntu-fedora/" >VMware虚拟机有关的几个问题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>环境:XP+VMware 7.0 英文版  ubuntu 10.4  fedora  13</p>
-<p><span style="color: #ff0000;">VMware里面安装ubuntu之后，第一次进去的时候，</span><span style="color: #ff0000;">来到输入密码界面的时候居然键盘失灵了</span>，这个比较囧。后来上网搜了下，发现是设置问题，但是要改设置得先进去才能改，这里首先可以通过如下方法进去:</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2012/04/ubuntu.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/04/ubuntu-300x91.jpg" alt="" title="ubuntu"></a></p>
-<p>看到上图中右下角的红色框框里面的那个小人没，点击小人来到下面的图片</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2012/04/ubuntu2.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/04/ubuntu2-300x157.jpg" alt="" title="ubuntu2"></a></p>
-<p>点击小人会出现上图中的红色框框中的那个东西，然后点击这个东西，就会出现后面的那个界面，然后选中第一个就可以了，重启之，发现出来了软键盘，然后就可以进入系统了。</p>
-<p>OK，现在需要修改配置文件让登陆的时候，键盘有效。</p>
-<p>在终端输入:vi /etc/default/console-setup</p>
-<p>然后来到文本的末尾，把[XKBMODEL=”SKIP”]一行中的”SKIP”改成”pc105”,把[XKBVARIANT=”U.S.English”]中的”U.S.English”改成空然后重启就可以了</p>
-<p><span style="color: #ff0000;">第二个问题是VMware里面不能用U盘</span>，我记得以前自己的可以的，只要在插入U盘的时候，选中虚拟机，然后就会询问是否在虚拟机里面用U盘，可是现在的信息是:host usb device connections disabled。上网搜了下，发现是一个服务没有开启，果断开启之.开启的方法如下:</p>
-<p>控制面板—&gt;管理工具—-&gt;服务—–&gt;找到”VMware USB Arbitration Service”然后开启之，当然你也可以选择让这个服务自动开启就行了，以后就不用这么麻烦了。然后重启虚拟机就OK了</p>
-<p><span style="color: #ff0000;">VMware里面装了fedora之后，进去发现fedora的鼠标左键不能用了</span>。这个有点坑爹啊。</p>
-<p>解决方法如下[需要root权限]</p>
-<p>首先调出终端<span style="font-family: 'Times New Roman';">:</span><span style="font-family: 宋体;">在桌面右击</span><span style="font-family: 'Times New Roman';">—&gt;</span><span style="font-family: 宋体;">按</span><span style="font-family: 'Times New Roman';">a.</span><span style="font-family: 宋体;">然后在命令那一栏添上</span><span style="font-family: 'Times New Roman';">gnome-terminal</span><span style="font-family: 宋体;">就行了</span><span style="font-family: 'Times New Roman';">.</span></p>
-<p>这里会在桌面加一个<span style="font-family: 'Times New Roman';">terminal</span><span style="font-family: 宋体;">的快捷方式</span><span style="font-family: 'Times New Roman';">,</span><span style="font-family: 宋体;">然后上下键可以移动了</span><span style="font-family: 'Times New Roman';">,</span><span style="font-family: 宋体;">选中</span><span style="font-family: 'Times New Roman';">terminal</span><span style="font-family: 宋体;">之后确定就启动</span><span style="font-family: 'Times New Roman';">terminal</span><span style="font-family: 宋体;">了</span></p>
-<p>接下来输入如下命令<span style="font-family: 宋体;"> “</span><span style="font-family: 'Times New Roman';">vi</span>    /lib/udev/rules.d/69-xorg-vmmouse.rules”然后<span style="font-family: 宋体;">在里面加上一句</span></p>
-<p>KERNEL==”event[0-9]*”<span style="font-family: 宋体;">就行了</span><span style="font-family: Arial;">,</span><span style="font-family: 宋体;">当然如果你加到中间的话</span><span style="font-family: Arial;">,</span><span style="font-family: 宋体;">要加上一个逗号</span></p>
-<p>接下来重启就行了</p>
-<p>一切Linux的问题貌似都和配置有关~~</p>
-<p>&nbsp;</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
 			<div class="date"> 2012-03-29 </div>
 			<div class="article-title"><a href="/2012/03/29/user-chrome-cross-gfw/" >利用Chrome零基础翻墙</a></div>						
 		</h3>
@@ -501,6 +459,72 @@
 
            
 		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-12-13 </div>
+			<div class="article-title"><a href="/2011/12/13/windows-mpi/" >windows下MPI的环境搭建。</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>由于需要MPI来实现并行化,因此在windows下搭建了MPI的环境。MPI在windos下的环境搭建还算比较容易的。</p>
+<p>首先去<a href="http://www-unix.mcs.anl.gov/mpi/mpich2/下载MPICH2，然后安装。" target="_blank" rel="external">http://www-unix.mcs.anl.gov/mpi/mpich2/下载MPICH2，然后安装。</a></p>
+<p>接下来在环境变量那的path设置C:\Program Files\MPICH2\bin，然后打开vc6-Tools–Options–Directories。下面的show directories for:选择include files，把%MPICH2%include加进去，然后在Library files下面把%MPICH2%/lib加进去。</p>
+<p>然后再启动%MPICH2%/bin下面的wmpiregister.exe进行注册即可。</p>
+<p>接下来就可以写Hello World了。</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span>#include </span><span class="string">“stdafx.h”</span><span> </span></span></li>
+<li><span> </span></li>
+<li><span>#define MPICH_SKIP_MPICXX </span></li>
+<li><span>#include </span><span class="string">“mpi.h”</span><span> </span></li>
+<li><span>#include <cstdio> </cstdio></span></li>
+<li><span> </span></li>
+<li><span class="keyword">int</span><span> main(</span><span class="keyword">int</span><span> argc, </span><span class="keyword">char</span><span>* argv[]) </span></li>
+<li><span>{ </span></li>
+<li><span> </span></li>
+<li><span> </span><span class="keyword">int</span><span> rank,size; </span></li>
+<li><span> </span><span class="keyword">int</span><span> tt; </span></li>
+<li><span> </span><span class="keyword">char</span><span> processor_name[MPI_MAX_PROCESSOR_NAME]; </span></li>
+<li><span> </span></li>
+<li><span> MPI_Init(argc,&amp;argv); </span></li>
+<li><span> </span></li>
+<li><span> MPI_Comm_rank(MPI_COMM_WORLD,rank); </span></li>
+<li><span> </span></li>
+<li><span> MPI_Comm_size(MPI_COMM_WORLD,size); </span></li>
+<li><span> </span><span class="comment">//printf(“ </span><span> </span></li>
+<li><span> </span></li>
+<li><span> MPI_Get_processor_name(processor_name,tt); </span></li>
+<li><span> printf(“Hello World! I am %d,in %d computer on %s\n</span><span class="string">“,rank,size,processor_name); </span></li>
+<li><span><span class="string"> MPI_Finalize(); </span> </span></li>
+<li><span><span class="string"> if(1==rank) </span> </span></li>
+<li><span><span class="string"> { </span> </span></li>
+<li><span><span class="string"> printf(“</span><span>Press any key to </span><span class="keyword">continue</span><span>\n”); </span></span></li>
+<li><span> </span><span class="comment">//getch(); </span><span> </span></li>
+<li><span> } </span></li>
+<li><span> </span><span class="keyword">return</span><span> </span><span class="number">0</span><span> </span></li>
+<li><span>} </span></li>
+<li><span><br></span><br></li></ol></div><br>写完之后再打开project-settings-link把mpi.lib加到Object/library modules中
+
+<p>#define MPICH_SKIP_MPICXX就是不让包含mpicxx.h.这个在mpi.h里面可以看到。然后其他的就是MPI的函数的应用</p>
+<p>参考:</p>
+<p>1.<a href="http://www.cppblog.com/wlwlxj/archive/2006/06/12/8463.aspx" target="_blank" rel="external">http://www.cppblog.com/wlwlxj/archive/2006/06/12/8463.aspx</a>【<a href="http://www.cppblog.com/wlwlxj/archive/2006/06/12/8463.html" target="_blank" rel="external">并行编程–MPI开发入门</a>】</p>
+<p>2.<a href="http://blog.csdn.net/morewindows/article/details/6823436" target="_blank" rel="external">http://blog.csdn.net/morewindows/article/details/6823436</a>[<strong>Windows系统下搭建MPI环境</strong>]</p>
+
+	
+	</div>
+</div>
+
+           
+		
 
 		</div>
 
@@ -575,9 +599,9 @@
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -587,35 +611,31 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
-		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
-		
-			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
 		
 		</ul>
 	</div>
@@ -628,43 +648,43 @@
 		
 			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
 		
-			<li><a href="/tags/go/">go<span>1</span></a></li>
+			<li><a href="/tags/fork/">fork<span>2</span></a></li>
 		
-			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+			<li><a href="/tags/RecurringTimer/">RecurringTimer<span>1</span></a></li>
 		
-			<li><a href="/tags/DFS/">DFS<span>2</span></a></li>
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
 		
-			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
-			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
+			<li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li>
 		
-			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
 		
-			<li><a href="/tags/stack/">stack<span>1</span></a></li>
+			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
 		
-			<li><a href="/tags/network/">network<span>1</span></a></li>
+			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
 		
-			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
+			<li><a href="/tags/svm/">svm<span>1</span></a></li>
 		
-			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
+			<li><a href="/tags/command/">command<span>1</span></a></li>
 		
-			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
+			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
 		
-			<li><a href="/tags/米聊/">米聊<span>1</span></a></li>
+			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
 		
-			<li><a href="/tags/jekyll/">jekyll<span>1</span></a></li>
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
 		
-			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
+			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
 		
-			<li><a href="/tags/dag/">dag<span>1</span></a></li>
+			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
 		
-			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
+			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
 		
-			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
+			<li><a href="/tags/timestamp/">timestamp<span>1</span></a></li>
 		
-			<li><a href="/tags/test/">test<span>1</span></a></li>
+			<li><a href="/tags/kafka/">kafka<span>8</span></a></li>
 		
-			<li><a href="/tags/数学/">数学<span>5</span></a></li>
+			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>260</span></a></li>
@@ -680,10 +700,6 @@
   <ul class="entry list-unstyled">
     
       <li>
-        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
-      </li>
-    
-      <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
       </li>
     
@@ -697,6 +713,10 @@
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>

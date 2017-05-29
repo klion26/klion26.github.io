@@ -135,18 +135,8 @@
 <p><span style="color: #ff0000;">|</span> 小于 pivot 的所有元素  <span style="color: #ff0000;">|</span>  等于 pivot 的所有元素  <span style="color: #ff0000;">|</span>  大于 pivot 的所有元素 <span style="color: #ff0000;">|</span></p>
 <p>这里就需要用到上面的 vecswap，就是两段数之间的交换。将所有等于 pivot 的元素放到中间，所有小于 pivot 的元素放到左边，所有大于 pivot 的元素放到右边</p>
 <p>2. 利用冒泡和插入排序。</p>
-<p>在本方法中，对于少于7个元素的都利用冒泡排序解决（7 是一个 Magical number），然后对于接近已排好序的数组，利用插入排序，我们知道快速排序对于已排好序的数组进行排序复杂度是很高的，因此在内部采用了插入排序解决这一问题</p>
-<p><pre class="lang:c decode:true ">if (swap_cnt == 0) {  /<em> Switch to insertion sort </em>/<br>        /** {a[0]}  {a[1]…a[k]}  {a[k+1]…a[n-1]}</pre></p>
-<pre><code>     * a[i] &lt; a[0]  for 1&amp;lt;= i &amp;lt; k+1
-     * a[i] &gt; a[0]  for k+1 &lt;= i &amp;lt; n
-     **/
-    for (pm = (char *) a + es; pm &lt; (char *) a + n * es; pm += es)
-        for (pl = pm; pl &gt; (char *) a &amp;amp; cmp(pl - es, pl) &amp;gt; 0; 
-             pl -= es)
-            swap(pl, pl - es);
-    return;
-}&lt;/pre&gt;
-</code></pre><p>这段代码中的 swap_cnt 是记录了在第一次排序过程中是否进行过交换，等于零表示没有进行过交换。</p>
+<p>在本方法中，对于少于7个元素的都利用冒泡排序解决（7 是一个 Magical number），然后对于接近已排好序的数组，利用插入排序，我们知道快速排序对于已排好序的数组进行排序复杂度是很高的，因此在内部采用了插入排序解决这一问题<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">if (swap_cnt == 0) &#123;  /* Switch to insertion sort */</div><div class="line">        /** &#123;a[0]&#125;  &#123;a[1]...a[k]&#125;  &#123;a[k+1]...a[n-1]&#125;</div><div class="line">         * a[i] &lt; a[0]  for 1&amp;lt;= i &amp;lt; k+1</div><div class="line">         * a[i] &gt; a[0]  for k+1 &lt;= i &amp;lt; n</div><div class="line">         **/</div><div class="line">		for (pm = (char *) a + es; pm &lt; (char *) a + n * es; pm += es)</div><div class="line">			for (pl = pm; pl &gt; (char *) a &amp;amp; cmp(pl - es, pl) &amp;gt; 0; </div><div class="line">			     pl -= es)</div><div class="line">				swap(pl, pl - es);</div><div class="line">		return;</div><div class="line">	&#125;</div></pre></td></tr></table></figure></p>
+<p>这段代码中的 swap_cnt 是记录了在第一次排序过程中是否进行过交换，等于零表示没有进行过交换。</p>
 <p>3. 找一个更合适的 pivot 这一点，本方法利用下面的方法来进行 pivot 的寻找，其中 pm 指向最终我们设定的 pivot</p>
 <p><pre class="lang:c decode:true">    pm = (char <em>) a + (n / 2) </em> es; /<strong> 首先用数组中间的那个元素做 pivot </strong>/<br>    if (n &gt; 7) { /<strong> 如果元素个数大于 7 </strong>/<br>        pl = (char <em>) a;/</em> 首元素 <em>/<br>        pn = (char </em>) a + (n - 1) <em> es; /</em> 末尾元素 <em>/<br>        if (n &gt; 40) { /<strong> 如果大于40个元素（40 也是一个 Magical Number） </strong>/<br>            d = (n / 8) </em> es; /<strong> 利用下面的 9 个数来近似整个数组的中位数 </strong>/<br>            pl = med3(pl, pl + d, pl + 2 <em> d, cmp); /</em> pl 这三个数里面的一个中位数 <em>/<br>            pm = med3(pm - d, pm, pm + d, cmp); /</em> pm 是这三个数的中位数 <em>/<br>            pn = med3(pn - 2 </em> d, pn - d, pn, cmp); /<em> pn 是这三个数的中位数 </em>/<br>        }<br>        pm = med3(pl, pm, pn, cmp); /<em> pm 是 pl pm pn 的中位数，近似整个数组的中位数 </em>/<br>    }</pre><br>这样找到的 pivot 不会偏向很严重，从而在快排的时候，不会导致某一边（大于 pivot 和小于 pivot 两边）的数据量比较大。</p>
 <p>另外在对数组的右半部分进行排序的时候，利用了 goto，而不是递归，这样可以节省栈空间。</p>
@@ -222,9 +212,9 @@
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -234,35 +224,31 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
-		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
-		
-			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
 		
 		</ul>
 	</div>
@@ -273,45 +259,45 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
+			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
+		
+			<li><a href="/tags/concrete-mathematics/">concrete-mathematics<span>2</span></a></li>
+		
+			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
+		
+			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
+		
+			<li><a href="/tags/rmvb/">rmvb<span>1</span></a></li>
+		
+			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
 		
 			<li><a href="/tags/tencent/">tencent<span>1</span></a></li>
 		
-			<li><a href="/tags/prim/">prim<span>1</span></a></li>
+			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
+		
+			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+		
+			<li><a href="/tags/bellman-ford/">bellman-ford<span>1</span></a></li>
+		
+			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+		
+			<li><a href="/tags/微信/">微信<span>1</span></a></li>
+		
+			<li><a href="/tags/i-o-multiplexing/">i/o multiplexing<span>1</span></a></li>
+		
+			<li><a href="/tags/question/">question<span>1</span></a></li>
+		
+			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
+		
+			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
 		
 			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
 		
-			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
+			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
+			<li><a href="/tags/windows/">windows<span>4</span></a></li>
 		
-			<li><a href="/tags/job/">job<span>1</span></a></li>
-		
-			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
-		
-			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
-		
-			<li><a href="/tags/topic/">topic<span>1</span></a></li>
-		
-			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
-		
-			<li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li>
-		
-			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
-		
-			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
-		
-			<li><a href="/tags/office/">office<span>1</span></a></li>
-		
-			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
-		
-			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
-		
-			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
-		
-			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
-		
-			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
+			<li><a href="/tags/exercise/">exercise<span>8</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>260</span></a></li>
@@ -327,10 +313,6 @@
   <ul class="entry list-unstyled">
     
       <li>
-        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
-      </li>
-    
-      <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
       </li>
     
@@ -344,6 +326,10 @@
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>

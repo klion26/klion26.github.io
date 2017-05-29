@@ -111,42 +111,6 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
-			<div class="date"> 2012-12-26 </div>
-			<div class="article-title"><a href="/2012/12/26/fedora-13-update-to-fedora-15/" >Fedora13 升级到Fedora 15</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>在开学的时候装了Fedora 13,然后一直用着，感觉也还可以，虽然现在Fedora都出18了。前两天不知道那根神经一短路然后就想着升级Fedora，一开始想升级到16的（担心17,18还不那么稳定，到时出了问题找不到解决方案）。然后就用下面的命令执行呗 。</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">sudo yum install preupgrade<br>preupgrade</div><br>执行preupgrade需要输入root命令，照着做就行了，然后就可以选择你想升级到的版本，有14,15,16,17，当然你还可以列出那些unstable版本。选择之后，就一直下一步就行了，然后等着下载所需要的软件包吧（时间根据你的网速不同而不同，我大概用了20分钟左右）。我一开始选择的版本是16,然后下完之后，提醒需要reboot来完成升级，好，那就reboot呗。</p>
-<p>reboot之后，你会发现屏幕一直是一个光标在那跳动，啥也不可以做，这个时候你只需要等待就行了，应该是在配置些啥东西吧。别重启了，实在没事干就出喝杯咖啡吧，等好了之后，结果发现提示说Fedora 16只能通过14,15升级而来，也就是不能跨太多的版本升级。好吧。那就重启升级到15再说吧。然后照着做之后，发现尼妈居然又是自动升级到16,然后一顿折腾之后，我把/var/cache/yum/下面所有和preupgrade有关的文件夹全都删掉了（其实应该做个备份更好，万一删错了还可以还原）。然后继续升级到Fedora 15.然后就可以了，没出现啥问题，刚好装Fedora 15的时候老师叫开会，然后开会回来之后发现已经装好了。而且还不错。</p>
-<p>现在你已经装好了Fedora 15了，当然还是可以访问Fedora 13的。然后说说接下来你需要做的事情吧。或许你可以在网上搜一篇叫做《Fedora 15安装之后需要做的×件事》，不过很多你可能不需要，我这里大致写下我做的一些事情吧</p>
-<p>1.安装gnome-tweak-tool，因为现在你的桌面是没有任何东西的，而且右击也没用，装这个东西就是解决这些事的，装好之后，用命令gnome-tweak-tool执行出来一个配置界面，选中File Manager。把右边的“Have file manager handle the desktop该陈ON就行了，现在你的桌面有东西了，而且可以右击了。</p>
-<p>2.在上一步中的Tweak tool中打开选中左边的Shell栏目，然后把右边的Arrangement of buttons on the titlebar选项改为All，这样尼会看到你的cmd窗口上面有最小化，最大化和关闭按钮了，默认的是只有关闭按钮的。</p>
-<p>3.解决按下Del不能删除文件的事情，首先用命令</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gsettings <span style="color: #b0c4de; font-weight: bold;">set </span>org.gnome.desktop.interface can-change-accels <span style="color: #b0c4de; font-weight: bold;">true</span></div><br>设置可以改变相应的快捷方式映射</p>
-<p>然后打开一个文件夹，选中随便一个文件然后点击菜单Edit，把鼠标放到“Move to Trash”上，然后按<span style="color: #ff0000;">两次<span style="color: #000000;">Del键就行了，接下来你可以用命令</span></span></p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gsettings <span style="color: #b0c4de; font-weight: bold;">set </span>org.gnome.desktop.interface can-change-accels <span style="color: #b0c4de; font-weight: bold;">false</span></div><br>来关闭快捷方式的映射。</p>
-<p>4.中文输入法的问题，由于我是由Fedora 13升级来的，系统没有自动安装ibus输入法，还是保留了我在13上安装的fcitx，可是奇怪的事情发生了，fcitx输入法只能在浏览器下使用，其他任何地方都不能使用。这个也太坑爹了。然后google，百度结果没有发现什么解决办法，又说是gnome3的问题，又说是配置的问题， 有说直接换ibus的。可是换了ibus结果还是用不了，不知为何（应该不是和fcitx冲突的问题，我在装ibus之前卸载了fcitx）。然后最后发现有个帖子的配置和其他人的配置有个小小的区别，那就是试试吧，结果就TM可以了。我一开始的配置是（下面语句放在～/.bashrc文件中）</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">XMODIFIERS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“@im=fcitx”</span><br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">QT_IM_MODULE</span><span style="color: #f5deb3;">=</span>xim<br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">GTK_IM_MODULE</span><span style="color: #f5deb3;">=</span>xim</div><br>然后另外那个人的配置是把两个xim改成了fcitx也就是</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">XMODIFIERS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“@im=fcitx”</span><br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">QT_IM_MODULE</span><span style="color: #f5deb3;">=</span>fcitx<br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">GTK_IM_MODULE</span><span style="color: #f5deb3;">=</span>fcitx</div><br>然后奇迹发生了，重登录之后结果就可以了，这中间我各种重装，反正都不知道是为什么，<span style="color: #ff0000;">如果你也遇到了这样的问题，但是上面的方案没有帮到你的话，我只能说声遗憾了，因为我也不知道是为什么了。</span></p>
-<p>最后再吐嘈下Fedora 15的界面，感觉用起来总是没有13那么爽，gnome3或许炫一点，但是现在打开软件的方式有点不爽，也没有下面的任务栏了，而且最上面的panel也没了，现在变成了“Your favorites”，反正就是现在暂时还不适应这种界面，接下来慢慢适应吧。</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
 			<div class="date"> 2012-12-12 </div>
 			<div class="article-title"><a href="/2012/12/12/fedora-13-texlive2012-install-chinese-configure/" >Fedora 13 TexLive2012安装+中文配置</a></div>						
 		</h3>
@@ -243,7 +207,7 @@
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#105;&#108;&#x74;&#x6f;&#x3a;&#x6a;&#x63;&#109;&#x40;&#x6a;&#111;&#x6e;&#x6d;&#x61;&#x73;&#116;&#101;&#114;&#x73;&#46;&#111;&#114;&#x67;">&#x6a;&#x63;&#109;&#x40;&#x6a;&#111;&#x6e;&#x6d;&#x61;&#x73;&#116;&#101;&#114;&#x73;&#46;&#111;&#114;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x6a;&#99;&#109;&#x40;&#106;&#x6f;&#x6e;&#109;&#x61;&#x73;&#116;&#x65;&#x72;&#x73;&#46;&#111;&#114;&#x67;">&#x6a;&#99;&#109;&#x40;&#106;&#x6f;&#x6e;&#109;&#x61;&#x73;&#116;&#x65;&#x72;&#x73;&#46;&#111;&#114;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -494,6 +458,31 @@
 
            
 		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-11-06 </div>
+			<div class="article-title"><a href="/2012/11/06/chrome-https-connection/" >Chrome强制https连接某些网站</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>最近一段时间google貌似非常的不稳定,不知道是不是那个什么”多少大”马上就要开的原因。有时上google首页也许要翻墙，而且有时https连接下也打不开。今早看到<a href="http://www.williamlong.info/archives/3270.html" target="_blank" rel="external">月光博客</a>上说，https在某些情况下是用http打开的，所以就会时不时断网了。下面是教你怎么用chrome强制https连接。</p>
+<p>你需要的就是chrome浏览器，然后有可能需要翻墙[我在自己电脑上实验的时候，有时不翻墙不行]，翻墙可以参照<span style="color: #ff0000;"><a href="http://www.klion26.com/user-chrome-cross-gfw.html" target="_blank" rel="external"><span style="color: #ff0000;">这里</span></a></span>。然后接下来你只需要在chrome的新建标签页里面输入”chrome://net-internals/“会出来如下界面:</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/11/hsts.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/11/hsts-300x165.jpg" alt="" title="hsts"></a>看到上图的倒数第二个HSTS没，点开这个，然后Add domain下填写www.google.com，如果你需要google的子域名也用https的话，就勾上下面的Include subdomains选项框。不过勾上这个的话貌似translate就不能用了，反正我这translate不管怎样都不能用https访问，翻墙也不行，translate.google.com都不行，直接跳到traslate.google.cn去了。</p>
+
+	
+	</div>
+</div>
+
+           
+		
 
 		</div>
 
@@ -568,9 +557,9 @@
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -580,35 +569,31 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
-		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
-		
-			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
 		
 		</ul>
 	</div>
@@ -619,45 +604,45 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
+			<li><a href="/tags/方法/">方法<span>1</span></a></li>
 		
-			<li><a href="/tags/微信/">微信<span>1</span></a></li>
+			<li><a href="/tags/火柴棍式程序题/">火柴棍式程序题<span>1</span></a></li>
 		
-			<li><a href="/tags/databse/">databse<span>1</span></a></li>
+			<li><a href="/tags/code-interview/">code interview<span>1</span></a></li>
 		
-			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
 		
-			<li><a href="/tags/rm/">rm<span>1</span></a></li>
+			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
 		
-			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
+			<li><a href="/tags/opengl/">opengl<span>1</span></a></li>
 		
-			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
+			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/free/">free<span>1</span></a></li>
+			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
 		
-			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
+			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
 		
-			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
 		
-			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+			<li><a href="/tags/specify-timestamp/">specify_timestamp<span>1</span></a></li>
 		
-			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
+			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
 		
-			<li><a href="/tags/scc/">scc<span>1</span></a></li>
+			<li><a href="/tags/google-adsense/">google-adsense<span>1</span></a></li>
 		
-			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
-			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
+			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
 		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+			<li><a href="/tags/vim/">vim<span>2</span></a></li>
 		
-			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
+			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
 		
-			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
+			<li><a href="/tags/kv/">kv<span>1</span></a></li>
 		
-			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
+			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
 		
-			<li><a href="/tags/top排序/">top排序<span>2</span></a></li>
+			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>260</span></a></li>
@@ -673,10 +658,6 @@
   <ul class="entry list-unstyled">
     
       <li>
-        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
-      </li>
-    
-      <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
       </li>
     
@@ -690,6 +671,10 @@
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>

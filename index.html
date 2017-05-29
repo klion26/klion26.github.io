@@ -447,42 +447,9 @@
 		
             
 		
-            
-		
         
         <!-- render other articles -->
         
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2017-05-20 </div>
-			<div class="article-title"><a href="/2017/05/20/hello-world/" >Hello World</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-	
-	</div>
-</div>
-
-           
-		
            
 			  
 	
@@ -498,8 +465,14 @@
   <div class="row">
 	
 	
-		<div class="markdown-here-wrapper" style="font-size: 16px; line-height: 1.8em; letter-spacing: 0.1em;" data-md-url="http://www.klion26.com/wp-admin/post-new.php"><br><br>## 现象<br><br>一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据<br><br>## 问题排查<br><br>这一批作业的功能就是从 kafka 消费数据，进行转化后存储到外部可靠介质中。所有作业的 <code>batchDuration</code> 都设置为 60s。<br>我们追踪代码可以得到在 <code>JobGenerator</code> 中有一个变量 <code>timer : RecurringTimer</code>，改变量用于定时的启动 task 去消费数据。<br>从 <code>RecurringTimer#getStartTime</code> 我们可以得到作业第一个 batch 的启动时间，后续的 batch 启动时间则是在第一个 batch 的启动时间上加上 <code>batchDuration</code> 的整数倍。<br>第一个 batch 的起动时间实现如下：<br><code>(math.floor(clock.getTimeMillis().toDouble / period) + 1).toLong * period</code><br>其中 <code>clock.getTimeMillis()</code> 是当前时间，period 是<code>batchDuration</code> 的毫秒表示法。通过上述公式，我们可以知道作业的启动时间会对齐到 <code>batchDuration</code>，而我们把这一批作业的 <code>batchDuration</code> 都设置为 60s，因此都会在每分钟的 00 秒开始消费 kafka 数据。<br><br>## 问题解决<br><br>我们可以通过下面两种方式进行解决<br><br>1.  设置不同的 <code>batchDuration</code><br>2.  改写 <code>RecurringTimer#getStartTime</code> 的逻辑，在上述对齐的时间基础上加上一个 [0, period) 范围内的随机数<br><br>我们知道在上述两种解决方案中，第一种，不同作业还是会在某一时刻重合，而且这个重合的时间点不可控，可能是作业运行一小时后，可能是运行一天后，也可能是运行一周后。而第二种作业则是可控的，在作业启动时就决定了。因此这里我们采用第二种方案。<br><br></div>
-
+		<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据</p>
+<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><p>这一批作业的功能就是从 kafka 消费数据，进行转化后存储到外部可靠介质中。所有作业的 <code>batchDuration</code> 都设置为 60s。<br>我们追踪代码可以得到在 <code>JobGenerator</code> 中有一个变量 <code>timer : RecurringTimer</code>，改变量用于定时的启动 task 去消费数据。<br>从 <code>RecurringTimer#getStartTime</code> 我们可以得到作业第一个 batch 的启动时间，后续的 batch 启动时间则是在第一个 batch 的启动时间上加上 <code>batchDuration</code> 的整数倍。<br>第一个 batch 的起动时间实现如下：<br><code>(math.floor(clock.getTimeMillis().toDouble / period) + 1).toLong * period</code><br>其中 <code>clock.getTimeMillis()</code> 是当前时间，period 是<code>batchDuration</code> 的毫秒表示法。通过上述公式，我们可以知道作业的启动时间会对齐到 <code>batchDuration</code>，而我们把这一批作业的 <code>batchDuration</code> 都设置为 60s，因此都会在每分钟的 00 秒开始消费 kafka 数据。</p>
+<h2 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h2><p>我们可以通过下面两种方式进行解决</p>
+<ol>
+<li>设置不同的 <code>batchDuration</code></li>
+<li>改写 <code>RecurringTimer#getStartTime</code> 的逻辑，在上述对齐的时间基础上加上一个 [0, period) 范围内的随机数</li>
+</ol>
+<p>我们知道在上述两种解决方案中，第一种，不同作业还是会在某一时刻重合，而且这个重合的时间点不可控，可能是作业运行一小时后，可能是运行一天后，也可能是运行一周后。而第二种作业则是可控的，在作业启动时就决定了。因此这里我们采用第二种方案。</p>
 <p>本文采用了一种新的排版方式，在进行实验，如果效果好的好，后续大部分内容都会以这种形式进行发布</p>
 <div class="markdown-here-wrapper" style="font-size: 16px; line-height: 1.8em; letter-spacing: 0.1em;" data-md-url="http://www.klion26.com/wp-admin/post-new.php"></div>
 
@@ -527,8 +500,8 @@
 		<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将数据从 Kafka 同步到 Hive，并且目标格式希望是 lzo。我们通过 Spark Streaming 做这件事，将文件写成 lzo 格式，并且添加索引。</p>
 <h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>要实现将数据从 Kafka 同步到 Hive 的功能，我们通过将数据直接写到 HDFS 路径来解决，由于担心小文件太多的问题（一个 batch 一个文件的话，可能造成小文件太多，对 HDFS 造成非常大的压力），所以我们通过追加的方式写 HDFS 文件。</p>
 <p>往 HDFS 追加写文件的方式，我们在前面一篇文章中描述了具体的方案。但是对于格式为 LZO 的文件，我们发现一个现象：通过 Hive 查询，只能查到第一个 batch 的数据（也就是说所有 append 的数据都不能被查询到）。这是因为 LZO 文件会在关闭的时候在文件末尾添加一个块结束标记符，导致解析的时候只能读取到块结束符之前的数据（Linux 自带的 lzop 文件可以解析包含块结束符的文件）。到这里我们有两个思路：</p>
-<pre><code>1\. 在 Hive 层面进行修改，将 Hive 使用的 InputFormat 重新实现，从而可以解析 multipart 的文件；
-2\. 通过某种方式将文件进行追加，但是文件的中间不会出现结束块的标记符。
+<pre><code>1. 在 Hive 层面进行修改，将 Hive 使用的 InputFormat 重新实现，从而可以解析 multipart 的文件；
+2. 通过某种方式将文件进行追加，但是文件的中间不会出现结束块的标记符。
 </code></pre><p>由于第一种方式影响较大，实现起来周期较长，所以这里采用第二种方法。</p>
 <p>我们考虑如何做到往 HDFS 写完数据之后，文件流不进行关闭，在我们需要关闭的时候再手动关闭。也就是说同一个 Executor 上的多 batch 公用同一个文件流。</p>
 <p>查看<a href="http://spark.apache.org/docs/latest/streaming-programming-guide.html#design-patterns-for-using-foreachrdd" target="_blank" rel="external">官方文档</a>我们可以得到这是可以实现的，也就是文档中的 ConnectionPool 实现的方式，这可以做到在同一个 Executor 上执行的多个 batch 公用同一个文件流（个人觉得这里也可以从 JVM 的层面来考虑，就是利用了 static 变量的声明周期以及可访问范围）。</p>
@@ -557,82 +530,21 @@
 	
 		<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>Spark Streaming 处理数据过程中遇到 <code>Ran out of messages before reaching ending offset</code> 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）</p>
 <h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>通过异常栈信息，我们知道异常从 KafkaRDD.scala#211 行抛出，下面是相应代码</p>
-<pre><code>206 override def getNext(): R = {
-      if (iter == null || !iter.hasNext) {
-208        iter = fetchBatch
-      }
-210      if (!iter.hasNext) {
-211        assert(requestOffset == part.untilOffset, errRanOutBeforeEnd(part))
-212        finished = true
-        null.asInstanceOf[R]
-      } else {
-        val item = iter.next()
-        if (item.offset &gt;= part.untilOffset) {
-217          assert(item.offset == part.untilOffset, errOvershotEnd(item.offset, part))
-          finished = true
-          null.asInstanceOf[R]
-        } else {
-          requestOffset = item.nextOffset
-          messageHandler(new MessageAndMetadata(
-            part.topic, part.partition, item.message, item.offset, keyDecoder, valueDecoder))
-        }
-      }
-226    }
-`&lt;/pre&gt;
-通过分析，我们知道这个地方是实际从 Kafka 读取数据的逻辑，首先会调用 `fetchBatch` 函数（208 行），然后进行逻辑判断，数据是否读取完毕，是否发生异常
-
-其中 211 行的异常表示还未读取到 part.untilOffset 但是当前迭代器中没有数据了；217 行表示当前读取的数据如果超过了 part.untilOffset ，那么在这个时候退出当前 batch（offset 从 fromOffset 逐次加一增加的，正常的逻辑肯定会和 part.untilOffset 相等）
-
-我们知道异常从 211 行抛出来的，也知道了异常的最直接原因，那么这个原因是什么造成的呢？
-
-211 行的代码执行了，也就是 210 行的 if 语句未 true，这样的话，207 行的逻辑也应该为 true。这样的话 iter 就是 fetchBatch 返回的迭代器了。接下来我们看看 fetchBatch 的代码
-&lt;pre&gt;`188 private def fetchBatch: Iterator[MessageAndOffset] = {
-189      val req = new FetchRequestBuilder()
-190        .addFetch(part.topic, part.partition, requestOffset, kc.config.fetchMessageMaxBytes)
-        .build()
-192      val resp = consumer.fetch(req)
-      handleFetchErr(resp)
-      // kafka may return a batch that starts before the requested offset
-      resp.messageSet(part.topic, part.partition)
-196       .iterator
-        .dropWhile(_.offset &lt; requestOffset)
-    }
-`&lt;/pre&gt;
-我们发现 192 行会通过 consumer 从 kafka 获取数据，本次从哪获取数据，以及获取多少分别由 190 行的 `topic`, `partition` 和 `kc.config.fetchMessageMaxBytes` 指定。我们查看 `kc.config.fetchMessageMaxBytes`，发现默认使用的是 1M
-&lt;pre&gt;`ConsumerConfig.scala
-29 val FetchSize = 1024 * 1024
-
-114 val fetchMessageMaxBytes = props.getInt(&quot;fetch.message.max.bytes&quot;, FetchSize)
-`&lt;/pre&gt;
-从这里我们知道每次从 kafka 上最多获取 1M 的数据（这也是为什么需要在 `KafkaRDD.getNext` 函数的开头通过 `iter.hasNext()` 来判断是否需要调用 `fetchBatch`
-
-然后看到 fetchBatch 函数对应的 196 行，获取迭代器作为返回值，查看相应代码，跳转到 `ByteBufferMessageSet.scala`
-&lt;pre&gt;`139 override def iterator: Iterator[MessageAndOffset] = internalIterator()
-145 private def internalIterator(isShallow: Boolean = false): Iterator[MessageAndOffset] = {
-    new IteratorTemplate[MessageAndOffset] {
-        ......
-152      def makeNextOuter: MessageAndOffset = {
-        // if there isn&apos;t at least an offset and size, we are done
-        if (topIter.remaining &lt; 12)
-          return allDone()
-        val offset = topIter.getLong()
-        val size = topIter.getInt()
-        if(size &lt; Message.MinHeaderSize)
-          throw new InvalidMessageException(&quot;Message found with corrupt size (&quot; + size + &quot;)&quot;)
-
- 160       // we have an incomplete message
- 161       if(topIter.remaining &lt; size)
- 162         return allDone()
-       ....
- 185     }
-</code></pre><p>从 161 行我们可以看出，如果读取的消息是一条不完整的，那么本次不处理，默认本次消息读取完成。</p>
-<p>上面所有的链条穿起来就抛出了我们文章开始的异常。</p>
-<ol>
-<li>从 kafka 读取 1M 的数据（默认大小）</li>
-<li>发现读取的数据不完整（这个消息的大小大于 1M），所以本次读取的 迭代器 为空</li>
-<li>发现迭代器为空，但是当前的 offset 和 part.untilOffset 不想等，抛出异常</li>
-</ol>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过设置 kafkaParam 的参数 <code>fetch.message.max.bytes</code> 就行了，我们设置成 2M（大于一条数据的最大值即可），就能够运行成功了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">206 override def getNext(): R = &#123;</div><div class="line">	  if (iter == null || !iter.hasNext) &#123;</div><div class="line">208        iter = fetchBatch</div><div class="line">      &#125;</div><div class="line">210      if (!iter.hasNext) &#123;</div><div class="line">211        assert(requestOffset == part.untilOffset, errRanOutBeforeEnd(part))</div><div class="line">212        finished = true</div><div class="line">           null.asInstanceOf[R]</div><div class="line">		&#125; else &#123;</div><div class="line">		   	val item = iter.next()</div><div class="line">			if (item.offset &gt;= part.untilOffset) &#123;</div><div class="line">217 	        assert(item.offset == part.untilOffset, errOvershotEnd(item.offset, part))</div><div class="line">				finished = true</div><div class="line">				null.asInstanceOf[R]</div><div class="line">			&#125; else &#123;</div><div class="line">				requestOffset = item.nextOffset</div><div class="line">				messageHandler(new MessageAndMetadata(</div><div class="line">				part.topic, part.partition, item.message, item.offset, keyDecoder, valueDecoder))</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">226    &#125;</div></pre></td></tr></table></figure>
+<p>通过分析，我们知道这个地方是实际从 Kafka 读取数据的逻辑，首先会调用 <code>fetchBatch</code> 函数（208 行），然后进行逻辑判断，数据是否读取完毕，是否发生异常</p>
+<p>其中 211 行的异常表示还未读取到 part.untilOffset 但是当前迭代器中没有数据了；217 行表示当前读取的数据如果超过了 part.untilOffset ，那么在这个时候退出当前 batch（offset 从 fromOffset 逐次加一增加的，正常的逻辑肯定会和 part.untilOffset 相等）</p>
+<p>我们知道异常从 211 行抛出来的，也知道了异常的最直接原因，那么这个原因是什么造成的呢？</p>
+<p>211 行的代码执行了，也就是 210 行的 if 语句未 true，这样的话，207 行的逻辑也应该为 true。这样的话 iter 就是 fetchBatch 返回的迭代器了。接下来我们看看 fetchBatch 的代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">188 private def fetchBatch: Iterator[MessageAndOffset] = &#123;</div><div class="line">189      val req = new FetchRequestBuilder()</div><div class="line">190         .addFetch(part.topic, part.partition, requestOffset, kc.config.fetchMessageMaxBytes)</div><div class="line">			.build()</div><div class="line">192      val resp = consumer.fetch(req)</div><div class="line">	   	 handleFetchErr(resp)</div><div class="line">		// kafka may return a batch that starts before the requested offset</div><div class="line">		 resp.messageSet(part.topic, part.partition)</div><div class="line">196       .iterator</div><div class="line">          .dropWhile(_.offset &lt; requestOffset)</div><div class="line">		&#125;</div></pre></td></tr></table></figure></p>
+<p>我们发现 192 行会通过 consumer 从 kafka 获取数据，本次从哪获取数据，以及获取多少分别由 190 行的 <code>topic</code>, <code>partition</code> 和 <code>kc.config.fetchMessageMaxBytes</code> 指定。我们查看 <code>kc.config.fetchMessageMaxBytes</code>，发现默认使用的是 1M</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">ConsumerConfig.scala</div><div class="line">29 val FetchSize = 1024 * 1024</div><div class="line"></div><div class="line">114 val fetchMessageMaxBytes = props.getInt(&quot;fetch.message.max.bytes&quot;, FetchSize)</div></pre></td></tr></table></figure>
+<p>从这里我们知道每次从 kafka 上最多获取 1M 的数据（这也是为什么需要在 <code>KafkaRDD.getNext</code> 函数的开头通过 <code>iter.hasNext()</code> 来判断是否需要调用 <code>fetchBatch</code> </p>
+<p>然后看到 fetchBatch 函数对应的 196 行，获取迭代器作为返回值，查看相应代码，跳转到 <code>ByteBufferMessageSet.scala</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">139 override def iterator: Iterator[MessageAndOffset] = internalIterator()</div><div class="line">145 private def internalIterator(isShallow: Boolean = false): Iterator[MessageAndOffset] = &#123;</div><div class="line">		    new IteratorTemplate[MessageAndOffset] &#123;</div><div class="line">				        ......</div><div class="line">152      def makeNextOuter: MessageAndOffset = &#123;</div><div class="line">             // if there isn&apos;t at least an offset and size, we are done</div><div class="line">			if (topIter.remaining &lt; 12)</div><div class="line">				return allDone()</div><div class="line">			    val offset = topIter.getLong()</div><div class="line">			    val size = topIter.getInt()</div><div class="line">		        if(size &lt; Message.MinHeaderSize)</div><div class="line">			         throw new InvalidMessageException(&quot;Message found with corrupt size (&quot; + size + &quot;)&quot;)</div><div class="line">					</div><div class="line">160       // we have an incomplete message</div><div class="line">161       if(topIter.remaining &lt; size)</div><div class="line">162         return allDone()</div><div class="line">		....</div><div class="line">185     &#125;</div></pre></td></tr></table></figure>
+<p>从 161 行我们可以看出，如果读取的消息是一条不完整的，那么本次不处理，默认本次消息读取完成。<br>上面所有的链条穿起来就抛出了我们文章开始的异常。</p>
+<pre><code>1. 从 kafka 读取 1M 的数据（默认大小）
+2. 发现读取的数据不完整（这个消息的大小大于 1M），所以本次读取的 迭代器 为空
+3. 发现迭代器为空，但是当前的 offset 和 part.untilOffset 不想等，抛出异常
+</code></pre><h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过设置 kafkaParam 的参数 <code>fetch.message.max.bytes</code> 就行了，我们设置成 2M（大于一条数据的最大值即可），就能够运行成功了</p>
 
 	
 	</div>
@@ -664,24 +576,8 @@
 <li>将步骤 2 中的 offset 作为参数传入 <code>createDirectStream</code> 即可<br>通过查看源码，我们知道步骤 1 和步骤 2 中的功能在 <code>org.apache.spark.streaming.kafka.KafkaCluster</code> 中都已经有现成的函数了：<code>getPartitions</code> 和 <code>getLeaderOffsets</code>，分别表示获取指定 topic 的 partition 以及获取 partition 指定时间戳所在的 segment 的起始 offset，那么我们需要做的就是如何调用这两个函数实现我们的功能了。</li>
 </ol>
 <p>我们知道 <code>KafkaCluster</code> 的作用域是 <code>private[spark]</code> 所以我们需要在自己的代码中使用 <code>package org.apache.spark(.xxx ... .yyy)</code>(小括号中表示可以省略）来限定自己的代码，因此我们可以将步骤 1 和步骤 2 中的功能实现如下：</p>
-<pre><code>package org.apache.spark.streaming.kafka
-......      //省略其他不相关的代码
-
-def getPartitions(kafkaParams: Map[String, String], topics: Set[String]): Either[Err, Set[TopicAndPartition]] = {
-        val kc = new KafkaCluster(kafkaParams)
-        kc.getPartitions(topics)    //我们可以在这里处理错误，也可以将错误继续往上传递
-    }
-
-    def getLeaderOffsets(kafkaParams: Map[String, String], topicAndPartitions: Set[TopicAndPartition], before: Long) : Map[TopicAndPartition, Long]  = {
-        val kc = new KafkaCluster(kafkaParams)
-        val leaderOffsets = kc.getLeaderOffsets(topicAndPartitions, before)
-        if (leaderOffsets.isLeft) {  //在本函数内部处理错误，如果有错误抛出异常
-            throw new RuntimeException(s&quot;### Exception when MTKafkaUtils#getLeaderOffsets ${leaderOffsets.left.get} ###&quot;)
-        }
-
-        leaderOffsets.right.get.map { case (k, v) =&gt; (k, v.offset)}  //将 Map[TopicAndPartition, LeaderOffset] 转变为 Map[TopicAndPartition, Long]（Long 为对应 partition 的 offset，从 LeaderOffset 中获取）
-    }
-</code></pre><p>步骤 3 直接传入参数即可，就可以从指定时间戳开始消费 Kafka 数据了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">package org.apache.spark.streaming.kafka</div><div class="line">......      //省略其他不相关的代码</div><div class="line"></div><div class="line">def getPartitions(kafkaParams: Map[String, String], topics: Set[String]): Either[Err, Set[TopicAndPartition]] = &#123;</div><div class="line">        val kc = new KafkaCluster(kafkaParams)</div><div class="line">        kc.getPartitions(topics)    //我们可以在这里处理错误，也可以将错误继续往上传递</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    def getLeaderOffsets(kafkaParams: Map[String, String], topicAndPartitions: Set[TopicAndPartition], before: Long) : Map[TopicAndPartition, Long]  = &#123;</div><div class="line">        val kc = new KafkaCluster(kafkaParams)</div><div class="line">        val leaderOffsets = kc.getLeaderOffsets(topicAndPartitions, before)</div><div class="line">        if (leaderOffsets.isLeft) &#123;  //在本函数内部处理错误，如果有错误抛出异常</div><div class="line">            throw new RuntimeException(s&quot;### Exception when MTKafkaUtils#getLeaderOffsets $&#123;leaderOffsets.left.get&#125; ###&quot;)</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        leaderOffsets.right.get.map &#123; case (k, v) =&gt; (k, v.offset)&#125;  //将 Map[TopicAndPartition, LeaderOffset] 转变为 Map[TopicAndPartition, Long]（Long 为对应 partition 的 offset，从 LeaderOffset 中获取）</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>步骤 3 直接传入参数即可，就可以从指定时间戳开始消费 Kafka 数据了</p>
 
 	
 	</div>
@@ -704,49 +600,17 @@ def getPartitions(kafkaParams: Map[String, String], topics: Set[String]): Either
   <div class="row">
 	
 	
-		<div class="markdown-body">
-
-<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将 kafka 上的数据实时同步到 HDFS，不能有太多小文件</p>
+		<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将 kafka 上的数据实时同步到 HDFS，不能有太多小文件</p>
 <h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><p>Spark Streaming 支持 RDD#saveAsTextFile，将数据以 <strong>纯文本</strong> 方式写到 HDFS，我们查看 RDD#saveAsTextFile 可以看到</p>
-<pre><code>RDD.rddToPairRDDFunctions(r)(nullWritableClassTag, textClassTag, null)
-      .saveAsHadoopFile[TextOutputFormat[NullWritable, Text]](path)
-`&lt;/pre&gt;
-从上面这句话我们可以知道，首先将 RDD 转化为 PariRDD（PariRDD 的数据是 (K,V) 类型的），然后再调用 saveAsHadoopFile 函数进行实际的操作。上面的语句中 `r` 是原始 RDD，`nullWritableClassTag` 和 `textClassTag` 表示所写数据的类型（分别代表 PariRDD 的 K 和 V 的类型），使用 `nullWritableClassTag` 是因为 HDFS 不会将 PairRDD 的 key 进行实际写入，从效果上看就只写入了 PariRDD 的 V 字段。`TextOutputFormat` 是一个格式化函数，后面我们再来看这个函数，`NullWritable` 则表示一个占位符，同样是这个字段不需要实际写入 HDFS，`Text` 表示我们将写入文本类型的数据。
-
-我们看到 `TextOutputFormat` 这个类中有一个函数是 `RecordWriter` 用于操作没一条记录的写入，代码如下
-&lt;pre&gt;`public RecordWriter&lt;K, V&gt; getRecordWriter(FileSystem ignored, JobConf job, String name, Progressable progress) throws IOException {
-        boolean isCompressed = getCompressOutput(job);
-        String keyValueSeparator = job.get(&quot;mapreduce.output.textoutputformat.separator&quot;, &quot;\t&quot;);
-        if(!isCompressed) {
-            Path codecClass1 = FileOutputFormat.getTaskOutputPath(job, name);
-            FileSystem codec1 = codecClass1.getFileSystem(job);
-            FSDataOutputStream file1 = codec1.create(codecClass1, progress);
-            return new TextOutputFormat.LineRecordWriter(file1, keyValueSeparator);
-        } else {
-            Class codecClass = getOutputCompressorClass(job, GzipCodec.class);
-            CompressionCodec codec = (CompressionCodec)ReflectionUtils.newInstance(codecClass, job);
-            Path file = FileOutputFormat.getTaskOutputPath(job, name + codec.getDefaultExtension());
-            FileSystem fs = file.getFileSystem(job);
-            FSDataOutputStream fileOut = fs.create(file, progress);
-            return new TextOutputFormat.LineRecordWriter(new DataOutputStream(codec.createOutputStream(fileOut)), keyValueSeparator);
-        }
-    }
-</code></pre><p></p></div><br>从上面的代码中我们可以的知道，首先打开需要的文件，获得对应的 Stream，然后直接往里面写数据就行了。接下来我们需要做还有：1）自定义文件名；2）往文件追加数据<p></p>
-<p>而这两个需求都可以在 RecordWriter 中进行实现。</p>
-<p>对于自定义文件名，重写下面这句话就行了</p>
-<p><pre class="lang:default decode:true">Path codecClass1 = FileOutputFormat.getTaskOutputPath(job, name);</pre><br>其中 name 就是文件名，我们自定义 name 就 OK 了</p>
-<p>如果希望往文件追加数据的话（不然会有很多小文件）：</p>
-<p>我们可以在获取文件流的时候，传入已经存在的文件，然后往里面追加就行了。而且将 creat 函数换成 append 即可，具体参考下面的代码：</p>
-<p><pre class="lang:default decode:true  ">override def getRecordWriter(ignored: FileSystem, job: JobConf, name: String, progress: Progressable): RecordWriter[K, V] = {<br>        val isCompressed: Boolean = FileOutputFormat.getCompressOutput(job)<br>        val keyValueSeparator: String = job.get(“mapreduce.output.textoutputformat.separator”, “\t”)<br>        val iname = name + System.currentTimeMillis() / HDFSService.getBatchInteral<br>        if (!isCompressed) {<br>            val file: Path = FileOutputFormat.getTaskOutputPath(job, iname)<br>            val fs: FileSystem = file.getFileSystem(job)<br>            val newFile : Path = new Path(FileOutputFormat.getOutputPath(job), iname)<br>            val fileOut : FSDataOutputStream = if (fs.exists(newFile)) {<br>                fs.append(newFile)<br>            } else {<br>                fs.create(file, progress)<br>            }<br>            new TextOutputFormat.LineRecordWriter<a href="fileOut, keyValueSeparator">K, V</a><br>        } else {<br>            val codecClass: Class[_ &lt;: CompressionCodec] = FileOutputFormat.getOutputCompressorClass(job, classOf[GzipCodec])<br>            // create the named codec<br>            val codec: CompressionCodec = ReflectionUtils.newInstance(codecClass, job)<br>            // build the filename including the extension<br>            val file: Path = FileOutputFormat.getTaskOutputPath(job, iname + codec.getDefaultExtension)<br>            val fs: FileSystem = file.getFileSystem(job)<br>            val newFile : Path = new Path(FileOutputFormat.getOutputPath(job), iname + codec.getDefaultExtension)</pre></p>
-<pre><code>        val fileOut: FSDataOutputStream = if (fs.exists(newFile)) {
-            fs.append(newFile)
-        } else {
-            fs.create(file, progress)
-        }
-        new TextOutputFormat.LineRecordWriter[K, V](new DataOutputStream(codec.createOutputStream(fileOut)), keyValueSeparator)
-    }
-}&lt;/pre&gt;
-</code></pre><p>&nbsp;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">RDD.rddToPairRDDFunctions(r)(nullWritableClassTag, textClassTag, null)</div><div class="line">      .saveAsHadoopFile[TextOutputFormat[NullWritable, Text]](path)</div></pre></td></tr></table></figure>
+<p>从上面这句话我们可以知道，首先将 RDD 转化为 PariRDD，然后再调用 saveAsHadoopFile 函数进行实际的操作。上面的语句中 <code>r</code> 是原始 RDD，<code>nullWritableClassTag</code> 和 <code>textClassTag</code> 表示所写数据的类型，使用 <code>nullWritableClassTag</code> 是因为 HDFS 不会将这个数据进行实际写入（pariRDD 是 (K,V) 类型， 我们只需要写入 V），从效果上看就只写如后面的一个字段。<code>TextOutputFormat</code> 是一个格式化函数，后面我们再来看这个函数，<code>NullWritable</code> 则表示一个占位符，同样是这个字段不需要实际写入 HDFS，<code>Text</code> 表示我们将写入文本类型的数据。</p>
+<p>我们看到 <code>TextOutputFormat</code> 这个类中有一个函数是 <code>RecordWriter</code> 用于操作没一条记录的写入，代码如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">public RecordWriter&lt;K, V&gt; getRecordWriter(FileSystem ignored, JobConf job, String name, Progressable progress) throws IOException &#123;</div><div class="line">	boolean isCompressed = getCompressOutput(job);</div><div class="line">	String keyValueSeparator = job.get(&quot;mapreduce.output.textoutputformat.separator&quot;, &quot;\t&quot;);</div><div class="line">	if(!isCompressed) &#123;</div><div class="line">	    Path codecClass1 = FileOutputFormat.getTaskOutputPath(job, name);</div><div class="line">		FileSystem codec1 = codecClass1.getFileSystem(job);</div><div class="line">		FSDataOutputStream file1 = codec1.create(codecClass1, progress);</div><div class="line">		return new TextOutputFormat.LineRecordWriter(file1, keyValueSeparator);</div><div class="line">	&#125; else &#123;</div><div class="line">	    Class codecClass = getOutputCompressorClass(job, GzipCodec.class);</div><div class="line">		CompressionCodec codec = (CompressionCodec)ReflectionUtils.newInstance(codecClass, job);</div><div class="line">		Path file = FileOutputFormat.getTaskOutputPath(job, name + codec.getDefaultExtension());</div><div class="line">		FileSystem fs = file.getFileSystem(job);</div><div class="line">		FSDataOutputStream fileOut = fs.create(file, progress);</div><div class="line">		return new TextOutputFormat.LineRecordWriter(new DataOutputStream(codec.createOutputStream(fileOut)), keyValueSeparator);</div><div class="line">		&#125;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>文件中分为两部分：1）压缩文件，2）非压缩文件。然后剩下的事情就是打开文件，往文件中写数据了。</p>
+<p>说到压缩文件，就和写 lzo 格式关联起来了，因为 lzo 格式就是压缩的，那么我们从哪拿到这个压缩的格式的呢？实际上 PariRDDFunctions#saveAsHadoopFile 还可以传入压缩格式类，函数原型如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">def saveAsHadoopFile[F &lt;: OutputFormat[K, V]](</div><div class="line">    path: String,</div><div class="line">    codec: Class[_ &lt;: CompressionCodec])(implicit fm: ClassTag[F]): Unit = self.withScope &#123;</div></pre></td></tr></table></figure>
+<p>这里第二个参数表示压缩的类。如果需要我们传入一个压缩类即可，如 <code>classOf[com.hadoop.compression.lzo.LzopCodec]</code> 最终这个参数会传给 <code>TextOutputFormat#RecordWriter</code>.</p>
+<p>至此，我们以及可以写 lzo 格式的文件了。但是还没有结束，因为会产生小文件，每个 RDD 的每个 partition 都会在 HDFS 上产生一个文件，而且这些文件大小非常小，就形成了很多小文件，这对 HDFS 的压力会非常大。我们需要解决这个问题</p>
 
 	
 	</div>
@@ -769,14 +633,30 @@ def getPartitions(kafkaParams: Map[String, String], topics: Set[String]): Either
   <div class="row">
 	
 	
-		<div class="markdown-body"><br><br>## 背景<br><br>Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。<br><br>## 思考过程<br><br>为了作业能够长时间的运行，一开始遇到这种情况的时候，想到两种方案：<br><br>1.  感知上游 topic 的 partition 数目变化，然后发送报警，让用户重启<br>2.  直接在作业内部自适应上游 topic partition 的变化，完全不影响作业<br>方案 1 是简单直接，第一反应的结果，但是效果不好，需要用户人工介入，而且需要删除 checkpoint 文件<br><br>方案 2 从根本上解决问题，用户不需要关心上游 partition 数目的变化，但是第一眼会觉得较难实现。<br><br>方案 1 很快被 pass 掉，因为人工介入的成本太高，而且实现起来很别扭。接下来考虑方案 2.<br><br>Spark Streaming 程序中使用 Kafka 的最原始方式为 <code>KafkaUtils.createDirectStream</code> 通过源码，我们找到调用链条大致是这样的<br><br><span style="color: #0000ff;"><strong><code>KafkaUtils.createDirectStream</code></strong></span>   –&gt;   <strong><span style="color: #0000ff;"><code>new DirectKafkaInputDStream</code></span></strong> –&gt; 最终由 <code>DirectKafkaInputDStream#compute(validTime : Time)</code> 函数来生成 KafkaRDD。<br><br>而 KafkaRDD 的 partition 数和 <strong><span style="color: #0000ff;">作业开始运行时</span></strong> topic 的 partition 数一致，topic 的 partition 数保存在 currentOffsets 变量中，currentOffsets 是一个 Map[TopicAndPartition, Long]类型的变量，保存每个 partition 当前消费的 offset 值，但是作业运行过程中 currentOffsets 不会增加 key，就是说不会增加 KafkaRDD 的 partition，这样导致每次生成 KafkaRDD 的时候都使用 <span style="color: #0000ff;"><strong>作业开始运行时</strong></span> topic 的 partition 数作为 KafkaRDD 的 partition 数，从而会造成数据的丢失。<br><br>## 解决方案<br><br>我们只需要在每次生成 KafkaRDD 的时候，将 currentOffsets 修正为正常的值（往里面增加对应的 partition 数，总共 B-A 个，以及每个增加的 partition 的当前 offset 从零开始）。<br><br><em>   第一个问题出现了，我们不能修改 Spark 的源代码，重新进行编译，因为这不是我们自己维护的。想到的一种方案是继承 DirectKafkaInputDStream。我们发现不能继承 DirectKafkaInputDStream 该类，因为这个类是使用 <code>private[streaming]</code> 修饰的。
-</em>   第二个问题出现了，怎么才能够继承 DirectKafkaInputDStream，这时我们只需要将希望继承 DirectKafkaInputDStream 的类放到一个单独的文件 F 中，文件 F 使用 <code>package org.apache.spark.streaming</code> 进行修饰即可，这样可以绕过不能继承 DirectKafkaInputDStream 的问题。这个问题解决后，我们还需要修改 <code>Object KafkaUtils</code>，让该 Object 内部调用我们修改后的 DirectKafkaInputDStream（我命名为 MTDirectKafkaInputDStream)<br><em>   第三个问题如何让 Spark 调用 MTDirectKafkaInputDStream，而不是 DirectKafkaInputDStream，这里我们使用简单粗暴的方式，将 KafkaUtils 的代码 copy 一份，然后将其中调用 DirectKafkaInputDStream 的部分都修改为 MTDirectKafkaInputDStream，这样就实现了我们的需要。当然该文件也需要使用 <code>package org.apache.spark.streaming</code> 进行修饰
-</em>   第二个和第三个问题的解决方案在  中国 Spark 技术峰会 2016  上，广点通的 林立伟 有提及，后续会进行尝试<br>总结下，我们需要做两件事<br><br>1.  修改 DirectKafkaInputDStream#compute 使得能够自适应 topic 的 partition 变更<br>2.  修改 KafkaUtils，使得我们能够调用修改过后的 DirectKafkaInputDStream<br><br>## 代码<br><br>    package org.apache.spark.streaming.kafka.mt<br><br>    import com.meituan.data.util.Constants<br>    import com.meituan.service.inf.kms.client.Kms<br>    import kafka.common.{ErrorMapping, TopicAndPartition}<br>    import kafka.javaapi.{TopicMetadata, TopicMetadataRequest}<br>    import kafka.javaapi.consumer.SimpleConsumer<br>    import kafka.message.MessageAndMetadata<br>    import kafka.serializer.Decoder<br>    import org.apache.spark.streaming.{StreamingContext, Time}<br>    import org.apache.spark.streaming.kafka.{DirectKafkaInputDStream, KafkaRDD}<br><br>    import scala.collection.JavaConverters.<em><br>    import scala.util.control.Breaks.</em><br>    import scala.reflect.ClassTag<br><br>    /<strong><br>      <em> Created by qiucongxian on 10/27/16.
-      </em>/<br>    class MTDirectKafkaInputDStream<a href="@transient ssc_ : StreamingContext,
-        val MTkafkaParams: Map[String, String],
-        val MTfromOffsets: Map[TopicAndPartition, Long],
-        messageHandler: MessageAndMetadata[K, V] =&gt; R"><br>      K: ClassTag,<br>      V: ClassTag,<br>      U &lt;: Decoder[K]: ClassTag,<br>      T &lt;: Decoder[V]: ClassTag,<br>      R: ClassTag</a> extends DirectKafkaInputDStream<a href="ssc_, MTkafkaParams , MTfromOffsets, messageHandler">K, V, U, T, R</a> {<br>        private val kafkaBrokerList : String = “host1:port1,host2:port2,host3:port3” //根据自己的情况自行修改<br><br>        override def compute(validTime: Time) : Option[KafkaRDD[K, V, U, T, R]] = {<br>          /</strong><br>            <em> 在这更新 currentOffsets 从而做到自适应上游 partition 数目变化
-            </em>/<br>            updateCurrentOffsetForKafkaPartitionChange()<br>            super.compute(validTime)<br>        }<br><br>        private def updateCurrentOffsetForKafkaPartitionChange() : Unit = {<br>          val topic = currentOffsets.head.<em>1.topic<br>          val nextPartitions : Int = getTopicMeta(topic) match {<br>              case Some(x) =&gt; x.partitionsMetadata.size()<br>              case </em> =&gt; 0<br>          }<br>          val currPartitions = currentOffsets.keySet.size<br><br>          if (nextPartitions &gt; currPartitions) {<br>            var i = currPartitions<br>            while (i &lt; nextPartitions) {<br>               currentOffsets = currentOffsets + (TopicAndPartition(topic, i) -&gt; 0)<br>               i = i + 1<br>            }<br>          }<br>          logInfo(s”######### ${nextPartitions}  currentParttions ${currentOffsets.keySet.size} ########”)<br>        }<br><br>        private def getTopicMeta(topic: String) : Option[TopicMetadata] = {<br>            var metaData : Option[TopicMetadata] = None<br>            var consumer : Option[SimpleConsumer] = None<br><br>            val topics = List<a href="topic">String</a><br>            val brokerList = kafkaBrokerList.split(“,”)<br>            brokerList.foreach(<br>              item =&gt; {<br>                val hostPort = item.split(“:”)<br>                try {<br>                  breakable {<br>                      for (i &lt;- 0 to 3) {<br>                          consumer = Some(new SimpleConsumer(host = hostPort(0), port = hostPort(1).toInt,<br>                                                soTimeout = 10000, bufferSize = 64 * 1024, clientId = “leaderLookup”))<br>                          val req : TopicMetadataRequest = new TopicMetadataRequest(topics.asJava)<br>                          val resp = consumer.get.send(req)<br><br>                          metaData = Some(resp.topicsMetadata.get(0))<br>                          if (metaData.get.errorCode == ErrorMapping.NoError) break()<br>                      }<br>                  }<br>                } catch {<br>                  case e =&gt; logInfo(s” ###### Error in MTDirectKafkaInputDStream ${e} ######”)<br>                }<br>              }<br>            )<br>            metaData<br>        }<br>    }<br><br>在修改过后的 KafkaUtils 文件中，将所有的 <code>DirectKafkaInputDStream</code> 都替换为 <code>MTDirectKafkaInputDStream</code> 即可<br><br></div>
+		<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。</p>
+<h2 id="思考过程"><a href="#思考过程" class="headerlink" title="思考过程"></a>思考过程</h2><p>为了作业能够长时间的运行，一开始遇到这种情况的时候，想到两种方案：</p>
+<ol>
+<li>感知上游 topic 的 partition 数目变化，然后发送报警，让用户重启</li>
+<li>直接在作业内部自适应上游 topic partition 的变化，完全不影响作业<br>方案 1 是简单直接，第一反应的结果，但是效果不好，需要用户人工介入，而且需要删除 checkpoint 文件</li>
+</ol>
+<p>方案 2 从根本上解决问题，用户不需要关心上游 partition 数目的变化，但是第一眼会觉得较难实现。</p>
+<p>方案 1 很快被 pass 掉，因为人工介入的成本太高，而且实现起来很别扭。接下来考虑方案 2.</p>
+<p>Spark Streaming 程序中使用 Kafka 的最原始方式为 <code>KafkaUtils.createDirectStream</code> 通过源码，我们找到调用链条大致是这样的</p>
+<p><span style="color: #0000ff;"><strong><code>KafkaUtils.createDirectStream</code></strong></span>   –&gt;   <strong><span style="color: #0000ff;"><code>new DirectKafkaInputDStream</code></span></strong> –&gt; 最终由 <code>DirectKafkaInputDStream#compute(validTime : Time)</code> 函数来生成 KafkaRDD。</p>
+<p>而 KafkaRDD 的 partition 数和 <strong><span style="color: #0000ff;">作业开始运行时</span></strong> topic 的 partition 数一致，topic 的 partition 数保存在 currentOffsets 变量中，currentOffsets 是一个 Map[TopicAndPartition, Long]类型的变量，保存每个 partition 当前消费的 offset 值，但是作业运行过程中 currentOffsets 不会增加 key，就是说不会增加 KafkaRDD 的 partition，这样导致每次生成 KafkaRDD 的时候都使用 <span style="color: #0000ff;"><strong>作业开始运行时</strong></span> topic 的 partition 数作为 KafkaRDD 的 partition 数，从而会造成数据的丢失。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>我们只需要在每次生成 KafkaRDD 的时候，将 currentOffsets 修正为正常的值（往里面增加对应的 partition 数，总共 B-A 个，以及每个增加的 partition 的当前 offset 从零开始）。</p>
+<ul>
+<li>第一个问题出现了，我们不能修改 Spark 的源代码，重新进行编译，因为这不是我们自己维护的。想到的一种方案是继承 DirectKafkaInputDStream。我们发现不能继承 DirectKafkaInputDStream 该类，因为这个类是使用 <code>private[streaming]</code> 修饰的。</li>
+<li>第二个问题出现了，怎么才能够继承 DirectKafkaInputDStream，这时我们只需要将希望继承 DirectKafkaInputDStream 的类放到一个单独的文件 F 中，文件 F 使用 <code>package org.apache.spark.streaming</code> 进行修饰即可，这样可以绕过不能继承 DirectKafkaInputDStream 的问题。这个问题解决后，我们还需要修改 <code>Object KafkaUtils</code>，让该 Object 内部调用我们修改后的 DirectKafkaInputDStream（我命名为 MTDirectKafkaInputDStream)</li>
+<li>第三个问题如何让 Spark 调用 MTDirectKafkaInputDStream，而不是 DirectKafkaInputDStream，这里我们使用简单粗暴的方式，将 KafkaUtils 的代码 copy 一份，然后将其中调用 DirectKafkaInputDStream 的部分都修改为 MTDirectKafkaInputDStream，这样就实现了我们的需要。当然该文件也需要使用 <code>package org.apache.spark.streaming</code> 进行修饰</li>
+<li>第二个和第三个问题的解决方案在  中国 Spark 技术峰会 2016  上，广点通的 林立伟 有提及，后续会进行尝试<br>总结下，我们需要做两件事</li>
+</ul>
+<ol>
+<li>修改 DirectKafkaInputDStream#compute 使得能够自适应 topic 的 partition 变更</li>
+<li>修改 KafkaUtils，使得我们能够调用修改过后的 DirectKafkaInputDStream</li>
+</ol>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div></pre></td><td class="code"><pre><div class="line">package org.apache.spark.streaming.kafka.mt</div><div class="line"></div><div class="line">import com.meituan.data.util.Constants</div><div class="line">import com.meituan.service.inf.kms.client.Kms</div><div class="line">import kafka.common.&#123;ErrorMapping, TopicAndPartition&#125;</div><div class="line">import kafka.javaapi.&#123;TopicMetadata, TopicMetadataRequest&#125;</div><div class="line">import kafka.javaapi.consumer.SimpleConsumer</div><div class="line">import kafka.message.MessageAndMetadata</div><div class="line">import kafka.serializer.Decoder</div><div class="line">import org.apache.spark.streaming.&#123;StreamingContext, Time&#125;</div><div class="line">import org.apache.spark.streaming.kafka.&#123;DirectKafkaInputDStream, KafkaRDD&#125;</div><div class="line"></div><div class="line">import scala.collection.JavaConverters._</div><div class="line">import scala.util.control.Breaks._</div><div class="line">import scala.reflect.ClassTag</div><div class="line"></div><div class="line">/**</div><div class="line">  * Created by qiucongxian on 10/27/16.</div><div class="line">  */</div><div class="line">class MTDirectKafkaInputDStream[</div><div class="line">  K: ClassTag,</div><div class="line">  V: ClassTag,</div><div class="line">  U &lt;: Decoder[K]: ClassTag,</div><div class="line">  T &lt;: Decoder[V]: ClassTag,</div><div class="line">  R: ClassTag](</div><div class="line">    @transient ssc_ : StreamingContext,</div><div class="line">    val MTkafkaParams: Map[String, String],</div><div class="line">    val MTfromOffsets: Map[TopicAndPartition, Long],</div><div class="line">    messageHandler: MessageAndMetadata[K, V] =&gt; R</div><div class="line">) extends DirectKafkaInputDStream[K, V, U, T, R](ssc_, MTkafkaParams , MTfromOffsets, messageHandler) &#123;</div><div class="line">    private val kafkaBrokerList : String = &quot;host1:port1,host2:port2,host3:port3&quot; //根据自己的情况自行修改</div><div class="line"></div><div class="line">    override def compute(validTime: Time) : Option[KafkaRDD[K, V, U, T, R]] = &#123;</div><div class="line">      /**</div><div class="line">        * 在这更新 currentOffsets 从而做到自适应上游 partition 数目变化</div><div class="line">        */</div><div class="line">        updateCurrentOffsetForKafkaPartitionChange()</div><div class="line">        super.compute(validTime)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private def updateCurrentOffsetForKafkaPartitionChange() : Unit = &#123;</div><div class="line">      val topic = currentOffsets.head._1.topic</div><div class="line">      val nextPartitions : Int = getTopicMeta(topic) match &#123;</div><div class="line">          case Some(x) =&gt; x.partitionsMetadata.size()</div><div class="line">          case _ =&gt; 0</div><div class="line">      &#125;</div><div class="line">      val currPartitions = currentOffsets.keySet.size</div><div class="line"></div><div class="line">      if (nextPartitions &gt; currPartitions) &#123;</div><div class="line">        var i = currPartitions</div><div class="line">        while (i &lt; nextPartitions) &#123;</div><div class="line">           currentOffsets = currentOffsets + (TopicAndPartition(topic, i) -&gt; 0)</div><div class="line">           i = i + 1</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      logInfo(s&quot;######### $&#123;nextPartitions&#125;  currentParttions $&#123;currentOffsets.keySet.size&#125; ########&quot;)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private def getTopicMeta(topic: String) : Option[TopicMetadata] = &#123;</div><div class="line">        var metaData : Option[TopicMetadata] = None</div><div class="line">        var consumer : Option[SimpleConsumer] = None</div><div class="line"></div><div class="line">        val topics = List[String](topic)</div><div class="line">        val brokerList = kafkaBrokerList.split(&quot;,&quot;)</div><div class="line">        brokerList.foreach(</div><div class="line">          item =&gt; &#123;</div><div class="line">            val hostPort = item.split(&quot;:&quot;)</div><div class="line">            try &#123;</div><div class="line">              breakable &#123;</div><div class="line">                  for (i &lt;- 0 to 3) &#123;</div><div class="line">                      consumer = Some(new SimpleConsumer(host = hostPort(0), port = hostPort(1).toInt,</div><div class="line">                                            soTimeout = 10000, bufferSize = 64 * 1024, clientId = &quot;leaderLookup&quot;))</div><div class="line">                      val req : TopicMetadataRequest = new TopicMetadataRequest(topics.asJava)</div><div class="line">                      val resp = consumer.get.send(req)</div><div class="line"></div><div class="line">                      metaData = Some(resp.topicsMetadata.get(0))</div><div class="line">                      if (metaData.get.errorCode == ErrorMapping.NoError) break()</div><div class="line">                  &#125;</div><div class="line">              &#125;</div><div class="line">            &#125; catch &#123;</div><div class="line">              case e =&gt; logInfo(s&quot; ###### Error in MTDirectKafkaInputDStream $&#123;e&#125; ######&quot;)</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">        )</div><div class="line">        metaData</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在修改过后的 KafkaUtils 文件中，将所有的 <code>DirectKafkaInputDStream</code> 都替换为 <code>MTDirectKafkaInputDStream</code> 即可</p>
 
 	
 	</div>
@@ -799,9 +679,20 @@ def getPartitions(kafkaParams: Map[String, String], topics: Set[String]): Either
   <div class="row">
 	
 	
-		<div class="markdown-body"><br><br># 要多快才能跑完一场马拉松<br><br>## 完成一场马拉松的最慢速度<br><br>工作后身边跑马拉松的人突然就多起来了，或许你也蠢蠢欲动，但是一看到半程马拉松有 21 公理，全程马拉松 42 公理，就提前打退堂鼓了。那么你有没有想过<br><br>    到底要多快我们才能跑完一场 半程/全程 马拉松？<br>    <code>&lt;/pre&gt;
-    我们来算一算到底需要多快才能才可以跑完一场马拉松，鉴于体力原因，假设我们开始想完成一场半程马拉松，那么我们需要在 3 小时内跑完 21 公理，也就是说每小时需要跑完 7 公理，这样算还是不够直观，我们换一种方式，我们计算每公里平均最长耗时 M
-    &lt;pre&gt;</code>M <em> 21 公里 = 3 小时<br>    `<br>    这样，我们得到 M 的值为 3 </em> 60 / 21 约等于 8.57 分钟，即 8 分钟 34 秒。这个值告诉我们平均 8 分钟 34 秒跑完一公里 – 也就是快走的速度 – 以这个速度就能跑完一场半程马拉松比赛。<br><br>    ## 最慢速度的作用<br><br>    我们知道了跑完一场半程马拉松，最慢平均速度是 8 分 34 秒。<br>    <pre><code>那么我们知道这个速度有什么用呢？</code></pre><br>    让我们从心底知道我们能完成这件事，这并不是一件只有少数人才能做的事情，并不需要你在体育方面有超过常人能力，只要你身体健康就行。卡耐基在《人性的优点》里面介绍一个应对恐惧的方法也是类似的：<br>    <pre>`把你恐惧的事情会导致的所有最坏可能性都一一罗列出来，然后一一检查它们。<br><br>这个方法的好处是让你知道，就算最坏情况也就这样，让你从无边的恐惧中解放出来。<br><br>## 最后<br><br>如果你自己能够一个人跑完十公里，那么你的体力就能跑完半程马拉松。<br><br>跑马拉松是一项群体运动，你会被大家带着跑，但是大家需要找到适合自己的节奏，根据自己的实际情况来确定你能跑完全程的速度。<br><br>如果在比赛过程中有任何不适，要量力而行，千万不要硬撑。<br><br>最后不建议在雾霾天跑马拉松。<br><br></pre></div>
+		<h2 id="完成一场马拉松的最慢速度"><a href="#完成一场马拉松的最慢速度" class="headerlink" title="完成一场马拉松的最慢速度"></a>完成一场马拉松的最慢速度</h2><p>工作后身边跑马拉松的人突然就多起来了，或许你也蠢蠢欲动，但是一看到半程马拉松有 21 公理，全称马拉松 42 公理，就提前打退堂鼓了。那么你有没有想过</p>
+<pre><code>到底要多快我们才能跑完一场 半程/全程 马拉松？
+</code></pre><p>我们来算一算到底需要多快才能才可以跑完一场马拉松，鉴于体力原因，假设我们开始想完成一场半程马拉松，那么我们需要在 3 小时内跑完 21 公理，也就是说每小时需要跑完 7 公理，这样算还是不够直观，我们换一种方式，我们计算每公里平均最长耗时 M</p>
+<pre><code>M * 21 公里 = 3 小时
+</code></pre><p>这样，我们得到 M 的值为 3 * 60 / 21 约等于  8.57 分钟，即 8 分钟 34 秒。这个值告诉我们平均 8 分钟 34 秒跑完一公里  – 也就是快走的速度 – 以这个速度就能跑完一场半程马拉松比赛。</p>
+<h2 id="最慢速度的作用"><a href="#最慢速度的作用" class="headerlink" title="最慢速度的作用"></a>最慢速度的作用</h2><p>我们知道了跑完一场半程马拉松，最慢平均速度是 8 分 34 秒。</p>
+<pre><code>那么我们知道这个速度有什么用呢？
+</code></pre><p>让我们从心底知道我们能完成这件事，这并不是一件只有少数人才能做的事情，并不需要你在体育方面有超过常人能力，只要你身体健康就行。卡耐基在《人性的优点》里面介绍一个应对恐惧的方法也是类似的：</p>
+<pre><code>把你恐惧的事情会导致的所有最坏可能性都一一罗列出来，然后一一检查它们。
+</code></pre><p>这个方法的好处是让你知道，就算最坏情况也就这样，让你从无边的恐惧中解放出来。</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>如果你自己能够一个人跑完十公里，那么你的体力就能跑完半程马拉松。</p>
+<p>跑马拉松是一项群体运动，你会被大家带着跑，但是大家需要找到适合自己的节奏，根据自己的实际情况来确定你能跑完全程的速度。</p>
+<p>如果在比赛过程中有任何不适，要量力而行，千万不要硬撑。</p>
+<p>最后不建议在雾霾天跑马拉松。</p>
 
 	
 	</div>
@@ -830,58 +721,42 @@ def getPartitions(kafkaParams: Map[String, String], topics: Set[String]): Either
 <p>在实时计算中，用户不仅仅关心时效性的问题，同时也关心消息处理的成功率。本文将通过实验验证 Storm 的消息可靠性保证机制，文章分为消息保证机制、测试目的、测试环境、测试场景以及总结等五节。</p>
 <h2 id="Storm-的消息保证机制"><a href="#Storm-的消息保证机制" class="headerlink" title="Storm 的消息保证机制"></a>Storm 的消息保证机制</h2><p>Storm 提供了三种不同层次的消息保证机制，分别是 At Most Once、At Least Once 以及 Exactly Once。消息保证机制依赖于消息是否被完全处理。</p>
 <h3 id="消息完全处理"><a href="#消息完全处理" class="headerlink" title="消息完全处理"></a>消息完全处理</h3><p>每个从 Spout（Storm 中数据源节点）发出的 Tuple（Storm 中的最小消息单元）可能会生成成千上万个新的 Tuple，形成一棵 Tuple 树，当整棵 Tuple 树的节点都被成功处理了，我们就说从 Spout 发出的 Tuple 被完全处理了。 我们可以通过下面的例子来更好地诠释消息被完全处理这个概念：</p>
-<pre><code>TopologyBuilder builder = new TopologyBuilder();
-builder.setSpout(&quot;sentences&quot;, new KafkaSpout(spoutConfig), spoutNum);
-builder.setBolt(&quot;split&quot;, new SplitSentence(), 10)
-    .shuffleGrouping(&quot;sentences&quot;);
-builder.setBolt(&quot;count&quot;, new WordCount(), 20)
-    .fieldsGrouping(&quot;split&quot;, new Fields(&quot;word&quot;));
-`&lt;/pre&gt;
-这个 Topology 从 Kafka（一个开源的分布式消息队列）读取信息发往下游，下游的 Bolt 将收到的句子分割成单独的单词，并进行计数。每一个从 Spout 发送出来的 Tuple 会衍生出多个新的 Tuple，从 Spout 发送出来的 Tuple 以及后续衍生出来的 Tuple 形成一棵 Tuple 树，下图是一棵 Tuple 树示例：
-
-![Tuple 树示例图](http://tech.meituan.com/img/test-of-storm)
-
-上图中所有的 Tuple 都被成功处理了，我们才认为 Spout 发出的 Tuple 被完全处理。如果在一个固定的时间内（这个时间可以配置，默认为 30 秒），有至少一个 Tuple 处理失败或超时，则认为整棵 Tuple 树处理失败，即从 Spout 发出的 Tuple 处理失败。
-
-### 如何实现不同层次的消息保证机制
-
-![spout_bolt_acker](http://tech.meituan.com/img/test-of-storm)
-
-Tuple 的完全处理需要 Spout、Bolt 以及 Acker（Storm 中用来记录某棵 Tuple 树是否被完全处理的节点）协同完成，如上图所示。从 Spout 发送 Tuple 到下游，并把相应信息通知给 Acker，整棵 Tuple 树中某个 Tuple 被成功处理了都会通知 Acker，待整棵 Tuple 树都被处理完成之后，Acker 将成功处理信息返回给 Spout；如果某个 Tuple 处理失败，或者超时，Acker 将会给 Spout 发送一个处理失败的消息，Spout 根据 Acker 的返回信息以及用户对消息保证机制的选择判断是否需要进行消息重传。
-
-Storm 提供的三种不同消息保证机制中。利用 Spout、Bolt 以及 Acker 的组合我们可以实现 At Most Once 以及 At Least Once 语义，Storm 在 At Least Once 的基础上进行了一次封装（Trident），从而实现 Exactly Once 语义。
-
-Storm 的消息保证机制中，如果需要实现 At Most Once 语义，只需要满足下面任何一条即可：
-</code></pre><ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">TopologyBuilder builder = new TopologyBuilder();</div><div class="line">builder.setSpout(&quot;sentences&quot;, new KafkaSpout(spoutConfig), spoutNum);</div><div class="line">builder.setBolt(&quot;split&quot;, new SplitSentence(), 10)</div><div class="line">    .shuffleGrouping(&quot;sentences&quot;);</div><div class="line">builder.setBolt(&quot;count&quot;, new WordCount(), 20)</div><div class="line">    .fieldsGrouping(&quot;split&quot;, new Fields(&quot;word&quot;));</div></pre></td></tr></table></figure>
+<p>这个 Topology 从 Kafka（一个开源的分布式消息队列）读取信息发往下游，下游的 Bolt 将收到的句子分割成单独的单词，并进行计数。每一个从 Spout 发送出来的 Tuple 会衍生出多个新的 Tuple，从 Spout 发送出来的 Tuple 以及后续衍生出来的 Tuple 形成一棵 Tuple 树，下图是一棵 Tuple 树示例：</p>
+<p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/tuple_tree.png" alt="Tuple 树示例图"></p>
+<p>上图中所有的 Tuple 都被成功处理了，我们才认为 Spout 发出的 Tuple 被完全处理。如果在一个固定的时间内（这个时间可以配置，默认为 30 秒），有至少一个 Tuple 处理失败或超时，则认为整棵 Tuple 树处理失败，即从 Spout 发出的 Tuple 处理失败。</p>
+<h3 id="如何实现不同层次的消息保证机制"><a href="#如何实现不同层次的消息保证机制" class="headerlink" title="如何实现不同层次的消息保证机制"></a>如何实现不同层次的消息保证机制</h3><p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/spout_bolt_acker.png" alt="spout_bolt_acker"></p>
+<p>Tuple 的完全处理需要 Spout、Bolt 以及 Acker（Storm 中用来记录某棵 Tuple 树是否被完全处理的节点）协同完成，如上图所示。从 Spout 发送 Tuple 到下游，并把相应信息通知给 Acker，整棵 Tuple 树中某个 Tuple 被成功处理了都会通知 Acker，待整棵 Tuple 树都被处理完成之后，Acker 将成功处理信息返回给 Spout；如果某个 Tuple 处理失败，或者超时，Acker 将会给 Spout 发送一个处理失败的消息，Spout 根据 Acker 的返回信息以及用户对消息保证机制的选择判断是否需要进行消息重传。</p>
+<p>Storm 提供的三种不同消息保证机制中。利用 Spout、Bolt 以及 Acker 的组合我们可以实现 At Most Once 以及 At Least Once 语义，Storm 在 At Least Once 的基础上进行了一次封装（Trident），从而实现 Exactly Once 语义。</p>
+<p>Storm 的消息保证机制中，如果需要实现 At Most Once 语义，只需要满足下面任何一条即可：</p>
+<ul>
 <li>关闭 ACK 机制，即 Acker 数目设置为 0</li>
 <li><p>Spout 不实现可靠性传输</p>
-<pre><code>*   Spout 发送消息是使用不带 message ID 的 API
-</code></pre><ul>
+</li>
+<li><p>Spout 发送消息是使用不带 message ID 的 API</p>
+</li>
 <li>不实现 fail 函数</li>
+<li>Bolt 不把处理成功或失败的消息发送给 Acker</li>
 </ul>
-</li>
-<li><p>Bolt 不把处理成功或失败的消息发送给 Acker<br>如果需要实现 At Least Once 语义，则需要同时保证如下几条：</p>
-</li>
-<li><p>开启 ACK 机制，即 Acker 数目大于 0</p>
-</li>
-<li><p>Spout 实现可靠性传输保证</p>
-<pre><code>*   Spout 发送消息时附带 message 的 ID
-</code></pre><ul>
+<p>如果需要实现 At Least Once 语义，则需要同时保证如下几条：</p>
+<ul>
+<li>开启 ACK 机制，即 Acker 数目大于 0</li>
+<li>Spout 实现可靠性传输保证</li>
+<li>Spout 发送消息时附带 message 的 ID</li>
 <li>如果收到 Acker 的处理失败反馈，需要进行消息重传，即实现 fail 函数</li>
+<li>Bolt 在处理成功或失败后需要调用相应的方法通知 Acker<br>实现 Exactly Once 语义，则需要在 At Least Once 的基础上进行状态的存储，用来防止重复发送的数据被重复处理，在 Storm 中使用 Trident API 实现。</li>
 </ul>
-</li>
-<li><p>Bolt 在处理成功或失败后需要调用相应的方法通知 Acker<br>实现 Exactly Once 语义，则需要在 At Least Once 的基础上进行状态的存储，用来防止重复发送的数据被重复处理，在 Storm 中使用 Trident API 实现。</p>
 <p>下图中，每种消息保证机制中左边的字母表示上游发送的消息，右边的字母表示下游接收到的消息。从图中可以知道，At Most Once 中，消息可能会丢失（上游发送了两个 A，下游只收到一个 A）；At Least Once 中，消息不会丢失，可能重复（上游只发送了一个 B ，下游收到两个 B）；Exactly Once 中，消息不丢失、不重复，因此需要在 At Least Once 的基础上保存相应的状态，表示上游的哪些消息已经成功发送到下游，防止同一条消息发送多次给下游的情况。</p>
-<p><img src="http://tech.meituan.com/img/test-of-storm" alt="三种消息保证机制比较图"></p>
+<p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/3_compare.png" alt="三种消息保证机制比较图"></p>
 <h2 id="测试目的"><a href="#测试目的" class="headerlink" title="测试目的"></a>测试目的</h2><p>Storm 官方提供 At Most Once、At Least Once 以及 Exactly Once 三种不同层次的消息保证机制，我们希望通过相关测试，达到如下目的：</p>
-</li>
-<li><p>三种消息保证机制的表现，是否与官方的描述相符；</p>
-</li>
+<ul>
+<li>三种消息保证机制的表现，是否与官方的描述相符；</li>
 <li>At Most Once 语义下，消息的丢失率和什么有关系、关系如何；</li>
-<li><p>At Least Once 语义下，消息的重复率和什么有关系、关系如何。</p>
+<li>At Least Once 语义下，消息的重复率和什么有关系、关系如何。</li>
+</ul>
 <h2 id="测试环境"><a href="#测试环境" class="headerlink" title="测试环境"></a>测试环境</h2><p>本文的测试环境如下: 每个 worker（worker 为一个 物理 JVM 进程，用于运行实际的 Storm 作业）分配 1 CPU 以及 1.6G 内存。Spout、Bolt、Acker 分别跑在单独的 worker 上。并通过在程序中控制抛出异常以及人工 Kill Spout/Bolt/Acker 的方式来模拟实际情况中的异常情况。</p>
 <p>三种消息保证机制的测试均由 Spout 从 Kafka 读取测试数据，经由相应 Bolt 进行处理，然后发送到 Kafka，并将 Kafka 上的数据同步到 MySQL 方便最终结果的统计，如下图所示：</p>
-<p><img src="http://tech.meituan.com/img/test-of-storm" alt="测试流程示意图"></p>
+<p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/test-flow.png" alt="测试流程示意图"></p>
 <p>测试数据为 Kafka 上顺序保存的一系列纯数字，数据量分别有十万、五十万、一百万等，每个数字在每个测试样例中出现且仅出现一次。</p>
 <h2 id="测试场景"><a href="#测试场景" class="headerlink" title="测试场景"></a>测试场景</h2><p>对于三种不同的消息保证机制，我们分别设置了不同的测试场景，来进行充分的测试。其中为了保证 Spout/Bolt/Acker 发生异常的情况下不影响其他节点，在下面的测试中，所有的节点单独运行在独立的 Worker 上。</p>
 <h3 id="At-Most-Once"><a href="#At-Most-Once" class="headerlink" title="At Most Once"></a>At Most Once</h3><p>从背景中可以得知，如果希望实现 At Most Once 语义，将 Acker 的数目设置为 0 即可，本文的测试过程中通过把设置 Acker 为 0 来进行 At Most Once 的测试。</p>
@@ -891,152 +766,37 @@ Storm 的消息保证机制中，如果需要实现 At Most Once 语义，只需
 <h4 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h4><p>不发生异常的情况下，消息能够不丢不重；Bolt 发生异常的情况下，消息会丢失，不会重复，其中消息的<strong>丢失数目</strong>与<strong>异常次数正相关</strong>。与官方文档描述相符，符合预期。</p>
 <h3 id="At-Least-Once"><a href="#At-Least-Once" class="headerlink" title="At Least Once"></a>At Least Once</h3><p>为了实现 At Least Once 语义，需要 Spout、Bolt、Acker 进行配合。我们使用 Kafka-Spout 并通过自己管理 offset 的方式来实现可靠的 Spout；Bolt 通过继承 BaseBasicBolt，自动帮我们建立 Tuple 树以及消息处理之后通知 Acker；将 Acker 的数目设置为 1，即打开 ACK 机制，这样整个 Topology 即可提供 At Least Once 的语义。</p>
 <h4 id="测试数据"><a href="#测试数据" class="headerlink" title="测试数据"></a>测试数据</h4><p>Kafka 上保存的十万到五十万不等的纯数字，其中每个测试样例中，每个数字在 Kafka 中出现且仅出现一次。</p>
-<h4 id="测试结果-1"><a href="#测试结果-1" class="headerlink" title="测试结果"></a>测试结果</h4><p>Acker 发生异常的情况</p>
-<table><br><thead><br><tr><br><th>异常的次数</th><br><th>测试数据总量</th><br><th>结果集中不重复的 Tuple 数</th><br><th>数据重复的次数（&gt;1)</th><br><th>出现重复的 Tuple 数</th><br><th>数据丢失数量</th><br><th>最大积压量</th><br></tr><br></thead><br><tbody><br><tr><br><td>0</td><br><td>100000</td><br><td>100000</td><br><td>-</td><br><td>-</td><br><td>0</td><br><td>2000（默认值）</td><br></tr><br><tr><br><td>0</td><br><td>200000</td><br><td>200000</td><br><td>-</td><br><td>-</td><br><td>0</td><br><td>2000</td><br></tr><br><tr><br><td>0</td><br><td>300000</td><br><td>300000</td><br><td>-</td><br><td>-</td><br><td>0</td><br><td>2000</td><br></tr><br><tr><br><td>0</td><br><td>400000</td><br><td>400000</td><br><td>-</td><br><td>-</td><br><td>0</td><br><td>2000</td><br></tr><br></tbody><br></table><br><table><br><thead><br><tr><br><th>异常的次数</th><br><th>测试数据总量</th><br><th>结果集中不重复的 Tuple 数</th><br><th>数据重复的次数（&gt;1)</th><br><th>出现重复的 Tuple 数</th><br><th>数据丢失数量</th><br><th>最大积压量</th><br></tr><br></thead><br><tbody><br><tr><br><td>1</td><br><td>100000</td><br><td>100000</td><br><td>2</td><br><td>2000</td><br><td>0</td><br><td>2000</td><br></tr><br><tr><br><td>2</td><br><td>100000</td><br><td>100000</td><br><td>2</td><br><td>4001</td><br><td>0</td><br><td>2000</td><br></tr><br><tr><br><td>3</td><br><td>100000</td><br><td>100000</td><br><td>2</td><br><td>6000</td><br><td>0</td><br><td>2000</td><br></tr><br><tr><br><td>4</td><br><td>100000</td><br><td>100000</td><br><td>2</td><br><td>8000</td><br><td>0</td><br><td>2000</td><br></tr><br></tbody><br></table><br>Spout 发生异常的情况<br><table><br><thead><br><tr><br><th>异常的次数</th><br><th>测试数据总量</th><br><th>结果集中不重复的 Tuple 数</th><br><th>数据重复的次数（&gt;1)</th><br><th>出现重复的 Tuple 数</th><br><th>数据丢失数量</th><br></tr><br></thead><br><tbody><br><tr><br><td>0</td><br><td>100000</td><br><td>100000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>200000</td><br><td>200000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>300000</td><br><td>300000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>400000</td><br><td>400000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br></tbody><br></table><br><table><br><thead><br><tr><br><th>异常的次数</th><br><th>测试数据总量</th><br><th>结果集中不重复的 Tuple 数</th><br><th>数据重复的次数（&gt;1)</th><br><th>出现重复的 Tuple 数</th><br><th>数据丢失数量</th><br></tr><br></thead><br><tbody><br><tr><br><td>1</td><br><td>100000</td><br><td>100000</td><br><td>2</td><br><td>2052</td><br><td>0</td><br></tr><br><tr><br><td>2</td><br><td>100000</td><br><td>100000</td><br><td>2</td><br><td>4414</td><br><td>0</td><br></tr><br><tr><br><td>4</td><br><td>100000</td><br><td>100000</td><br><td>2</td><br><td>9008</td><br><td>0</td><br></tr><br><tr><br><td>6</td><br><td>100000</td><br><td>100000</td><br><td>2</td><br><td>9690</td><br><td>0</td><br></tr><br><tr><br><td></td><br><td></td><br><td></td><br><td>3</td><br><td>1675</td><br><td>0</td><br></tr><br></tbody><br></table><br>Bolt 发生异常的情况<br><br>调用 emit 函数之前发生异常<br><table><br><thead><br><tr><br><th>异常次数</th><br><th>结果集中不重复的 Tuple 数</th><br><th>数据重复的次数 (&gt;1)</th><br><th>出现重复的 Tuple 数</th><br><th>数据丢失量</th><br></tr><br></thead><br><tbody><br><tr><br><td>0</td><br><td>100000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>200000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>300000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>400000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br></tbody><br></table><br><table><br><thead><br><tr><br><th>异常次数</th><br><th>结果集中不重复的 Tuple 数</th><br><th>数据重复的次数 (&gt;1)</th><br><th>出现重复的 Tuple 数</th><br><th>数据丢失量</th><br></tr><br></thead><br><tbody><br><tr><br><td>1</td><br><td>100000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>2</td><br><td>100000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>4</td><br><td>100000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>8</td><br><td>100000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>10</td><br><td>100000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br></tbody><br></table><br>调用 emit 函数之后发生异常<br><table><br><thead><br><tr><br><th>异常次数</th><br><th>结果集中不重复的 Tuple 数</th><br><th>数据重复的次数(&gt;1)</th><br><th>出现重复的 Tuple 数</th><br><th>数据丢失数量</th><br></tr><br></thead><br><tbody><br><tr><br><td>0</td><br><td>100000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>200000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>300000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>400000</td><br><td>-</td><br><td>-</td><br><td>0</td><br></tr><br></tbody><br></table><br><table><br><thead><br><tr><br><th>异常次数</th><br><th>结果集中不重复的 Tuple 数</th><br><th>数据重复的次数(&gt;1)</th><br><th>出现重复的 Tuple 数</th><br><th>数据丢失数量</th><br></tr><br></thead><br><tbody><br><tr><br><td>1</td><br><td>100000</td><br><td>2</td><br><td>2</td><br><td>0</td><br></tr><br><tr><br><td>2</td><br><td>100000</td><br><td>2</td><br><td>3</td><br><td>0</td><br></tr><br><tr><br><td>4</td><br><td>100000</td><br><td>2</td><br><td>5</td><br><td>0</td><br></tr><br><tr><br><td>8</td><br><td>100000</td><br><td>2</td><br><td>9</td><br><td>0</td><br></tr><br><tr><br><td>10</td><br><td>100000</td><br><td>2</td><br><td>11</td><br><td>0</td><br></tr><br></tbody><br></table>
-
+<h4 id="测试结果-1"><a href="#测试结果-1" class="headerlink" title="测试结果"></a>测试结果</h4><p>Acker 发生异常的情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常的次数</th><br>    <th>测试数据总量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数（&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    <th>最大积压量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>0</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    <td>2000（默认值）</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>200000</td><br>    <td>200000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>300000</td><br>    <td>300000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>400000</td><br>    <td>400000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    </tbody><br>    </table><br>    <table><br>    <thead><br>    <tr><br>    <th>异常的次数</th><br>    <th>测试数据总量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数（&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    <th>最大积压量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>2000</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>4001</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>3</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>6000</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>4</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>8000</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    </tbody><br>    </table><br>    Spout 发生异常的情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常的次数</th><br>    <th>测试数据总量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数（&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>0</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>200000</td><br>    <td>200000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>300000</td><br>    <td>300000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>400000</td><br>    <td>400000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>    <table><br>    <thead><br>    <tr><br>    <th>异常的次数</th><br>    <th>测试数据总量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数（&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>2052</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>4414</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>4</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>9008</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>6</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>9690</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td></td><br>    <td></td><br>    <td></td><br>    <td>3</td><br>    <td>1675</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>Bolt 发生异常的情况</p>
+<p>调用 emit 函数之前发生异常<br>    <table><br>    <thead><br>    <tr><br>    <th>异常次数</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数 (&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>0</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>200000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>300000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>400000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>    <table><br>    <thead><br>    <tr><br>    <th>异常次数</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数 (&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>4</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>8</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>10</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>    调用 emit 函数之后发生异常<br>    <table><br>    <thead><br>    <tr><br>    <th>异常次数</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数(&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>0</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>200000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>300000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>400000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>    <table><br>    <thead><br>    <tr><br>    <th>异常次数</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数(&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>2</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>3</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>4</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>5</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>8</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>9</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>10</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>11</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table></p>
 <h4 id="结论-1"><a href="#结论-1" class="headerlink" title="结论"></a>结论</h4><p>从上面的表格中可以得到，消息不会丢失，可能发生重复，重复的数目与异常的情况相关。</p>
-</li>
-<li><p>不发生任何异常的情况下，消息不会重复不会丢失。</p>
-</li>
+<ul>
+<li>不发生任何异常的情况下，消息不会重复不会丢失。</li>
 <li>Spout 发生异常的情况下，消息的重复数目约等于 spout.max.pending(Spout 的配置项，每次可以发送的最多消息条数） * NumberOfException（异常次数）。</li>
 <li>Acker 发生异常的情况下，消息重复的数目等于 spout.max.pending * NumberOfException。</li>
-<li><p>Bolt 发生异常的情况：</p>
-<pre><code>*   emit 之前发生异常，消息不会重复。
-</code></pre><ul>
+<li>Bolt 发生异常的情况：</li>
+<li>emit 之前发生异常，消息不会重复。</li>
 <li>emit 之后发生异常，消息重复的次数等于异常的次数。<br>结论与官方文档所述相符，每条消息至少发送一次，保证数据不会丢失，但可能重复，符合预期。</li>
 </ul>
 <h3 id="Exactly-Once"><a href="#Exactly-Once" class="headerlink" title="Exactly Once"></a>Exactly Once</h3><p>对于 Exactly Once 的语义，利用 Storm 中的 Trident 来实现。</p>
 <h4 id="测试数据-1"><a href="#测试数据-1" class="headerlink" title="测试数据"></a>测试数据</h4><p>Kafka 上保存的一万到一百万不等的数字，每个数字在每次测试样例中出现且仅出现一次。</p>
-<h4 id="测试结果-2"><a href="#测试结果-2" class="headerlink" title="测试结果"></a>测试结果</h4><p>Spout 发生异常情况</p>
-<table><br><thead><br><tr><br><th>异常数</th><br><th>测试数据量</th><br><th>结果集中不重复的 Tuple 数</th><br><th>结果集中所有 Tuple 的总和</th><br></tr><br></thead><br><tbody><br><tr><br><td>1</td><br><td>10000</td><br><td>10000</td><br><td>50005000</td><br></tr><br><tr><br><td>2</td><br><td>10000</td><br><td>10000</td><br><td>50005000</td><br></tr><br><tr><br><td>3</td><br><td>10000</td><br><td>10000</td><br><td>50005000</td><br></tr><br></tbody><br></table><br>Acker 发生异常的情况<br><table><br><thead><br><tr><br><th>异常数</th><br><th>测试数据量</th><br><th>结果集中不重复的 Tuple 数</th><br><th>结果集中所有 Tuple 的总和</th><br></tr><br></thead><br><tbody><br><tr><br><td>1</td><br><td>10000</td><br><td>10000</td><br><td>50005000</td><br></tr><br><tr><br><td>2</td><br><td>10000</td><br><td>10000</td><br><td>50005000</td><br></tr><br><tr><br><td>3</td><br><td>10000</td><br><td>10000</td><br><td>50005000</td><br></tr><br></tbody><br></table><br>Bolt 发生异常的情况<br><table><br><thead><br><tr><br><th>异常数</th><br><th>测试数据量</th><br><th>结果集中不重复的 Tuple 数</th><br><th>结果集中所有 Tuple 的总和</th><br></tr><br></thead><br><tbody><br><tr><br><td>1</td><br><td>10000</td><br><td>10000</td><br><td>50005000</td><br></tr><br><tr><br><td>2</td><br><td>10000</td><br><td>10000</td><br><td>50005000</td><br></tr><br><tr><br><td>3</td><br><td>10000</td><br><td>10000</td><br><td>50005000</td><br></tr><br></tbody><br></table>
-
+<h4 id="测试结果-2"><a href="#测试结果-2" class="headerlink" title="测试结果"></a>测试结果</h4><p>Spout 发生异常情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常数</th><br>    <th>测试数据量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>结果集中所有 Tuple 的总和</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>3</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    </tbody><br>    </table><br>    Acker 发生异常的情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常数</th><br>    <th>测试数据量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>结果集中所有 Tuple 的总和</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>3</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    </tbody><br>    </table><br>    Bolt 发生异常的情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常数</th><br>    <th>测试数据量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>结果集中所有 Tuple 的总和</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>3</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    </tbody><br>    </table></p>
 <h4 id="结论-2"><a href="#结论-2" class="headerlink" title="结论"></a>结论</h4><p>在所有情况下，最终结果集中的消息不会丢失，不会重复，与官方文档中的描述相符，符合预期。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>对 Storm 提供的三种不同消息保证机制，用户可以根据自己的需求选择不同的消息保证机制。</p>
 <h3 id="不同消息可靠性保证的使用场景"><a href="#不同消息可靠性保证的使用场景" class="headerlink" title="不同消息可靠性保证的使用场景"></a>不同消息可靠性保证的使用场景</h3><p>对于 Storm 提供的三种消息可靠性保证，优缺点以及使用场景如下所示：</p>
-<table><br><thead><br><tr><br><th>可靠性保证层次</th><br><th>优点</th><br><th>缺点</th><br><th>使用场景</th><br></tr><br></thead><br><tbody><br><tr><br><td>At most once</td><br><td>处理速度快</td><br><td>数据可能丢失</td><br><td>都处理速度要求高，且对数据丢失容忍度高的场景</td><br></tr><br><tr><br><td>At least once</td><br><td>数据不会丢失</td><br><td>数据可能重复</td><br><td>不能容忍数据丢失，可以容忍数据重复的场景</td><br></tr><br><tr><br><td>Exactly once</td><br><td>数据不会丢失，不会重复</td><br><td>处理速度慢</td><br><td>对数据不丢不重性质要求非常高，且处理速度要求没那么高，比如支付金额</td><br></tr><br></tbody><br></table>
+<table><br><thead><br><tr><br><th>可靠性保证层次</th><br><th>优点</th><br><th>缺点</th><br><th>使用场景</th><br></tr><br></thead><br>    <tbody><br>    <tr><br>    <td>At most once</td><br>    <td>处理速度快</td><br>    <td>数据可能丢失</td><br>    <td>都处理速度要求高，且对数据丢失容忍度高的场景</td><br>    </tr><br>    <tr><br>    <td>At least once</td><br>    <td>数据不会丢失</td><br>    <td>数据可能重复</td><br>    <td>不能容忍数据丢失，可以容忍数据重复的场景</td><br>    </tr><br>    <tr><br>    <td>Exactly once</td><br>    <td>数据不会丢失，不会重复</td><br>    <td>处理速度慢</td><br>    <td>对数据不丢不重性质要求非常高，且处理速度要求没那么高，比如支付金额</td><br>    </tr><br>    </tbody><br>    </table>
 
 <h3 id="如何实现不同层次的消息可靠性保证"><a href="#如何实现不同层次的消息可靠性保证" class="headerlink" title="如何实现不同层次的消息可靠性保证"></a>如何实现不同层次的消息可靠性保证</h3><p>对于 At Least Once 的保证需要做如下几步：</p>
-</li>
-</ul>
 <ol>
 <li>需要开启 ACK 机制，即 Topology 中的 Acker 数量大于零；</li>
 <li>Spout 是可靠的。即 Spout 发送消息的时候需要附带 msgId，并且实现失败消息重传功能（fail 函数 ，可以参考下面的 Spout 代码）；</li>
-<li><p>Bolt 在发送消息时，需要调用 emit（inputTuple, outputTuple）进行建立 anchor 树（参考下面建立 anchor 树的代码），并且在成功处理之后调用 ack ，处理失败时调用 fail 函数，通知 Acker。<br>不满足以上三条中任意一条的都只提供 At Most Once 的消息可靠性保证，如果希望得到 Exactly Once 的消息可靠性保证，可以使用 Trident 进行实现。</p>
-<h3 id="不同层次的可靠性保证如何实现"><a href="#不同层次的可靠性保证如何实现" class="headerlink" title="不同层次的可靠性保证如何实现"></a>不同层次的可靠性保证如何实现</h3><h4 id="如何实现可靠的-Spout"><a href="#如何实现可靠的-Spout" class="headerlink" title="如何实现可靠的 Spout"></a>如何实现可靠的 Spout</h4><p>实现可靠的 Spout 需要在 nextTuple 函数中发送消息时，调用带 msgID 的 emit 方法，然后实现失败消息的重传（fail 函数），参考如下示例:</p>
-<pre>`/**
-     * 想实现可靠的 Spout，需要实现如下两点
-     * 1\. 在 nextTuple 函数中调用 emit 函数时需要带一个     msgId，用来表示当前的消息（如果消息发送失败会用 msgId 作为参数回调 fail 函数）
-     * 2\. 自己实现 fail 函数，进行重发（注意，在 storm 中没有 msgId 和消息的对应关系，需要自己进行维护）
-     */
-public void nextTuple() {
-    //设置 msgId 和 Value 一样，方便 fail 之后重发
-    collector.emit(new Values(curNum + "", round +     ""), curNum + ":" + round);
-}
-
-@Override
-public void fail(Object msgId) {//消息发送失败时的回调函数
-String tmp = (String)msgId;   //上面我们设置了 msgId 和消息相同，这里通过 msgId 解析出具体的消息
-String[] args = tmp.split(":");
-
-//消息进行重发
-collector.emit(new Values(args[0], args[1]), msgId);
-}
-`</pre>
-
-<h4 id="如何实现可靠的-Bolt"><a href="#如何实现可靠的-Bolt" class="headerlink" title="如何实现可靠的 Bolt"></a>如何实现可靠的 Bolt</h4><p>Storm 提供两种不同类型的 Bolt，分别是 BaseRichBolt 和 BaseBasicBolt，都可以实现可靠性消息传递，不过 BaseRichBolt 需要自己做很多周边的事情（建立 anchor 树，以及手动 ACK/FAIL 通知 Acker），使用场景更广泛，而 BaseBasicBolt 则由 Storm 帮忙实现了很多周边的事情，实现起来方便简单，但是使用场景单一。如何用这两个 Bolt 实现（不）可靠的消息传递如下所示：</p>
-<pre>`//BaseRichBolt 实现不可靠消息传递
-public class SplitSentence extends BaseRichBolt {//不建立 anchor 树的例子
-    OutputCollector _collector;
-
-    public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
-        _collector = collector;
-    }
-
-    public void execute(Tuple tuple) {
-        String sentence = tuple.getString(0);
-        for(String word: sentence.split(" ")) {
-            _collector.emit(new Values(word));  // 不建立 anchor 树
-        }
-        _collector.ack(tuple);          //手动 ack，如果不建立 anchor 树，是否 ack 是没有区别的，这句可以进行注释
-    }
-
-    public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("word"));
-    }      
-}
-
-//BaseRichBolt 实现可靠的 Bolt
-public class SplitSentence extends BaseRichBolt {//建立 anchor 树以及手动 ack 的例子
-    OutputCollector _collector;
-
-    public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
-        _collector = collector;
-    }
-
-    public void execute(Tuple tuple) {
-        String sentence = tuple.getString(0);
-        for(String word: sentence.split(" ")) {
-            _collector.emit(tuple, new Values(word));  // 建立 anchor 树
-        }
-        _collector.ack(tuple);          //手动 ack，如果想让 Spout 重发该 Tuple，则调用 _collector.fail(tuple);
-    }
-
-    public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("word"));
-    }      
-}
-
-下面的示例会可以建立 Multi-anchoring
-List<tuple> anchors = new ArrayList&lt;Tuple&gt;();
-anchors.add(tuple1);
-anchors.add(tuple2);
-_collector.emit(anchors, new Values(1, 2, 3));
-
-//BaseBasicBolt 是吸纳可靠的消息传递
-public class SplitSentence extends BaseBasicBolt {//自动建立 anchor，自动 ack
-    public void execute(Tuple tuple, BasicOutputCollector collector) {
-        String sentence = tuple.getString(0);
-        for(String word: sentence.split(" ")) {
-            collector.emit(new Values(word));
-        }
-    }
-
-    public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("word"));
-    }      
-}
-`</tuple></pre>
-
-<h4 id="Trident"><a href="#Trident" class="headerlink" title="Trident"></a>Trident</h4><p>在 Trident 中，Spout 和 State 分别有三种状态，如下图所示：</p>
-<p><img src="http://tech.meituan.com/img/test-of-storm" alt="Trident Spout 和 State 的状态图"></p>
-<p>其中表格中的 Yes 表示相应的 Spout 和 State 组合可以实现 Exactly Once 语义，No 表示相应的 Spout 和 State 组合不保证 Exactly Once 语义。下面的代码是一个 Trident 示例：<br><pre>`     OpaqueTridentKafkaSpout spout = new OpaqueTridentKafkaSpout(spoutConf);   //Opaque Spout</pre></p>
-<pre><code>//TransactionalTridentKafkaSpout spout = new TransactionalTridentKafkaSpout(spoutConf);   //Transaction Spout
-
-TridentTopology topology = new TridentTopology();
-String spoutTxid = Utils.kafkaSpoutGroupIdBuilder(topologyConfig.kafkaSrcTopic, topologyConfig.topologyName);
-Stream stream = topology.newStream(spoutTxid, spout)
-        .name(&quot;new stream&quot;)
-        .parallelismHint(1);
-
-// kafka config
-KafkaProducerConfig kafkaProducerConfig = new KafkaProducerConfig();      //KafkaProducerConfig 仅对 kafka 相关配置进行了封装，具体可以参考 TridentKafkaStateFactory2(Map&lt;String, String&gt; config)
-Map&lt;String, String&gt; kafkaConfigs = kafkaProducerConfig.loadFromConfig(topologyConfig);
-TridentToKafkaMapper tridentToKafkaMapper = new TridentToKafkaMapper();  //TridentToKafkaMapper 继承自 TridentTupleToKafkaMapper&lt;String, String&gt;，实现 getMessageFromTuple 接口，该接口中返回 tridentTuple.getString(0);
-
-String  dstTopic = &quot;test__topic_for_all&quot;;
-
-TridentKafkaStateFactory2 stateFactory = new TridentKafkaStateFactory2(kafkaConfigs);
-stateFactory.withTridentTupleToKafkaMapper(tridentToKafkaMapper);
-stateFactory.withKafkaTopicSelector(new DefaultTopicSelector(dstTopic));
-
-stream.each(new Fields(&quot;bytes&quot;), new AddMarkFunction(), new Fields(&quot;word&quot;)) //从spout 出来数据是一个 bytes 类型的数据，第二个是参数是自己的处理函数，第三个参数是处理函数的输出字段
-        .name(&quot;write2kafka&quot;)
-        .partitionPersist(stateFactory         //将数据写入到 Kafka 中，可以保证写入到 Kafka 的数据是 exactly once 的
-                , new Fields(&quot;word&quot;)
-                , new TridentKafkaUpdater())
-        .parallelismHint(1);
-</code></pre></li>
+<li>Bolt 在发送消息时，需要调用 emit（inputTuple, outputTuple）进行建立 anchor 树（参考下面建立 anchor 树的代码），并且在成功处理之后调用 ack ，处理失败时调用 fail 函数，通知 Acker。</li>
 </ol>
+<p>不满足以上三条中任意一条的都只提供 At Most Once 的消息可靠性保证，如果希望得到 Exactly Once 的消息可靠性保证，可以使用 Trident 进行实现。</p>
+<h3 id="不同层次的可靠性保证如何实现"><a href="#不同层次的可靠性保证如何实现" class="headerlink" title="不同层次的可靠性保证如何实现"></a>不同层次的可靠性保证如何实现</h3><h4 id="如何实现可靠的-Spout"><a href="#如何实现可靠的-Spout" class="headerlink" title="如何实现可靠的 Spout"></a>如何实现可靠的 Spout</h4><p>实现可靠的 Spout 需要在 nextTuple 函数中发送消息时，调用带 msgID 的 emit 方法，然后实现失败消息的重传（fail 函数），参考如下示例:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">         * 想实现可靠的 Spout，需要实现如下两点</div><div class="line">         * 1\. 在 nextTuple 函数中调用 emit 函数时需要带一个     msgId，用来表示当前的消息（如果消息发送失败会用 msgId 作为参数回调 fail 函数）</div><div class="line">         * 2\. 自己实现 fail 函数，进行重发（注意，在 storm 中没有 msgId 和消息的对应关系，需要自己进行维护）</div><div class="line">         */</div><div class="line">    public void nextTuple() &#123;</div><div class="line">        //设置 msgId 和 Value 一样，方便 fail 之后重发</div><div class="line">        collector.emit(new Values(curNum + &quot;&quot;, round +     &quot;&quot;), curNum + &quot;:&quot; + round);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void fail(Object msgId) &#123;//消息发送失败时的回调函数</div><div class="line">    String tmp = (String)msgId;   //上面我们设置了 msgId 和消息相同，这里通过 msgId 解析出具体的消息</div><div class="line">    String[] args = tmp.split(&quot;:&quot;);</div><div class="line"></div><div class="line">    //消息进行重发</div><div class="line">    collector.emit(new Values(args[0], args[1]), msgId);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<h4 id="如何实现可靠的-Bolt"><a href="#如何实现可靠的-Bolt" class="headerlink" title="如何实现可靠的 Bolt"></a>如何实现可靠的 Bolt</h4><p>Storm 提供两种不同类型的 Bolt，分别是 BaseRichBolt 和 BaseBasicBolt，都可以实现可靠性消息传递，不过 BaseRichBolt 需要自己做很多周边的事情（建立 anchor 树，以及手动 ACK/FAIL 通知 Acker），使用场景更广泛，而 BaseBasicBolt 则由 Storm 帮忙实现了很多周边的事情，实现起来方便简单，但是使用场景单一。如何用这两个 Bolt 实现（不）可靠的消息传递如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div></pre></td><td class="code"><pre><div class="line">//BaseRichBolt 实现不可靠消息传递</div><div class="line">    public class SplitSentence extends BaseRichBolt &#123;//不建立 anchor 树的例子</div><div class="line">        OutputCollector _collector;</div><div class="line"></div><div class="line">        public void prepare(Map conf, TopologyContext context, OutputCollector collector) &#123;</div><div class="line">            _collector = collector;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void execute(Tuple tuple) &#123;</div><div class="line">            String sentence = tuple.getString(0);</div><div class="line">            for(String word: sentence.split(&quot; &quot;)) &#123;</div><div class="line">                _collector.emit(new Values(word));  // 不建立 anchor 树</div><div class="line">            &#125;</div><div class="line">            _collector.ack(tuple);          //手动 ack，如果不建立 anchor 树，是否 ack 是没有区别的，这句可以进行注释</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void declareOutputFields(OutputFieldsDeclarer declarer) &#123;</div><div class="line">            declarer.declare(new Fields(&quot;word&quot;));</div><div class="line">        &#125;      </div><div class="line">    &#125;</div><div class="line"></div><div class="line">    //BaseRichBolt 实现可靠的 Bolt</div><div class="line">    public class SplitSentence extends BaseRichBolt &#123;//建立 anchor 树以及手动 ack 的例子</div><div class="line">        OutputCollector _collector;</div><div class="line"></div><div class="line">        public void prepare(Map conf, TopologyContext context, OutputCollector collector) &#123;</div><div class="line">            _collector = collector;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void execute(Tuple tuple) &#123;</div><div class="line">            String sentence = tuple.getString(0);</div><div class="line">            for(String word: sentence.split(&quot; &quot;)) &#123;</div><div class="line">                _collector.emit(tuple, new Values(word));  // 建立 anchor 树</div><div class="line">            &#125;</div><div class="line">            _collector.ack(tuple);          //手动 ack，如果想让 Spout 重发该 Tuple，则调用 _collector.fail(tuple);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void declareOutputFields(OutputFieldsDeclarer declarer) &#123;</div><div class="line">            declarer.declare(new Fields(&quot;word&quot;));</div><div class="line">        &#125;      </div><div class="line">    &#125;</div><div class="line"></div><div class="line">    下面的示例会可以建立 Multi-anchoring</div><div class="line">    List&lt;Tuple&gt; anchors = new ArrayList&amp;lt;Tuple&amp;gt;();</div><div class="line">    anchors.add(tuple1);</div><div class="line">    anchors.add(tuple2);</div><div class="line">    _collector.emit(anchors, new Values(1, 2, 3));</div><div class="line"></div><div class="line">    //BaseBasicBolt 是吸纳可靠的消息传递</div><div class="line">    public class SplitSentence extends BaseBasicBolt &#123;//自动建立 anchor，自动 ack</div><div class="line">        public void execute(Tuple tuple, BasicOutputCollector collector) &#123;</div><div class="line">            String sentence = tuple.getString(0);</div><div class="line">            for(String word: sentence.split(&quot; &quot;)) &#123;</div><div class="line">                collector.emit(new Values(word));</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void declareOutputFields(OutputFieldsDeclarer declarer) &#123;</div><div class="line">            declarer.declare(new Fields(&quot;word&quot;));</div><div class="line">        &#125;      </div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<h4 id="Trident"><a href="#Trident" class="headerlink" title="Trident"></a>Trident</h4><p>在 Trident 中，Spout 和 State 分别有三种状态，如下图所示：</p>
+<p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/spout-vs-state.png" alt="Trident Spout 和 State 的状态图"></p>
+<p>其中表格中的 Yes 表示相应的 Spout 和 State 组合可以实现 Exactly Once 语义，No 表示相应的 Spout 和 State 组合不保证 Exactly Once 语义。下面的代码是一个 Trident 示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">OpaqueTridentKafkaSpout spout = new OpaqueTridentKafkaSpout(spoutConf);   //Opaque Spout</div><div class="line">//TransactionalTridentKafkaSpout spout = new TransactionalTridentKafkaSpout(spoutConf);   //Transaction Spout</div><div class="line"></div><div class="line">TridentTopology topology = new TridentTopology();</div><div class="line">String spoutTxid = Utils.kafkaSpoutGroupIdBuilder(topologyConfig.kafkaSrcTopic, topologyConfig.topologyName);</div><div class="line">Stream stream = topology.newStream(spoutTxid, spout)</div><div class="line">        .name(&quot;new stream&quot;)</div><div class="line">        .parallelismHint(1);</div><div class="line"></div><div class="line">// kafka config</div><div class="line">KafkaProducerConfig kafkaProducerConfig = new KafkaProducerConfig();      //KafkaProducerConfig 仅对 kafka 相关配置进行了封装，具体可以参考 TridentKafkaStateFactory2(Map&lt;String, String&gt; config)</div><div class="line">Map&lt;String, String&gt; kafkaConfigs = kafkaProducerConfig.loadFromConfig(topologyConfig);</div><div class="line">TridentToKafkaMapper tridentToKafkaMapper = new TridentToKafkaMapper();  //TridentToKafkaMapper 继承自 TridentTupleToKafkaMapper&lt;String, String&gt;，实现 getMessageFromTuple 接口，该接口中返回 tridentTuple.getString(0);</div><div class="line"></div><div class="line">String  dstTopic = &quot;test__topic_for_all&quot;;</div><div class="line"></div><div class="line">TridentKafkaStateFactory2 stateFactory = new TridentKafkaStateFactory2(kafkaConfigs);</div><div class="line">stateFactory.withTridentTupleToKafkaMapper(tridentToKafkaMapper);</div><div class="line">stateFactory.withKafkaTopicSelector(new DefaultTopicSelector(dstTopic));</div><div class="line"></div><div class="line">stream.each(new Fields(&quot;bytes&quot;), new AddMarkFunction(), new Fields(&quot;word&quot;)) //从spout 出来数据是一个 bytes 类型的数据，第二个是参数是自己的处理函数，第三个参数是处理函数的输出字段</div><div class="line">        .name(&quot;write2kafka&quot;)</div><div class="line">        .partitionPersist(stateFactory         //将数据写入到 Kafka 中，可以保证写入到 Kafka 的数据是 exactly once 的</div><div class="line">                , new Fields(&quot;word&quot;)</div><div class="line">                , new TridentKafkaUpdater())</div><div class="line">        .parallelismHint(1);</div></pre></td></tr></table></figure></p>
 <p><strong>关注我们的官方微信公众号“美团点评技术团队”。现在就拿出手机，扫一扫：</strong></p>
 <p><img src="http://tech.meituan.com/img/qrcode_for_gh.jpg" alt="公众号二维码"></p>
 
@@ -1061,36 +821,57 @@ stream.each(new Fields(&quot;bytes&quot;), new AddMarkFunction(), new Fields(&qu
   <div class="row">
 	
 	
-		<ul>
-<li><p><a href="#toc_0">一种可行的英语阅读学习方法</a><br>&nbsp;</p>
-</li>
-<li><p><a href="#toc_1">为什么要看英语文章</a></p>
-</li>
-<li><a href="#toc_2">我之前的英语基础</a></li>
-<li><a href="#toc_3">具体做法</a></li>
-<li><a href="#toc_4">我遇到过的问题</a></li>
-<li><p><a href="#toc_5">有关书籍</a></p>
-<ul>
-<li><a href="#toc_6">书籍在哪找</a></li>
-</ul>
-</li>
-<li><p><a href="#toc_7">有关 YL 值</a></p>
-</li>
-</ul>
-<h1 id="一种可行的英语阅读学习方法"><a href="#一种可行的英语阅读学习方法" class="headerlink" title="一种可行的英语阅读学习方法"></a>一种可行的英语阅读学习方法</h1><p>介绍自己从抵触看英语文章，到现在能够自如的阅读英语文章的方法，以及可能遇到的问题。方法基于 <a href="https://book.douban.com/subject/1880983/" target="_blank" rel="external">今日就读百万英语</a>。这种方法只是我实验过，且可行的，当然还有其他很多方法。</p>
+		<p>介绍自己从抵触看英语文章，到现在能够自如的阅读英语文章的方法，以及可能遇到的问题。方法基于 <a href="https://book.douban.com/subject/1880983/" target="_blank" rel="external">今日就读百万英语</a>。这种方法只是我实验过，且可行的，当然还有其他很多方法。</p>
 <h2 id="为什么要看英语文章"><a href="#为什么要看英语文章" class="headerlink" title="为什么要看英语文章"></a>为什么要看英语文章</h2><p>我看英语文章的理由很简单，因为在 IT 行业，前沿的技术，论文和好的书籍都是英文的，从英文翻译到中文的时间往往很长很长，而且大部分翻译的质量达不到我的要求。还有就是看到别人看美剧可以不看字幕很羡慕。</p>
 <h2 id="我之前的英语基础"><a href="#我之前的英语基础" class="headerlink" title="我之前的英语基础"></a>我之前的英语基础</h2><p>英语水平四级 450，六级未过。单词量 5000 左右。</p>
 <h2 id="具体做法"><a href="#具体做法" class="headerlink" title="具体做法"></a>具体做法</h2><p>严格按照按照下面三点来</p>
 <ul>
 <li>不要查辞典，不要翻成母语；</li>
 <li>阅读不查辞典也能完全理解的图书，个别不懂的地方就跳过去；</li>
-<li>越读越没趣的书就暂时停下去，先往后放一放。<br>第一点会要求你从看得懂的书开始，形成阅读英文原文的习惯。如果不这么做，我们会习惯的去看一些别人推荐的书籍或文章，这些书籍的难度可能是已经超过了我们的范围的。这样就会给自己造成很大的压力，慢慢的可能就不想继续阅读英语原文了。我最开始阅读的书籍包括《高级彩绘英文童书》，就是那种插画书，每一页可能就几句话，大部分是插图。如果你基本没有阅读过英文原本书籍的话，建议不要跳过这些插图书。</li>
+<li>越读越没趣的书就暂时停下去，先往后放一放。</li>
 </ul>
+<p>第一点会要求你从看得懂的书开始，形成阅读英文原文的习惯。如果不这么做，我们会习惯的去看一些别人推荐的书籍或文章，这些书籍的难度可能是已经超过了我们的范围的。这样就会给自己造成很大的压力，慢慢的可能就不想继续阅读英语原文了。我最开始阅读的书籍包括《高级彩绘英文童书》，就是那种插画书，每一页可能就几句话，大部分是插图。如果你基本没有阅读过英文原本书籍的话，建议不要跳过这些插图书。</p>
 <p>第二点是需要你从整体上理解一篇文章，一开始你只要能读懂整篇文章的 70% 左右就行了，其他的没读懂的部分可以通过这 70% 进行推测。等慢慢熟练了，再将注意力放在具体的词句上。</p>
 <p>第三点是和前面的结合起来用的，每个人的喜好是不一样的，所以每个人有兴趣的书籍也是不一样的。读你感兴趣的书籍，那么你都下去的概率会大大增加。我看过一本英文的侦探小说，真是停不下来。</p>
 <p>没读完一本书，就下面的表格进行记录（具体可根据自己的情况调整），下面是我最早的两条记录（不要担心 YL 值太小，单词书太少，慢慢来）</p>
-<table><br><thead><br><tr><br><th>No</th><br><th>日期</th><br><th>系列</th><br><th>书名</th><br><th>YL 值</th><br><th>单词字数</th><br><th>累计阅读量</th><br><th>时间</th><br><th>速度</th><br></tr><br></thead><br><tbody><br><tr><br><td>1</td><br><td>20130726</td><br><td>ORT</td><br><td>look at me</td><br><td>0.1</td><br><td>35</td><br><td>35</td><br><td></td><br><td></td><br></tr><br><tr><br><td>2</td><br><td>20130727</td><br><td>ORT</td><br><td>floppy floppy</td><br><td>0.1</td><br><td>10</td><br><td>45</td><br><td></td><br><td></td><br></tr><br></tbody><br></table>
-
+<table>
+<thead>
+<tr>
+<th>No</th>
+<th>日期</th>
+<th>系列</th>
+<th>书名</th>
+<th>YL 值</th>
+<th>单词字数</th>
+<th>累计阅读量</th>
+<th>时间</th>
+<th>速度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>20130726</td>
+<td>ORT</td>
+<td>look at me</td>
+<td>0.1</td>
+<td>35</td>
+<td>35</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td>20130727</td>
+<td>ORT</td>
+<td>floppy floppy</td>
+<td>0.1</td>
+<td>10</td>
+<td>45</td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <h2 id="我遇到过的问题"><a href="#我遇到过的问题" class="headerlink" title="我遇到过的问题"></a>我遇到过的问题</h2><ol>
 <li><p>一开始阅读的书籍会很简单，读完一本想继续读第二本，真想一开始读七，八，十本才好。</p>
 <blockquote>
@@ -1113,14 +894,67 @@ stream.each(new Fields(&quot;bytes&quot;), new AddMarkFunction(), new Fields(&qu
 </blockquote>
 </li>
 </ol>
-<h2 id="有关书籍"><a href="#有关书籍" class="headerlink" title="有关书籍"></a>有关书籍</h2><p>我读过的书籍系列包括 oxford reading tree，Curious George，PGR(Penguim<br>_Readers) 0，PGR 1，PGR 2，Frog and Toad，彩绘英文图书，牛津书虫。</p>
+<h2 id="有关书籍"><a href="#有关书籍" class="headerlink" title="有关书籍"></a>有关书籍</h2><p>我读过的书籍系列包括 oxford reading tree，Curious George，PGR(Penguim_Readers) 0，PGR 1，PGR 2，Frog and Toad，彩绘英文图书，牛津书虫。</p>
 <h3 id="书籍在哪找"><a href="#书籍在哪找" class="headerlink" title="书籍在哪找"></a>书籍在哪找</h3><p>如果经济能力允许的话建议在 Amazon 等商城购买，其他的可以自行 Google，百度网盘之类的应该也不少。</p>
 <h2 id="有关-YL-值"><a href="#有关-YL-值" class="headerlink" title="有关 YL 值"></a>有关 YL 值</h2><p>YL 值可以理解为书籍的阅读难度登记，阅读越容易。</p>
 <p>下面几个网址可以查询书籍的 YL 值和字数，方便统计时使用。<br><a href="http://www2.odn.ne.jp/ims/bookdata/list_all.html" target="_blank" rel="external">http://www2.odn.ne.jp/ims/bookdata/list_all.html</a><br><a href="http://www.seg.co.jp/sss_review/jsp/frm_a_130.jsp" target="_blank" rel="external">http://www.seg.co.jp/sss_review/jsp/frm_a_130.jsp</a></p>
 <blockquote>
-<p>PS: 在豆瓣有一个 <a href="https://site.douban.com/195274/" target="_blank" rel="external">小组</a>，是 恶魔的奶爸 建立的，也可以参考。</p>
-<p>有问题的留言交流。<br>&nbsp;</p>
+<p>PS: 在豆瓣有一个 <a href="https://site.douban.com/195274/" target="_blank" rel="external">小组</a>，是 恶魔的奶爸 建立的，也可以参考。<br>有问题的留言交流。</p>
 </blockquote>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2016-08-27 </div>
+			<div class="article-title"><a href="/2016/08/27/spark-streaming-kafka-read-binlog-to-json/" >Spark Streaming 从 Kafka 读取 binlog 转换成 Json</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>在开发 Spark Streaming 的公共组件过程中，需要将 binlog 的数据(Array[Byte])转换为 Json 格式，供用户使用，本文提供一种转换的思路。另外我们会用到几个辅助类，为了行文流畅，我们将辅助类的定义放在文章的最后面。如果</p>
+<p>如果本文有讲述不详细，或者错误指出，肯请指出，谢谢</p>
+<p>对于 binlog 数据，每一次操作(INSERT/UPDATE/DELETE 等）都会作为一条记录写入 binlog 文件，但是同一条记录可能包含数据库中的几行数据（这里比较绕，可以看一个具体的例子）</p>
+<p>在数据库中，有 id, name，age 三个字段，其中 id 为主键，name 随意, age 随意。有两行数据如下</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>age</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>john</td>
+<td>30</td>
+</tr>
+<tr>
+<td>2</td>
+<td>john</td>
+<td>40</td>
+</tr>
+</tbody>
+</table>
+<p>那么你进行操作</p>
+<p><pre class="lang:tsql decode:true  ">update table set age = 50 where name = “john”</pre><br>的时候，就会将两行的数据都进行更改，这两行更改的数据会在同一个 binlog 记录中，这一点会在后面的实现中有体现。</p>
+<p>下面，我们给出具体的代码，然后对代码进行分析</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">def desirializeByte(b: (String, Array[Byte])) : (String, String) = &#123; </div><div class="line">  val binlogEntry = BinlogEntryUtil.serializeToBean(b._2)   //将 Array[Byte] 数据转换成 com.meituan.data.binlog.BinlogEntry 类，相关类定义参考附录</div><div class="line"></div><div class="line">  val pkeys = binlogEntry.getPrimaryKeys.asScala   //获取主键，这里的 asScala 将 Java 的 List 转换为 Scala 的 List</div><div class="line">  val rowDatas : List[BinlogRow] = binlogEntry.getRowDatas.asScala.toList  //获取具体的信息</div><div class="line">  val strRowDatas = rowDatas.map(a =&gt; &#123;            //将获取到的具体信息进行转换，这里主要是将没一条信息的内容，转换 [(K1:V1,K2:V2...Kn:Vn)] 的形式，方面后面进行 Json 化</div><div class="line">    val b = a.getBeforeColumns.asScala    //获取 beforColumns</div><div class="line">    val c = a.getAfterColumns.asScala     //获取 afterColumns</div><div class="line">    val mb = b.map(d =&gt; (d._1, d._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值</div><div class="line">    val mc = c.map(c =&gt; (c._1, c._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值</div><div class="line">    (mb, mc) //返回转换后的 beforeColumns 和 afterColumns</div><div class="line">  &#125;)</div><div class="line">  //下面利用 json4s 进行 Json 化</div><div class="line">  (binlogEntry.getEventType, compact(&quot;rowdata&quot; -&gt; strRowDatas.map&#123;</div><div class="line">    w =&gt; List(&quot;row_data&quot; -&amp;gt; (&quot;before&quot; -&amp;gt; w._1.toMap) ~ (&quot;after&quot; -&amp;gt; w._2.toMap))  //这里的两个 toMap 是必要的，不然里层会变成 List，这个地方比较疑惑的是，</div><div class="line">                                                                                 //w._1 按理是 Map类型，为什么还需要强制转换成 Map</div><div class="line">                                                                              //而且用 strRowDatas.foreach(x =&gt; println(s&quot;$&#123;x._1&#125;  $&#123;x._2&#125;&quot;)打印的结果表名是 Map</div><div class="line">  &#125;))&lt;/pre&gt;</div><div class="line">desirializeByte 函数传入 topic 中的一条记录，返回参数自己确定，我这里为了测试，返回一个 (String, String) 的 Tuple，第一个字段表示该条记录的 EventType（Insert/Update/Delete 等），第二个字段为 Json 化后的数据。</div><div class="line"></div><div class="line">BinlogEntryUtil.serilizeToBean 是一个辅助类，将 binlog 数据转化为一个 Java bean 类。</div><div class="line"></div><div class="line">第 4 行，我们得到表对应的主键，第 5 行获得具体的数据</div><div class="line"></div><div class="line">第 6 行到第 12 行是 Json 化之前的辅助工作，将所有不需要的东西给剔除掉，只留下字段，以及字段对应的值。</div><div class="line"></div><div class="line">第 14， 15 行就是具体的 Json 工作了（使用了 json4s 包进行 Json 化）</div><div class="line"></div><div class="line">这个过程中有一点需要注意的是，在 Json 化的时候，记得为 w._1 和 w._2 加 toMap 操作，不然会变成 List（很奇怪，我将 w._1 和 w._2 打印出来看，都是 Map 类型）或者你可以在第 7，8 行的末尾加上 .toMap 操作。这个我查了 API，进行了实验，暂时怀疑是在和 json4s 组合的时候，出现了问题，有待验证。</div><div class="line"></div><div class="line">利用上述代码，我们可以得到下面这样 Json 化之后的字符串(我进行了排版，程序返回的 Json 串是不换行的）</div><div class="line">&lt;pre class=&quot;font-size:8 lang:default decode:true&quot;&gt;&#123;&quot;rowdata&quot;:</div><div class="line">   [&#123;&quot;row_data&quot;:</div><div class="line">       &#123;&quot;before&quot;:&#123;&quot;param_name&quot;:&quot;creator&quot;,&quot;param_value&quot;:&quot;chenqiang05&quot;,&quot;horigindb_etl_id&quot;:&quot;2532&quot;,&quot;utime&quot;:&quot;2016-07-26 15:07:16&quot;,&quot;id&quot;:&quot;15122&quot;,&quot;status&quot;:&quot;0&quot;,&quot;ctime&quot;:&quot;2016-07-25 17:06:01&quot;&#125;,</div><div class="line">        &quot;after&quot;:&#123;&quot;param_name&quot;:&quot;creator&quot;,&quot;param_value&quot;:&quot;chendayao&quot;,&quot;horigindb_etl_id&quot;:&quot;2532&quot;,&quot;utime&quot;:&quot;2016-08-01 10:32:01&quot;,&quot;id&quot;:&quot;15122&quot;,&quot;status&quot;:&quot;0&quot;,&quot;ctime&quot;:&quot;2016-07-25 17:06:01&quot;&#125;</div><div class="line">       &#125;</div><div class="line">    &#125;]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>到这里，基本就完成了一种将 binlog 数据 Json 化的代码。</p>
+<p>附录代码，由于这些代码是从其他工程里面抠出来的，可能读起来会不顺畅，还请见谅。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div></pre></td><td class="code"><pre><div class="line">public static BinlogEntry serializeToBean(byte[] input) &#123;</div><div class="line">      BinlogEntry binlogEntry = null;</div><div class="line">      Entry entry = deserializeFromProtoBuf(input);//从 protobuf 反序列化</div><div class="line">      if(entry != null) &#123;</div><div class="line">         binlogEntry = serializeToBean(entry);</div><div class="line">      &#125;</div><div class="line">      return binlogEntry;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public static Entry deserializeFromProtoBuf(byte[] input) &#123;</div><div class="line">        Entry entry = null;</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            entry = Entry.parseFrom(input);</div><div class="line">//com.alibaba.otter.canal.protocol.CanalEntry#Entry 类的方法，由 protobuf 生成</div><div class="line">        &#125; catch (InvalidProtocolBufferException var3) &#123;</div><div class="line">            logger.error(&quot;Exception:&quot; + var3);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return entry;</div><div class="line">    &#125;</div><div class="line">//将 Entry 解析为一个 bean 类</div><div class="line">public static BinlogEntry serializeToBean(Entry entry) &#123;</div><div class="line">        RowChange rowChange = null;</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            rowChange = RowChange.parseFrom(entry.getStoreValue());</div><div class="line">        &#125; catch (Exception var8) &#123;</div><div class="line">            throw new RuntimeException(&quot;parse event has an error , data:&quot; + entry.toString(), var8);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        BinlogEntry binlogEntry = new BinlogEntry();</div><div class="line">        String[] logFileNames = entry.getHeader().getLogfileName().split(&quot;\\.&quot;);</div><div class="line">        String logFileNo = &quot;000000&quot;;</div><div class="line">        if(logFileNames.length &gt; 1) &#123;</div><div class="line">            logFileNo = logFileNames[1];</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        binlogEntry.setBinlogFileName(logFileNo);</div><div class="line">        binlogEntry.setBinlogOffset(entry.getHeader().getLogfileOffset());</div><div class="line">        binlogEntry.setExecuteTime(entry.getHeader().getExecuteTime());</div><div class="line">        binlogEntry.setTableName(entry.getHeader().getTableName());</div><div class="line">        binlogEntry.setEventType(entry.getHeader().getEventType().toString());</div><div class="line">        Iterator primaryKeysList = rowChange.getRowDatasList().iterator();</div><div class="line"></div><div class="line">        while(primaryKeysList.hasNext()) &#123;</div><div class="line">            RowData rowData = (RowData)primaryKeysList.next();</div><div class="line">            BinlogRow row = new BinlogRow(binlogEntry.getEventType());</div><div class="line">            row.setBeforeColumns(getColumnInfo(rowData.getBeforeColumnsList()));</div><div class="line">            row.setAfterColumns(getColumnInfo(rowData.getAfterColumnsList()));</div><div class="line">            binlogEntry.addRowData(row);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if(binlogEntry.getRowDatas().size() &gt;= 1) &#123;</div><div class="line">            BinlogRow primaryKeysList1 = (BinlogRow)binlogEntry.getRowDatas().get(0);</div><div class="line">            binlogEntry.setPrimaryKeys(getPrimaryKeys(primaryKeysList1));</div><div class="line">        &#125; else &#123;</div><div class="line">            ArrayList primaryKeysList2 = new ArrayList();</div><div class="line">            binlogEntry.setPrimaryKeys(primaryKeysList2);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return binlogEntry;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public class BinlogEntry implements Serializable &#123;</div><div class="line">    private String binlogFileName;</div><div class="line">    private long binlogOffset;</div><div class="line">    private long executeTime;</div><div class="line">    private String tableName;</div><div class="line">    private String eventType;</div><div class="line">    private List&lt;String&gt; primaryKeys;</div><div class="line">    private List&lt;BinlogRow&gt; rowDatas = new ArrayList();</div><div class="line">&#125;</div><div class="line">public class BinlogRow implements Serializable &#123;</div><div class="line">    public static final String EVENT_TYPE_INSERT = &quot;INSERT&quot;;</div><div class="line">    public static final String EVENT_TYPE_UPDATE = &quot;UPDATE&quot;;</div><div class="line">    public static final String EVENT_TYPE_DELETE = &quot;DELETE&quot;;</div><div class="line">    private String eventType;</div><div class="line">    private Map&lt;String, BinlogColumn&gt; beforeColumns;</div><div class="line">    private Map&lt;String, BinlogColumn&gt; afterColumns;</div><div class="line">&#125;</div><div class="line">public class BinlogColumn implements Serializable &#123;</div><div class="line">    private int index;</div><div class="line">    private String mysqlType;</div><div class="line">    private String name;</div><div class="line">    private boolean isKey;</div><div class="line">    private boolean updated;</div><div class="line">    private boolean isNull;</div><div class="line">    private String value;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>&nbsp;</p>
 
 	
@@ -1203,9 +1037,9 @@ stream.each(new Fields(&quot;bytes&quot;), new AddMarkFunction(), new Fields(&qu
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -1215,35 +1049,31 @@ stream.each(new Fields(&quot;bytes&quot;), new AddMarkFunction(), new Fields(&qu
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
-		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
-		
-			<li><a href="/categories/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机图形学-amp-图像处理/">计算机图形学&amp;amp;图像处理<span>0</span></a></li>
-		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
 		
 		</ul>
 	</div>
@@ -1254,45 +1084,45 @@ stream.each(new Fields(&quot;bytes&quot;), new AddMarkFunction(), new Fields(&qu
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/json/">json<span>1</span></a></li>
+			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
+		
+			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
+		
+			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+		
+			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+		
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
 		
 			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
 		
-			<li><a href="/tags/thinking/">thinking<span>1</span></a></li>
+			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
 		
-			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
+			<li><a href="/tags/prim/">prim<span>1</span></a></li>
 		
-			<li><a href="/tags/vi/">vi<span>2</span></a></li>
+			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
 		
-			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
+			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
 		
-			<li><a href="/tags/积分/">积分<span>1</span></a></li>
+			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
 		
-			<li><a href="/tags/错误配置/">错误配置<span>1</span></a></li>
+			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
 		
-			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
+			<li><a href="/tags/linux/">linux<span>24</span></a></li>
 		
-			<li><a href="/tags/chinese/">chinese<span>1</span></a></li>
+			<li><a href="/tags/git/">git<span>4</span></a></li>
 		
-			<li><a href="/tags/kv/">kv<span>1</span></a></li>
+			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
 		
-			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
+			<li><a href="/tags/offset/">offset<span>1</span></a></li>
 		
-			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
+			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
 		
-			<li><a href="/tags/read/">read<span>3</span></a></li>
+			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
 		
-			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
+			<li><a href="/tags/windows/">windows<span>4</span></a></li>
 		
-			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
-		
-			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
-		
-			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
-		
-			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
-		
-			<li><a href="/tags/opengl/">opengl<span>1</span></a></li>
+			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>260</span></a></li>
@@ -1308,10 +1138,6 @@ stream.each(new Fields(&quot;bytes&quot;), new AddMarkFunction(), new Fields(&qu
   <ul class="entry list-unstyled">
     
       <li>
-        <a href="/2017/05/20/hello-world/" ><i class="fa fa-file-o"></i>Hello World</a>
-      </li>
-    
-      <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
       </li>
     
@@ -1325,6 +1151,10 @@ stream.each(new Fields(&quot;bytes&quot;), new AddMarkFunction(), new Fields(&qu
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
+      </li>
+    
+      <li>
+        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>
