@@ -111,6 +111,72 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-12-13 </div>
+			<div class="article-title"><a href="/2011/12/13/windows-mpi/" >windows下MPI的环境搭建。</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>由于需要MPI来实现并行化,因此在windows下搭建了MPI的环境。MPI在windos下的环境搭建还算比较容易的。</p>
+<p>首先去<a href="http://www-unix.mcs.anl.gov/mpi/mpich2/下载MPICH2，然后安装。" target="_blank" rel="external">http://www-unix.mcs.anl.gov/mpi/mpich2/下载MPICH2，然后安装。</a></p>
+<p>接下来在环境变量那的path设置C:\Program Files\MPICH2\bin，然后打开vc6-Tools–Options–Directories。下面的show directories for:选择include files，把%MPICH2%include加进去，然后在Library files下面把%MPICH2%/lib加进去。</p>
+<p>然后再启动%MPICH2%/bin下面的wmpiregister.exe进行注册即可。</p>
+<p>接下来就可以写Hello World了。</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span>#include </span><span class="string">“stdafx.h”</span><span> </span></span></li>
+<li><span> </span></li>
+<li><span>#define MPICH_SKIP_MPICXX </span></li>
+<li><span>#include </span><span class="string">“mpi.h”</span><span> </span></li>
+<li><span>#include <cstdio> </cstdio></span></li>
+<li><span> </span></li>
+<li><span class="keyword">int</span><span> main(</span><span class="keyword">int</span><span> argc, </span><span class="keyword">char</span><span>* argv[]) </span></li>
+<li><span>{ </span></li>
+<li><span> </span></li>
+<li><span> </span><span class="keyword">int</span><span> rank,size; </span></li>
+<li><span> </span><span class="keyword">int</span><span> tt; </span></li>
+<li><span> </span><span class="keyword">char</span><span> processor_name[MPI_MAX_PROCESSOR_NAME]; </span></li>
+<li><span> </span></li>
+<li><span> MPI_Init(argc,&amp;argv); </span></li>
+<li><span> </span></li>
+<li><span> MPI_Comm_rank(MPI_COMM_WORLD,rank); </span></li>
+<li><span> </span></li>
+<li><span> MPI_Comm_size(MPI_COMM_WORLD,size); </span></li>
+<li><span> </span><span class="comment">//printf(“ </span><span> </span></li>
+<li><span> </span></li>
+<li><span> MPI_Get_processor_name(processor_name,tt); </span></li>
+<li><span> printf(“Hello World! I am %d,in %d computer on %s\n</span><span class="string">“,rank,size,processor_name); </span></li>
+<li><span><span class="string"> MPI_Finalize(); </span> </span></li>
+<li><span><span class="string"> if(1==rank) </span> </span></li>
+<li><span><span class="string"> { </span> </span></li>
+<li><span><span class="string"> printf(“</span><span>Press any key to </span><span class="keyword">continue</span><span>\n”); </span></span></li>
+<li><span> </span><span class="comment">//getch(); </span><span> </span></li>
+<li><span> } </span></li>
+<li><span> </span><span class="keyword">return</span><span> </span><span class="number">0</span><span> </span></li>
+<li><span>} </span></li>
+<li><span><br></span><br></li></ol></div><br>写完之后再打开project-settings-link把mpi.lib加到Object/library modules中
+
+<p>#define MPICH_SKIP_MPICXX就是不让包含mpicxx.h.这个在mpi.h里面可以看到。然后其他的就是MPI的函数的应用</p>
+<p>参考:</p>
+<p>1.<a href="http://www.cppblog.com/wlwlxj/archive/2006/06/12/8463.aspx" target="_blank" rel="external">http://www.cppblog.com/wlwlxj/archive/2006/06/12/8463.aspx</a>【<a href="http://www.cppblog.com/wlwlxj/archive/2006/06/12/8463.html" target="_blank" rel="external">并行编程–MPI开发入门</a>】</p>
+<p>2.<a href="http://blog.csdn.net/morewindows/article/details/6823436" target="_blank" rel="external">http://blog.csdn.net/morewindows/article/details/6823436</a>[<strong>Windows系统下搭建MPI环境</strong>]</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-11-27 </div>
 			<div class="article-title"><a href="/2011/11/27/fuzhou-a-hdu-4121/" >[模拟]HDU_4121</a></div>						
 		</h3>
@@ -359,30 +425,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-05-30 </div>
-			<div class="article-title"><a href="/2011/05/30/south-central-china-invite-competition-by-klion26/" >华中南邀请赛 by klion26</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>我们队的第二次正式比赛,下一次正式比赛应该就是省赛了.<br>[由于29号早上3点左右有欧冠决赛,所以我被吵醒了好几次,从3点到5点一直没睡着.]<br>下面是比赛记录.基本纯流水账.<br>首先是A F J,由于我们一开始开题不对(A),加上写A的不是对计算几何不是特别熟悉,所以我们的A是53’时过的,但是中间,知道J更容易,确没有及时的抢过机器来写.A是1A,然后是J,悲剧的是J不知为何TLE了,怎么想都不可能的事情啊.TLE两次之后就换人写了.3A.[J换人写一共浪费了两个人40’左右,加上罚时40’,也就是说J一共浪费了80’左右的时间],然后20分钟后,F 1A.还以为接下来就是我们的show time了,结果就悲剧了,一个G(gcd_depth),一个D(dp),一个H(找规律/组合)D由于认为不可能出成恶心的高精度,认为转移方程错了,放弃.H和G就不知道是为啥错了,后面3小时一直在调这两个题(赛后问了下裁判,思路基本是对的,看来又tm是实现问题).还有就是E居然就是一个裸的离散对数,而且a^x=b(mod c),c还是个素数,我去啊.不过这些都是后话了,比赛已经过去了.反正就是被各种踩,我们是各种送,送成狗了.<br>下面说点关于我的,其实J我也想早早的抢过机器来写,可是我又怕不1A,又怕耽误时间,反正就是各种怕,然后就只能干等着,关于J的两次TLE,我也不知道是怎么了,应该是我的程序风格的问题,但是队友检查时也没看出什么可以TLE的东西,可是tm的重写就过了,关于后面的E,在还有90’左右的时候,我看过榜之后,还是看了下E的,只是没有自己分析,不过心里知道,肯定是个裸的数论题,但是由于G的Wa,和其他一系列原因,就”忘”了E,只有在讲解题报告时才想起还有一道裸的离散对数,这tm和不知道离散对数不是一样的结果么.我觉得我最大的问题不是知识的不足,而是信心的不足,不知道从什么时候开始,已经没有了那种舍我其谁的霸气了,已经被完全钝化了,接下来的几个月,首要任务是找回那种霸气,其次才是弥补知识的不足.</p>
-<p>昨天,今天虐我的,明天我会虐回来的</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -504,48 +546,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
+			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
 		
-			<li><a href="/tags/ln/">ln<span>1</span></a></li>
+			<li><a href="/tags/office/">office<span>1</span></a></li>
 		
-			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
+			<li><a href="/tags/shell/">shell<span>5</span></a></li>
 		
-			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
+			<li><a href="/tags/filter/">filter<span>1</span></a></li>
 		
-			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
 		
-			<li><a href="/tags/rmvb/">rmvb<span>1</span></a></li>
+			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
 		
-			<li><a href="/tags/thinking/">thinking<span>1</span></a></li>
+			<li><a href="/tags/于娟/">于娟<span>1</span></a></li>
 		
-			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
+			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
 		
-			<li><a href="/tags/top排序/">top排序<span>2</span></a></li>
+			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
 		
-			<li><a href="/tags/vundle/">vundle<span>1</span></a></li>
+			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
 		
-			<li><a href="/tags/lzo/">lzo<span>1</span></a></li>
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
 		
-			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
+			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
 		
-			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
+			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
 		
-			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
+			<li><a href="/tags/timestamp/">timestamp<span>1</span></a></li>
 		
-			<li><a href="/tags/scc/">scc<span>1</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
-			<li><a href="/tags/list/">list<span>1</span></a></li>
+			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
 		
-			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
+			<li><a href="/tags/python/">python<span>1</span></a></li>
 		
-			<li><a href="/tags/scala/">scala<span>1</span></a></li>
+			<li><a href="/tags/offset/">offset<span>1</span></a></li>
 		
-			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
+			<li><a href="/tags/learning/">learning<span>1</span></a></li>
 		
-			<li><a href="/tags/program/">program<span>1</span></a></li>
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>260</span></a></li>
+		   <li><a href="/tags">...<span>265</span></a></li>
 		 
 		</ul>
 	</div>
@@ -556,6 +598,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
+      </li>
     
       <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
@@ -571,10 +617,6 @@
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
-      </li>
-    
-      <li>
-        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>

@@ -111,6 +111,61 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2016-08-27 </div>
+			<div class="article-title"><a href="/2016/08/27/spark-streaming-kafka-read-binlog-to-json/" >Spark Streaming 从 Kafka 读取 binlog 转换成 Json</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>在开发 Spark Streaming 的公共组件过程中，需要将 binlog 的数据(Array[Byte])转换为 Json 格式，供用户使用，本文提供一种转换的思路。另外我们会用到几个辅助类，为了行文流畅，我们将辅助类的定义放在文章的最后面。如果</p>
+<p>如果本文有讲述不详细，或者错误指出，肯请指出，谢谢</p>
+<p>对于 binlog 数据，每一次操作(INSERT/UPDATE/DELETE 等）都会作为一条记录写入 binlog 文件，但是同一条记录可能包含数据库中的几行数据（这里比较绕，可以看一个具体的例子）</p>
+<p>在数据库中，有 id, name，age 三个字段，其中 id 为主键，name 随意, age 随意。有两行数据如下</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>age</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>john</td>
+<td>30</td>
+</tr>
+<tr>
+<td>2</td>
+<td>john</td>
+<td>40</td>
+</tr>
+</tbody>
+</table>
+<p>那么你进行操作</p>
+<p><pre class="lang:tsql decode:true  ">update table set age = 50 where name = “john”</pre><br>的时候，就会将两行的数据都进行更改，这两行更改的数据会在同一个 binlog 记录中，这一点会在后面的实现中有体现。</p>
+<p>下面，我们给出具体的代码，然后对代码进行分析</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">def desirializeByte(b: (String, Array[Byte])) : (String, String) = &#123; </div><div class="line">  val binlogEntry = BinlogEntryUtil.serializeToBean(b._2)   //将 Array[Byte] 数据转换成 com.meituan.data.binlog.BinlogEntry 类，相关类定义参考附录</div><div class="line"></div><div class="line">  val pkeys = binlogEntry.getPrimaryKeys.asScala   //获取主键，这里的 asScala 将 Java 的 List 转换为 Scala 的 List</div><div class="line">  val rowDatas : List[BinlogRow] = binlogEntry.getRowDatas.asScala.toList  //获取具体的信息</div><div class="line">  val strRowDatas = rowDatas.map(a =&gt; &#123;            //将获取到的具体信息进行转换，这里主要是将没一条信息的内容，转换 [(K1:V1,K2:V2...Kn:Vn)] 的形式，方面后面进行 Json 化</div><div class="line">    val b = a.getBeforeColumns.asScala    //获取 beforColumns</div><div class="line">    val c = a.getAfterColumns.asScala     //获取 afterColumns</div><div class="line">    val mb = b.map(d =&gt; (d._1, d._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值</div><div class="line">    val mc = c.map(c =&gt; (c._1, c._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值</div><div class="line">    (mb, mc) //返回转换后的 beforeColumns 和 afterColumns</div><div class="line">  &#125;)</div><div class="line">  //下面利用 json4s 进行 Json 化</div><div class="line">  (binlogEntry.getEventType, compact(&quot;rowdata&quot; -&gt; strRowDatas.map&#123;</div><div class="line">    w =&gt; List(&quot;row_data&quot; -&amp;gt; (&quot;before&quot; -&amp;gt; w._1.toMap) ~ (&quot;after&quot; -&amp;gt; w._2.toMap))  //这里的两个 toMap 是必要的，不然里层会变成 List，这个地方比较疑惑的是，</div><div class="line">                                                                                 //w._1 按理是 Map类型，为什么还需要强制转换成 Map</div><div class="line">                                                                              //而且用 strRowDatas.foreach(x =&gt; println(s&quot;$&#123;x._1&#125;  $&#123;x._2&#125;&quot;)打印的结果表名是 Map</div><div class="line">  &#125;))&lt;/pre&gt;</div><div class="line">desirializeByte 函数传入 topic 中的一条记录，返回参数自己确定，我这里为了测试，返回一个 (String, String) 的 Tuple，第一个字段表示该条记录的 EventType（Insert/Update/Delete 等），第二个字段为 Json 化后的数据。</div><div class="line"></div><div class="line">BinlogEntryUtil.serilizeToBean 是一个辅助类，将 binlog 数据转化为一个 Java bean 类。</div><div class="line"></div><div class="line">第 4 行，我们得到表对应的主键，第 5 行获得具体的数据</div><div class="line"></div><div class="line">第 6 行到第 12 行是 Json 化之前的辅助工作，将所有不需要的东西给剔除掉，只留下字段，以及字段对应的值。</div><div class="line"></div><div class="line">第 14， 15 行就是具体的 Json 工作了（使用了 json4s 包进行 Json 化）</div><div class="line"></div><div class="line">这个过程中有一点需要注意的是，在 Json 化的时候，记得为 w._1 和 w._2 加 toMap 操作，不然会变成 List（很奇怪，我将 w._1 和 w._2 打印出来看，都是 Map 类型）或者你可以在第 7，8 行的末尾加上 .toMap 操作。这个我查了 API，进行了实验，暂时怀疑是在和 json4s 组合的时候，出现了问题，有待验证。</div><div class="line"></div><div class="line">利用上述代码，我们可以得到下面这样 Json 化之后的字符串(我进行了排版，程序返回的 Json 串是不换行的）</div><div class="line">&lt;pre class=&quot;font-size:8 lang:default decode:true&quot;&gt;&#123;&quot;rowdata&quot;:</div><div class="line">   [&#123;&quot;row_data&quot;:</div><div class="line">       &#123;&quot;before&quot;:&#123;&quot;param_name&quot;:&quot;creator&quot;,&quot;param_value&quot;:&quot;chenqiang05&quot;,&quot;horigindb_etl_id&quot;:&quot;2532&quot;,&quot;utime&quot;:&quot;2016-07-26 15:07:16&quot;,&quot;id&quot;:&quot;15122&quot;,&quot;status&quot;:&quot;0&quot;,&quot;ctime&quot;:&quot;2016-07-25 17:06:01&quot;&#125;,</div><div class="line">        &quot;after&quot;:&#123;&quot;param_name&quot;:&quot;creator&quot;,&quot;param_value&quot;:&quot;chendayao&quot;,&quot;horigindb_etl_id&quot;:&quot;2532&quot;,&quot;utime&quot;:&quot;2016-08-01 10:32:01&quot;,&quot;id&quot;:&quot;15122&quot;,&quot;status&quot;:&quot;0&quot;,&quot;ctime&quot;:&quot;2016-07-25 17:06:01&quot;&#125;</div><div class="line">       &#125;</div><div class="line">    &#125;]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>到这里，基本就完成了一种将 binlog 数据 Json 化的代码。</p>
+<p>附录代码，由于这些代码是从其他工程里面抠出来的，可能读起来会不顺畅，还请见谅。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div></pre></td><td class="code"><pre><div class="line">public static BinlogEntry serializeToBean(byte[] input) &#123;</div><div class="line">      BinlogEntry binlogEntry = null;</div><div class="line">      Entry entry = deserializeFromProtoBuf(input);//从 protobuf 反序列化</div><div class="line">      if(entry != null) &#123;</div><div class="line">         binlogEntry = serializeToBean(entry);</div><div class="line">      &#125;</div><div class="line">      return binlogEntry;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public static Entry deserializeFromProtoBuf(byte[] input) &#123;</div><div class="line">        Entry entry = null;</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            entry = Entry.parseFrom(input);</div><div class="line">//com.alibaba.otter.canal.protocol.CanalEntry#Entry 类的方法，由 protobuf 生成</div><div class="line">        &#125; catch (InvalidProtocolBufferException var3) &#123;</div><div class="line">            logger.error(&quot;Exception:&quot; + var3);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return entry;</div><div class="line">    &#125;</div><div class="line">//将 Entry 解析为一个 bean 类</div><div class="line">public static BinlogEntry serializeToBean(Entry entry) &#123;</div><div class="line">        RowChange rowChange = null;</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            rowChange = RowChange.parseFrom(entry.getStoreValue());</div><div class="line">        &#125; catch (Exception var8) &#123;</div><div class="line">            throw new RuntimeException(&quot;parse event has an error , data:&quot; + entry.toString(), var8);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        BinlogEntry binlogEntry = new BinlogEntry();</div><div class="line">        String[] logFileNames = entry.getHeader().getLogfileName().split(&quot;\\.&quot;);</div><div class="line">        String logFileNo = &quot;000000&quot;;</div><div class="line">        if(logFileNames.length &gt; 1) &#123;</div><div class="line">            logFileNo = logFileNames[1];</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        binlogEntry.setBinlogFileName(logFileNo);</div><div class="line">        binlogEntry.setBinlogOffset(entry.getHeader().getLogfileOffset());</div><div class="line">        binlogEntry.setExecuteTime(entry.getHeader().getExecuteTime());</div><div class="line">        binlogEntry.setTableName(entry.getHeader().getTableName());</div><div class="line">        binlogEntry.setEventType(entry.getHeader().getEventType().toString());</div><div class="line">        Iterator primaryKeysList = rowChange.getRowDatasList().iterator();</div><div class="line"></div><div class="line">        while(primaryKeysList.hasNext()) &#123;</div><div class="line">            RowData rowData = (RowData)primaryKeysList.next();</div><div class="line">            BinlogRow row = new BinlogRow(binlogEntry.getEventType());</div><div class="line">            row.setBeforeColumns(getColumnInfo(rowData.getBeforeColumnsList()));</div><div class="line">            row.setAfterColumns(getColumnInfo(rowData.getAfterColumnsList()));</div><div class="line">            binlogEntry.addRowData(row);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if(binlogEntry.getRowDatas().size() &gt;= 1) &#123;</div><div class="line">            BinlogRow primaryKeysList1 = (BinlogRow)binlogEntry.getRowDatas().get(0);</div><div class="line">            binlogEntry.setPrimaryKeys(getPrimaryKeys(primaryKeysList1));</div><div class="line">        &#125; else &#123;</div><div class="line">            ArrayList primaryKeysList2 = new ArrayList();</div><div class="line">            binlogEntry.setPrimaryKeys(primaryKeysList2);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return binlogEntry;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public class BinlogEntry implements Serializable &#123;</div><div class="line">    private String binlogFileName;</div><div class="line">    private long binlogOffset;</div><div class="line">    private long executeTime;</div><div class="line">    private String tableName;</div><div class="line">    private String eventType;</div><div class="line">    private List&lt;String&gt; primaryKeys;</div><div class="line">    private List&lt;BinlogRow&gt; rowDatas = new ArrayList();</div><div class="line">&#125;</div><div class="line">public class BinlogRow implements Serializable &#123;</div><div class="line">    public static final String EVENT_TYPE_INSERT = &quot;INSERT&quot;;</div><div class="line">    public static final String EVENT_TYPE_UPDATE = &quot;UPDATE&quot;;</div><div class="line">    public static final String EVENT_TYPE_DELETE = &quot;DELETE&quot;;</div><div class="line">    private String eventType;</div><div class="line">    private Map&lt;String, BinlogColumn&gt; beforeColumns;</div><div class="line">    private Map&lt;String, BinlogColumn&gt; afterColumns;</div><div class="line">&#125;</div><div class="line">public class BinlogColumn implements Serializable &#123;</div><div class="line">    private int index;</div><div class="line">    private String mysqlType;</div><div class="line">    private String name;</div><div class="line">    private boolean isKey;</div><div class="line">    private boolean updated;</div><div class="line">    private boolean isNull;</div><div class="line">    private String value;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&nbsp;</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2016-07-15 </div>
 			<div class="article-title"><a href="/2016/07/15/spark-streaming-saving-offset-in-zookeeper-2/" >Spark Streaming 中使用 zookeeper 保存 offset 并重用（二）</a></div>						
 		</h3>
@@ -831,49 +886,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2015-07-16 </div>
-			<div class="article-title"><a href="/2015/07/16/a-brief-view-of-storm/" >Storm 初探</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><span style="color: #ff0000;">打算把自己学习实时计算的相关东西写出来，形成一个从零开始学实时计算的系列，由于我也是刚开始接触，系列文中的描述或概念有不当的地方，还请不吝指教。在此谢过。</span></p>
-<p><a href="http://storm.apache.org/" target="_blank" rel="external">Storm</a> 是一个分布式实时计算框架，由 Twitter 开放并开源。用来处理无边界的流数据，进行实时处理。与 Hadoop 做批处理相对应。因为底层使用 Thrift 来定义和提交 Topology（Storm 中的一种结构），Storm 可以使用任何语言来进行编程。可以用来做实时计算，在线机器学习等等一系列事情。每秒可以每个节点可以处理百万级别的 Tuple（Storm 中的一种结构）。伸缩性好，容错好，并且保证所有数据都会被处理。</p>
-<p>首先介绍 Storm 中几个结构的定义，分别是 Tuples, Stream, Spout, Bolt, Topology, Task.</p>
-<ul>
-<li>其中 Tuple 是最基本的结构，是传输数据过程中的最小单元，可以当作为一个包装好的结构体</li>
-<li>Stream： 是无边界的 Tuple 组成的数据流，可以理解为 Tuple 的流动</li>
-<li>Spout： 是程序的数据来源，由用户指定，指定之后，所有的数据都从 spout 发出</li>
-<li>Bolt： 数据中转和处理的节点，负责经过数据的中转以及处理</li>
-<li>Topology： 是包括 spout，stream，bolt 的一个完整流程，表示数据从开始到结束的整个过程，每一个 Topology 定义了数据的来源，中间需要怎么转换，以及最后输出到哪</li>
-<li>Task： Spout 或者 Bolt 中实际处理数据的单元，每一个 Spout 或 Bolt 可以包含多个 Task<br>下面的图形象的表示了大部分结构，其中水龙头表示 Spout，写有 Tuple 字样的表示 Tuple，闪电状的结构是 Bolt，多个 Tuple 形成了 Stream，整张图可以看作是一个 Topology。这里没有细分出 Task 结构。</li>
-</ul>
-<p><img src="http://storm.apache.org/images/topology.png" alt="storm 基本结构图](http://storm.apache.org/images/topology.png)"> </p>
-<p>由于 Storm 是分布式的实时处理框架，所有需要一个分配任务的节点，在 Storm 中，这个任务由 Nimbus 担任，所有的 Topology 都是提交 Nimbus 中，由 Nimbus 进行任务分配，Nimbus 会在所有的 Supervisor 中查找最合适的（最空闲），然后把任务分发给它，但是 Nimbus 和 Supervisor 不是直接通信，而是由 <a href="http://zookeeper.apache.org/" target="_blank" rel="external">Zookeeper</a> 进行中间传话（Supervisor 可以理解为实际的机器，然后 Bolt 会在每一个 Supervisor 上跑，每一个 Supervisor 上有多个 Bolt存在），为什么不让 Nimbus 和 Supervisor 直接通信呢，因为这样可以减少 Nimbus 的负担，Nimbus 只需要把任务分配写到 Zookeeper 就行了，然后 Supervisor 去 Zookeeper 读，每一个 Supervisor 的状态（空闲等情况）也会写到 Zookeeper 上，由 Nimbus 去读。如果是直接通信的话，那么需要 Nimbus 和 Supervisor 同时有空才可以，这样是不太现实的。（比如 A 需要把黄金交给 B，只能直接给的话，必须 A 和 B 同时有空才行，但是总共由四种情况存在：1. A 有空，B 没空；2 A 有空，B有空；3 A没空，B没空；4A没空，B有空。那么只有情况2才可以进行交易，就可能导致 A 一直跑过去找 B，或者B 一直去找 A 的情况，会大大浪费时间）</p>
-<p>由于每个 Bolt 有多个 Task 存在，那么对于 Tuple 传给哪一个对应的 Task 处理，就需要进行控制了，这里就有 Grouping 的概念了，Grouping 表示在 Topology 中从上一个节点（Spout/Bolt）到下一个节点（Bolt）时怎么进行 Tuple 的传输（传给哪个 Task）Storm 中包含了 7 中 Grouping 的方式｛<span class="s1">Shuffle grouping；Fields grouping；Partial Key grouping；All grouping；Global grouping；None grouping；Direct grouping｝（</span>对于 Fields 方式，只需要相同字段的分到一组就行了，并不需要不同字段的分到不同组）</p>
-<p>基本概念差不多就这些了，我也是刚开始接触，本文内容结合下面几个链接以及自己理解进行书写，如果有错误的地方，还请不吝指教。</p>
-<p>References：</p>
-<p>1. Apache Storm：<a href="http://storm.apache.org/" target="_blank" rel="external">http://storm.apache.org/</a></p>
-<p>2. Storm Concepts：<a href="https://storm.apache.org/documentation/Concepts.html" target="_blank" rel="external">https://storm.apache.org/documentation/Concepts.html</a></p>
-<ol>
-<li><a href="http://xumingming.sinaapp.com/category/storm/" target="_blank" rel="external">http://xumingming.sinaapp.com/category/storm/</a></li>
-</ol>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -995,48 +1007,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
+			<li><a href="/tags/tree/">tree<span>1</span></a></li>
 		
-			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
+			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
 		
-			<li><a href="/tags/partition/">partition<span>1</span></a></li>
+			<li><a href="/tags/bit/">bit<span>0</span></a></li>
 		
-			<li><a href="/tags/spark/">spark<span>3</span></a></li>
+			<li><a href="/tags/c/">c++<span>1</span></a></li>
 		
-			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
+			<li><a href="/tags/blog/">blog<span>2</span></a></li>
 		
-			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
+			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
 		
-			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+			<li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li>
 		
-			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
+			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
 		
-			<li><a href="/tags/append/">append<span>2</span></a></li>
+			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
 		
-			<li><a href="/tags/prim/">prim<span>1</span></a></li>
+			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
+		
+			<li><a href="/tags/链接排序/">链接排序<span>1</span></a></li>
+		
+			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
+		
+			<li><a href="/tags/错误配置/">错误配置<span>1</span></a></li>
+		
+			<li><a href="/tags/fork/">fork<span>2</span></a></li>
+		
+			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+		
+			<li><a href="/tags/shell/">shell<span>5</span></a></li>
+		
+			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
+		
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
 		
 			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
 		
-			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
-		
-			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
-		
-			<li><a href="/tags/topic/">topic<span>1</span></a></li>
-		
-			<li><a href="/tags/exercise/">exercise<span>8</span></a></li>
-		
-			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
-		
-			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
-		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
-		
-			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
-		
-			<li><a href="/tags/tree/">tree<span>1</span></a></li>
+			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>260</span></a></li>
+		   <li><a href="/tags">...<span>265</span></a></li>
 		 
 		</ul>
 	</div>
@@ -1047,6 +1059,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
+      </li>
     
       <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
@@ -1062,10 +1078,6 @@
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
-      </li>
-    
-      <li>
-        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>

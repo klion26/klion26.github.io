@@ -111,6 +111,31 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-03-03 </div>
+			<div class="article-title"><a href="/2011/03/03/networkflow-24-2-minimum-cut/" >网络流24题-2最小割模型</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>对于第一次做最小割模型的我 是看了黑书上的讲解才会的 - -下面附上黑书上的讲解[由于pdf文件不能复制,所以截图传上来]</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2011/03/24-2.bmp" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2011/03/24-2.bmp" alt="" title="24-2"></a></p>
+<p>那么收益的问题就解决了,输出那些器材和实验的时候,可以先从源点开始搜索求出S集,然后不再S集里面的就都要输出了[为什么?]求网络流的算法我用的是前面介绍的sap+gap<!--EndFragment--></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-02-27 </div>
 			<div class="article-title"><a href="/2011/02/27/networkflow-sap/" >网络流sap算法</a></div>						
 		</h3>
@@ -443,40 +468,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2010-12-30 </div>
-			<div class="article-title"><a href="/2010/12/30/linux-fork-test/" >fork函数小测试</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>本篇文章还是beta版,由于本人对这个函数的了解还不是非常清晰,暂时只知道返回值有两个,返回两次.一个是,表示创建的子进程,一个是创建的子进程的id.如果返回-1表示创建失败,下面就不考虑了.下面的函数是测试用代码.</p>
-<p>代码如下:</p>
-<p><div class="source" style="background-color: #2f4f4f; font-family: 'Courier New','Consolas','Lucida Console'; color: #f5deb3;"><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <unistd.h></unistd.h></span><br><span style="color: #eeee00;">#include <systypes.h></systypes.h></span></div><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span>(<span style="color: #98fb98; font-weight: bold;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #98fb98; font-weight: bold;">int</span> p;<br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“main——</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>    p <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">fork</span>();<span style="color: #da70d6;">//调用fork函数</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“after-fork<strong><em>*</em></strong></span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>    <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> p)<br>       <span style="color: #f5deb3;">{</span><br>          <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“child  %d—–ppid-&gt;%d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span><span style="color: #f5deb3;">(),</span><span style="color: #f5deb3;">getppid</span>());<br>       <span style="color: #f5deb3;">}</span><br>    <span style="color: #b0c4de; font-weight: bold;">else</span><br>       <span style="color: #f5deb3;">{</span><br>          <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“parent %d—</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br>       <span style="color: #f5deb3;">}</span><br>   <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“over—<em>*</em></span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>   <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></p>
-<p>结果如下:</p>
-<p>main——</p>
-<p>after-fork<strong><em>*</em></strong></p>
-<p>child  2579—–ppid-&gt;2578</p>
-<p>over—<em>*</em></p>
-<p>after-fork<strong><em>*</em></strong></p>
-<p>parent 2578—</p>
-<p>over—<em>*</em></p>
-<p>上述结果说明一些事情:首先是前面我说的.还有就是fork函数后面的都会被子进程和父进程都执行.还有一个是说这两个是并行的,也就是说可能先执行父进程再进行子进程,不过暂时结果没见过.等进一步了解之后,再来更新本篇文章.</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -598,48 +589,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/spark-streaming/">spark_streaming<span>2</span></a></li>
+			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
 		
-			<li><a href="/tags/memset/">memset<span>1</span></a></li>
+			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
 		
-			<li><a href="/tags/windows/">windows<span>4</span></a></li>
+			<li><a href="/tags/poll/">poll<span>1</span></a></li>
 		
-			<li><a href="/tags/longest-increasing-subsequences/">longest increasing subsequences<span>1</span></a></li>
+			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
 		
-			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
-		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
-		
-			<li><a href="/tags/hive/">hive<span>1</span></a></li>
-		
-			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
-		
-			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
+			<li><a href="/tags/积分/">积分<span>1</span></a></li>
 		
 			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
 		
-			<li><a href="/tags/text-plain/">text/plain<span>1</span></a></li>
+			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
 		
-			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
+			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
 		
-			<li><a href="/tags/kv/">kv<span>1</span></a></li>
+			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
 		
-			<li><a href="/tags/数论/">数论<span>5</span></a></li>
+			<li><a href="/tags/question/">question<span>1</span></a></li>
 		
-			<li><a href="/tags/ln/">ln<span>1</span></a></li>
+			<li><a href="/tags/filter/">filter<span>1</span></a></li>
 		
-			<li><a href="/tags/problem-solve/">problem_solve<span>1</span></a></li>
+			<li><a href="/tags/vi/">vi<span>2</span></a></li>
 		
-			<li><a href="/tags/tree/">tree<span>1</span></a></li>
+			<li><a href="/tags/6-824/">6.824<span>2</span></a></li>
 		
-			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
+			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
 		
-			<li><a href="/tags/trident/">trident<span>1</span></a></li>
+			<li><a href="/tags/rename/">rename<span>1</span></a></li>
 		
-			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
+			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
+		
+			<li><a href="/tags/reservior/">reservior<span>1</span></a></li>
+		
+			<li><a href="/tags/MST/">MST<span>1</span></a></li>
+		
+			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
+		
+			<li><a href="/tags/horn-formulas/">horn formulas<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>260</span></a></li>
+		   <li><a href="/tags">...<span>265</span></a></li>
 		 
 		</ul>
 	</div>
@@ -650,6 +641,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
+      </li>
     
       <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
@@ -665,10 +660,6 @@
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
-      </li>
-    
-      <li>
-        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>

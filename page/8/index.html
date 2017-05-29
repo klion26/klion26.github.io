@@ -111,6 +111,31 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2012-11-06 </div>
+			<div class="article-title"><a href="/2012/11/06/chrome-https-connection/" >Chrome强制https连接某些网站</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>最近一段时间google貌似非常的不稳定,不知道是不是那个什么”多少大”马上就要开的原因。有时上google首页也许要翻墙，而且有时https连接下也打不开。今早看到<a href="http://www.williamlong.info/archives/3270.html" target="_blank" rel="external">月光博客</a>上说，https在某些情况下是用http打开的，所以就会时不时断网了。下面是教你怎么用chrome强制https连接。</p>
+<p>你需要的就是chrome浏览器，然后有可能需要翻墙[我在自己电脑上实验的时候，有时不翻墙不行]，翻墙可以参照<span style="color: #ff0000;"><a href="http://www.klion26.com/user-chrome-cross-gfw.html" target="_blank" rel="external"><span style="color: #ff0000;">这里</span></a></span>。然后接下来你只需要在chrome的新建标签页里面输入”chrome://net-internals/“会出来如下界面:</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/11/hsts.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/11/hsts-300x165.jpg" alt="" title="hsts"></a>看到上图的倒数第二个HSTS没，点开这个，然后Add domain下填写www.google.com，如果你需要google的子域名也用https的话，就勾上下面的Include subdomains选项框。不过勾上这个的话貌似translate就不能用了，反正我这translate不管怎样都不能用https访问，翻墙也不行，translate.google.com都不行，直接跳到traslate.google.cn去了。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2012-11-05 </div>
 			<div class="article-title"><a href="/2012/11/05/display-views-count-without-plugin/" >wordpress文章浏览量-非插件实现</a></div>						
 		</h3>
@@ -531,48 +556,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-04-19 </div>
-			<div class="article-title"><a href="/2012/04/19/vmware-ubuntu-fedora/" >VMware虚拟机有关的几个问题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>环境:XP+VMware 7.0 英文版  ubuntu 10.4  fedora  13</p>
-<p><span style="color: #ff0000;">VMware里面安装ubuntu之后，第一次进去的时候，</span><span style="color: #ff0000;">来到输入密码界面的时候居然键盘失灵了</span>，这个比较囧。后来上网搜了下，发现是设置问题，但是要改设置得先进去才能改，这里首先可以通过如下方法进去:</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2012/04/ubuntu.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/04/ubuntu-300x91.jpg" alt="" title="ubuntu"></a></p>
-<p>看到上图中右下角的红色框框里面的那个小人没，点击小人来到下面的图片</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2012/04/ubuntu2.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/04/ubuntu2-300x157.jpg" alt="" title="ubuntu2"></a></p>
-<p>点击小人会出现上图中的红色框框中的那个东西，然后点击这个东西，就会出现后面的那个界面，然后选中第一个就可以了，重启之，发现出来了软键盘，然后就可以进入系统了。</p>
-<p>OK，现在需要修改配置文件让登陆的时候，键盘有效。</p>
-<p>在终端输入:vi /etc/default/console-setup</p>
-<p>然后来到文本的末尾，把[XKBMODEL=”SKIP”]一行中的”SKIP”改成”pc105”,把[XKBVARIANT=”U.S.English”]中的”U.S.English”改成空然后重启就可以了</p>
-<p><span style="color: #ff0000;">第二个问题是VMware里面不能用U盘</span>，我记得以前自己的可以的，只要在插入U盘的时候，选中虚拟机，然后就会询问是否在虚拟机里面用U盘，可是现在的信息是:host usb device connections disabled。上网搜了下，发现是一个服务没有开启，果断开启之.开启的方法如下:</p>
-<p>控制面板—&gt;管理工具—-&gt;服务—–&gt;找到”VMware USB Arbitration Service”然后开启之，当然你也可以选择让这个服务自动开启就行了，以后就不用这么麻烦了。然后重启虚拟机就OK了</p>
-<p><span style="color: #ff0000;">VMware里面装了fedora之后，进去发现fedora的鼠标左键不能用了</span>。这个有点坑爹啊。</p>
-<p>解决方法如下[需要root权限]</p>
-<p>首先调出终端<span style="font-family: 'Times New Roman';">:</span><span style="font-family: 宋体;">在桌面右击</span><span style="font-family: 'Times New Roman';">—&gt;</span><span style="font-family: 宋体;">按</span><span style="font-family: 'Times New Roman';">a.</span><span style="font-family: 宋体;">然后在命令那一栏添上</span><span style="font-family: 'Times New Roman';">gnome-terminal</span><span style="font-family: 宋体;">就行了</span><span style="font-family: 'Times New Roman';">.</span></p>
-<p>这里会在桌面加一个<span style="font-family: 'Times New Roman';">terminal</span><span style="font-family: 宋体;">的快捷方式</span><span style="font-family: 'Times New Roman';">,</span><span style="font-family: 宋体;">然后上下键可以移动了</span><span style="font-family: 'Times New Roman';">,</span><span style="font-family: 宋体;">选中</span><span style="font-family: 'Times New Roman';">terminal</span><span style="font-family: 宋体;">之后确定就启动</span><span style="font-family: 'Times New Roman';">terminal</span><span style="font-family: 宋体;">了</span></p>
-<p>接下来输入如下命令<span style="font-family: 宋体;"> “</span><span style="font-family: 'Times New Roman';">vi</span>    /lib/udev/rules.d/69-xorg-vmmouse.rules”然后<span style="font-family: 宋体;">在里面加上一句</span></p>
-<p>KERNEL==”event[0-9]*”<span style="font-family: 宋体;">就行了</span><span style="font-family: Arial;">,</span><span style="font-family: 宋体;">当然如果你加到中间的话</span><span style="font-family: Arial;">,</span><span style="font-family: 宋体;">要加上一个逗号</span></p>
-<p>接下来重启就行了</p>
-<p>一切Linux的问题貌似都和配置有关~~</p>
-<p>&nbsp;</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -694,48 +677,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
+			<li><a href="/tags/java/">java<span>1</span></a></li>
 		
-			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
+			<li><a href="/tags/ASM/">ASM<span>1</span></a></li>
 		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
 		
-			<li><a href="/tags/at-most-once/">at-most-once<span>1</span></a></li>
+			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
 		
-			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
+			<li><a href="/tags/code/">code<span>1</span></a></li>
 		
-			<li><a href="/tags/office/">office<span>1</span></a></li>
+			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
 		
-			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
+			<li><a href="/tags/grub/">grub<span>2</span></a></li>
 		
-			<li><a href="/tags/bellman-ford/">bellman-ford<span>1</span></a></li>
+			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
 		
-			<li><a href="/tags/mit/">mit<span>2</span></a></li>
+			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
 		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
+			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
 		
-			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
+			<li><a href="/tags/project/">project<span>1</span></a></li>
 		
-			<li><a href="/tags/partition/">partition<span>1</span></a></li>
+			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
 		
-			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
+			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
 		
-			<li><a href="/tags/critical/">critical<span>1</span></a></li>
+			<li><a href="/tags/hash/">hash<span>1</span></a></li>
 		
-			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
+			<li><a href="/tags/code-interview/">code interview<span>1</span></a></li>
 		
-			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+			<li><a href="/tags/topic/">topic<span>1</span></a></li>
 		
-			<li><a href="/tags/command/">command<span>1</span></a></li>
+			<li><a href="/tags/博弈/">博弈<span>3</span></a></li>
 		
-			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
 		
-			<li><a href="/tags/https/">https<span>1</span></a></li>
+			<li><a href="/tags/错误配置/">错误配置<span>1</span></a></li>
 		
-			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
+			<li><a href="/tags/kv/">kv<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>260</span></a></li>
+		   <li><a href="/tags">...<span>265</span></a></li>
 		 
 		</ul>
 	</div>
@@ -746,6 +729,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
+      </li>
     
       <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
@@ -761,10 +748,6 @@
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
-      </li>
-    
-      <li>
-        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>

@@ -447,9 +447,55 @@
 		
             
 		
+            
+		
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2017-05-29 </div>
+			<div class="article-title"><a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" >从源码级别分析 metric-core 的抽样算法</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://metrics.dropwizard.io" target="_blank" rel="external">metric-core</a> 是一个 java metric 库，用于统计 JVM 层面以及 服务级别 的各种 metric 信息。其中 metric-core 是其核心模块，代码量不多，总共 44 个文件，5700 行左右代码（包括注释）。算是一个很小的开源项目了。由于 metric 在所有项目中都非常重要，因此选择通读该项目，本文分析 metrci-core 中的抽样算法。</p>
+<h2 id="metric-core-中的抽样算法"><a href="#metric-core-中的抽样算法" class="headerlink" title="metric-core 中的抽样算法"></a>metric-core 中的抽样算法</h2><p>在 metric-core 中总共有四种抽样算法，分别是 <code>ExponentiallyDecayingReservoir</code>, <code>SlidingTimeWindowReservoir</code>, <code>SlidingWindowReservoir</code>, <code>UniformReservoir</code>，其中后面三个抽样算法比较常规，也通常能见到，第一个则出于一篇论文<code>Forward Decay: A Practical Time Decay Model for Streaming Systems</code>，本文会通过源码分析自己对于这种抽样算法的理解。本文暂时只分析后面三种抽样算法，对于第一种，我会单独用一篇文章进行分析。</p>
+<h3 id="UniformReservoir-算法"><a href="#UniformReservoir-算法" class="headerlink" title="UniformReservoir 算法"></a>UniformReservoir 算法</h3><p>该算法来自于论文<code>Random Sampling with a Reservoir</code>，讲述了一种随机抽样的方法，主要思想是使用一个固定的“蓄水池”装满需要数量的样本，如果当前“蓄水池”未满，将接下来的样本直接放入“蓄水池”，如果“蓄水池”已满，则随机从”蓄水池“中挑选一个样本进行替换（也可能不进行替换），这样在理论上能够保证所有的样本以同样的概率被选中。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public void update(long value) &#123;</div><div class="line">	final long c = count.incrementAndGet();//获得当前”蓄水池“的大小</div><div class="line">	if (c &lt;= values.length()) &#123; //如果”蓄水池“未满，直接将当前样本放入</div><div class="line">		values.set((int) c - 1, value);</div><div class="line">	&#125; else &#123;</div><div class="line">		final long r = nextLong(c);//随机挑选一个数据（这个随机挑选的数可能在&quot;蓄水池”中，也可能不在“蓄水池”中</div><div class="line">		if (r &lt; values.length()) &#123;//如果随机挑选的样本，在”蓄水池“中，则进行替换</div><div class="line">			values.set((int) r, value);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>为了能够更好的理解，先使用样例如下。假设现在总共来了 10 个数 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]，而“蓄水池“大小为 3. 那么”蓄水池”的 <strong>一种可能</strong> 变化如下（说是一种可能的变化，因为这里面牵涉到概率）</p>
+<ul>
+<li>[1]</li>
+<li>[1, 2]</li>
+<li>[1, 2, 3]</li>
+<li>[1, 2, 4]  # 当 4 来的时候，发现“蓄水池”已满，然后从中筛选一个进行替换掉，假设我们替换掉 3</li>
+<li>[1, 5, 4] # 当 5 来的时候，发现“蓄水池”已满，然后从中筛选一个进行替换掉，假设这次我们替换掉 2</li>
+<li>[1, 5, 4] # 当 6 来的时候，发现“蓄水池”已满，我们打算从之前的数字中筛选一个进行替换，这个时候假设我们得到的下标是 3 或者 4，发现下标为 3 和 4 的数字不在“蓄水池”中（“蓄水池”的最大下标为 2 – 从 0 开始），因此不进行替换，所以本次“蓄水池”不变</li>
+<li>[7, 5, 4] # 当 7 来的时候，发现“蓄水池”已满，随机一个下标，我们得到 0,那么将 7 放置到下标为 0 的位置</li>
+<li>[8, 5, 4] # 同上</li>
+<li>[8, 5, 9] # 同上</li>
+<li>[10, 5, 9] # 同上<h3 id="SlidingWindowReservoir-抽样算法"><a href="#SlidingWindowReservoir-抽样算法" class="headerlink" title="SlidingWindowReservoir 抽样算法"></a>SlidingWindowReservoir 抽样算法</h3><code>SlidingWindowReservoir</code> 抽样算法则以最近的 N 个样本作为整个数据集的子集，这样简单直接，对于数据波动不大，或者窗口大小 N 足够大的情况下，该算法会有较好的效果。代码如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public synchronized void update(long value) &#123;//加锁保证线程安全</div><div class="line">	        //每次替换掉最旧的数据，保证”蓄水池“中的数据是最近的 N 个样本</div><div class="line">	        measurements[(int) (count++ % measurements.length)] = value;</div><div class="line">			    &#125;</div></pre></td></tr></table></figure>
+<h3 id="SlidingTimeWindowReservoir-抽样算法"><a href="#SlidingTimeWindowReservoir-抽样算法" class="headerlink" title="SlidingTimeWindowReservoir 抽样算法"></a>SlidingTimeWindowReservoir 抽样算法</h3><p>该算法是上面移动窗口算法的变种，保留的是最近 N 时间单位（支持 TimeUnit 的所有时间单位）内的数据，而不是最近的 N 个数据。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">public void update(long value) &#123;</div><div class="line">//每 TRIM_THRESHOLD 次操作之后会进行一次 trim() 操作</div><div class="line">	if (count.incrementAndGet() % TRIM_THRESHOLD == 0) &#123;</div><div class="line">		trim();</div><div class="line">	&#125;</div><div class="line">			        //直接将该值加入到 ”蓄水池“ 中</div><div class="line">	measurements.put(getTick(), value);</div><div class="line">	&#125;</div><div class="line">//获得当前的时间</div><div class="line">private long getTick() &#123;</div><div class="line">	for (; ; ) &#123;</div><div class="line">		final long oldTick = lastTick.get();</div><div class="line">		final long tick = clock.getTick() * COLLISION_BUFFER;</div><div class="line">		// ensure the tick is strictly incrementing even if there are duplicate ticks</div><div class="line">		final long newTick = tick - oldTick &gt; 0 ? tick : oldTick + 1;</div><div class="line">		if (lastTick.compareAndSet(oldTick, newTick)) &#123;</div><div class="line">			return newTick;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void trim() &#123;</div><div class="line">	measurements.headMap(getTick() - window).clear();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这三种算法中，第二种和第三种是大家都很容易想到的，实现起来也很简单，第一种进行简单推导也不难，也算是一种现成的算法“蓄水池抽样”。</p>
+<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>如果某个系统每天会有 N 个人请求（N 不确定），需要从这些人中等概率的抽出 K 个中奖者，那么应该怎么做呢？是否可以使用上面抽样算法中的一种呢？</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -908,61 +954,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2016-08-27 </div>
-			<div class="article-title"><a href="/2016/08/27/spark-streaming-kafka-read-binlog-to-json/" >Spark Streaming 从 Kafka 读取 binlog 转换成 Json</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>在开发 Spark Streaming 的公共组件过程中，需要将 binlog 的数据(Array[Byte])转换为 Json 格式，供用户使用，本文提供一种转换的思路。另外我们会用到几个辅助类，为了行文流畅，我们将辅助类的定义放在文章的最后面。如果</p>
-<p>如果本文有讲述不详细，或者错误指出，肯请指出，谢谢</p>
-<p>对于 binlog 数据，每一次操作(INSERT/UPDATE/DELETE 等）都会作为一条记录写入 binlog 文件，但是同一条记录可能包含数据库中的几行数据（这里比较绕，可以看一个具体的例子）</p>
-<p>在数据库中，有 id, name，age 三个字段，其中 id 为主键，name 随意, age 随意。有两行数据如下</p>
-<table>
-<thead>
-<tr>
-<th>id</th>
-<th>name</th>
-<th>age</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>john</td>
-<td>30</td>
-</tr>
-<tr>
-<td>2</td>
-<td>john</td>
-<td>40</td>
-</tr>
-</tbody>
-</table>
-<p>那么你进行操作</p>
-<p><pre class="lang:tsql decode:true  ">update table set age = 50 where name = “john”</pre><br>的时候，就会将两行的数据都进行更改，这两行更改的数据会在同一个 binlog 记录中，这一点会在后面的实现中有体现。</p>
-<p>下面，我们给出具体的代码，然后对代码进行分析</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">def desirializeByte(b: (String, Array[Byte])) : (String, String) = &#123; </div><div class="line">  val binlogEntry = BinlogEntryUtil.serializeToBean(b._2)   //将 Array[Byte] 数据转换成 com.meituan.data.binlog.BinlogEntry 类，相关类定义参考附录</div><div class="line"></div><div class="line">  val pkeys = binlogEntry.getPrimaryKeys.asScala   //获取主键，这里的 asScala 将 Java 的 List 转换为 Scala 的 List</div><div class="line">  val rowDatas : List[BinlogRow] = binlogEntry.getRowDatas.asScala.toList  //获取具体的信息</div><div class="line">  val strRowDatas = rowDatas.map(a =&gt; &#123;            //将获取到的具体信息进行转换，这里主要是将没一条信息的内容，转换 [(K1:V1,K2:V2...Kn:Vn)] 的形式，方面后面进行 Json 化</div><div class="line">    val b = a.getBeforeColumns.asScala    //获取 beforColumns</div><div class="line">    val c = a.getAfterColumns.asScala     //获取 afterColumns</div><div class="line">    val mb = b.map(d =&gt; (d._1, d._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值</div><div class="line">    val mc = c.map(c =&gt; (c._1, c._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值</div><div class="line">    (mb, mc) //返回转换后的 beforeColumns 和 afterColumns</div><div class="line">  &#125;)</div><div class="line">  //下面利用 json4s 进行 Json 化</div><div class="line">  (binlogEntry.getEventType, compact(&quot;rowdata&quot; -&gt; strRowDatas.map&#123;</div><div class="line">    w =&gt; List(&quot;row_data&quot; -&amp;gt; (&quot;before&quot; -&amp;gt; w._1.toMap) ~ (&quot;after&quot; -&amp;gt; w._2.toMap))  //这里的两个 toMap 是必要的，不然里层会变成 List，这个地方比较疑惑的是，</div><div class="line">                                                                                 //w._1 按理是 Map类型，为什么还需要强制转换成 Map</div><div class="line">                                                                              //而且用 strRowDatas.foreach(x =&gt; println(s&quot;$&#123;x._1&#125;  $&#123;x._2&#125;&quot;)打印的结果表名是 Map</div><div class="line">  &#125;))&lt;/pre&gt;</div><div class="line">desirializeByte 函数传入 topic 中的一条记录，返回参数自己确定，我这里为了测试，返回一个 (String, String) 的 Tuple，第一个字段表示该条记录的 EventType（Insert/Update/Delete 等），第二个字段为 Json 化后的数据。</div><div class="line"></div><div class="line">BinlogEntryUtil.serilizeToBean 是一个辅助类，将 binlog 数据转化为一个 Java bean 类。</div><div class="line"></div><div class="line">第 4 行，我们得到表对应的主键，第 5 行获得具体的数据</div><div class="line"></div><div class="line">第 6 行到第 12 行是 Json 化之前的辅助工作，将所有不需要的东西给剔除掉，只留下字段，以及字段对应的值。</div><div class="line"></div><div class="line">第 14， 15 行就是具体的 Json 工作了（使用了 json4s 包进行 Json 化）</div><div class="line"></div><div class="line">这个过程中有一点需要注意的是，在 Json 化的时候，记得为 w._1 和 w._2 加 toMap 操作，不然会变成 List（很奇怪，我将 w._1 和 w._2 打印出来看，都是 Map 类型）或者你可以在第 7，8 行的末尾加上 .toMap 操作。这个我查了 API，进行了实验，暂时怀疑是在和 json4s 组合的时候，出现了问题，有待验证。</div><div class="line"></div><div class="line">利用上述代码，我们可以得到下面这样 Json 化之后的字符串(我进行了排版，程序返回的 Json 串是不换行的）</div><div class="line">&lt;pre class=&quot;font-size:8 lang:default decode:true&quot;&gt;&#123;&quot;rowdata&quot;:</div><div class="line">   [&#123;&quot;row_data&quot;:</div><div class="line">       &#123;&quot;before&quot;:&#123;&quot;param_name&quot;:&quot;creator&quot;,&quot;param_value&quot;:&quot;chenqiang05&quot;,&quot;horigindb_etl_id&quot;:&quot;2532&quot;,&quot;utime&quot;:&quot;2016-07-26 15:07:16&quot;,&quot;id&quot;:&quot;15122&quot;,&quot;status&quot;:&quot;0&quot;,&quot;ctime&quot;:&quot;2016-07-25 17:06:01&quot;&#125;,</div><div class="line">        &quot;after&quot;:&#123;&quot;param_name&quot;:&quot;creator&quot;,&quot;param_value&quot;:&quot;chendayao&quot;,&quot;horigindb_etl_id&quot;:&quot;2532&quot;,&quot;utime&quot;:&quot;2016-08-01 10:32:01&quot;,&quot;id&quot;:&quot;15122&quot;,&quot;status&quot;:&quot;0&quot;,&quot;ctime&quot;:&quot;2016-07-25 17:06:01&quot;&#125;</div><div class="line">       &#125;</div><div class="line">    &#125;]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>到这里，基本就完成了一种将 binlog 数据 Json 化的代码。</p>
-<p>附录代码，由于这些代码是从其他工程里面抠出来的，可能读起来会不顺畅，还请见谅。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div></pre></td><td class="code"><pre><div class="line">public static BinlogEntry serializeToBean(byte[] input) &#123;</div><div class="line">      BinlogEntry binlogEntry = null;</div><div class="line">      Entry entry = deserializeFromProtoBuf(input);//从 protobuf 反序列化</div><div class="line">      if(entry != null) &#123;</div><div class="line">         binlogEntry = serializeToBean(entry);</div><div class="line">      &#125;</div><div class="line">      return binlogEntry;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public static Entry deserializeFromProtoBuf(byte[] input) &#123;</div><div class="line">        Entry entry = null;</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            entry = Entry.parseFrom(input);</div><div class="line">//com.alibaba.otter.canal.protocol.CanalEntry#Entry 类的方法，由 protobuf 生成</div><div class="line">        &#125; catch (InvalidProtocolBufferException var3) &#123;</div><div class="line">            logger.error(&quot;Exception:&quot; + var3);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return entry;</div><div class="line">    &#125;</div><div class="line">//将 Entry 解析为一个 bean 类</div><div class="line">public static BinlogEntry serializeToBean(Entry entry) &#123;</div><div class="line">        RowChange rowChange = null;</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            rowChange = RowChange.parseFrom(entry.getStoreValue());</div><div class="line">        &#125; catch (Exception var8) &#123;</div><div class="line">            throw new RuntimeException(&quot;parse event has an error , data:&quot; + entry.toString(), var8);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        BinlogEntry binlogEntry = new BinlogEntry();</div><div class="line">        String[] logFileNames = entry.getHeader().getLogfileName().split(&quot;\\.&quot;);</div><div class="line">        String logFileNo = &quot;000000&quot;;</div><div class="line">        if(logFileNames.length &gt; 1) &#123;</div><div class="line">            logFileNo = logFileNames[1];</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        binlogEntry.setBinlogFileName(logFileNo);</div><div class="line">        binlogEntry.setBinlogOffset(entry.getHeader().getLogfileOffset());</div><div class="line">        binlogEntry.setExecuteTime(entry.getHeader().getExecuteTime());</div><div class="line">        binlogEntry.setTableName(entry.getHeader().getTableName());</div><div class="line">        binlogEntry.setEventType(entry.getHeader().getEventType().toString());</div><div class="line">        Iterator primaryKeysList = rowChange.getRowDatasList().iterator();</div><div class="line"></div><div class="line">        while(primaryKeysList.hasNext()) &#123;</div><div class="line">            RowData rowData = (RowData)primaryKeysList.next();</div><div class="line">            BinlogRow row = new BinlogRow(binlogEntry.getEventType());</div><div class="line">            row.setBeforeColumns(getColumnInfo(rowData.getBeforeColumnsList()));</div><div class="line">            row.setAfterColumns(getColumnInfo(rowData.getAfterColumnsList()));</div><div class="line">            binlogEntry.addRowData(row);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if(binlogEntry.getRowDatas().size() &gt;= 1) &#123;</div><div class="line">            BinlogRow primaryKeysList1 = (BinlogRow)binlogEntry.getRowDatas().get(0);</div><div class="line">            binlogEntry.setPrimaryKeys(getPrimaryKeys(primaryKeysList1));</div><div class="line">        &#125; else &#123;</div><div class="line">            ArrayList primaryKeysList2 = new ArrayList();</div><div class="line">            binlogEntry.setPrimaryKeys(primaryKeysList2);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return binlogEntry;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public class BinlogEntry implements Serializable &#123;</div><div class="line">    private String binlogFileName;</div><div class="line">    private long binlogOffset;</div><div class="line">    private long executeTime;</div><div class="line">    private String tableName;</div><div class="line">    private String eventType;</div><div class="line">    private List&lt;String&gt; primaryKeys;</div><div class="line">    private List&lt;BinlogRow&gt; rowDatas = new ArrayList();</div><div class="line">&#125;</div><div class="line">public class BinlogRow implements Serializable &#123;</div><div class="line">    public static final String EVENT_TYPE_INSERT = &quot;INSERT&quot;;</div><div class="line">    public static final String EVENT_TYPE_UPDATE = &quot;UPDATE&quot;;</div><div class="line">    public static final String EVENT_TYPE_DELETE = &quot;DELETE&quot;;</div><div class="line">    private String eventType;</div><div class="line">    private Map&lt;String, BinlogColumn&gt; beforeColumns;</div><div class="line">    private Map&lt;String, BinlogColumn&gt; afterColumns;</div><div class="line">&#125;</div><div class="line">public class BinlogColumn implements Serializable &#123;</div><div class="line">    private int index;</div><div class="line">    private String mysqlType;</div><div class="line">    private String name;</div><div class="line">    private boolean isKey;</div><div class="line">    private boolean updated;</div><div class="line">    private boolean isNull;</div><div class="line">    private String value;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>&nbsp;</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -1084,48 +1075,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
+			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
 		
-			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
-		
-			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
-		
-			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
-		
-			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
-		
-			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
-		
-			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
-		
-			<li><a href="/tags/prim/">prim<span>1</span></a></li>
-		
-			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
-		
-			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
-		
-			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
+			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
 		
 			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
 		
-			<li><a href="/tags/linux/">linux<span>24</span></a></li>
+			<li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li>
 		
-			<li><a href="/tags/git/">git<span>4</span></a></li>
+			<li><a href="/tags/rm/">rm<span>1</span></a></li>
 		
-			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
+			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
 		
-			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+			<li><a href="/tags/sap/">sap<span>1</span></a></li>
 		
-			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
+			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
 		
-			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
 		
-			<li><a href="/tags/windows/">windows<span>4</span></a></li>
+			<li><a href="/tags/kv/">kv<span>1</span></a></li>
 		
-			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
+			<li><a href="/tags/vi/">vi<span>2</span></a></li>
+		
+			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
+		
+			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
+		
+			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
+		
+			<li><a href="/tags/redis/">redis<span>1</span></a></li>
+		
+			<li><a href="/tags/how/">how<span>1</span></a></li>
+		
+			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
+		
+			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
+		
+			<li><a href="/tags/递归/">递归<span>1</span></a></li>
+		
+			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>260</span></a></li>
+		   <li><a href="/tags">...<span>265</span></a></li>
 		 
 		</ul>
 	</div>
@@ -1136,6 +1127,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
+      </li>
     
       <li>
         <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
@@ -1151,10 +1146,6 @@
     
       <li>
         <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
-      </li>
-    
-      <li>
-        <a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 写文件，...</a>
       </li>
     
   </ul>

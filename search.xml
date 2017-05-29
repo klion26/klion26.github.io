@@ -3,6 +3,50 @@
   
     
     <entry>
+      <title><![CDATA[从源码级别分析 metric-core 的抽样算法]]></title>
+      <url>/2017/05/29/%E4%BB%8E%E6%BA%90%E7%A0%81%E7%BA%A7%E5%88%AB%E5%88%86%E6%9E%90-metric-core-%E7%9A%84%E6%8A%BD%E6%A0%B7%E7%AE%97%E6%B3%95/</url>
+      <content type="html"><![CDATA[<p><a href="http://metrics.dropwizard.io" target="_blank" rel="external">metric-core</a> 是一个 java metric 库，用于统计 JVM 层面以及 服务级别 的各种 metric 信息。其中 metric-core 是其核心模块，代码量不多，总共 44 个文件，5700 行左右代码（包括注释）。算是一个很小的开源项目了。由于 metric 在所有项目中都非常重要，因此选择通读该项目，本文分析 metrci-core 中的抽样算法。</p>
+<h2 id="metric-core-中的抽样算法"><a href="#metric-core-中的抽样算法" class="headerlink" title="metric-core 中的抽样算法"></a>metric-core 中的抽样算法</h2><p>在 metric-core 中总共有四种抽样算法，分别是 <code>ExponentiallyDecayingReservoir</code>, <code>SlidingTimeWindowReservoir</code>, <code>SlidingWindowReservoir</code>, <code>UniformReservoir</code>，其中后面三个抽样算法比较常规，也通常能见到，第一个则出于一篇论文<code>Forward Decay: A Practical Time Decay Model for Streaming Systems</code>，本文会通过源码分析自己对于这种抽样算法的理解。本文暂时只分析后面三种抽样算法，对于第一种，我会单独用一篇文章进行分析。</p>
+<h3 id="UniformReservoir-算法"><a href="#UniformReservoir-算法" class="headerlink" title="UniformReservoir 算法"></a>UniformReservoir 算法</h3><p>该算法来自于论文<code>Random Sampling with a Reservoir</code>，讲述了一种随机抽样的方法，主要思想是使用一个固定的“蓄水池”装满需要数量的样本，如果当前“蓄水池”未满，将接下来的样本直接放入“蓄水池”，如果“蓄水池”已满，则随机从”蓄水池“中挑选一个样本进行替换（也可能不进行替换），这样在理论上能够保证所有的样本以同样的概率被选中。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public void update(long value) &#123;</div><div class="line">	final long c = count.incrementAndGet();//获得当前”蓄水池“的大小</div><div class="line">	if (c &lt;= values.length()) &#123; //如果”蓄水池“未满，直接将当前样本放入</div><div class="line">		values.set((int) c - 1, value);</div><div class="line">	&#125; else &#123;</div><div class="line">		final long r = nextLong(c);//随机挑选一个数据（这个随机挑选的数可能在&quot;蓄水池”中，也可能不在“蓄水池”中</div><div class="line">		if (r &lt; values.length()) &#123;//如果随机挑选的样本，在”蓄水池“中，则进行替换</div><div class="line">			values.set((int) r, value);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>为了能够更好的理解，先使用样例如下。假设现在总共来了 10 个数 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]，而“蓄水池“大小为 3. 那么”蓄水池”的 <strong>一种可能</strong> 变化如下（说是一种可能的变化，因为这里面牵涉到概率）</p>
+<ul>
+<li>[1]</li>
+<li>[1, 2]</li>
+<li>[1, 2, 3]</li>
+<li>[1, 2, 4]  # 当 4 来的时候，发现“蓄水池”已满，然后从中筛选一个进行替换掉，假设我们替换掉 3</li>
+<li>[1, 5, 4] # 当 5 来的时候，发现“蓄水池”已满，然后从中筛选一个进行替换掉，假设这次我们替换掉 2</li>
+<li>[1, 5, 4] # 当 6 来的时候，发现“蓄水池”已满，我们打算从之前的数字中筛选一个进行替换，这个时候假设我们得到的下标是 3 或者 4，发现下标为 3 和 4 的数字不在“蓄水池”中（“蓄水池”的最大下标为 2 – 从 0 开始），因此不进行替换，所以本次“蓄水池”不变</li>
+<li>[7, 5, 4] # 当 7 来的时候，发现“蓄水池”已满，随机一个下标，我们得到 0,那么将 7 放置到下标为 0 的位置</li>
+<li>[8, 5, 4] # 同上</li>
+<li>[8, 5, 9] # 同上</li>
+<li>[10, 5, 9] # 同上<h3 id="SlidingWindowReservoir-抽样算法"><a href="#SlidingWindowReservoir-抽样算法" class="headerlink" title="SlidingWindowReservoir 抽样算法"></a>SlidingWindowReservoir 抽样算法</h3><code>SlidingWindowReservoir</code> 抽样算法则以最近的 N 个样本作为整个数据集的子集，这样简单直接，对于数据波动不大，或者窗口大小 N 足够大的情况下，该算法会有较好的效果。代码如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public synchronized void update(long value) &#123;//加锁保证线程安全</div><div class="line">	        //每次替换掉最旧的数据，保证”蓄水池“中的数据是最近的 N 个样本</div><div class="line">	        measurements[(int) (count++ % measurements.length)] = value;</div><div class="line">			    &#125;</div></pre></td></tr></table></figure>
+<h3 id="SlidingTimeWindowReservoir-抽样算法"><a href="#SlidingTimeWindowReservoir-抽样算法" class="headerlink" title="SlidingTimeWindowReservoir 抽样算法"></a>SlidingTimeWindowReservoir 抽样算法</h3><p>该算法是上面移动窗口算法的变种，保留的是最近 N 时间单位（支持 TimeUnit 的所有时间单位）内的数据，而不是最近的 N 个数据。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">public void update(long value) &#123;</div><div class="line">//每 TRIM_THRESHOLD 次操作之后会进行一次 trim() 操作</div><div class="line">	if (count.incrementAndGet() % TRIM_THRESHOLD == 0) &#123;</div><div class="line">		trim();</div><div class="line">	&#125;</div><div class="line">			        //直接将该值加入到 ”蓄水池“ 中</div><div class="line">	measurements.put(getTick(), value);</div><div class="line">	&#125;</div><div class="line">//获得当前的时间</div><div class="line">private long getTick() &#123;</div><div class="line">	for (; ; ) &#123;</div><div class="line">		final long oldTick = lastTick.get();</div><div class="line">		final long tick = clock.getTick() * COLLISION_BUFFER;</div><div class="line">		// ensure the tick is strictly incrementing even if there are duplicate ticks</div><div class="line">		final long newTick = tick - oldTick &gt; 0 ? tick : oldTick + 1;</div><div class="line">		if (lastTick.compareAndSet(oldTick, newTick)) &#123;</div><div class="line">			return newTick;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void trim() &#123;</div><div class="line">	measurements.headMap(getTick() - window).clear();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这三种算法中，第二种和第三种是大家都很容易想到的，实现起来也很简单，第一种进行简单推导也不难，也算是一种现成的算法“蓄水池抽样”。</p>
+<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>如果某个系统每天会有 N 个人请求（N 不确定），需要从这些人中等概率的抽出 K 个中奖者，那么应该怎么做呢？是否可以使用上面抽样算法中的一种呢？</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> code </tag>
+            
+            <tag> metric </tag>
+            
+            <tag> reservior </tag>
+            
+            <tag> metric-core </tag>
+            
+            <tag> java </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Spark Streaming 统一在每分钟的 00 秒消费 Kafka 数据的问题解决]]></title>
       <url>/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/</url>
       <content type="html"><![CDATA[<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据</p>
@@ -26,11 +70,11 @@
         
         <tags>
             
+            <tag> kafka </tag>
+            
             <tag> batchDuration </tag>
             
             <tag> JobGenerator </tag>
-            
-            <tag> kafka </tag>
             
             <tag> problem_solve </tag>
             
@@ -116,9 +160,9 @@
             
             <tag> kafka </tag>
             
-            <tag> spark </tag>
-            
             <tag> spark-streaming </tag>
+            
+            <tag> spark </tag>
             
             <tag> exception </tag>
             
@@ -194,9 +238,9 @@
         
         <tags>
             
-            <tag> spark </tag>
-            
             <tag> spark-streaming </tag>
+            
+            <tag> spark </tag>
             
             <tag> append </tag>
             
@@ -2095,9 +2139,9 @@ private:
         
         <tags>
             
-            <tag> filter </tag>
-            
             <tag> nginx </tag>
+            
+            <tag> filter </tag>
             
             <tag> text/plain </tag>
             
@@ -2140,11 +2184,11 @@ private:
         
         <tags>
             
-            <tag> nginx </tag>
-            
             <tag> array </tag>
             
             <tag> list </tag>
+            
+            <tag> nginx </tag>
             
             <tag> queue </tag>
             
@@ -3201,9 +3245,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> blog </tag>
             
-            <tag> github </tag>
-            
             <tag> free </tag>
+            
+            <tag> github </tag>
             
             <tag> github-pages </tag>
             
@@ -3503,7 +3547,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x6a;&#99;&#109;&#x40;&#106;&#x6f;&#x6e;&#109;&#x61;&#x73;&#116;&#x65;&#x72;&#x73;&#46;&#111;&#114;&#x67;">&#x6a;&#99;&#109;&#x40;&#106;&#x6f;&#x6e;&#109;&#x61;&#x73;&#116;&#x65;&#x72;&#x73;&#46;&#111;&#114;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#x6a;&#99;&#109;&#x40;&#x6a;&#x6f;&#x6e;&#109;&#97;&#115;&#116;&#101;&#x72;&#115;&#x2e;&#x6f;&#x72;&#103;">&#x6a;&#99;&#109;&#x40;&#x6a;&#x6f;&#x6e;&#109;&#97;&#115;&#116;&#101;&#x72;&#115;&#x2e;&#x6f;&#x72;&#103;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -3726,9 +3770,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> linux </tag>
             
-            <tag> fedora </tag>
-            
             <tag> compter graphics </tag>
+            
+            <tag> fedora </tag>
             
             <tag> opengl </tag>
             
