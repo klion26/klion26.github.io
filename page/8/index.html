@@ -3,14 +3,16 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 8 | Hexo</title>
-  <meta name="author" content="John Doe">
+  <title>Page 8 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-  <meta property="og:site_name" content="Hexo"/>
+  <meta property="og:site_name" content="klion26"/>
 
   
     <meta property="og:image" content="undefined"/>
@@ -48,7 +50,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-       <a class="navbar-brand" href="/">Hexo</a>
+       <a class="navbar-brand" href="/">klion26</a>
       <div class="collapse navbar-collapse nav-menu">
 		<ul class="nav navbar-nav">
 		  
@@ -91,7 +93,7 @@
   <div class="container">
   	<div class="content">
     	 <div class="page-header page-header-inverse ">
-  <h1 class="title title-inverse ">Hexo</h1>
+  <h1 class="title title-inverse ">klion26</h1>
 </div>
 
 <div class="row page">
@@ -112,6 +114,66 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-11-08 </div>
+			<div class="article-title"><a href="/2012/11/08/vc-6-clistctr-add-image-and-cant-display/" >VC++ 6 CListCtr添加图片以及不显示文字的问题</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>用CListCtrl的时候添加图片首先把CListCtrl的样式改成热破让他，默认是ICON。<br>然后你需要把下面这段代码添加到InsertItem之前</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span class="comment">//在report样式下得先加列,不然不会显示 </span><span>  </span></span></li>
+<li><span>m_lsCListCtrl.InsertColumn(</span><span class="number">0</span><span>,_T(</span><span class="string">“文件名 “</span><span>),LVCFMT_RIGHT);   </span></li>
+<li><span>m_lsCListCtrl.InsertColumn(</span><span class="number">1</span><span>,_T(</span><span class="string">“仪器类别”</span><span>),LVCFMT_RIGHT);   </span></li>
+<li><span>m_lsCListCtrl.InsertColumn(</span><span class="number">2</span><span>,_T(</span><span class="string">“项目类别”</span><span>),LVCFMT_LEFT);   </span></li>
+<li><span class="comment">//设置列宽 </span><span>  </span></li>
+<li><span class="keyword">for</span><span>(k = </span><span class="number">0</span><span>k&lt;</span><span class="number">3</span><span>;++k)   </span></li>
+<li><span>m_lsCListCtrl.SetColumnWidth(k,</span><span class="number">100</span><span>);   </span></li>
+<li><span>  </span></li>
+<li><span class="comment">//下面是为了添加图片用的 </span><span>  </span></li>
+<li><span class="comment">//其中m_ImageList是可以全局访问的，保证随时都可以访问到 </span><span>  </span></li>
+<li><span>m_ImageList.Create(</span><span class="number">16</span><span>,</span><span class="number">16</span><span>,ILC_COLOR24,</span><span class="number">5</span><span>,</span><span class="number">1</span><span>);   </span></li>
+<li><span>CBitmap bitmap;</span><span class="comment">//创建一个CBitmap对象 </span><span>  </span></li>
+<li><span>bitmap.LoadBitmap(IDB_TIME);</span><span class="comment">//IDB_TIME是一个bitmap资源的ID，可以自己添加 ID自取 </span><span>  </span></li>
+<li><span>m_ImageList.Add(bitmap,RGB(</span><span class="number">0</span><span>,</span><span class="number">128</span><span>,</span><span class="number">128</span><span>));</span><span class="comment">//把bitmap加到m_ImageList中 </span><span>  </span></li>
+<li><span>bitmap.Detach();</span><span class="comment">//释放位图 然后添加IDB_TICK </span><span>  </span></li>
+<li><span>bitmap.LoadBitmap(IDB_TICK);   </span></li>
+<li><span>m_ImageList.Add(bitmap,RGB(</span><span class="number">0</span><span>,</span><span class="number">128</span><span>,</span><span class="number">128</span><span>));   </span></li>
+<li><span class="comment">//设置m_lsCListCtrl的属性 这里m_lsCListCtrl是CListCtrl的control类型的变量 </span><span>  </span></li>
+<li><span>m_lsCListCtrl.SetExtendedStyle(LVS_EX_CHECKBOXES |LVS_EX_GRIDLINES|LVS_EX_FULLROWSELECT | LVS_EX_SUBITEMIMAGES);   </span></li>
+<li><span>m_lsCListCtrl.SetImageList(m_ImageList,LVSIL_SMALL);</span><span class="comment">//把m_ImageList关联给m_lsCListCtrl控件 </span><span>  </span></li>
+<li><span>  </span></li>
+<li><span class="comment">//下面是添加内容 </span><span>  </span></li>
+<li><span class="keyword">int</span><span> ret = m_lsCListCtrl.InsertItem(</span><span class="number">0</span><span>,</span><span class="string">“HELLO”</span><span>);</span><span class="comment">//默认会添加到第一列 </span><span>  </span></li>
+<li><span>m_lsCListCtrl.SetItemText(</span><span class="number">0</span><span>,</span><span class="number">0</span><span>,</span><span class="string">“HELL”</span><span>); </span><span class="comment">//在第一行的第一列修改 </span><span>  </span></li>
+<li><span>m_lsCListCtrl.SetItemText(</span><span class="number">0</span><span>,</span><span class="number">1</span><span>,</span><span class="string">“HPLL”</span><span>); </span><span class="comment">//在第一行的第二列加修 </span><span>  </span></li>
+<li><span class="comment">// m_lsCListCtrl.SetItem(ret,0,LVIF_IMAGE,NULL,0,0,0,0); </span><span>  </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">1</span><span>,</span><span class="string">“HELLO”</span><span>,</span><span class="number">0</span><span>);   </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">2</span><span>,</span><span class="string">“HELLO”</span><span>,</span><span class="number">1</span><span>);   </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">3</span><span>,</span><span class="string">“HELLO”</span><span>,</span><span class="number">0</span><span>);   </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">4</span><span>,</span><span class="string">“HELLO”</span><span>); </span><span class="comment">//没有加图片的某人添加ID为0的图片 相当于第三个参数是0 </span><span>  </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">5</span><span>,</span><span class="string">“HELLO”</span><span>);   </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">6</span><span>,</span><span class="string">“HELLO”</span><span>);  </span><br></li></ol></div><br>对于新手来说，可能添加图片之后，发现图片不能显示，连文字也不能显示。这其实只是你<span style="color: #ff0000;">没有设置列而已，<span style="color: #000000;">对于report样式的CListCtrl，首先需要设置列头，就是InsertColumn。然后才会显示。</span></span>
+
+<p>好好学习，天天向上。</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -539,29 +601,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-09-21 </div>
-			<div class="article-title"><a href="/2012/09/21/wordpress-fatal-error/" >Wordpress Fatal Error</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>这博客好久都没更新了，最近登录后台的时候出现了”WordPress Fatal error: Allowed memory size of 33554432 bytes exhausted (tried to allocate 30720 bytes)”错误，怎么都进不了后台，网上一查才知道需要修改一个文件，好使的WP_MEMORY更大一些，具体的操作，就是通过ftp修改/www下的wp_config.php文件，然后在最开始的地方加上一句{define(‘WP_MEMORY_LIMIT’,’64M’);}这里的64M应该就是最大可以达到的内存了吧，如果还不够的话自己继续增加。好久都没更新博客了，这篇就当是除草了。。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -636,9 +675,9 @@
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -683,45 +722,45 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/博弈/">博弈<span>3</span></a></li>
+			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
 		
-			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
+			<li><a href="/tags/vi/">vi<span>2</span></a></li>
 		
-			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
+			<li><a href="/tags/read/">read<span>3</span></a></li>
 		
-			<li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li>
+			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
 		
-			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
+			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
 		
-			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
+			<li><a href="/tags/git/">git<span>4</span></a></li>
+		
+			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
+		
+			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+		
+			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
+		
+			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
+		
+			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
+		
+			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
 		
 			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
 		
-			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
 		
-			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
+			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
 		
-			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
+			<li><a href="/tags/python/">python<span>1</span></a></li>
 		
-			<li><a href="/tags/notes/">notes<span>0</span></a></li>
+			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
 		
-			<li><a href="/tags/fork/">fork<span>2</span></a></li>
+			<li><a href="/tags/exercise/">exercise<span>8</span></a></li>
 		
-			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
 		
-			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
-		
-			<li><a href="/tags/老师/">老师<span>1</span></a></li>
-		
-			<li><a href="/tags/critical/">critical<span>1</span></a></li>
-		
-			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
-		
-			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
-		
-			<li><a href="/tags/插件/">插件<span>1</span></a></li>
-		
-			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
+			<li><a href="/tags/shortest-paths-in-dag/">shortest paths in dag<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>265</span></a></li>
@@ -737,6 +776,10 @@
   <ul class="entry list-unstyled">
     
       <li>
+        <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
+      </li>
+    
+      <li>
         <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
       </li>
     
@@ -750,10 +793,6 @@
     
       <li>
         <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
-      </li>
-    
-      <li>
-        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
       </li>
     
   </ul>
@@ -802,7 +841,7 @@
   </div>
   <div class="container-narrow">
   <footer> <p>
-  &copy; 2017 John Doe
+  &copy; 2017 klion26
   
       with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
 </p> </footer>

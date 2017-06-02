@@ -3,14 +3,16 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 3 | Hexo</title>
-  <meta name="author" content="John Doe">
+  <title>Page 3 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-  <meta property="og:site_name" content="Hexo"/>
+  <meta property="og:site_name" content="klion26"/>
 
   
     <meta property="og:image" content="undefined"/>
@@ -48,7 +50,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-       <a class="navbar-brand" href="/">Hexo</a>
+       <a class="navbar-brand" href="/">klion26</a>
       <div class="collapse navbar-collapse nav-menu">
 		<ul class="nav navbar-nav">
 		  
@@ -91,7 +93,7 @@
   <div class="container">
   	<div class="content">
     	 <div class="page-header page-header-inverse ">
-  <h1 class="title title-inverse ">Hexo</h1>
+  <h1 class="title title-inverse ">klion26</h1>
 </div>
 
 <div class="row page">
@@ -112,6 +114,52 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-07-17 </div>
+			<div class="article-title"><a href="/2015/07/17/experiment-of-storm-grouping/" >storm 分组方式实验结果</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><span style="color: #ff0000;">打算把自己学习实时计算的相关东西写出来，形成一个从零开始学实时计算的系列，由于我也是刚开始接触，系列文中的描述或概念有不当的地方，还请不吝指教。在此谢过。</span></p>
+<p>本文对 storm 的几种分组方式进行测试，加深对每一种分组方式的理解。首先，storm 包含下面七种分组方式：</p>
+<ul>
+<li><strong><span style="color: #0000ff;">Shuffle grouping</span>:</strong> Tuples are randomly distributed across the bolt’s tasks in a way such that each bolt is guaranteed to get an equal number of tuples.</li>
+<li><span style="color: #0000ff;"><strong>Fields grouping</strong></span>: The stream is partitioned by the fields specified in the grouping. For example, if the stream is grouped by the “user-id” field, tuples with the same “user-id” will always go to the same task, but tuples with different “user-id”‘s may go to different tasks.</li>
+<li><span style="color: #000000;"><strong>Partial Key grouping</strong></span>: The stream is partitioned by the fields specified in the grouping, like the Fields grouping, but are load balanced between two downstream bolts, which provides better utilization of resources when the incoming data is skewed. <a href="https://melmeric.files.wordpress.com/2014/11/the-power-of-both-choices-practical-load-balancing-for-distributed-stream-processing-engines.pdf" target="_blank" rel="external">This paper</a> provides a good explanation of how it works and the advantages it provides.</li>
+<li><span style="color: #0000ff;"><strong>All grouping</strong></span>: The stream is replicated across all the bolt’s tasks. Use this grouping with care.</li>
+<li><span style="color: #0000ff;"><strong>Global grouping</strong>:</span> The entire stream goes to a single one of the bolt’s tasks. Specifically, it goes to the task with the lowest id.</li>
+<li><span style="color: #0000ff;"><strong>None grouping</strong>:</span> This grouping specifies that you don’t care how the stream is grouped. Currently, none groupings are equivalent to shuffle groupings. Eventually though, Storm will push down bolts with none groupings to execute in the same thread as the bolt or spout they subscribe from (when possible).</li>
+<li><strong>Direct grouping</strong>: This is a special kind of grouping. A stream grouped this way means that the producer of the tuple decides which task of the consumer will receive this tuple. Direct groupings can only be declared on streams that have been declared as direct streams. Tuples emitted to a direct stream must be emitted using one of the <a href="/javadoc/apidocs/backtype/storm/task/OutputCollector.html#emitDirect(int, int, java.util.List">emitDirect</a> methods. A bolt can get the task ids of its consumers by either using the provided<a href="https://storm.apache.org/javadoc/apidocs/backtype/storm/task/TopologyContext.html" target="_blank" rel="external">TopologyContext</a> or by keeping track of the output of the <code>emit</code> method in <a href="https://storm.apache.org/javadoc/apidocs/backtype/storm/task/OutputCollector.html" target="_blank" rel="external">OutputCollector</a> (which returns the task ids that the tuple was sent to).<br>由于测试环境种没有 Partial Key grouping 方式，Direct grouping 方式使用不同的消息发送方式。这里只对其他五种方式进行了测试。</li>
+</ul>
+<p>测试环境为：</p>
+<ul>
+<li>Spout 一个，循环发送一百个单词，配置了一个线程</li>
+<li><p>Bolt 一个，统计单词数目，配置了两个线程<br>测试结果为（<span style="color: #ff0000;">下面出现的阿拉伯数字为单词重复的次数</span>）：</p>
+</li>
+<li><p>Shuffle 从第<span style="color: #0000ff;">一百零八</span>个统计数据出现 2，后面还会穿插出现 1</p>
+</li>
+<li>Field 从第<span style="color: #0000ff;">一百零一</span>个统计数据出现 2，出现方式为一百个个1，然后一百个个 2，然后一百个3….</li>
+<li>Global 从第<span style="color: #0000ff;">一百零一</span>个统计数据出现2，出现方式与 Field grouping 方式一样</li>
+<li>All 从第<span style="color: #0000ff;">二百零一</span>个统计数据出现2，然后是两百个2，接着是两百个3….</li>
+<li>None 从第<span style="color: #0000ff;">一百</span>个统计数据出现 2，后面会穿插着出现 1，次数随机出现，与 Shuffle grouping 方式一样<br>其中 Shuffle 和 None 都是随机模式，会随机的发送给下一个 Bolt 的任何一个 task。Field 方式会把相同字段的分到同一个 task 上（<span style="color: #ff0000;">不同字段的也可以在相同 task 上</span>），Global 方式效果和 Field 一样，根据官方文档，每次都发送给 id 小的 task，All 会发送给 Bolt 上的所有 task（所有上述例子的循环长度为二百），这种方式会浪费比较多的资源。</li>
+</ul>
+<p>另外根据文档说明，<strong>Partial Key grouping 是在 Field 的基础上进行了压力均衡；Direct 方式需要使用 emitDirect 发送数据。</strong></p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -629,37 +677,6 @@ private:
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2014-09-26 </div>
-			<div class="article-title"><a href="/2014/09/26/epoll-and-select/" >epoll 小解以及和select的区别</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>前面写过 <a href="http://www.klion26.com/select-and-poll.html" target="_blank" rel="external">select 和 poll</a> 的文章，在 Linux 下有一种更高效的 I/O 多路机制，那就是 epoll。epoll的高效和它的结构有关系（本文默认读者已经了解 select），首先 epoll 会把 select 的过程分成3个部分， epoll_create(), epoll_ctl() 和 epoll_wait。在 epoll_create 的过程中，会创建一个 eventpoll 结构体，这个结构体的部分定义如下</p>
-<pre class="lang:c decode:true ">struct eventpoll{
-    ...  
-    struct rb_root rbr; //红黑树，存储了所有添加到 epoll 中的事件
-    struct list_head rdllist; // 双向链表保存通过 epoll_wait 返回给用户的满足条件的事件
-    ...
-}</pre> 
-
-<p>这里的红黑树 rbr 存储了所有已经添加到 epoll 中的事件，如果使用 epoll_ctl 进行事件操作的时候，会在红黑树中进行查找，这个效率是很高的（红黑树是一颗自平衡二叉搜索树，查找事件 O(lgn))。双向链表 rdllist 则保存将要返回给用户的满足条件的事件。<br>然后所有添加的事件都会和设备（如网卡）驱动程序建立回调关系，一旦相应事件发生就回调用这里的回调函数，然后回调函数就会把事件添加到上面的双向链表中去。因为最后返回时只需要查看链表是否有数据，这个就比 select 要高效很多<br>然后最后是 epoll_wait.调用这个函数的时候，我们会等待一段时间（这段时间是由自己设置），这段时间过去之后，epoll 会自动返回双向链表中的事件，如果双向链表不为空，就把这里的事件复制到用户态内存中，同时将事件数量返回给用户。<br>epoll 的基本功能差不多就这些，当然还有一个叫做触发模式的，epoll 分为两种触发模式｛水平触发，边缘触发｝，区别就是水平触发的话，如果某一次没有处理，那么下一次还会返回给用户，但是边缘触发的话，只在事件发生时返回给用户一次，如果用户忽略掉了，那么后面就不会再返回给用户了。<br>至于为什么 epoll 会比 select 要好用，大致有如下几个原因<br>1. select 用的是 FD_SET进行操作，而 FD_SET 有上限限制（可以通过自己改源码进行修改），但是 epoll 没有这个限制<br>2. select 会对所有的感兴趣的 fd 一个个去检查是否就绪，这样就行成了一个轮询，这个是比较慢的，而 epoll 则通过设置回调函数，在有事件发生的时候，将事件添加到双向链表中，最后只需要检查双向链表是否为空即可，这个也是很高效的。<br>3. 还有 epoll_ctl 对事件进行操作时，会在红黑树中先查找是否存在，查找的过程也是很高效的。<br>这样 epoll 就可以轻松处理百万级的并发处理了。<br>epoll 的东西大致就这么一些，至于实际应用，这个需要看实际的情况了，这个没有经验，不敢妄谈。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -734,9 +751,9 @@ private:
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -781,45 +798,45 @@ private:
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+			<li><a href="/tags/6-824/">6.824<span>2</span></a></li>
 		
-			<li><a href="/tags/problem-solve/">problem_solve<span>1</span></a></li>
+			<li><a href="/tags/python/">python<span>1</span></a></li>
 		
-			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
+			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
 		
-			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
+			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
 		
-			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
 		
-			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
+			<li><a href="/tags/latex/">latex<span>1</span></a></li>
 		
-			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
+			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
 		
-			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
+			<li><a href="/tags/错误配置/">错误配置<span>1</span></a></li>
 		
-			<li><a href="/tags/spark/">spark<span>3</span></a></li>
+			<li><a href="/tags/how/">how<span>1</span></a></li>
 		
-			<li><a href="/tags/DFS/">DFS<span>2</span></a></li>
+			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
 		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+		
+			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
+		
+			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
+		
+			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
+		
+			<li><a href="/tags/office/">office<span>1</span></a></li>
+		
+			<li><a href="/tags/filter/">filter<span>1</span></a></li>
+		
+			<li><a href="/tags/learning/">learning<span>1</span></a></li>
 		
 			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/spark/">spark<span>4</span></a></li>
 		
-			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
-		
-			<li><a href="/tags/积分/">积分<span>1</span></a></li>
-		
-			<li><a href="/tags/storm/">storm<span>3</span></a></li>
-		
-			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
-		
-			<li><a href="/tags/program/">program<span>1</span></a></li>
-		
-			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
-		
-			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
+			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>265</span></a></li>
@@ -835,6 +852,10 @@ private:
   <ul class="entry list-unstyled">
     
       <li>
+        <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
+      </li>
+    
+      <li>
         <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
       </li>
     
@@ -848,10 +869,6 @@ private:
     
       <li>
         <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
-      </li>
-    
-      <li>
-        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
       </li>
     
   </ul>
@@ -900,7 +917,7 @@ private:
   </div>
   <div class="container-narrow">
   <footer> <p>
-  &copy; 2017 John Doe
+  &copy; 2017 klion26
   
       with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
 </p> </footer>

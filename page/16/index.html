@@ -3,14 +3,16 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 16 | Hexo</title>
-  <meta name="author" content="John Doe">
+  <title>Page 16 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-  <meta property="og:site_name" content="Hexo"/>
+  <meta property="og:site_name" content="klion26"/>
 
   
     <meta property="og:image" content="undefined"/>
@@ -48,7 +50,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-       <a class="navbar-brand" href="/">Hexo</a>
+       <a class="navbar-brand" href="/">klion26</a>
       <div class="collapse navbar-collapse nav-menu">
 		<ul class="nav navbar-nav">
 		  
@@ -91,7 +93,7 @@
   <div class="container">
   	<div class="content">
     	 <div class="page-header page-header-inverse ">
-  <h1 class="title title-inverse ">Hexo</h1>
+  <h1 class="title title-inverse ">klion26</h1>
 </div>
 
 <div class="row page">
@@ -112,6 +114,29 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-03-06 </div>
+			<div class="article-title"><a href="/2011/03/06/usaco-4-3-2-the-primes/" >USACO 4.3.2 The Primes</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>这题直接搜就行了,不过要注意搜索顺序,这里如果选的不好的话,那么基本就不可能过了,一开始我选的是先确定第一行再确定反对角线,然后再依次确定第二行,第三行和第四行,再确定第2列最后确定最后一行,这样的顺序我主要是考虑可以比较好的算出一些东西,也就是可以少算一点东西[因为一开始我是用的最原始的一行一行的搜索],可是这样不行,发现会死在第4组数据上,给的是2s我的用了2.67s.无奈之下搜了解题报告,原来可以先确定两条对角线,因为它们两影响的最多,我们把最复杂的先做了,那么剪枝也可以在一开始就实现,这样可以节约不少时间,这样之后就过了,后来的搜索顺序是先对角线—&gt;反对角线—-&gt;第一行—-&gt;第二列—&gt;第四列[这里可以顺便算出第五行]—&gt;第一列[这里可以顺便算出第三行的第五个]—&gt;第二行[剩下的都可以顺便算出来了]代码写了250+行,就不在这里贴了,<a href="http://fayaa.com/code/view/17458/" target="_blank" rel="external">放在这里</a>,有兴趣的可以看看.另外官方的解题报告和这个差不多,不过还多加了一个用对称来减少搜索的时间,官方的解题报告<a href="http://files.cppblog.com/klion/4.3.2.txt" target="_blank" rel="external">传在这里</a>,有兴趣的可以下来看看</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -416,64 +441,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2010-12-31 </div>
-			<div class="article-title"><a href="/2010/12/31/linux-fork-2/" >Linux-fork(2)</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>由于这篇会比较长,所以就不接在上一篇后面了,在此再开一篇.这里说说和fork有关的两个比较有趣的程序</p>
-<p>第一个是这样的[一组,一共两个程序对比]</p>
-<p><div class="source" style="color: #f5deb3; background-color: #2f4f4f; font-family: 'Courier New', 'Lucida Console', Verdana;"><span style="color: #eeee00;">#include <unistd.h>;</unistd.h></span><br><span style="color: #eeee00;">#include <sys types.h="">;</sys></span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span> ()<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">pid_t</span> <span style="color: #f5deb3;">pid</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">fork</span><span style="color: #f5deb3;">”</span>);<span style="color: #da70d6;">//注意这句和下面的区别</span><br><span style="color: #f5deb3;">pid</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">fork</span>();<br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">error</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">fork</span><span style="color: #f5deb3;">!</span><span style="color: #f5deb3;">”</span>);<br><span style="color: #b0c4de; font-weight: bold;">else</span> <span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">am</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">child</span> <span style="color: #f5deb3;">process</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">my</span> <span style="color: #f5deb3;">process</span> <span style="color: #f5deb3;">id</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">dn</span><span style="color: #f5deb3;">”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">am</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">parent</span> <span style="color: #f5deb3;">process</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">my</span> <span style="color: #f5deb3;">process</span> <span style="color: #f5deb3;">id</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">dn</span><span style="color: #f5deb3;">”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br><span style="color: #f5deb3;">retrun</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#include <unistd.h>;</unistd.h></span><br><span style="color: #eeee00;">#include <sys types.h="">;</sys></span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span> ()<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">pid_t</span> <span style="color: #f5deb3;">pid</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">fork</span><span style="color: #f5deb3;">\</span>n<span style="color: #f5deb3;">”</span>);<span style="color: #da70d6;">//注意这句和下面的区别</span><br><span style="color: #f5deb3;">pid</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">fork</span>();<br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">error</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">fork</span><span style="color: #f5deb3;">!</span><span style="color: #f5deb3;">”</span>);<br><span style="color: #b0c4de; font-weight: bold;">else</span> <span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">am</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">child</span> <span style="color: #f5deb3;">process</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">my</span> <span style="color: #f5deb3;">process</span> <span style="color: #f5deb3;">id</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">dn</span><span style="color: #f5deb3;">”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">am</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">parent</span> <span style="color: #f5deb3;">process</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">my</span> <span style="color: #f5deb3;">process</span> <span style="color: #f5deb3;">id</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">dn</span><span style="color: #f5deb3;">”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div><br>上面的两个会输出什么呢?</p>
-<p>。</p>
-<p>。</p>
-<p>。</p>
-<p>。</p>
-<p>答案是</p>
-<p>第一个输出:</p>
-<p>forki am the child process, my process id is 2955</p>
-<p>forki am the child process, my process id is 2954</p>
-<p>第二个的输出是</p>
-<p>fork</p>
-<p>i am the child process, my process id is 2955</p>
-<p>i am the child process, my process id is 2954</p>
-<p>是不是觉得和我昨天说的不一样呢?怎么第一个中的fork输出两次呢？这里就和printf的缓冲有关了,具体的可以<a href="http://bbs.chinaunix.net/viewthread.php?tid=311067" target="_blank" rel="external"><span style="color: #ff0000;">参考这里</span></a></p>
-<p>下面的是<a href="http://www.cppblog.com/zhangxu/archive/2007/12/02/37640.aspx" target="_blank" rel="external"><span style="color: #ff0000;">转自这里</span></a></p>
-<p>我试验了下,结果和博主的相似.</p>
-<p>.给你两分钟抢答时间</p>
-<p>.</p>
-<p>.</p>
-<p>.</p>
-<p>.</p>
-<p>.</p>
-<p>.</p>
-<p>.</p>
-<p>.</p>
-<p>OK,答案来了.</p>
-<p>对一下答案吧：[这分析和结果是复制过来的.]</p>
-<p>[hardy@localhost fork]$ ./fork<br>father<br>son<br>son<br>son<br>father<br>father<br>son<br>father<br>son<br>son<br>father<br>father<br>son<br>father<br>总共7个son7个father。你答对了么？</p>
-<p>这道题需要在纸上画画才好理解[由于格式会不对,所以我用图片,速度不给力的还请见谅]</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/fork-1.bmp" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/fork-1.bmp" alt="" title="fork-1"></a></p>
-<p>其中每一行分别代表一个进程的运行打印结果。</p>
-<p>当产生子进程的时刻，子进程打印son，当子进程调用fork的生成子子进程，他就提升为father。<br>总结来说，father永远打印father，son在fork之前是son，fork之后就为father，同时生成新的son。<br>这个比喻就像真正的父子，孩子长大了生了小孩，孩子就成了父亲。而父亲永远是父亲。</p>
-<p>我自己试验的时候的结果如下:</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/fork.bmp" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/fork.bmp" alt="" title="fork"></a></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -548,9 +515,9 @@
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -595,45 +562,45 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
-		
-			<li><a href="/tags/kv/">kv<span>1</span></a></li>
-		
-			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
-		
-			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
-		
-			<li><a href="/tags/critical/">critical<span>1</span></a></li>
-		
-			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
-		
-			<li><a href="/tags/learning/">learning<span>1</span></a></li>
-		
-			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
-		
-			<li><a href="/tags/dag/">dag<span>1</span></a></li>
-		
-			<li><a href="/tags/lru/">lru<span>1</span></a></li>
-		
-			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
-		
-			<li><a href="/tags/redis/">redis<span>1</span></a></li>
+			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
 		
 			<li><a href="/tags/code-interview/">code interview<span>1</span></a></li>
 		
-			<li><a href="/tags/append/">append<span>2</span></a></li>
+			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
 		
-			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
+			<li><a href="/tags/pair/">pair<span>1</span></a></li>
 		
-			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
+			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
 		
-			<li><a href="/tags/queue/">queue<span>1</span></a></li>
+			<li><a href="/tags/at-most-once/">at-most-once<span>1</span></a></li>
 		
-			<li><a href="/tags/reservior/">reservior<span>1</span></a></li>
+			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
+		
+			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
+		
+			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
+		
+			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
+		
+			<li><a href="/tags/blog/">blog<span>2</span></a></li>
+		
+			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
+		
+			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
+		
+			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
+		
+			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
 		
 			<li><a href="/tags/于娟/">于娟<span>1</span></a></li>
 		
-			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+			<li><a href="/tags/opengl/">opengl<span>1</span></a></li>
+		
+			<li><a href="/tags/bit/">bit<span>0</span></a></li>
+		
+			<li><a href="/tags/google-adsense/">google-adsense<span>1</span></a></li>
+		
+			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>265</span></a></li>
@@ -649,6 +616,10 @@
   <ul class="entry list-unstyled">
     
       <li>
+        <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
+      </li>
+    
+      <li>
         <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
       </li>
     
@@ -662,10 +633,6 @@
     
       <li>
         <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
-      </li>
-    
-      <li>
-        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
       </li>
     
   </ul>
@@ -714,7 +681,7 @@
   </div>
   <div class="container-narrow">
   <footer> <p>
-  &copy; 2017 John Doe
+  &copy; 2017 klion26
   
       with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
 </p> </footer>

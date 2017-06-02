@@ -3,14 +3,16 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 7 | Hexo</title>
-  <meta name="author" content="John Doe">
+  <title>Page 7 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-  <meta property="og:site_name" content="Hexo"/>
+  <meta property="og:site_name" content="klion26"/>
 
   
     <meta property="og:image" content="undefined"/>
@@ -48,7 +50,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-       <a class="navbar-brand" href="/">Hexo</a>
+       <a class="navbar-brand" href="/">klion26</a>
       <div class="collapse navbar-collapse nav-menu">
 		<ul class="nav navbar-nav">
 		  
@@ -91,7 +93,7 @@
   <div class="container">
   	<div class="content">
     	 <div class="page-header page-header-inverse ">
-  <h1 class="title title-inverse ">Hexo</h1>
+  <h1 class="title title-inverse ">klion26</h1>
 </div>
 
 <div class="row page">
@@ -112,6 +114,32 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-12-27 </div>
+			<div class="article-title"><a href="/2012/12/27/too-many-levels-of-symbolic-links/" >Too many levels of symbolic links</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>说是用Linux，可是一直在X-window下用，基本命令很多都不会用，得慢慢学命令啊。Linux下命令才是王道。</p>
+<p>“Too many levels of symbolic links”这个错误是我用ln -s创建了一个软链接时发生的。比如我一开始的命令是</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">ln -s /usr/bin/vuze vuze   <span style="color: #da70d6;">#我在vuze所在的目录下操作这条语句，另外需要root权限</span></div><br>原因是因为我创建链接的时候用的是相对路径，而不是绝对路径造成了，用了绝对路径之后，就解决了。命令如下</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">ln -s /usr/bin/vuze ～/vuze/vuze</div><br>另外，Linux下一直没找到什么好的下载软件，下载速度一直上不去，现在都是用Firfox的Downthemall和chrome的下载功能。感觉文件一大就不给力啊，<span style="color: #ff0000;">要是有什么推荐的话，还请告知，不胜感激啊</span></p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -249,7 +277,7 @@
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#x61;&#105;&#x6c;&#x74;&#x6f;&#58;&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#110;&#x6d;&#97;&#115;&#x74;&#x65;&#114;&#115;&#x2e;&#x6f;&#x72;&#103;">&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#110;&#x6d;&#97;&#115;&#x74;&#x65;&#114;&#115;&#x2e;&#x6f;&#x72;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#111;&#x3a;&#x6a;&#x63;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#97;&#115;&#x74;&#x65;&#x72;&#115;&#x2e;&#111;&#114;&#x67;">&#x6a;&#x63;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#97;&#115;&#x74;&#x65;&#x72;&#115;&#x2e;&#111;&#114;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -440,66 +468,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-11-08 </div>
-			<div class="article-title"><a href="/2012/11/08/vc-6-clistctr-add-image-and-cant-display/" >VC++ 6 CListCtr添加图片以及不显示文字的问题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>用CListCtrl的时候添加图片首先把CListCtrl的样式改成热破让他，默认是ICON。<br>然后你需要把下面这段代码添加到InsertItem之前</p>
-<div class="dp-highlighter">
-
-<ol>
-<li><span><span class="comment">//在report样式下得先加列,不然不会显示 </span><span>  </span></span></li>
-<li><span>m_lsCListCtrl.InsertColumn(</span><span class="number">0</span><span>,_T(</span><span class="string">“文件名 “</span><span>),LVCFMT_RIGHT);   </span></li>
-<li><span>m_lsCListCtrl.InsertColumn(</span><span class="number">1</span><span>,_T(</span><span class="string">“仪器类别”</span><span>),LVCFMT_RIGHT);   </span></li>
-<li><span>m_lsCListCtrl.InsertColumn(</span><span class="number">2</span><span>,_T(</span><span class="string">“项目类别”</span><span>),LVCFMT_LEFT);   </span></li>
-<li><span class="comment">//设置列宽 </span><span>  </span></li>
-<li><span class="keyword">for</span><span>(k = </span><span class="number">0</span><span>k&lt;</span><span class="number">3</span><span>;++k)   </span></li>
-<li><span>m_lsCListCtrl.SetColumnWidth(k,</span><span class="number">100</span><span>);   </span></li>
-<li><span>  </span></li>
-<li><span class="comment">//下面是为了添加图片用的 </span><span>  </span></li>
-<li><span class="comment">//其中m_ImageList是可以全局访问的，保证随时都可以访问到 </span><span>  </span></li>
-<li><span>m_ImageList.Create(</span><span class="number">16</span><span>,</span><span class="number">16</span><span>,ILC_COLOR24,</span><span class="number">5</span><span>,</span><span class="number">1</span><span>);   </span></li>
-<li><span>CBitmap bitmap;</span><span class="comment">//创建一个CBitmap对象 </span><span>  </span></li>
-<li><span>bitmap.LoadBitmap(IDB_TIME);</span><span class="comment">//IDB_TIME是一个bitmap资源的ID，可以自己添加 ID自取 </span><span>  </span></li>
-<li><span>m_ImageList.Add(bitmap,RGB(</span><span class="number">0</span><span>,</span><span class="number">128</span><span>,</span><span class="number">128</span><span>));</span><span class="comment">//把bitmap加到m_ImageList中 </span><span>  </span></li>
-<li><span>bitmap.Detach();</span><span class="comment">//释放位图 然后添加IDB_TICK </span><span>  </span></li>
-<li><span>bitmap.LoadBitmap(IDB_TICK);   </span></li>
-<li><span>m_ImageList.Add(bitmap,RGB(</span><span class="number">0</span><span>,</span><span class="number">128</span><span>,</span><span class="number">128</span><span>));   </span></li>
-<li><span class="comment">//设置m_lsCListCtrl的属性 这里m_lsCListCtrl是CListCtrl的control类型的变量 </span><span>  </span></li>
-<li><span>m_lsCListCtrl.SetExtendedStyle(LVS_EX_CHECKBOXES |LVS_EX_GRIDLINES|LVS_EX_FULLROWSELECT | LVS_EX_SUBITEMIMAGES);   </span></li>
-<li><span>m_lsCListCtrl.SetImageList(m_ImageList,LVSIL_SMALL);</span><span class="comment">//把m_ImageList关联给m_lsCListCtrl控件 </span><span>  </span></li>
-<li><span>  </span></li>
-<li><span class="comment">//下面是添加内容 </span><span>  </span></li>
-<li><span class="keyword">int</span><span> ret = m_lsCListCtrl.InsertItem(</span><span class="number">0</span><span>,</span><span class="string">“HELLO”</span><span>);</span><span class="comment">//默认会添加到第一列 </span><span>  </span></li>
-<li><span>m_lsCListCtrl.SetItemText(</span><span class="number">0</span><span>,</span><span class="number">0</span><span>,</span><span class="string">“HELL”</span><span>); </span><span class="comment">//在第一行的第一列修改 </span><span>  </span></li>
-<li><span>m_lsCListCtrl.SetItemText(</span><span class="number">0</span><span>,</span><span class="number">1</span><span>,</span><span class="string">“HPLL”</span><span>); </span><span class="comment">//在第一行的第二列加修 </span><span>  </span></li>
-<li><span class="comment">// m_lsCListCtrl.SetItem(ret,0,LVIF_IMAGE,NULL,0,0,0,0); </span><span>  </span></li>
-<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">1</span><span>,</span><span class="string">“HELLO”</span><span>,</span><span class="number">0</span><span>);   </span></li>
-<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">2</span><span>,</span><span class="string">“HELLO”</span><span>,</span><span class="number">1</span><span>);   </span></li>
-<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">3</span><span>,</span><span class="string">“HELLO”</span><span>,</span><span class="number">0</span><span>);   </span></li>
-<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">4</span><span>,</span><span class="string">“HELLO”</span><span>); </span><span class="comment">//没有加图片的某人添加ID为0的图片 相当于第三个参数是0 </span><span>  </span></li>
-<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">5</span><span>,</span><span class="string">“HELLO”</span><span>);   </span></li>
-<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">6</span><span>,</span><span class="string">“HELLO”</span><span>);  </span><br></li></ol></div><br>对于新手来说，可能添加图片之后，发现图片不能显示，连文字也不能显示。这其实只是你<span style="color: #ff0000;">没有设置列而已，<span style="color: #000000;">对于report样式的CListCtrl，首先需要设置列头，就是InsertColumn。然后才会显示。</span></span>
-
-<p>好好学习，天天向上。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -574,9 +542,9 @@
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -621,45 +589,45 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
+			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
 		
-			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
+			<li><a href="/tags/topic/">topic<span>1</span></a></li>
 		
-			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
+			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
 		
-			<li><a href="/tags/learning/">learning<span>1</span></a></li>
+			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
 		
-			<li><a href="/tags/test/">test<span>1</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
-			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
+			<li><a href="/tags/安全/">安全<span>1</span></a></li>
 		
-			<li><a href="/tags/火柴棍式程序题/">火柴棍式程序题<span>1</span></a></li>
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
 		
-			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
+			<li><a href="/tags/ln/">ln<span>1</span></a></li>
 		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
+			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
 		
-			<li><a href="/tags/select/">select<span>2</span></a></li>
+			<li><a href="/tags/notes/">notes<span>0</span></a></li>
 		
-			<li><a href="/tags/rename/">rename<span>1</span></a></li>
+			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
 		
-			<li><a href="/tags/教师/">教师<span>1</span></a></li>
+			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
 		
-			<li><a href="/tags/update/">update<span>1</span></a></li>
+			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
 		
-			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
+			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
 		
-			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
+			<li><a href="/tags/windows/">windows<span>4</span></a></li>
 		
-			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
+			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
 		
-			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
 		
-			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+			<li><a href="/tags/fork/">fork<span>2</span></a></li>
 		
-			<li><a href="/tags/knapsack/">knapsack<span>1</span></a></li>
+			<li><a href="/tags/program/">program<span>1</span></a></li>
 		
-			<li><a href="/tags/积分/">积分<span>1</span></a></li>
+			<li><a href="/tags/mit/">mit<span>2</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>265</span></a></li>
@@ -675,6 +643,10 @@
   <ul class="entry list-unstyled">
     
       <li>
+        <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
+      </li>
+    
+      <li>
         <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
       </li>
     
@@ -688,10 +660,6 @@
     
       <li>
         <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
-      </li>
-    
-      <li>
-        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
       </li>
     
   </ul>
@@ -740,7 +708,7 @@
   </div>
   <div class="container-narrow">
   <footer> <p>
-  &copy; 2017 John Doe
+  &copy; 2017 klion26
   
       with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
 </p> </footer>

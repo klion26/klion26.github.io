@@ -3,6 +3,39 @@
   
     
     <entry>
+      <title><![CDATA[如何在不重启 Spark Streaming 作业的情况下，增加消费的 topic]]></title>
+      <url>/2017/06/01/%E5%A6%82%E4%BD%95%E5%9C%A8%E4%B8%8D%E9%87%8D%E5%90%AF-Spark-Streaming-%E4%BD%9C%E4%B8%9A%E7%9A%84%E6%83%85%E5%86%B5%E4%B8%8B%EF%BC%8C%E5%A2%9E%E5%8A%A0%E6%B6%88%E8%B4%B9%E7%9A%84-topic/</url>
+      <content type="html"><![CDATA[<blockquote>
+<p>本文所有和 kafka 相关操作都基于 Direct 消费模式</p>
+</blockquote>
+<p>在 Spark Streaming 作业中，每个作业会消费一个或多个 topic，但是这些 topic 需要在作业启动之前确定好，在作业运行中不能进行调整，之前<a href="https://klion26.github.io/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/" target="_blank" rel="external">修改了源码</a>做到了自适应 topic partition 扩容的情况，但是无法动态调整消费的 topic。现在需要在不重启作业的情况下，动态调整消费的 topic。</p>
+<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><p>回顾之前自适应 partition 调整的方案，落到源码层面最终以 partition 为最小消费单元，而不是 topic。因此动态的调整消费的 topic 在理论上就是可行的 – 假设作业已经消费的 topic 为 A，在自适应 partition 扩容的时候，我们是增加了 A 的某些 partition，那么我们同样可以增加 B topic 的 partition，其中 B topic 是作业之前没有消费的。</p>
+<p>动态调整 partition 的方案中，只需要将现在消费的 parition 数不断的对齐现在 kafka 上相应 topic 的 partition 数目即可。动态调整作业消费的 topic 则需要有一个地方存储作业消费的 topic 数目，然后将这个信息周期性的同步给作业即可 – 可以理解前者使用 kafka 作为存储介质，保存了 topic 的 partition 数目。</p>
+<p>本方案中，选择 zookeeper 作业作为存储 topic 的介质。希望动态调整 topic 的时候，修改 zookeeper 中对应路径下的节点即可。然后作业定时的访问 zookeeper 的特定路径同步需要消费的 topic 数目即可。示意图如下</p>
+<p><img src="media/14962258636529/14963257212101.jpg" alt=""></p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>方案确定了，直接修改下上次自适应 partition 扩容的代码即可 – 本方案只实现了增加 topic 的功能，当前消费的 topic 不会被删除，如果需要的话可以自行修改源码满足这一点。</p>
+<p>在 <code>DirectKafkaInputStream</code> 的 <code>compute</code> 函数开始处添加如下逻辑</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">val topic = currentOffsets.head._1.topic</div><div class="line">var addedTopic : Set[String] = Set()</div><div class="line">val topics = getTopicsForJob()</div><div class="line">for (i &lt;- topics) &#123;</div><div class="line">      if (!i.equals(topic)) &#123;</div><div class="line">            addedTopic = addedTopic + i</div><div class="line">       &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">if (addedTopic.nonEmpty) &#123;</div><div class="line">     val topicLeaders = MTKafkaUtils.getPartitions(kafkaParams, addedTopic)</div><div class="line">     val largestOffset = MTKafkaUtils.getLeaderOffsets(kafkaParams, topicLeaders, OffsetRequest.LatestTime)</div><div class="line"></div><div class="line">     currentOffsets = currentOffsets ++ largestOffset</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后增加一个获取所有 topic 的函数，下面 Constants 包中使用了一些常量，自行替换即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">private def getTopicsForJob() : List[String] = &#123;</div><div class="line">        val jobName = SparkEnv.get.conf.get(Constants.JOB_PREFIXED_NAME_KEY)  //这个是提交 job 时添加的一个参数，用于区分每个作业，会当作 zk 中路径的一级</div><div class="line">        val zkHostPort: String =  &quot;xxxxxxxxx&quot;</div><div class="line">        val zkClient = new ZkClient(zkHostPort, Constants.DEFAULT_SESSION_TIMEOUT, Constants.DEFAULT_CONNECTION_TIMEOUT, new ZkOffsetSerializer) //ZkOffsetSerializer 自己实现了一个简单的序列化，反序列化类，就用了 String.getBytes 和 new String()</div><div class="line"></div><div class="line">        if (!zkClient.exists(s&quot;$&#123;Constants.ROOT_PATH_OF_MULTI_TOPIC_PER_JOB&#125;/$&#123;jobName&#125;&quot;)) &#123;</div><div class="line">									            ZkUtils.updatePersistentPath(zkClient, s&quot;$&#123;Constants.ROOT_PATH_OF_MULTI_TOPIC_PER_JOB&#125;/$&#123;jobName&#125;&quot;, s&quot;$&#123;jobName&#125;&quot;);</div><div class="line">														        &#125;</div><div class="line"></div><div class="line">        zkClient.getChildren(s&quot;$&#123;Constants.ROOT_PATH_OF_MULTI_TOPIC_PER_JOB&#125;/$&#123;jobName&#125;&quot;).asScala.toList</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> kafka </tag>
+            
+            <tag> spark </tag>
+            
+            <tag> spark_streaming </tag>
+            
+            <tag> zookeeper </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[从源码级别分析 metric-core 的抽样算法]]></title>
       <url>/2017/05/29/%E4%BB%8E%E6%BA%90%E7%A0%81%E7%BA%A7%E5%88%AB%E5%88%86%E6%9E%90-metric-core-%E7%9A%84%E6%8A%BD%E6%A0%B7%E7%AE%97%E6%B3%95/</url>
       <content type="html"><![CDATA[<p><a href="http://metrics.dropwizard.io" target="_blank" rel="external">metric-core</a> 是一个 java metric 库，用于统计 JVM 层面以及 服务级别 的各种 metric 信息。其中 metric-core 是其核心模块，代码量不多，总共 44 个文件，5700 行左右代码（包括注释）。算是一个很小的开源项目了。由于 metric 在所有项目中都非常重要，因此选择通读该项目，本文分析 metrci-core 中的抽样算法。</p>
@@ -70,17 +103,17 @@
         
         <tags>
             
-            <tag> spark </tag>
-            
-            <tag> kafka </tag>
-            
             <tag> batchDuration </tag>
             
             <tag> JobGenerator </tag>
             
+            <tag> kafka </tag>
+            
             <tag> problem_solve </tag>
             
             <tag> RecurringTimer </tag>
+            
+            <tag> spark </tag>
             
             <tag> spark_streaming </tag>
             
@@ -111,13 +144,13 @@
         
         <tags>
             
-            <tag> append </tag>
-            
-            <tag> hdfs </tag>
-            
             <tag> kafka </tag>
             
             <tag> spark_streaming </tag>
+            
+            <tag> append </tag>
+            
+            <tag> hdfs </tag>
             
             <tag> hive </tag>
             
@@ -158,11 +191,11 @@
         
         <tags>
             
+            <tag> kafka </tag>
+            
             <tag> spark </tag>
             
             <tag> spark-streaming </tag>
-            
-            <tag> kafka </tag>
             
             <tag> exception </tag>
             
@@ -199,9 +232,9 @@
         
         <tags>
             
-            <tag> spark-streaming </tag>
-            
             <tag> kafka </tag>
+            
+            <tag> spark-streaming </tag>
             
             <tag> specify_timestamp </tag>
             
@@ -238,13 +271,13 @@
         
         <tags>
             
-            <tag> append </tag>
-            
-            <tag> hdfs </tag>
-            
             <tag> spark </tag>
             
             <tag> spark-streaming </tag>
+            
+            <tag> append </tag>
+            
+            <tag> hdfs </tag>
             
         </tags>
         
@@ -290,9 +323,9 @@
         
         <tags>
             
-            <tag> spark-streaming </tag>
-            
             <tag> kafka </tag>
+            
+            <tag> spark-streaming </tag>
             
             <tag> auto-adaptive </tag>
             
@@ -609,9 +642,9 @@
         
         <tags>
             
-            <tag> spark-streaming </tag>
-            
             <tag> kafka </tag>
+            
+            <tag> spark-streaming </tag>
             
             <tag> binlog </tag>
             
@@ -647,9 +680,9 @@
         
         <tags>
             
-            <tag> spark-streaming </tag>
-            
             <tag> kafka </tag>
+            
+            <tag> spark-streaming </tag>
             
             <tag> at-least-once </tag>
             
@@ -683,9 +716,9 @@
         
         <tags>
             
-            <tag> spark-streaming </tag>
-            
             <tag> kafka </tag>
+            
+            <tag> spark-streaming </tag>
             
             <tag> at-least-once </tag>
             
@@ -1103,9 +1136,9 @@
             
             <tag> distributed-system </tag>
             
-            <tag> kv </tag>
-            
             <tag> mit </tag>
+            
+            <tag> kv </tag>
             
             <tag> viewservice </tag>
             
@@ -1157,11 +1190,11 @@
             
             <tag> distributed-system </tag>
             
-            <tag> mit </tag>
-            
             <tag> go </tag>
             
             <tag> mapreduce </tag>
+            
+            <tag> mit </tag>
             
         </tags>
         
@@ -3547,7 +3580,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#x61;&#105;&#x6c;&#x74;&#x6f;&#58;&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#110;&#x6d;&#97;&#115;&#x74;&#x65;&#114;&#115;&#x2e;&#x6f;&#x72;&#103;">&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#110;&#x6d;&#97;&#115;&#x74;&#x65;&#114;&#115;&#x2e;&#x6f;&#x72;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#111;&#x3a;&#x6a;&#x63;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#97;&#115;&#x74;&#x65;&#x72;&#115;&#x2e;&#111;&#114;&#x67;">&#x6a;&#x63;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#97;&#115;&#x74;&#x65;&#x72;&#115;&#x2e;&#111;&#114;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>

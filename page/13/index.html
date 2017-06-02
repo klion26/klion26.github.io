@@ -3,14 +3,16 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 13 | Hexo</title>
-  <meta name="author" content="John Doe">
+  <title>Page 13 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-  <meta property="og:site_name" content="Hexo"/>
+  <meta property="og:site_name" content="klion26"/>
 
   
     <meta property="og:image" content="undefined"/>
@@ -48,7 +50,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-       <a class="navbar-brand" href="/">Hexo</a>
+       <a class="navbar-brand" href="/">klion26</a>
       <div class="collapse navbar-collapse nav-menu">
 		<ul class="nav navbar-nav">
 		  
@@ -91,7 +93,7 @@
   <div class="container">
   	<div class="content">
     	 <div class="page-header page-header-inverse ">
-  <h1 class="title title-inverse ">Hexo</h1>
+  <h1 class="title title-inverse ">klion26</h1>
 </div>
 
 <div class="row page">
@@ -112,6 +114,29 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-04-10 </div>
+			<div class="article-title"><a href="/2011/04/10/usaco-5-3-4big-barn/" >USACO 5.3.4Big Barn</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://www.nocow.cn/index.php/Translate:USACO/bigbrn" target="_blank" rel="external">中文题意</a><br>此题我用的是dp做的,因为数据不大,所以直接开两个二维数组,一个记录农场信息,一个是dp用的矩阵.dp[i][j]表示右下角是[i,j]的正方形的边长.我的农场信息是,farm[i][j]=1表示无树 而=0表示有树.那么dp的二维数组首先初始化第一行和第一列,如果第一行的某个点有树,那么这个点的dp值为0,否则为1.递推方程是dp[i][j]=min(dp[i-1][j-1],dp[i-1][j],dp[i][j-1])+1[if farm[i][j]==1]否则dp[i][j]=0;然后输出dp的最大值就OK了.当然这里dp的二维数组完全没必要,因为dp[i][j]只与当前行,上一行有关,我们完全可以只开一个2*N的数组就ok了.</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -436,32 +461,6 @@ return 1;
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-03-30 </div>
-			<div class="article-title"><a href="/2011/03/30/c-string-point-two-dimension/" >C字符串二维指针的一个问题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>看C和指针的时候看到一个这样的函数:</p>
-<p><div class="source" style="font-family: amp;amp; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">find_char</span>(<span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;"><strong></strong></span><span style="color: #f5deb3;">string</span><span style="color: #f5deb3;">,</span><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">val</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">assert</span>(<span style="color: #f5deb3;">string</span> <span style="color: #f5deb3;">!=</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span>);<br><span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">string</span> <span style="color: #f5deb3;">!=</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #f5deb3;"></span>(<span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">string</span>)<span style="color: #f5deb3;">!=</span> <span style="color: #7fffd4;">‘\0’</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;"></span>(<span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">string</span>)<span style="color: #f5deb3;">++</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">val</span>)<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">string</span><span style="color: #f5deb3;">++</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div><br>书上说这个函数有副作用,只适合一次查询的情况,由于本人愚笨,一时没看出来到底是怎么搞的,于是今天上机一试,才知道原来是((<em>string)++ == val)这句的问题,这句会把找到之前的那些字符都给过滤掉,之后就再也找不回来了,就好像被大灰狼叼走之后一样~~~.我的想法是</em>string是一个一维指针,是由string这个二维指针通过间接访问得到的,所以在函数里面改过之后,在原数组也是会有效果的,就好像一个一维数组,然后*num=5这样的语句一样,不过这里的间接访问之后还是一个指针而已.<span style="color: #ff0000;">如果有什么错误,还请看官指出</span>.这里附上我做试验的string和输出<br>string = {“abc”,”cb”,”de”}//当然你不能直接这么赋值<br>然后我输出整个string,格式如下:</p>
-<p><div class="source" style="font-family: amp;amp; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">string</span> <span style="color: #f5deb3;">!=</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%s</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">string</span>);<br><span style="color: #f5deb3;">string</span><span style="color: #f5deb3;">++</span><br><span style="color: #f5deb3;">}</span><span style="color: #add8e6;">2</span></div><br>结果如下<br><em>
-</em><br>e//上面的下划线表示没有输出.</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -536,9 +535,9 @@ return 1;
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -583,45 +582,45 @@ return 1;
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+			<li><a href="/tags/no-recursive/">no-recursive<span>1</span></a></li>
 		
-			<li><a href="/tags/jekyll/">jekyll<span>1</span></a></li>
+			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
 		
-			<li><a href="/tags/trident/">trident<span>1</span></a></li>
+			<li><a href="/tags/chain-matrix-multiplication/">chain matrix multiplication<span>1</span></a></li>
 		
-			<li><a href="/tags/alibaba/">alibaba<span>1</span></a></li>
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
 		
-			<li><a href="/tags/米聊/">米聊<span>1</span></a></li>
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
 		
-			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
+			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
 		
-			<li><a href="/tags/partition/">partition<span>1</span></a></li>
+			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
 		
-			<li><a href="/tags/半平面交/">半平面交<span>1</span></a></li>
+			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
 		
-			<li><a href="/tags/kafka/">kafka<span>8</span></a></li>
-		
-			<li><a href="/tags/question/">question<span>1</span></a></li>
-		
-			<li><a href="/tags/update/">update<span>1</span></a></li>
-		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
-		
-			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
-		
-			<li><a href="/tags/tree/">tree<span>1</span></a></li>
-		
-			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
-		
-			<li><a href="/tags/数论/">数论<span>5</span></a></li>
-		
-			<li><a href="/tags/exercise/">exercise<span>8</span></a></li>
-		
-			<li><a href="/tags/git/">git<span>4</span></a></li>
+			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
 		
 			<li><a href="/tags/stack/">stack<span>1</span></a></li>
 		
-			<li><a href="/tags/zookeeper/">zookeeper<span>2</span></a></li>
+			<li><a href="/tags/hash/">hash<span>1</span></a></li>
+		
+			<li><a href="/tags/timestamp/">timestamp<span>1</span></a></li>
+		
+			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
+		
+			<li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li>
+		
+			<li><a href="/tags/list/">list<span>1</span></a></li>
+		
+			<li><a href="/tags/插件/">插件<span>1</span></a></li>
+		
+			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
+		
+			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
+		
+			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
+		
+			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>265</span></a></li>
@@ -637,6 +636,10 @@ return 1;
   <ul class="entry list-unstyled">
     
       <li>
+        <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
+      </li>
+    
+      <li>
         <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
       </li>
     
@@ -650,10 +653,6 @@ return 1;
     
       <li>
         <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
-      </li>
-    
-      <li>
-        <a href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/" ><i class="fa fa-file-o"></i>Spark Streaming 从指定时间戳开始消费 ...</a>
       </li>
     
   </ul>
@@ -702,7 +701,7 @@ return 1;
   </div>
   <div class="container-narrow">
   <footer> <p>
-  &copy; 2017 John Doe
+  &copy; 2017 klion26
   
       with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
 </p> </footer>
