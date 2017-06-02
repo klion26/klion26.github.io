@@ -124,7 +124,7 @@
 <h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><p>回顾之前自适应 partition 调整的方案，落到源码层面最终以 partition 为最小消费单元，而不是 topic。因此动态的调整消费的 topic 在理论上就是可行的 – 假设作业已经消费的 topic 为 A，在自适应 partition 扩容的时候，我们是增加了 A 的某些 partition，那么我们同样可以增加 B topic 的 partition，其中 B topic 是作业之前没有消费的。</p>
 <p>动态调整 partition 的方案中，只需要将现在消费的 parition 数不断的对齐现在 kafka 上相应 topic 的 partition 数目即可。动态调整作业消费的 topic 则需要有一个地方存储作业消费的 topic 数目，然后将这个信息周期性的同步给作业即可 – 可以理解前者使用 kafka 作为存储介质，保存了 topic 的 partition 数目。</p>
 <p>本方案中，选择 zookeeper 作业作为存储 topic 的介质。希望动态调整 topic 的时候，修改 zookeeper 中对应路径下的节点即可。然后作业定时的访问 zookeeper 的特定路径同步需要消费的 topic 数目即可。示意图如下</p>
-<p><img src="media/14962258636529/14963257212101.jpg" alt=""></p>
+<p><img src="https://c1.staticflickr.com/5/4275/34202432474_eb409ae6a5.jpg" alt=""></p>
 <h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>方案确定了，直接修改下上次自适应 partition 扩容的代码即可 – 本方案只实现了增加 topic 的功能，当前消费的 topic 不会被删除，如果需要的话可以自行修改源码满足这一点。</p>
 <p>在 <code>DirectKafkaInputStream</code> 的 <code>compute</code> 函数开始处添加如下逻辑</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">val topic = currentOffsets.head._1.topic</div><div class="line">var addedTopic : Set[String] = Set()</div><div class="line">val topics = getTopicsForJob()</div><div class="line">for (i &lt;- topics) &#123;</div><div class="line">      if (!i.equals(topic)) &#123;</div><div class="line">            addedTopic = addedTopic + i</div><div class="line">       &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">if (addedTopic.nonEmpty) &#123;</div><div class="line">     val topicLeaders = MTKafkaUtils.getPartitions(kafkaParams, addedTopic)</div><div class="line">     val largestOffset = MTKafkaUtils.getLeaderOffsets(kafkaParams, topicLeaders, OffsetRequest.LatestTime)</div><div class="line"></div><div class="line">     currentOffsets = currentOffsets ++ largestOffset</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -139,13 +139,13 @@
 <ul class="pagination">
 	 
 		
-          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
         
 
         <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
 
 		
-		   <li class="next"><a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+		   <li class="next"><a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
         
 	
 </ul>
@@ -181,7 +181,7 @@
 	<!-- comment -->
 	
 <section id="comment">
-  <h2 class="title">Comments</h2>
+  <h2 class="title">留言</h2>
 
   
 </section>
