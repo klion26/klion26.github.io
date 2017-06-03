@@ -115,6 +115,40 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2017-05-10 </div>
+			<div class="article-title"><a href="/2017/05/10/Python-代码实践小结/" >Python 代码实践小结</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>最近写了较多的 Python 脚本，将最近自己写的脚本进行一个总结，其中有些是 Python 独有的，有些是所有程序设计中共有的：</p>
+<ol>
+<li>考虑使用 Logger（logger 怎么配置，需要输出哪些信息 – 可以反向考虑，自己看到这个 logger 的时候想了解什么信息）</li>
+<li>传递的数据结构如何考虑（是否对调用方有先验知识的要求，比如返回一个 Tuple，则需要用户了解 tuple 中元素的顺序，这样情况是否应该进行封装；），数据结构定义清楚了，很多东西也就清楚了。</li>
+<li>如何操作数据库（可以学习 sqlalchemy，包括 core 和 orm 两种 api）</li>
+<li>异常如何处理（异常应该分开捕获 – 可以清楚的知道什么情况下导致的，异常之后应该打印日志说明出现什么问题，如果情况恶劣需要进行异常再次抛出或者报警）</li>
+<li>所有获取资源的地方都应该做 check（a. 没有获取到会怎么办；b.获取到异常的怎么办）</li>
+<li>所有操作资源的地方都应该检查是否操作成功</li>
+<li>每个函数都应该简短，如果函数过长应该进行拆分（有个建议值，函数包含的行数应该在 20-30 行之间，具体按照这个规范做过一次之后就会发现这样真好）</li>
+<li>使用 class 之后，考虑重构 <code>__str__</code> 函数，用户打印输出，如果对象放到 collection 中之后，需要实现 <code>__repr__</code> 函数，用于打印整个 collection 的时候，直观显示（如果不实现 <code>__str__</code>，会调用 <code>__repr__</code>)</li>
+<li>如果有些资源会发生变化，可以单独抽取出来，做成函数，这样后续调用就可以不用改变了</li>
+</ol>
+<p>上述总结肯定有片面的地方，也有不全的地方，欢迎指出</p>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2017/05/10/Python-代码实践小结/#more" class="btn btn-default more">Read More</a>
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2012-10-08 </div>
 			<div class="article-title"><a href="/2012/10/08/scheme-and-the-little-scheme/" >Scheme &amp; The Little Scheme</a></div>						
 		</h3>
@@ -259,7 +293,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -268,16 +302,16 @@
 		
 			
 	<div class="widget">
-		<h4>Categorias</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -297,19 +331,21 @@
 		
 			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
 		
-			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+			<li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li>
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
-			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+			<li><a href="/categories/我的生活/">我的生活<span>9</span></a></li>
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
@@ -319,25 +355,29 @@
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
+			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>2</span></a></li>
 		
 		</ul>
 	</div>
@@ -348,48 +388,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
-		
 			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
 		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+			<li><a href="/tags/notes/">notes<span>0</span></a></li>
 		
-			<li><a href="/tags/tree/">tree<span>1</span></a></li>
+			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
 		
-			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
 		
-			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
+			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
 		
-			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
+			<li><a href="/tags/hive/">hive<span>1</span></a></li>
 		
-			<li><a href="/tags/question/">question<span>1</span></a></li>
+			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
 		
-			<li><a href="/tags/test/">test<span>1</span></a></li>
+			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
 		
-			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
+			<li><a href="/tags/MST/">MST<span>1</span></a></li>
 		
-			<li><a href="/tags/spark/">spark<span>5</span></a></li>
+			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
 		
-			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
+			<li><a href="/tags/read/">read<span>3</span></a></li>
 		
-			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
+			<li><a href="/tags/source-code/">source_code<span>1</span></a></li>
 		
-			<li><a href="/tags/google-adsense/">google-adsense<span>1</span></a></li>
+			<li><a href="/tags/方法/">方法<span>1</span></a></li>
 		
-			<li><a href="/tags/specify-timestamp/">specify_timestamp<span>1</span></a></li>
+			<li><a href="/tags/rename/">rename<span>1</span></a></li>
 		
-			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
+			<li><a href="/tags/storm/">storm<span>3</span></a></li>
 		
-			<li><a href="/tags/mit/">mit<span>2</span></a></li>
+			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
 		
-			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
 		
-			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
+			<li><a href="/tags/stack/">stack<span>1</span></a></li>
 		
-			<li><a href="/tags/scc/">scc<span>1</span></a></li>
+			<li><a href="/tags/proof/">proof<span>1</span></a></li>
+		
+			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>266</span></a></li>
+		   <li><a href="/tags">...<span>270</span></a></li>
 		 
 		</ul>
 	</div>
@@ -398,7 +438,7 @@
 		
 			
 <div class="widget">
-  <h4>Posts recentes</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
     
       <li>
@@ -414,11 +454,11 @@
       </li>
     
       <li>
-        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+        <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
       <li>
-        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+        <a href="/2017/05/10/Python-代码实践小结/" ><i class="fa fa-file-o"></i>Python 代码实践小结</a>
       </li>
     
   </ul>

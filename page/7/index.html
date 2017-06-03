@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Página 7 | klion26</title>
+  <title>Page 7 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -114,6 +114,102 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-01-21 </div>
+			<div class="article-title"><a href="/2013/01/21/github-pages-jekyll-blog-free/" >github pages+jekyll搭建免费博客</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>不久前得知github page可以用来搭建博客，而且还可以绑定顶级域名（不绑定的话，是一个github.com下面的二级域名）。然后就找教程弄了一个，觉得这东西确实不错啊，如果只是写写文章，没有很多其他要求的话，这样的一个博客完全可以了，而且可以不用买域名，也相当于<span style="color: #ff0000;">完全免费</span>了。而且用Markdown来写文章，感觉也不错，可以用自己喜欢的编辑器来写文章，格式也简单，然后通过git push到github上就可以了，其他的事情全部不用自己管，而且自己可以找一些很炫的主题，这些主题同样可以自己改，而且比改wordpress主题容易多了。下面是简单的流程，参照<span style="color: #3366ff;"><a href="http://www.vikingmute.com/archives/309" target="_blank" rel="external"><span style="color: #3366ff;">这篇文章</span></a></span>.</p>
+<p>首先你得在github上创建一个帐号，然后进行下面的操作，我的环境是fedora 15，当然在其他平台也是可以的，linux下基本一样，win下可以自己google。</p>
+<p>1.安装ruby和jekyll</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">$ sudo yum install ruby-devel<br>$ gem install jekyll</div><br>2.clone这个库<a href="http://jekyllbootstrap.com/" target="_blank" rel="external">http://jekyllbootstrap.com/</a>，这个库在jekyll的基础上进行了一些修改</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">$ git clone <a href="https://github.com/plusjade/jekyll-bootstrap.git" target="_blank" rel="external">https://github.com/plusjade/jekyll-bootstrap.git</a> username.github.com<br><span style="color: #b0c4de; font-weight: bold;">$ cd </span>username.github.com<br>$ git remote <span style="color: #b0c4de; font-weight: bold;">set</span>-url origin <a href="https://github.com/username/username.github.com.git" target="_blank" rel="external">https://github.com/username/username.github.com.git</a><br>$ git push origin master</div><br>其中的username请自行替换成你在github上的用户名（如何安装git的话，linux自带，windows自行google，教程一大堆），期间会让你输入github的帐号和密码，照着做就行了，当然如果你觉得每次都输入密码麻烦的话，可以配置ssh，如何配置请自行google，如果出现port 22错误的话，可以参考<span style="color: #3366ff;"><a href="http://www.klion26.com/github-port-22-error-bad-file-number.html" target="_blank" rel="external"><span style="color: #3366ff;">这篇文章</span></a></span></p>
+<p>然后过上5-10分钟（第一次会比较就一点，以后一般是1分钟左右）。你就可以用username.github.com访问你的博客了，然后会看到介绍jekyll的文章。</p>
+<p>然后，可以用如下操作来编辑你的第一篇文章</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">$ rake post <span style="color: #d8bfd8;">title</span><span style="color: #f5deb3;">=</span>”Hello World”<br><span style="color: #b0c4de; font-weight: bold;">$ cd </span>_posts //看到一个新的hello world命名的.md文件 就是你的文章啦<br>$ vim <em>**</em>hello_world.md //打开他 用markdown格式撰写<br>//commit一下 就是等于发布了～<br>$ git add .<br>$ git commit -m “Add new content”<br>$ git push origin master</div><br>然后刷新一下就可以看到你的第一篇文章了，markdown的语法也很容易懂，而且可以边学边操作，等需要的时候再去学习更高层的东西。如果自己新建markdown文件的话，命名需要注意下，要写成日期加title的格式。</p>
+<p>至于其他的高级操作，可以在下面找到，另外google觉得是个好地方</p>
+<p>Jekyll-Bootstrap ：<a href="http://jekyllbootstrap.com/" target="_blank" rel="external">http://jekyllbootstrap.com/</a><br>Jeklly官方文档 ： <a href="http://jekyllrb.com/" target="_blank" rel="external">http://jekyllrb.com/</a><br>Github pages：<a href="http://pages.github.com/" target="_blank" rel="external">http://pages.github.com/</a></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-01-03 </div>
+			<div class="article-title"><a href="/2013/01/03/fedora-15-yum-rpm-problem/" >Fedora 15Yum问题和RPM包不能安装的问题</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>由于需要安装fftw库和其他一个神马库，然后自己编译的时候又不怎么对，想着用yum install快速解决得了，结果输入yum之后返回</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">There was a problem importing one of the Python modules<br>required to run yum. The error leading to this problem was:/usr/lib/python2.7/site-packages/pycurl.so: undefined symbol: CRYPTO_set_locking_callback</div></p>
+<p>Please install a package which provides this module, or<br>verify that the module is installed correctly.</p>
+<p>It<span style="color: #7fffd4;">‘s possible that the above module doesn’</span>t match the<br>current version of Python, which is:<br>2.7.1 (r271:86832, Apr 12 2011, 16:16:18)<br><span style="color: #f5deb3;">[</span>GCC 4.6.0 20110331 (Red Hat 4.6.0-2<span style="color: #f5deb3;">)]</span></p>
+<p>If you cannot solve this problem yourself, please go to<br>the yum faq at:<br><a href="http://yum.baseurl.org/wiki/Faq" target="_blank" rel="external">http://yum.baseurl.org/wiki/Faq</a></p>
+<p><br>简单的说就是YUM挂了，对于一个对Linux还不是很熟悉的人来说，这是致命的啊，FUCK！！！。然后上网搜解决方案，发现这个问题好少啊，不过刚好有一篇是在Fedora 15上出现这个问题，地址在<a href="http://forums.fedoraforum.org/archive/index.php/t-263887.html" target="_blank" rel="external">这里</a>，不过是英文的，然后照着做就行了，如果不想看英文，我大致说下意思，主要就是把你/usr/local/lib下所有libcurl开头的文件删除掉（对于新手还是用mv命令比较好，万一错了还可以移回来）。这样操作之后就可以了，这一下运行yum出来提示说没有加参数，觉得好有爱啊。上面的文章说，这个原因有可能是因为1.Fedora的libcurl是通过不同的参数或者路径编译得来的</p>
+<p>2.你系统的编译版本太新，没有相应的符号</p>
+<p>3.你系统的编译版本太久，没有相应的符号</p>
+<p>另外，在Yum出问题的过程中，我连安装rpm包都出现了问题，双击rpm包的时候，出现“An internal system error has occurred”错误，网上找也没人说，不过后来再解决了yum问题的同时，这个问题也解决了。</p>
+<p><span style="color: #0000ff;">PS.在搜解决方案的时候，我真想暴那些搞GFW的人的菊花啊，尼妈google一会断一次，百度答案又他们太坑爹。linux下GoAgent安装还出现问题，暂时还没解决。心里只想说一句：搞GFW的那些人，我问候你全家啊，肏。</span></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-01-02 </div>
+			<div class="article-title"><a href="/2013/01/02/fedora-15-install-opencv-2-4/" >Fedora 15安装配置OpenCV 2.4</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>在Fedora 15下安装配置OpenCV 2.4的过程和配置。</p>
+<p>首先我想安装OpenCV 2.0或这2.2.可是在Fedora 15上编译2.2的时候，一直会出现错误，然后照着网上的解决方案，还是会出现一些问题，于是就下了2.4的版本，编译的时候，没有出现问题（貌似平台不一样，安装的时候也不一样），网上最多的教程就是Ubuntu下安装。其实可以直接通过yum install opencv在Fedora 15下安装，不过安装了之后，貌似我的还是出现点问题，就直接卸载掉了。下面说说编译OpenCV 2.4的过程和出现的问题，以及处理方法。</p>
+<p>1.下载OpenCV 2.4，地址<a href="http://sourceforge.net/projects/opencvlibrary/files/" target="_blank" rel="external">http://sourceforge.net/projects/opencvlibrary/files/</a><br>2.解压下下来的文件，假设你在$HOME/Desktop下解压的。<br>3。进入OpenCV 2.4的目录<br>4.mkdir release                  #建立目录，用来存cmake命令处理之后的一些文件<br>5.cd release<br>6.cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_PYTHON_SUPPORT=ON ..<br>7.make<br>8.sudo make install</p>
+<p>到这里就安装好了，如果上面的任何一部出现Error的话，可以自行上网解决，编译2.2的时候，出现的错误主要是undefined reference to `cvCreateCameraCapture_V4L(int)’ 类似的问题，网上对这类问题的讨论也不少，可以自行google。假设你现在已经安装好OpenCV 2.4了。那么测试下吧。现在你需要在/etc/ld.so.conf文件中添加一行代码，如下：/usr/local/lib/pkgconfig。在/etc/ld.so.conf.d/opencv.conf文件中添加一句代码如下：/usr/local/lib.注意如果没有此文件，则自己新建就行。然后运行ldconfig命令[需要root权限]设置环境变量export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH</p>
+<p>进入OpenCV 2.4/sample/c目录下，运行build_all.sh文件[可以通过sh build_all.sh来运行]，然后可以通过运行</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">./facedetect –cascade<span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“/usr/local/share/opencv/haarcascades/haarcascade_frontalface_alt.xml”</span> –scale<span style="color: #f5deb3;">=</span>1.5 lena.jpg</div><br>看到一张检测人脸的图像，那么就表示你的OpenCV配置成功了。下面自己写一个简单的程序再测试下呗。</p>
+<p>好的，我们用如下的C程序来检测：</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #eeee00;">#include “opencv2/highgui/highgui_c.h”</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">argc</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;"><em>*</em></span><span style="color: #f5deb3;">argv</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">IplImage</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">img</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">cvLoadImage</span>(<span style="color: #f5deb3;">argv</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">],</span><span style="color: #add8e6;">1</span>);<br><span style="color: #da70d6;">/<em>cvNamedWindow(“Example”,CV_WINDOW_AUTOSIZE);</em>/</span><br><span style="color: #f5deb3;">cvShowImage</span>(<span style="color: #7fffd4;">“Image”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">img</span>);<br><span style="color: #f5deb3;">cvWaitKey</span>(<span style="color: #add8e6;">0</span>);<br><span style="color: #f5deb3;">cvReleaseImage</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">img</span>);<br><span style="color: #f5deb3;">cvDestroyWindow</span>(<span style="color: #7fffd4;">“Example”</span>);<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div><br>用命令</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gcc  <span style="color: #7fffd4;"><code>&lt;/span&gt;pkg-config --cflags --libs  opencv&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span> -o cv cv.c</div><br>来编译，发现出错了，说什么undefined reference to symbol ‘lrint@@GLIBC_2.1’。上网找了下，说要加一些什么编译的动态库之类的，一开始不知道需要添加什么库，后来在突然实验下发现需要用到math库，也就是<span style="color: #ff0000;">需要在编译命令的最后面加上 -lm才行</span>。不过如果改成C++文件，头文件用的highgui.hpp的话，不需要加-lm也可以通过编译且运行良好，编译好了之后，用如下命令：</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">./cv ex.bmp</div><br>来测试刚编译好的文件，ex.bmp是当前目录下的一张bmp图片。如果显示了该图片，就表示成功了。接下来就可以用OpenCV 写自己的其他代码了。</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -306,7 +402,7 @@
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#x61;&#x69;&#108;&#116;&#x6f;&#x3a;&#x6a;&#99;&#109;&#x40;&#106;&#111;&#x6e;&#x6d;&#x61;&#115;&#x74;&#x65;&#114;&#115;&#x2e;&#111;&#114;&#103;">&#x6a;&#99;&#109;&#x40;&#106;&#111;&#x6e;&#x6d;&#x61;&#115;&#x74;&#x65;&#114;&#115;&#x2e;&#111;&#114;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#x6a;&#x63;&#x6d;&#64;&#106;&#111;&#110;&#109;&#97;&#x73;&#116;&#x65;&#114;&#115;&#46;&#x6f;&#x72;&#x67;">&#x6a;&#x63;&#x6d;&#64;&#106;&#111;&#110;&#109;&#97;&#x73;&#116;&#x65;&#114;&#115;&#46;&#x6f;&#x72;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -382,92 +478,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-11-26 </div>
-			<div class="article-title"><a href="/2012/11/26/fedora-13-movie-mkv-mp4-rmvb-rm-song/" >Fedora13 下看视频，听歌</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>一开始没想在Linux下装视频，不过四宝在fedora-17下装了个视频之后，我也想装了。而且如果想只用Linux的话，那么视频这东西肯定需要的。然后上网搜了下，搜到<a href="http://www.cxybase.com/201104/fedora-13%E5%AE%89%E8%A3%85%E6%92%AD%E6%94%BE%E5%99%A8%E6%92%AD%E6%94%BEmp4%E8%A7%86%E9%A2%91/" target="_blank" rel="external">一篇文章</a>，说怎么安装文件使的可以打开mp4.rmvb，mkv等文件。然后我照着做的时候发现居然要求系统版本在15以上，fuck。。对于一直用fedora-13的我来说，压力很大。就想着去这个<a href="http://download1.rpmfusion.org/free/fedora/这里查看下，然后发现这个网页直接列出来的，系统版本最低要求是14.但是有一个release文件夹。点进去有一个文件夹13的文件夹。然后在里面找到一个文件[rpmfusion-free-release-13-2.noarch.rpm](http://download1.rpmfusion.org/free/fedora/releases/13/Everything/x86_64/os/rpmfusion-free-release-13-2.noarch.rpm)，然后在rpm" target="_blank" rel="external">http://download1.rpmfusion.org/free/fedora/这里查看下，然后发现这个网页直接列出来的，系统版本最低要求是14.但是有一个release文件夹。点进去有一个文件夹13的文件夹。然后在里面找到一个文件[rpmfusion-free-release-13-2.noarch.rpm](http://download1.rpmfusion.org/free/fedora/releases/13/Everything/x86_64/os/rpmfusion-free-release-13-2.noarch.rpm)，然后在rpm</a> -ivh 后面的地址改成这个文件的地址OK了。即就可以添加文件源了。然后yum install gstreamer-plugins-bad gstreamer-ffmpeg gstreamer-plugins-ugly 就行了。这两句需要用sudo来执行。接下来你就可以用Movie Player打开mp4,mkv，rmvb等文件。不过不知道为什么用QQ影音截取的一段rmvb文件却不可以播放。如果知道的还希望告知一声。</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-11-21 </div>
-			<div class="article-title"><a href="/2012/11/21/apue-chapter-3-excise-3-2/" >UNIX环境高级编程第3章的一些问题和习题3.2</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>APUE第3章讲的是文件IO，需要了解一些Linux底层的东西，不然看起来好费劲（我现在就这样- -|）。</p>
-<p>首先，讲了文件描述符，文件描述符简单的说就是一个非负整数，你可以通过这个整数来找到打开的文件，比如我们用open函数时返回的是一个整数，这就是open所打开的这个文件的文件描述符，文件描述符是内核向进程返回的。另外shell中的标准输入的文件描述符是0,标准输出是1,错误输出是2,这个是默认这么做的，与内核无关。但是不遵照这个惯例的话，那么很多系统应用程序就不能正常工作。文件描述符的范围是0~OPEN_MAX(每个进程的最大打开文件数)，早期的上限是19（即允许每个进程打开20个文件），现在很多系统则增至63.</p>
-<p>讲了一个文件空洞的东西，就是如果你现在的文件长度是n，然后你用lseek把文件指针位置定位到了一个大于n的位置，接下来你写一些东西，那么就形成了一个文件空洞，中间那一部分就是文件空洞，文件空洞是不占空间的，你可以用两个同样长度的文件，然后比较他们的文件大小，还有没有写过的字节读出来通通为0</p>
-<p>dup和dup2函数，都包含在unistd.h文件中。看到这两个函数的时候，不怎么懂，现在也不保证很懂(-_-|).</p>
-<p>dup的原型是int dup(int filedes) ;//传入参数是已打开的文件描述符，返回一个未用的最小的文件描述符。</p>
-<p>dup2的原型是int dup2(int oldfiledes,int newfiledes);//返回oldfiledes的一个文件描述符copy，然后返回的文件描述符是newfiledes。如果newfiledes已经打开，就先关闭，如果oldfiledes和newfiledes相等，那么就返回newfiledes，而不关闭它。这些返回的新文件描述符和原来的文件描述符（dup中的filedes和dup2中的oldfiledes）共享一个文件表项。如果出错返回-1,比如dup中的参数filedes是一个未打开的文件描述符</p>
-<p>当然这两个函数都可以由fcntl函数来替代，虽然可能不完全等效。比如原子性。</p>
-<p>fcntl原型int fcntl(int filedes,int cmd, … /<em> int arg </em>/ );</p>
-<p>fcntl可以复制文件描述符[cmd=F_DUPFD]，可以获得/设置文件描述符[cmd=F_GETFD/F_SETFD]，可以获得/设置文件状态标志[cmd=F_GETFL/F_SETFL]，可以获得/设置异步I/O所有权[cmd=F_GETOWN/F_SETOWN]，可以获得/设置记录锁[cmd=F_GETLK / F_SETLK / F_SETLKW]。出错返回-1.</p>
-<p>习题3.2需要自己不用fcntl来实现一个dup2函数，有出错提示。一开始脑袋一团浆糊，网上搜到一篇写这个的，用dup函数实现，出错信息要考虑齐全，另外，就是从0到newfiledes这些描述符中，看是否打开，每个都需要试，最后如果所有条件都符合，就可以返回newfiledes，不过刚开始的童鞋可以先照着网上那份写，再自己慢慢揣摩。</p>
-<p>习题3-4中给出，很多程序中都包含下面一段代码：<br>dup2(fd,0);<br>dup2(fd,1);<br>dup2(fd,2);<br>if(fd &gt; 2)<br>close(fd);<br>问为啥要关闭，也就是最后的if意义和在，还需要画出fd=1和fd=3时每次调用dup2时3个描述符项及相应的文件表项的变化情况。</p>
-<p>首先，前面3句就是相当于重定向，所有的标准输入，标准输出和错误输出都会写道fd所指的文件中去。那么如果fd&gt;2的话，执行那3句之后就有4个文件描述符指向同一个文件表项了。但是如果fd&lt;3的话，就只有3个。所以需要手动的把fd关闭掉</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-11-15 </div>
-			<div class="article-title"><a href="/2012/11/15/advanced-programming-in-the-unix-environment-apue-h/" >Unix环境高级编程中大apue.h问题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>看《Unix环境高级编程》第一章的时候，遇到的第一个问题就是书中的第一个例子找不到”apue.h”头文件，这个文件是作者编写的，处理的办法是：</p>
-<p>1.从<a href="http://www.apuebook.com/apue2e.html" target="_blank" rel="external">这里</a>下载所需要的文件。</p>
-<p>2.把src.tar.gz解压缩到你的home目录下（当然随便解压到哪都是一样的，这里只是为了方便描述）。</p>
-<p>3.进入到刚解压大apue.2e目录下，修改Make.defines.linux中的WKDIR，改成/home/user/apue.2e  [其中user是你的用户名]，然后把/apue.2e/std/中的linux.mk文件中大所有nawk改为awk</p>
-<p>4.把/home/user/apue.2e/include/apue.h和/home/user/apue.2e/lib/error.c两个文件都copy到/usr/include目录下,这一步需要root权限</p>
-<p>5.修改/usr/include/apue.h文件，在最后一行#endif的前面一行加上一句#include “error.c”然后就完工了，编译通过！</p>
-<p>好好学习，天天向上！</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -478,13 +488,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/6/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
+    	<li class="prev"><a href="/page/6/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/8/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/8/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -504,7 +514,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -513,16 +523,16 @@
 		
 			
 	<div class="widget">
-		<h4>Categorias</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -542,19 +552,21 @@
 		
 			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
 		
-			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+			<li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li>
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
-			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+			<li><a href="/categories/我的生活/">我的生活<span>9</span></a></li>
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
@@ -564,25 +576,29 @@
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
+			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>2</span></a></li>
 		
 		</ul>
 	</div>
@@ -593,48 +609,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
+			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
 		
-			<li><a href="/tags/rename/">rename<span>1</span></a></li>
+			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
 		
-			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
+			<li><a href="/tags/rmvb/">rmvb<span>1</span></a></li>
 		
-			<li><a href="/tags/metric-core/">metric-core<span>1</span></a></li>
+			<li><a href="/tags/text-plain/">text/plain<span>1</span></a></li>
 		
-			<li><a href="/tags/filter/">filter<span>1</span></a></li>
+			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
 		
-			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+			<li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li>
 		
-			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
-		
-			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
-		
-			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
-		
-			<li><a href="/tags/腾讯/">腾讯<span>1</span></a></li>
-		
-			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
-		
-			<li><a href="/tags/google-adsense/">google-adsense<span>1</span></a></li>
-		
-			<li><a href="/tags/poll/">poll<span>1</span></a></li>
-		
-			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
-		
-			<li><a href="/tags/select/">select<span>2</span></a></li>
+			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
 		
 			<li><a href="/tags/zookeeper/">zookeeper<span>3</span></a></li>
 		
-			<li><a href="/tags/rm/">rm<span>1</span></a></li>
+			<li><a href="/tags/source-code/">source_code<span>1</span></a></li>
 		
-			<li><a href="/tags/array/">array<span>1</span></a></li>
+			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
 		
-			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
+			<li><a href="/tags/教师/">教师<span>1</span></a></li>
 		
-			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
+			<li><a href="/tags/半平面交/">半平面交<span>1</span></a></li>
+		
+			<li><a href="/tags/job/">job<span>1</span></a></li>
+		
+			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
+		
+			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
+		
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
+		
+			<li><a href="/tags/插件/">插件<span>1</span></a></li>
+		
+			<li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li>
+		
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
+		
+			<li><a href="/tags/problem-solve/">problem_solve<span>2</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>266</span></a></li>
+		   <li><a href="/tags">...<span>270</span></a></li>
 		 
 		</ul>
 	</div>
@@ -643,7 +659,7 @@
 		
 			
 <div class="widget">
-  <h4>Posts recentes</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
     
       <li>
@@ -659,11 +675,11 @@
       </li>
     
       <li>
-        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+        <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
       <li>
-        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+        <a href="/2017/05/10/Python-代码实践小结/" ><i class="fa fa-file-o"></i>Python 代码实践小结</a>
       </li>
     
   </ul>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Página 11 | klion26</title>
+  <title>Page 11 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -114,6 +114,92 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-07-25 </div>
+			<div class="article-title"><a href="/2011/07/25/half-plan-cross/" >[计算几何]半平面交 POJ_2451 1474 1279 3335</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>半平面交,一开始以为很神奇的东西,看zzy的论文,看了好久,发现思路还好懂,不会写代码= =,只是觉得和melkman有点像.后来网上膜拜了各位牛人的代码,自己终于写出来了,A了2451,不过1474&amp;1279的时候发现了自己代码的错误,如果有多条直线平行那么我的代码会错,后来又在3335发现如果有反向平行且不共线的两条直线那么我的会错.于是各种改过之后,觉得现在的代码应该没啥问题了= =||</p>
+<p>主要思路就是先对边进行排序[按极角序],然后去重,把平行同向的直线只保留规约最紧的一条.然后对留下来的进行半平面交.现在觉得单独的半平面交不难,难的是把题目转化为半平面交</p>
+<p>2451代码如下[如有错误还请指出]</p>
+<div class="dp-highlighter"><br><br>1.  <span><span class="comment">/<strong><strong> </strong></strong></span> </span><br>2.  <span><span class="comment"> 注意事项: </span> </span><br>3.  <span><span class="comment"> 1.单独的点是否是符合条件的 </span> </span><br>4.  <span><span class="comment"> 2.对于输入边有没有两条反向的 </span> </span><br>5.  <span><span class="comment"> </span> </span><br>6.  <span><span class="comment"> 对于1需要改变的是check里面判断时是&gt;还是&gt;= </span> </span><br>7.  <span><span class="comment"> 如果是&gt;那么会忽略掉点 否则会留下 </span> </span><br>8.  <span> </span><br>9.  <span><span class="comment"> 对于2的话需要特判一下是不是有两条边方向且不共线 </span> </span><br>10.  <span><span class="comment"> 这里需要在排序然后去重之后做 </span> </span><br>11.  <span><span class="comment"> /</span><span> </span></span><br>12.  <span>#include <stdio.h> </stdio.h></span><br>13.  <span>#include <string.h> </string.h></span><br>14.  <span>#include <stdlib.h> </stdlib.h></span><br>15.  <span>#include <math.h> </math.h></span><br>16.  <span>#include <algorithm> </algorithm></span><br>17.  <span> </span><br>18.  <span>using namespace std; </span><br>19.  <span class="comment">/<em>点的结构体</em>/</span><span> </span><br>20.  <span>typedef struct </span><br>21.  <span>{ </span><br>22.  <span> </span><span class="keyword">double</span><span> x,y; </span><br>23.  <span>}TPoint; </span><br>24.  <span class="comment">/<em>直线的结构体 angle是和X轴正方向的夹角</em>/</span><span> </span><br>25.  <span>typedef struct </span><br>26.  <span>{ </span><br>27.  <span> TPoint p1,p2; </span><br>28.  <span> </span><span class="keyword">double</span><span> angle; </span><br>29.  <span>}TLine; </span><br>30.  <span class="comment">/<em> a</em>x+b<em>y+c=0直线中的a b c</em>/</span><span> </span><br>31.  <span>typedef struct </span><br>32.  <span>{ </span><br>33.  <span> </span><span class="keyword">double</span><span> a,b,c; </span><br>34.  <span>}abcLine; </span><br>35.  <span> </span><br>36.  <span class="keyword">const</span><span> </span><span class="keyword">int</span><span> maxnum=</span><span class="number">20016</span><span> </span><br>37.  <span class="keyword">const</span><span> </span><span class="keyword">double</span><span> eps=1e-</span><span class="number">8</span><span> </span><br>38.  <span> </span><br>39.  <span class="keyword">int</span><span> n; </span><br>40.  <span class="comment">/<em>pg存半平面最后的点</em>/</span><span> </span><br>41.  <span>TPoint pg[maxnum]; </span><br>42.  <span class="comment">/<em>line存输入的边 dq是双端队列</em>/</span><span> </span><br>43.  <span>TLine line[maxnum],dq[maxnum+</span><span class="number">2</span><span>]; </span><br>44.  <span class="keyword">int</span><span> idx;</span><span class="comment">/<em>the index of pg;</em>/</span><span> </span><br>45.  <span> </span><br>46.  <span class="comment">/<em>加边 所有的边都表示的是<p1,p2>的左手边</p1,p2></em>/</span><span> </span><br>47.  <span class="keyword">void</span><span> Add_line(</span><span class="keyword">int</span><span> idx,</span><span class="keyword">double</span><span> x1,</span><span class="keyword">double</span><span> y1,</span><span class="keyword">double</span><span> x2,</span><span class="keyword">double</span><span> y2) </span><br>48.  <span>{ </span><br>49.  <span> line[idx].p1.x = x1; </span><br>50.  <span> line[idx].p1.y = y1; </span><br>51.  <span> line[idx].p2.x = x2; </span><br>52.  <span> line[idx].p2.y = y2; </span><br>53.  <span> line[idx].angle = atan2(y2-y1,x2-x1); </span><br>54.  <span>} </span><br>55.  <span class="comment">/<em>输入</em>/</span><span> </span><br>56.  <span class="keyword">void</span><span> input() </span><br>57.  <span>{ </span><br>58.  <span> </span><span class="keyword">int</span><span> i; </span><br>59.  <span> </span><span class="keyword">double</span><span> x1,y1,x2,y2; </span><br>60.  <span> </span><span class="keyword">for</span><span>(i=</span><span class="number">0</span><span>i<n;i++) <="" span=""><br>61.  <span> { </span><br>62.  <span> scanf(</span><span class="string">“%lf%lf%lf%lf”</span><span>,x1,&amp;y1,&amp;x2,&amp;y2); </span><br>63.  <span> Add_line(i,x1,y1,x2,y2); </span><br>64.  <span> } </span><br>65.  <span> </span><span class="comment">/<em>加外面的限制区域</em>/</span><span> </span><br>66.  <span> Add_line(n,</span><span class="number">0</span><span>,</span><span class="number">0</span><span>,</span><span class="number">10000</span><span>,</span><span class="number">0</span><span>); </span><br>67.  <span> Add_line(n+</span><span class="number">1</span><span>,</span><span class="number">10000</span><span>,</span><span class="number">0</span><span>,</span><span class="number">10000</span><span>,</span><span class="number">10000</span><span>); </span><br>68.  <span> Add_line(n+</span><span class="number">2</span><span>,</span><span class="number">10000</span><span>,</span><span class="number">10000</span><span>,</span><span class="number">0</span><span>,</span><span class="number">10000</span><span>); </span><br>69.  <span> Add_line(n+</span><span class="number">3</span><span>,</span><span class="number">0</span><span>,</span><span class="number">10000</span><span>,</span><span class="number">0</span><span>,</span><span class="number">0</span><span>); </span><br>70.  <span> n+=</span><span class="number">4</span><span> </span><br>71.  <span>} </span><br>72.  <span class="comment">/<em> </em></span><br>73.  <span><span class="comment"> 把一个double转化到一个int上 </span> </span><br>74.  <span><span class="comment"> &lt;-esp  的转化为-1 </span> </span><br>75.  <span><span class="comment"> &gt;eps   的转化为1 </span> </span><br>76.  <span><span class="comment"> 其他的为0 </span> </span><br>77.  <span><span class="comment"> /</span><span> </span></span><br>78.  <span class="keyword">int</span><span> dou2int(</span><span class="keyword">double</span><span> x) </span><br>79.  <span>{ </span><br>80.  <span> </span><span class="keyword">if</span><span>(x&gt;eps) </span><br>81.  <span> </span><span class="keyword">return</span><span> </span><span class="number">1</span><span> </span><br>82.  <span> </span><span class="keyword">if</span><span>(x&lt;-eps) </span><br>83.  <span> </span><span class="keyword">return</span><span> -</span><span class="number">1</span><span> </span><br>84.  <span> </span><span class="keyword">return</span><span> </span><span class="number">0</span><span> </span><br>85.  <span>} </span><br>86.  <span> </span><br>87.  <span class="comment">/<strong> </strong></span><br>88.  <span><span class="comment"> 计算<a,b>和&lt;a,c&gt;的叉积 </a,b></span> </span><br>89.  <span><span class="comment"> /</span><span> </span></span><br>90.  <span class="keyword">double</span><span> cross(TPoint a,TPoint b,TPoint c) </span><br>91.  <span>{ </span><br>92.  <span> </span><span class="keyword">return</span><span> (b.x-a.x)<em>(c.y-a.y)-(b.y-a.y)</em>(c.x-a.x); </span><br>93.  <span>} </span><br>94.  <span> </span><br>95.  <span class="comment">/<strong> </strong></span><br>96.  <span><span class="comment"> 多边形排序的模板函数 </span> </span><br>97.  <span><span class="comment"> 首先按照极角序排列,如果极角序一样的话 </span> </span><br>98.  <span><span class="comment"> 那么限制宽的排在前面 </span> </span><br>99.  <span><span class="comment"> /</span><span> </span></span><br>100.  <span>bool cmp(TLine l1,TLine l2) </span><br>101.  <span>{ </span><br>102.  <span> </span><span class="keyword">int</span><span> ret = dou2int(l1.angle-l2.angle); </span><br>103.  <span> </span><span class="keyword">if</span><span>(ret &gt; </span><span class="number">0</span><span>) </span><br>104.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">true</span><span> </span><br>105.  <span> </span><span class="keyword">if</span><span>(ret &lt; </span><span class="number">0</span><span>) </span><br>106.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>107.  <span> </span><span class="keyword">if</span><span>(dou2int(cross(l2.p1,l2.p2,l1.p2))&gt;</span><span class="number">0</span><span>) </span><br>108.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>109.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">true</span><span> </span><br>110.  <span>} </span><br>111.  <span> </span><br>112.  <span class="comment">/<strong> </strong></span><br>113.  <span><span class="comment"> 由直线上的两点得到a<em>x+b</em>y+c=0中的a b c </span> </span><br>114.  <span><span class="comment"> /</span><span> </span></span><br>115.  <span>abcLine Get_line(TPoint p1,TPoint p2) </span><br>116.  <span>{ </span><br>117.  <span> abcLine ret; </span><br>118.  <span> ret.a = p1.y-p2.y; </span><br>119.  <span> ret.b = p2.x-p1.x; </span><br>120.  <span> ret.c = p1.x<em>p2.y-p2.x</em>p1.y; </span><br>121.  <span> </span><span class="keyword">return</span><span> ret; </span><br>122.  <span>} </span><br>123.  <span class="comment">/<strong> </strong></span><br>124.  <span><span class="comment"> 得到TLine结构体定义的两条直线的交点 </span> </span><br>125.  <span><span class="comment"> /</span><span> </span></span><br>126.  <span>TPoint Get_jiao(TLine l1,TLine l2) </span><br>127.  <span>{ </span><br>128.  <span> TPoint ret; </span><br>129.  <span> abcLine A,B; </span><br>130.  <span> A = Get_line(l1.p1,l1.p2); </span><br>131.  <span> B = Get_line(l2.p1,l2.p2); </span><br>132.  <span> ret.x = (B.b<em>A.c-A.b</em>B.c)/(B.a<em>A.b-A.a</em>B.b); </span><br>133.  <span> ret.y = (A.a<em>B.c-B.a</em>A.c)/(B.a<em>A.b-A.a</em>B.b); </span><br>134.  <span> </span><span class="keyword">return</span><span> ret; </span><br>135.  <span>} </span><br>136.  <span class="comment">/<strong> </strong></span><br>137.  <span><span class="comment"> 半平面交的时候判断当前平面是否合法 </span> </span><br>138.  <span><span class="comment"> 是否需要退栈等 </span> </span><br>139.  <span><span class="comment"> 如果单独的点不符合条件的话那么if语句 </span> </span><br>140.  <span><span class="comment"> 的判断直接&gt;0就行了,否则写成&gt;=0 </span> </span><br>141.  <span><span class="comment"> /</span><span> </span></span><br>142.  <span>bool check(TLine l1,TLine l2,TLine l3) </span><br>143.  <span>{ </span><br>144.  <span> TPoint cro = Get_jiao(l1,l2); </span><br>145.  <span> </span><span class="keyword">if</span><span>(dou2int(cross(l3.p1,l3.p2,cro))&gt;</span><span class="number">0</span><span>)</span><span class="comment">//加上等于0那么后来的直线过交点的时候不会退出 </span><span> </span><br>146.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>147.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">true</span><span> </span><br>148.  <span>} </span><br>149.  <span class="comment">/<strong> </strong></span><br>150.  <span><span class="comment"> 判断两条直线是否平行反向且不共线 </span> </span><br>151.  <span><span class="comment"> 下面的代码中需要加上不共线 需要对出去之后的直线进行判断 </span> </span><br>152.  <span><span class="comment"> /</span><span> </span></span><br>153.  <span>bool overline(TLine l1,TLine l2) </span><br>154.  <span>{ </span><br>155.  <span> </span><span class="keyword">int</span><span> ret; </span><br>156.  <span> </span><span class="keyword">int</span><span> a,b,c,d; </span><br>157.  <span> a = (l1.p1.y-l1.p2.y)<em>(l2.p1.x-l2.p2.x); </em></span><br>158.  <span> b = (l1.p1.x-l1.p2.x)(l2.p1.y-l2.p2.y); </span><br>159.  <span> c = l1.p1.x-l1.p2.x; </span><br>160.  <span> d = l2.p1.x-l2.p2.x; </span><br>161.  <span> ret = dou2int(cross(l1.p1,l1.p2,l2.p1)); </span><br>162.  <span> </span><span class="keyword">if</span><span>((a==b) &amp; (c<em>d&lt;</em></span><span class="number">0</span><span>) &amp;&amp; (</span><span class="number">0</span><span> != ret)) </span><br>163.  <span> { </span><br>164.  <span> </span><span class="comment">//printf(“%f  %f   %f   %f\n”,l1.p1.x,l1.p1.y,l1.p2.x,l1.p2.y); </span><span> </span><br>165.  <span> </span><span class="comment">//printf(“%f  %f   %f   %f\n”,l2.p1.x,l2.p1.y,l2.p2.x,l2.p2.y); </span><span> </span><br>166.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">true</span><span> </span><br>167.  <span> } </span><br>168.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>169.  <span>} </span><br>170.  <span> </span><br>171.  <span class="comment">/ </span><br>172.  <span><span class="comment"> work 求半平面交 最后的顶点存在pg数组里面 </span> </span><br>173.  <span><span class="comment"> 用到上面的TPoint TLine abcLine结构体 </span> </span><br>174.  <span><span class="comment"> 会用到上面的 </span> </span><br>175.  <span><span class="comment"> check    :判断当前测试的直线是否在一直区域的范围内 </span> </span><br>176.  <span><span class="comment"> dou2int  :double转int  &lt;-eps对应-1 &gt;eps 对应1 否则为0 </span> </span><br>177.  <span><span class="comment"> cross    :算叉积 </span> </span><br>178.  <span><span class="comment"> Get_jiao :由两条直线得到交点 </span> </span><br>179.  <span><span class="comment"> Get_line :由直线上的两个点得到直线的一般式 </span> </span><br>180.  <span><span class="comment"> cmp等函数:sort用的比较函数,首先是旋转角,如果旋转角 </span> </span><br>181.  <span><span class="comment"> 一样的话,那么要求松的放到前面,这样后面好写点 </span> </span><br>182.  <span><span class="comment"> <em>/</em></span><span> </span></span><br>183.  <span class="keyword">void</span><span> work() </span><br>184.  <span>{ </span><br>185.  <span> sort(line,line+n,cmp); </span><br>186.  <span> </span><span class="comment">/首先对所有直线进行排序<em>/</em></span><span> </span><br>187.  <span> </span><span class="comment">/<strong> </strong></span><br>188.  <span><span class="comment"> 把平行且限制宽的直线去掉 </span> </span><br>189.  <span><span class="comment"> /</span><span> </span></span><br>190.  <span> </span><span class="keyword">for</span><span>(</span><span class="keyword">int</span><span> i=</span><span class="number">1</span><span>i<n;i++) <="" span=""><br>191.  <span> { </span><br>192.  <span> </span><span class="keyword">if</span><span>(dou2int(line[i].angle-line[i-</span><span class="number">1</span><span>].angle)==</span><span class="number">0</span><span>) </span><br>193.  <span> { </span><br>194.  <span> memmove(line+i-</span><span class="number">1</span><span>,line+i,(n-i)sizeof(line[</span><span class="number">0</span><span>])); </span><br>195.  <span> n–; </span><br>196.  <span> i–;</span><span class="comment">/<em>防止多条直线平行</em>/</span><span> </span><br>197.  <span> } </span><br>198.  <span> } </span><br>199.  <span> </span><span class="comment">/<em>上面的for循环对直线进行”去重”</em>/</span><span> </span><br>200.  <span> </span><span class="keyword">int</span><span> top,bot; </span><br>201.  <span> bot = </span><span class="number">1</span><span> </span><br>202.  <span> top=</span><span class="number">2</span><span> </span><br>203.  <span> dq[bot]=line[</span><span class="number">0</span><span>]; </span><br>204.  <span> dq[top]=line[</span><span class="number">1</span><span>]; </span><br>205.  <span> </span><br>206.  <span> </span><span class="comment">/<strong> </strong></span><br>207.  <span><span class="comment"> 半平面交核心算法 </span> </span><br>208.  <span><span class="comment"> 和melkman算法有点像,每次考虑当前直线 </span> </span><br>209.  <span><span class="comment"> 然后把这条直线加入到双端队列中 </span> </span><br>210.  <span><span class="comment"> /</span><span> </span></span><br>211.  <span> </span><span class="keyword">for</span><span>(</span><span class="keyword">int</span><span> i=</span><span class="number">2</span><span>i<n;i++) <="" span=""><br>212.  <span> { </span><br>213.  <span> </span><span class="keyword">while</span><span>(top&gt;bot &amp; check(dq[top-</span><span class="number">1</span><span>],dq[top],line[i])) </span><br>214.  <span> top–; </span><br>215.  <span> </span><span class="keyword">while</span><span>(top&gt;bot &amp; check(dq[bot+</span><span class="number">1</span><span>],dq[bot],line[i])) </span><br>216.  <span> bot++; </span><br>217.  <span> </span><br>218.  <span> dq[++top]=line[i]; </span><br>219.  <span> </span><br>220.  <span> } </span><br>221.  <span> </span><br>222.  <span> </span><span class="keyword">while</span><span>(top&gt;bot &amp; check(dq[top-</span><span class="number">1</span><span>],dq[top],dq[bot])) </span><br>223.  <span> top–; </span><br>224.  <span> </span><span class="keyword">while</span><span>(top&gt;bot &amp; check(dq[bot+</span><span class="number">1</span><span>],dq[bot],dq[top])) </span><br>225.  <span> bot++; </span><br>226.  <span> dq[–bot]=dq[top];</span><span class="comment">/<em>把最后一条直线加到最前面 这样方便计算</em>/</span><span> </span><br>227.  <span> </span><br>228.  <span> </span><span class="comment">/<strong> </strong></span><br>229.  <span><span class="comment"> 输出由题目决定 这里表示无闭合区域 </span> </span><br>230.  <span><span class="comment"> /</span><span> </span></span><br>231.  <span> </span><span class="keyword">if</span><span>(top-bot&lt;</span><span class="number">3</span><span>) </span><br>232.  <span> {</span><span class="comment">/<em>因为上面加了一条直线 所以这里是3</em>/</span><span> </span><br>233.  <span> printf(</span><span class="string">“0.0\n”</span><span>); </span><br>234.  <span> </span><span class="keyword">return</span><span> ; </span><br>235.  <span> } </span><br>236.  <span> idx=</span><span class="number">0</span><span> </span><br>237.  <span> </span><span class="keyword">for</span><span>(</span><span class="keyword">int</span><span> i=bot;i<top;i++) <="" span=""><br>238.  <span> pg[idx++] = Get_jiao(dq[i],dq[i+</span><span class="number">1</span><span>]); </span><br>239.  <span> idx–; </span><br>240.  <span> </span><span class="comment">/<em>下面用叉积算面积</em>/</span><span> </span><br>241.  <span> </span><span class="keyword">double</span><span> ans=pg[idx].x<em>pg[</em></span><span class="number">0</span><span>].y-pg[</span><span class="number">0</span><span>].xpg[idx].y; </span><br>242.  <span> </span><span class="keyword">for</span><span>(</span><span class="keyword">int</span><span> i=</span><span class="number">0</span><span>i<idx;i++) <="" span=""><br>243.  <span> ans += pg[i].x<em>pg[i+</em></span><span class="number">1</span><span>].y-pg[i+</span><span class="number">1</span><span>].xpg[i].y; </span><br>244.  <span> ans /= </span><span class="number">2.0</span><span> </span><br>245.  <span> </span><span class="keyword">if</span><span>(ans &lt; </span><span class="number">0</span><span>)</span><span class="comment">/<em>如果是负的话转为正的</em>/</span><span> </span><br>246.  <span> ans = -ans; </span><br>247.  <span> </span><span class="comment">/<em> </em></span><br>248.  <span><span class="comment"> 这里ans = -ans要注意别把0转化为-0了 </span> </span><br>249.  <span><span class="comment"> 比如写成ans=ans&gt;0?ans:-ans;的话会把0变成-0; </span> </span><br>250.  <span><span class="comment"> /</span><span> </span></span><br>251.  <span> printf(</span><span class="string">“%.1f\n”</span><span>,ans); </span><br>252.  <span>} </span><br>253.  <span> </span><br>254.  <span class="keyword">int</span><span> main(</span><span class="keyword">void</span><span>) </span><br>255.  <span>{ </span><br>256.  <span> #ifndef ONLINE_JUDGE </span><br>257.  <span> freopen(</span><span class="string">“2451.in”</span><span>,</span><span class="string">“r”</span><span>,stdin); </span><br>258.  <span> freopen(</span><span class="string">“2451.out”</span><span>,</span><span class="string">“w”</span><span>,stdout); </span><br>259.  <span> #endif </span><br>260.  <span> scanf(</span><span class="string">“%d”</span><span>,n); </span><br>261.  <span> input(); </span><br>262.  <span> work(); </span><br>263.  <span> </span><span class="keyword">return</span><span> </span><span class="number">0</span><span> </span><br>264.  <span>} </span><br></idx;i++)></span></top;i++)></span></n;i++)></span></n;i++)></span></n;i++)></span></div>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-07-19 </div>
+			<div class="article-title"><a href="/2011/07/19/cg-hdu-3834/" >[计算几何]HDU_3834 2011多校第一场-HNU</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://acm.hdu.edu.cn/showproblem.php?pid=3834" target="_blank" rel="external">Where am i</a></p>
+<p>这题一开始以为很难,然后直接pass了,后来看到有人写解题报告才70+行的代码,于是决定写这题-<em>-||||.写到一半无奈那位朋友的方法不懂,好吧那自己慢慢搞吧[那位朋友貌似用复数搞的,无限ym啊]然后搞了好久一直处于样例不过的状态,而且网上解题报告很少.一直查思路,查代码.一直觉得自己思路是对的[自己当然觉得自己是对的了-</em>-||],后来幸运搞到几组数据,然后各种改啊,就过了,下面是思路:</p>
+<p>首先可以把打圆平移到和原点重合,然后大圆半径减去小圆半径.再处理其他的.然后小圆变成一个点</p>
+<p>1.算出小圆和和大圆第一碰撞所需时间,如果所给时间比这个时间短,直接算,否则进入2</p>
+<p>2.算出第一次碰撞的交点,和相应的夹角,假设圆心为0,小圆起始点为A,碰撞点为B,第二次碰撞的交点为C,算出角ABO的大小,然后可以算出BC的长度和所需要的时间,这样就可以了</p>
+<p>3.得到上面的信息之后,可以算出经过整数次弦长之后,还剩下多少时间,以及所处的位置和当前的速度方向,然后剩下的就简单了.最后再把大圆的圆心反原回去即可</p>
+<p>要注意的是旋转的时候一定要考虑到底是顺时针还是逆时针,我就是因为这个WA了n次!!!</p>
+<p>附上代码:</p>
+<div class="dp-highlighter"><br><br>1.  <span><span class="comment">/<em> </em></span> </span><br>2.  <span><span class="comment"> 1.把圆心移到原点 </span> </span><br>3.  <span><span class="comment"> 2.大圆的半径减掉小圆的半径 </span> </span><br>4.  <span><span class="comment"> </span> </span><br>5.  <span><span class="comment"> !!!用到斜率就要注意 斜率为0的情况!!! </span> </span><br>6.  <span> </span><br>7.  <span><span class="comment"> 1.角度问题,首先 对acos来说 i和2pi-i是一样的 </span> </span><br>8.  <span><span class="comment"> 还有atan2(y,x)得到y/x的正切值,返回值为[-pi,pi] </span> </span><br>9.  <span><span class="comment"> 这里还有一个角度问题就是转的时候可能是顺时针转 </span> </span><br>10.  <span><span class="comment"> 也就是角度旋转的时候不是用加了而是用减!!!!!!! </span> </span><br>11.  <span><span class="comment"> 代码中的flag就是用来判断顺时针还是逆时针的 </span> </span><br>12.  <span><span class="comment"> 还有一个就是向量旋转的表达式 </span> </span><br>13.  <span><span class="comment"> <em>/</em></span><span> </span></span><br>14.  <span>#include <stdio.h> </stdio.h></span><br>15.  <span>#include <string.h> </string.h></span><br>16.  <span>#include <stdlib.h> </stdlib.h></span><br>17.  <span>#include <math.h> </math.h></span><br>18.  <span> </span><br>19.  <span class="keyword">const</span><span> </span><span class="keyword">double</span><span> eps = 1e-</span><span class="number">6</span><span> </span><br>20.  <span class="keyword">const</span><span> </span><span class="keyword">double</span><span> pi = acos(-</span><span class="number">1.0</span><span>); </span><br>21.  <span> </span><br>22.  <span>typedef struct </span><br>23.  <span>{ </span><br>24.  <span> </span><span class="keyword">double</span><span> x,y; </span><br>25.  <span>}TPoint; </span><br>26.  <span> </span><br>27.  <span>typedef struct </span><br>28.  <span>{ </span><br>29.  <span> </span><span class="keyword">double</span><span> x,y,r; </span><br>30.  <span>}TCircle; </span><br>31.  <span> </span><br>32.  <span>TCircle ball,sball; </span><br>33.  <span>TPoint vec,convert; </span><br>34.  <span class="keyword">double</span><span> T; </span><br>35.  <span class="keyword">int</span><span> flag; </span><br>36.  <span> </span><br>37.  <span>inline </span><span class="keyword">double</span><span> squ(</span><span class="keyword">double</span><span> x) </span><br>38.  <span>{ </span><br>39.  <span> </span><span class="keyword">return</span><span> xx; </span><br>40.  <span>} </span><br>41.  <span> </span><br>42.  <span class="keyword">double</span><span> dot(TPoint a,TPoint b,TPoint c) </span><br>43.  <span>{ </span><br>44.  <span> </span><span class="keyword">return</span><span> (b.x-a.x)<em>(c.x-a.x)+(b.y-a.y)</em>(c.y-a.y); </span><br>45.  <span>} </span><br>46.  <span> </span><br>47.  <span class="keyword">int</span><span> cross(TPoint a,TPoint b,TPoint c) </span><br>48.  <span>{ </span><br>49.  <span> </span><span class="keyword">double</span><span> ret = (b.x-a.x)<em>(c.y-a.y)-(b.y-a.y)</em>(c.x-a.x); </span><br>50.  <span> </span><span class="keyword">if</span><span>(ret&gt;eps) </span><br>51.  <span> </span><span class="keyword">return</span><span> </span><span class="number">1</span><span> </span><br>52.  <span> </span><span class="keyword">return</span><span> -</span><span class="number">1</span><span> </span><br>53.  <span>} </span><br>54.  <span class="keyword">void</span><span> work() </span><br>55.  <span>{ </span><br>56.  <span> convert.x = ball.x; </span><br>57.  <span> convert.y = ball.y; </span><br>58.  <span> </span><br>59.  <span> sball.x -= convert.x; </span><br>60.  <span> sball.y -= convert.y; </span><br>61.  <span> ball.x =</span><span class="number">0</span><span> </span><br>62.  <span> ball.y = </span><span class="number">0</span><span> </span><br>63.  <span> ball.r -= sball.r; </span><br>64.  <span> </span><br>65.  <span> TPoint me = {sball.x,sball.y}; </span><br>66.  <span> </span><br>67.  <span> </span><span class="keyword">if</span><span>(fabs(vec.x) &lt; eps &amp; fabs(vec.y) &lt; eps) </span><br>68.  <span> {</span><span class="comment">/<em>vec is zero</em>/</span><span> </span><br>69.  <span> me.x += convert.x; </span><br>70.  <span> me.y += convert.y; </span><br>71.  <span> printf(</span><span class="string">“%.1f %.1f\n”</span><span>,me.x,me.y); </span><br>72.  <span> </span><span class="keyword">return</span><span> </span><br>73.  <span> } </span><br>74.  <span> </span><span class="keyword">if</span><span>(fabs(ball.r)<eps) <="" span=""><br>75.  <span> {</span><span class="comment">/<em>sball.r == ball.r</em>/</span><span> </span><br>76.  <span> me.x += convert.x; </span><br>77.  <span> me.y += convert.y; </span><br>78.  <span> printf(</span><span class="string">“%.1f %.1f\n”</span><span>,me.x,me.y); </span><br>79.  <span> </span><span class="keyword">return</span><span> </span><br>80.  <span> } </span><br>81.  <span> </span><br>82.  <span> </span><span class="keyword">if</span><span>(squ(me.x+T<em>vec.x)+squ(me.y+T</em>vec.y)+eps<squ(ball.r)) <="" span=""><br>83.  <span> { </span><br>84.  <span> me.x = me.x+T<em>vec.x; </em></span><br>85.  <span> me.y = me.y+Tvec.y; </span><br>86.  <span> me.x += convert.x; </span><br>87.  <span> me.y += convert.y; </span><br>88.  <span> printf(</span><span class="string">“%.1f %.1f\n”</span><span>,me.x,me.y); </span><br>89.  <span> </span><span class="keyword">return</span><span> ; </span><br>90.  <span> } </span><br>91.  <span> </span><br>92.  <span> </span><br>93.  <span> </span><span class="keyword">double</span><span> k=vec.y/vec.x; </span><br>94.  <span> </span><span class="keyword">double</span><span> b=me.y-k<em>me.x; </em></span><br>95.  <span> </span><span class="keyword">double</span><span> x1; </span><br>96.  <span> </span><br>97.  <span> </span><span class="comment">//printf(“k:%f   b:%f   %f\n”,k,b,ball.r); </span><span> </span><br>98.  <span> </span><span class="keyword">if</span><span>(vec.x&lt;</span><span class="number">0</span><span>) </span><br>99.  <span> { </span><br>100.  <span> x1=(-kb-sqrt(squ(k<em>ball.r)+squ(ball.r)-squ(b)))/(squ(k)+</em></span><span class="number">1</span><span>); </span><br>101.  <span> } </span><br>102.  <span> </span><span class="keyword">else</span><span> </span><br>103.  <span> { </span><br>104.  <span> x1=(-kb+sqrt(squ(k<em>ball.r)+squ(ball.r)-squ(b)))/(squ(k)+</em></span><span class="number">1.0</span><span>); </span><br>105.  <span> } </span><br>106.  <span> </span><span class="comment">/fjjjjj<em>/</em></span><span> </span><br>107.  <span> </span><span class="keyword">double</span><span> y1=kx1+b; </span><br>108.  <span> </span><span class="comment">/<strong> </strong></span><br>109.  <span><span class="comment">  x1 &amp; y1 </span> </span><br>110.  <span><span class="comment"> <strong>/</strong></span><span> </span></span><br>111.  <span> </span><span class="comment">// printf(“(x1,y1)%f  %f\n”,x1,y1); </span><span> </span><br>112.  <span> </span><br>113.  <span> </span><br>114.  <span> TPoint tmp1 = {x1,y1}; </span><br>115.  <span> TPoint tmp2 = {</span><span class="number">0</span><span>,</span><span class="number">0</span><span>}; </span><br>116.  <span> </span><span class="keyword">double</span><span> u = dot(tmp1,tmp2,me); </span><br>117.  <span> flag = cross(tmp1,tmp2,me); </span><br>118.  <span> </span><br>119.  <span> </span><span class="comment">/ </span><br>120.  <span><span class="comment"> flag </span> </span><br>121.  <span><span class="comment"> <strong>/</strong></span><span> </span></span><br>122.  <span> </span><span class="comment">//printf(“flag:%d\n”,flag); </span><span> </span><br>123.  <span> </span><br>124.  <span> u = u/(sqrt(squ(x1-me.x)+squ(y1-me.y))<em>ball.r); </em></span><br>125.  <span> </span><br>126.  <span> </span><span class="keyword">double</span><span> l=(u)ball.r; </span><br>127.  <span> l *= </span><span class="number">2</span><span> </span><br>128.  <span> u = acos(u); </span><br>129.  <span> </span><br>130.  <span> </span><span class="comment">/ </span><br>131.  <span><span class="comment"> l </span> </span><br>132.  <span><span class="comment"> <strong>/</strong></span><span> </span></span><br>133.  <span> </span><span class="comment">//printf(“l:%f\n”,l); </span><span> </span><br>134.  <span> </span><br>135.  <span> </span><br>136.  <span> </span><span class="keyword">double</span><span> t1 = l/sqrt(squ(vec.x)+squ(vec.y)); </span><br>137.  <span> </span><br>138.  <span> __int64 time = (T-(x1-me.x)/vec.x)/t1; </span><br>139.  <span> </span><br>140.  <span> </span><span class="comment">/ </span><br>141.  <span><span class="comment"> time </span> </span><br>142.  <span><span class="comment"> <strong>/</strong></span><span> </span></span><br>143.  <span> </span><span class="comment">//printf(“time:%I64d\n”,time); </span><span> </span><br>144.  <span> </span><br>145.  <span> T = T-(x1-me.x)/vec.x-time*t1; </span><br>146.  <span> </span><br>147.  <span> </span><span class="comment">/ </span><br>148.  <span><span class="comment"> lefttime </span> </span><br>149.  <span><span class="comment"> <em>*/</em></span><span> </span></span><br>150.  <span> </span><span class="comment">// printf(“lefttime:%f\n”,T); </span><span> </span><br>151.  <span> </span><br>152.  <span> </span><br>153.  <span> </span><span class="comment">/上面以对  很可能是角度算错了 下面的要仔细验证下!!!<em>/</em></span><span> </span><br>154.  <span> </span><span class="keyword">double</span><span> u2=atan2(y1,x1); </span><br>155.  <span> </span><span class="keyword">double</span><span> u3 = (time+</span><span class="number">1</span><span>)(pi-</span><span class="number">2</span><span><em>u)</em>flag; </span><br>156.  <span> u2 += time<em>(pi-</em></span><span class="number">2</span><span>u)<em>flag; </em></span><br>157.  <span> </span><span class="keyword">double</span><span> x2 = ball.rcos(u2); </span><br>158.  <span> </span><span class="keyword">double</span><span> y2 = ball.r<em>sin(u2); </em></span><br>159.  <span> </span><br>160.  <span> </span><span class="comment">//printf(“%f   %f(x2,y2)\n”,x2,y2); </span><span> </span><br>161.  <span> TPoint vec2; </span><br>162.  <span> </span><br>163.  <span> vec2.x = vec.xcos(u3)-vec.y<em>sin(u3); </em></span><br>164.  <span> vec2.y = vec.xsin(u3)+vec.y<em>cos(u3); </em></span><br>165.  <span> </span><br>166.  <span> me.x = x2+vec2.xT+convert.x; </span><br>167.  <span> me.y = y2+vec2.y*T+convert.y; </span><br>168.  <span> printf(</span><span class="string">“%.1f %.1f\n”</span><span>,me.x,me.y); </span><br>169.  <span> </span><span class="keyword">return</span><span> </span><br>170.  <span>} </span><br>171.  <span class="keyword">int</span><span> main(</span><span class="keyword">void</span><span>) </span><br>172.  <span>{ </span><br>173.  <span> #ifndef ONLINE_JUDGE </span><br>174.  <span> freopen(</span><span class="string">“G.in”</span><span>,</span><span class="string">“r”</span><span>,stdin); </span><br>175.  <span> freopen(</span><span class="string">“G.out”</span><span>,</span><span class="string">“w”</span><span>,stdout); </span><br>176.  <span> #endif </span><br>177.  <span> </span><span class="keyword">int</span><span> t; </span><br>178.  <span> scanf(</span><span class="string">“%d”</span><span>,t); </span><br>179.  <span> </span><span class="keyword">while</span><span>(t–) </span><br>180.  <span> { </span><br>181.  <span> scanf(</span><span class="string">“%lf%lf%lf”</span><span>,ball.x,&amp;ball.y,&amp;ball.r); </span><br>182.  <span> scanf(</span><span class="string">“%lf%lf%lf”</span><span>,sball.x,&amp;sball.y,&amp;sball.r); </span><br>183.  <span> scanf(</span><span class="string">“%lf%lf%lf”</span><span>,vec.x,&amp;vec.y,&amp;T); </span><br>184.  <span> work(); </span><br>185.  <span> } </span><br>186.  <span> </span><span class="keyword">return</span><span> </span><span class="number">0</span><span> </span><br>187.  <span>} </span><br></squ(ball.r))></span></eps)></span></div>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-07-09 </div>
+			<div class="article-title"><a href="/2011/07/09/fedora13-h3c/" >Fedora 13 H3C联网</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>搬了宿舍,然后ip神马的好多都变了,于是又得改了,可是隔了好久了都快忘记了.幸亏有history^-^</p>
+<p>这里把整个过程说下,也当是个备份</p>
+<p>如果想下文件的话<a href="http://www.linuxdiyf.com/viewarticle.php?id=192543" target="_blank" rel="external">猛击我吧 (</a>文件在文章末尾,这里有自动配置脚本,使用请慎重)</p>
+<p>首先你得安装H3C的文件.如果缺一个c++包的话,那么自己下下来之后放在/usr/lib下即可</p>
+<p>然后你需要配置ip和gateway等,下面的操作默认你是root权限</p>
+<p>vi /etc/sysconfig/network-scripts/ifcfg-eth0</p>
+<p>加上你的ip,gateway,dns,netmask等等之后就行了当然到了这里还不能联网,下面你就用system-config-network命令调出一个图形化窗口,修改eth0,这里的修改其实是把ip修改成静态的(其实上面可以不用编辑那么多,直接在这里以下改好也行).然后保存退出,会提醒你重启网卡或计算机之类的,你重启就行了,然后就可以联网了,如果还不行的话,你打电话问网络中心怎么回事吧,那有日志</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -308,87 +394,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-05-12 </div>
-			<div class="article-title"><a href="/2011/05/12/number-theory-poj-3358/" >[数论]POJ 3358</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://poj.org/problem?id=3358" target="_blank" rel="external">传送门</a><br>这题首先你要知道化成二进制的小数可以每次分子<em>2,再对分母求余,然后分母不变,这样就能得到所有的二进制小数了.知道了这一点之后,剩下的就只是一个欧拉函数的问题了.<br>题中给出p/q.需要求出r和s,那么按照上面的思想,可以转化成p</em>2^(r+s)=p<em>2^r(mod q)继续化变成<br>q|p</em>2^r(2^s-1).到了这里我们就基本没啥问题了,首先可以把p和q都除掉gcd(p,q)使之变成p’,q’.那么就变成了q’|p’<em>2^r(2^s-1)—–&gt;q’|2^r(2^s-1)(I)[因为没有p’和q’公因子了可以直接忽略p’],这里我们再把q’和2^r的最大公约数除掉,也就是q’一直除2知道不能除尽位置,这里就可以算法r了.算出r之后上面的式子I就再次变成了q’|(2^s-1)这里就熟悉了,我们转化成2^s=1(mod q’),首先我们知道gcd(2,q’)=1,然后2^phi(q’)=1(mod q’),对于k|q’,2^k=1(mod q’)也是有可能的,这里可以参照原根,因为如果对于2^k=1(mod q’)中最小的k==phi(q’)那么2就是q’的一个原根.好了,到这里本题基本就结束了.只需要求出q’的欧拉函数,然后对phi(q’)的每个因子都去试验下p</em>2^(r+k)  ?= p*2^r(mod q)如果等式成立,那么k就是答案(这里的k是phi(q’)的最小约数)代码如下:</p>
-<div class="dp-highlighter"><br><br>1.  <span><span class="preprocessor">#include <stdio.h> </stdio.h></span><span>  </span></span><br>2.  <span> </span><span class="preprocessor">#include <string.h> </string.h></span><span>  </span><br>3.  <span class="preprocessor">#include <stdlib.h> </stdlib.h></span><span>  </span><br>4.  <span class="preprocessor">#include <math.h> </math.h></span><span>  </span><br>5.  <span class="datatypes"><strong>int64</strong></span><span> p,q,s,pr,r;   </span><br>6.  <span class="datatypes">int64</span><span> prime[6760],idx;   </span><br>7.  <span class="datatypes"><strong>int64</strong></span><span> my_map[36][2],total;   </span><br>8.  <span class="comment">/<em>初始化素数 用来分解一个数</em>/</span><span>  </span><br>9.  <span class="keyword">void</span><span> init_prime()   </span><br>10.  <span>{   </span><br>11.  <span>    </span><span class="datatypes">int64</span><span> i,j;   </span><br>12.  <span>    </span><span class="datatypes">char</span><span> p[65536];   </span><br>13.  <span>    memset(p,0,</span><span class="keyword">sizeof</span><span>(p));   </span><br>14.  <span>    prime[0]=2;   </span><br>15.  <span>    idx = 1;   </span><br>16.  <span>    </span><span class="keyword">for</span><span>(i=4;i<65536;i+=2) <="" span=""><br>17.  <span>        {   </span><br>18.  <span>            p[i]=1;   </span><br>19.  <span>        }   </span><br>20.  <span>    </span><span class="keyword">for</span><span>(i=3;i<65536;i +="2)" <="" span=""><br>21.  <span>        {   </span><br>22.  <span>            </span><span class="keyword">if</span><span>(0 == p[i])   </span><br>23.  <span>                {   </span><br>24.  <span>                    prime[idx]=i;   </span><br>25.  <span>                    idx++;   </span><br>26.  <span>                    </span><span class="keyword">for</span><span>(j = i<em>i;j &lt;65536; j += 2</em>i)   </span><br>27.  <span>                        {   </span><br>28.  <span>                            p[j]=1;   </span><br>29.  <span>                        }   </span><br>30.  <span>                }   </span><br>31.  <span>        }   </span><br>32.  <span>}   </span><br>33.  <span class="comment">/<em>两个数的最大公约数</em>/</span><span>  </span><br>34.  <span class="datatypes"><strong>int64</strong></span><span> gcd(</span><span class="datatypes">int64</span><span> a,</span><span class="datatypes"><strong>int64</strong></span><span> b)   </span><br>35.  <span>{   </span><br>36.  <span>    </span><span class="datatypes">int64</span><span> t;   </span><br>37.  <span>    </span><span class="keyword">while</span><span>(b)   </span><br>38.  <span>        {   </span><br>39.  <span>            t = a;   </span><br>40.  <span>            a = b;   </span><br>41.  <span>            b = t%b;   </span><br>42.  <span>        }   </span><br>43.  <span>    </span><span class="keyword">return</span><span> a;   </span><br>44.  <span>}   </span><br>45.  <span class="comment">/<em>求n的欧拉函数</em>/</span><span>  </span><br>46.  <span class="datatypes"><strong>int64</strong></span><span> get_phi(</span><span class="datatypes">int64</span><span> n)   </span><br>47.  <span>{   </span><br>48.  <span>    </span><span class="datatypes"><strong>int64</strong></span><span> ret=1;   </span><br>49.  <span>    </span><span class="datatypes">int64</span><span> i;   </span><br>50.  <span>    </span><span class="keyword">for</span><span>(i=2;i<em>i&lt;=n;i++)   </em></span><br>51.  <span>        {   </span><br>52.  <span>            </span><span class="keyword">if</span><span>(0 == (n%i))   </span><br>53.  <span>                {   </span><br>54.  <span>                    n /= i;   </span><br>55.  <span>                    ret = i-1;   </span><br>56.  <span>                    </span><span class="keyword">while</span><span>(0 == (n%i))   </span><br>57.  <span>                        {   </span><br>58.  <span>                            n /= i;   </span><br>59.  <span>                            ret <em>= i;   </em></span><br>60.  <span>                        }   </span><br>61.  <span>                }   </span><br>62.  <span>        }   </span><br>63.  <span>    </span><span class="keyword">if</span><span>(n &gt; 1)   </span><br>64.  <span>        ret = (n-1);   </span><br>65.  <span>    </span><span class="keyword">return</span><span> ret;   </span><br>66.  <span>}   </span><br>67.  <span class="comment">/<em>快速幂取模</em>/</span><span>  </span><br>68.  <span class="datatypes"><strong>int64</strong></span><span> pow_mod(</span><span class="datatypes">int64</span><span> a,</span><span class="datatypes"><strong>int64</strong></span><span> b,</span><span class="datatypes">int64</span><span> c)   </span><br>69.  <span>{   </span><br>70.  <span>    </span><span class="datatypes"><strong>int64</strong></span><span> ret=1;   </span><br>71.  <span>    </span><span class="keyword">while</span><span>(b)   </span><br>72.  <span>        {   </span><br>73.  <span>            </span><span class="keyword">if</span><span>(b1)   </span><br>74.  <span>                ret = (ret<em>a)%c;   </em></span><br>75.  <span>            b &gt;&gt;= 1;   </span><br>76.  <span>            a = (aa)%c;   </span><br>77.  <span>        }   </span><br>78.  <span>    </span><span class="keyword">return</span><span> ret;   </span><br>79.  <span>}   </span><br>80.  <span class="comment">/<em>dfs枚举q’的所有因子</em>/</span><span>  </span><br>81.  <span class="keyword">void</span><span> dfs(</span><span class="datatypes">int64</span><span> val,</span><span class="datatypes"><strong>int64</strong></span><span> now)   </span><br>82.  <span>{   </span><br>83.  <span>    </span><span class="datatypes">int64</span><span> t,j;   </span><br>84.  <span>    </span><span class="keyword">if</span><span>(now == total)   </span><br>85.  <span>        {   </span><br>86.  <span>            t = pow_mod(2,r+val,q);   </span><br>87.  <span>            </span><span class="keyword">if</span><span>((p<em>t)%q == pr)   </em></span><br>88.  <span>                {   </span><br>89.  <span>                    </span><span class="keyword">if</span><span>(val &lt; s)   </span><br>90.  <span>                        s = val;   </span><br>91.  <span>                }   </span><br>92.  <span>            </span><span class="keyword">return</span><span> ;   </span><br>93.  <span>        }   </span><br>94.  <span>    j = 1;   </span><br>95.  <span>    </span><span class="keyword">for</span><span>(t = 0;t&lt;=my_map[now][1];t++)   </span><br>96.  <span>        {   </span><br>97.  <span>            dfs(valj,now+1);   </span><br>98.  <span>            j = j<em>my_map[now][0];   </em></span><br>99.  <span>        }   </span><br>100.  <span>}   </span><br>101.  <span class="comment">/算法主体<em>/</em></span><span>  </span><br>102.  <span class="keyword">void</span><span> work()   </span><br>103.  <span>{   </span><br>104.  <span>    </span><span class="datatypes"><strong>int64</strong></span><span> p1,q1,tq;   </span><br>105.  <span>    </span><span class="datatypes">int64</span><span> e,i;   </span><br>106.  <span>    tq = gcd(p,q);   </span><br>107.  <span>    p1 = p/tq;   </span><br>108.  <span>    q1 = q/tq;   </span><br>109.  <span>    tq = q;   </span><br>110.  <span>    r = 1;   </span><br>111.  <span>    </span><span class="comment">/求r的值<em>/</em></span><span>  </span><br>112.  <span>    </span><span class="keyword">while</span><span>(0 == (tq1))   </span><br>113.  <span>        {   </span><br>114.  <span>            r++;   </span><br>115.  <span>            tq &gt;&gt;= 1;   </span><br>116.  <span>        }   </span><br>117.  <span>  </span><br>118.  <span>    e = get_phi(tq);   </span><br>119.  <span>    total = 0;   </span><br>120.  <span>    s = e;   </span><br>121.  <span>    </span><span class="comment">/分解phi(tq)<em>/</em></span><span>  </span><br>122.  <span>    </span><span class="keyword">for</span><span>(i=0;i<idx;i++) <="" span=""><br>123.  <span>        {   </span><br>124.  <span>            </span><span class="keyword">if</span><span>(0 == (e%prime[i]))   </span><br>125.  <span>                {   </span><br>126.  <span>                    my_map[total][0] = prime[i];   </span><br>127.  <span>                    my_map[total][1] = 0;   </span><br>128.  <span>                    </span><span class="keyword">while</span><span>(0 == (e%prime[i]))   </span><br>129.  <span>                        {   </span><br>130.  <span>                            e /= prime[i];   </span><br>131.  <span>                            my_map[total][1]++;   </span><br>132.  <span>                        }   </span><br>133.  <span>                    total++;   </span><br>134.  <span>                }   </span><br>135.  <span>        }   </span><br>136.  <span>    pr = (ppow_mod(2,r,q))%q;   </span><br>137.  <span>    dfs(1,0);   </span><br>138.  <span>    printf(</span><span class="string">“%I64d,%I64d\n”</span><span>,r,s);   </span><br>139.  <span>}   </span><br>140.  <span>  </span><br>141.  <span class="datatypes">int</span><span> main(</span><span class="keyword">void</span><span>)   </span><br>142.  <span>{   </span><br>143.  <span>    </span><span class="datatypes">int</span><span> i=1;   </span><br>144.  <span>    init_prime();   </span><br>145.  <span>    </span><span class="keyword">while</span><span>(EOF != scanf(</span><span class="string">“%I64d/%I64d”</span><span>,p,&amp;q))   </span><br>146.  <span>        {   </span><br>147.  <span>          </span><span class="comment">//printf(“%I64d\n”,(p*pow_mod(2,8,q))%q); </span><span>  </span><br>148.  <span>            printf(</span><span class="string">“Case #%d: “</span><span>,i);   </span><br>149.  <span>            i++;   </span><br>150.  <span>            work();   </span><br>151.  <span>        }   </span><br>152.  <span>    </span><span class="keyword">return</span><span> 0;   </span><br>153.  <span>}   </span><br></idx;i++)></span></65536;i></span></65536;i+=2)></span></div>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-05-12 </div>
-			<div class="article-title"><a href="/2011/05/12/recent-life/" >最近的生活</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<pre><code>     一晃眼就大三下了,时间是真的快,最近听的看的最多的就是找实习,然后留在公司,到处都在比较哪家公司好?一见面就问,你实习去哪?
-
-    我一直没有去找实习单位,我觉得大学三年真的在混日子,什么东西都没学到,现在什么都不会.怎么找实习?说参加过acm?没拿过奖,你怎么说.说算法很NB,实在是不敢恭维.说语言?就那点破C预言基础还在这扯淡?算了吧.还有一个原因就是我希望自己能够把下学期的区域赛搞好,如果不读研,那么就是最后一年区域赛了.
-
-    大学已经过去这么久了,我一直没找到自己的方向,从很久以前就开始接触acm,一心以为可以在算法方面有点小成就,可是acm我也在打酱油,至少大三以前都是.最开始选这专业就是看着电视里面那些所谓的黑客,觉得他们很酷很NB,我也要这样,可是现在C语言还算过的去,其他的硬件,汇编,底层,脚本啥都不会,搞个毛线啊.以前学习那本&lt;自己动手写操作系统&gt;,后来也由于一系列事情给耽搁了.囧的是好多人加我QQ问我.
-
- 接下来,没有接下来了,接下来我也干不了什么了,或许有笔试面试的时候,去玩玩吧,实习可能还是不会去了,既然已经错过很多了,那么接下来的区域赛就希望没有遗憾吧.Mon-monsterkill!!!
-
-最后恭喜科长顺利拿到企鹅的offer,向神也应该没问题吧
-</code></pre>
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-05-08 </div>
-			<div class="article-title"><a href="/2011/05/08/gcj-2011-klion26/" >gcj_2011前三题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>第四题没看题目,当时就想着反正25分就可以进r1了.所以第四题没看.前三题应该说还是好做的.第一题直接模拟,用两个变量存下在对方走的过程中,自己可以走多远,然后到自己走的时候,算上刚才的时间就行了.注意不管怎么样每人每轮至少需要一秒的时间,这1s是用来按按钮的.</p>
-<p>第二题:直接模拟,每次清空的是整个字符串,所以这里注意下,每次合并的时候只需要考虑最后两个就行了,但是冲突的却要考虑所有已经在字符串里面的字符和当前新加入的字符.</p>
-<p>第三题,一开始时想水的,因为3个small已经超过25分了,后来水过之后还是想了下,发现直接把所有的数异或起来,如果等于0就表示有方案,否则就是no solution.因为等于0的话,就可以把一些数分出来,然后两堆数分别的异或值一样[这样才能保证最后异或是0].然后求最大值,只需要用总值减去最小值就行了.这样就能保证每次都能拿到最大值.</p>
-<p>还有就是gcj可以下代码,有兴趣的可以去下那些大牛的代码来看看.官方也有analysis.最后希望今年能rp爆发拿件衣服吧~~~</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -399,13 +404,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/10/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
+    	<li class="prev"><a href="/page/10/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/12/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/12/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -425,7 +430,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -434,16 +439,16 @@
 		
 			
 	<div class="widget">
-		<h4>Categorias</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -463,19 +468,21 @@
 		
 			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
 		
-			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+			<li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li>
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
-			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+			<li><a href="/categories/我的生活/">我的生活<span>9</span></a></li>
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
@@ -485,25 +492,29 @@
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
+			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>2</span></a></li>
 		
 		</ul>
 	</div>
@@ -514,48 +525,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/how/">how<span>1</span></a></li>
+			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
 		
-			<li><a href="/tags/trident/">trident<span>1</span></a></li>
+			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
 		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
+			<li><a href="/tags/shell/">shell<span>5</span></a></li>
 		
-			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
+			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
 		
-			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
+			<li><a href="/tags/c/">c++<span>1</span></a></li>
 		
-			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
+			<li><a href="/tags/horn-formulas/">horn formulas<span>1</span></a></li>
 		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
+			<li><a href="/tags/proof/">proof<span>1</span></a></li>
 		
-			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
 		
-			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
+			<li><a href="/tags/program/">program<span>1</span></a></li>
 		
-			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
+			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
 		
-			<li><a href="/tags/RecurringTimer/">RecurringTimer<span>1</span></a></li>
+			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
 		
-			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
+			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
 		
-			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
+			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
 		
-			<li><a href="/tags/yum/">yum<span>1</span></a></li>
+			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
 		
-			<li><a href="/tags/dag/">dag<span>1</span></a></li>
+			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
 		
-			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+			<li><a href="/tags/no-recursive/">no-recursive<span>1</span></a></li>
 		
-			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
 		
-			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
+			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
 		
-			<li><a href="/tags/databse/">databse<span>1</span></a></li>
+			<li><a href="/tags/list/">list<span>1</span></a></li>
 		
-			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>266</span></a></li>
+		   <li><a href="/tags">...<span>270</span></a></li>
 		 
 		</ul>
 	</div>
@@ -564,7 +575,7 @@
 		
 			
 <div class="widget">
-  <h4>Posts recentes</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
     
       <li>
@@ -580,11 +591,11 @@
       </li>
     
       <li>
-        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+        <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
       <li>
-        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+        <a href="/2017/05/10/Python-代码实践小结/" ><i class="fa fa-file-o"></i>Python 代码实践小结</a>
       </li>
     
   </ul>

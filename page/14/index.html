@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Página 14 | klion26</title>
+  <title>Page 14 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -114,6 +114,78 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-04-02 </div>
+			<div class="article-title"><a href="/2011/04/02/pointers-on-c-11-dynamical-memory/" >C和指针11章 动态内存分配</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>1.动态分配和数组的比较:数组方便,简单,但是不灵活会造成很大的浪费,还有就是如果数组开的太小了 没办法容纳后面的数据,这些缺点可以通过动态分配内存来搞定,不过动态分配也有一定的麻烦,易错,而且是那种可能你找好久都不能找出来的错误,因为有指针.<br>2.相关函数:malloc,free,realloc,calloc.<br>void <em>malloc(size_t size);//size_t是无符号型<br>void free(void </em>point);<br>void <em>realloc(void </em>ptr,size_t new_size);<br>void <em>calloc(size_t num_element,size_t element_size);<br>malloc是分配size个<span style="color: #ff0000;">字节<span style="color: #000000;">连续空间,如果不能分配返回NULL<span style="color: #ff0000;"> 这些内容不会被初始化</span></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">realloc改变prt的大小,改变为new_size个<span style="color: #ff0000;">字节</span>,如果是增大的话,保留原先的数据内容,然后增加,如果时间小的话,那么留下的那一段数据内容不变,这里减小的话,只能是释放掉后面的空间.如果不能在原来的内存上操作的话,就会新分配一个new_size的内存,把数据复制过去,<span style="color: #ff0000;">这样的话用了realloc之后ptr就不能再用了,得用返回的这个指针了</span></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">calloc:分配num_element个数据所需的内存,每个数据的字节是 element_size. <span style="color: #ff0000;">这些内容会被初始化为0</span></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">free是释放传入指针所分配的内存,不过这块内存必须是上面三个函数之一分配的,还有就是不能释放一部分,如果想释放一部分可以用realloc函数</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">分配内存是最好用sizeof,这样移植性好一点,比如malloc(100</span></span></em>sizeof(int));<br><span style="color: #ff0000;"><span style="color: #000000;">3.一般错误:I.对NULL指针的解引用(分配之后没有判断是否返回的指针为NULL)       II.对分配的内存操作时越界  III释放并非动态分配的内存,试图释放动态分配的内存的一部分  IV.释放的内存继续使用.</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">4.内存泄露就是该释放的内存没有释放,会导致内存一点点被榨干,直到再次重启程序或计算机.这样的后果可能会导致当前已经完成的工作统统丢失</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">5.字符串动态分配内存是千万别忘了考虑结尾NUL字符</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">下面给出一个书上的例子,可以防止那些不检测malloc返回指针是否为NULL的情况</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">alloc.h</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">#include <stdlib.h></stdlib.h></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">#define malloc //不直接使用malloc</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">#define MALLOC(num,type) (type <em>)alloc((num)</em>(sizeof(type)))</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">extern void *alloc(size_t size);</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">alloc.c</span></span><br><span style="color: #ff0000;">#include <stdio.h></stdio.h></span></p>
+<p>#include”alloc.h”</p>
+<p>#undef malloc//注意顺序我一开始把这句放在上面一句的前面结果很诡异的错误.<br><span style="color: #ff0000;"><span style="color: #000000;">void <em>alloc(size_t size)</em></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">{</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">    void new_mem;</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">  new_mem=malloc(size);</span></span><br><span style="color: #ff0000;"><span style="color: #000000;"> if(new_mem==NULL)</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">{</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">    printf(“fjkds;afkjds;af”);//自己改成需要的</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">   exit(1);</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">}</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">return new_mem;</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">}</span></span></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-03-31 </div>
+			<div class="article-title"><a href="/2011/03/31/poj-2478-eular-function/" >POJ 2478 欧拉函数</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://poj.org/problem?id=2478" target="_blank" rel="external">题目</a><br>这题的实际就是求欧拉函数,也就是给你一个n,然后求从2-n的所有数的欧拉函数的和,至于不知道欧拉函数的还请google之.下面给出两个求欧拉函数的模板,一个是求从1-n的所有数的欧拉函数,一个是求单个数的欧拉函数.这两个函数都是由phi(n)=n<em>(p1-1)</em>(p2-1)<em>……</em>(pn-1)/(p1<em>p2</em>……*pn)这个式子来的.<br>第一个求所有数的欧拉函数</p>
+<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">eular</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="color: #f5deb3;">memset</span>(p<span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(p));<br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">1000001</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">i</span><span style="color: #da70d6;">//初始化</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">1000001</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">==</span>p<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">–</span><span style="color: #da70d6;">//如果是素数 那么等于n-1</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">1000001</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">+=</span><span style="color: #f5deb3;">i</span>)<br>                        <span style="color: #f5deb3;">{</span><br>                            p<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #da70d6;">//这里就是那个公式的应用,这里的P[j]数组是表示这个数是否是素数</span><br>                            <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>);<br>                            <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">/=</span><span style="color: #f5deb3;">i</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span></div><br>第二个,求单个数的欧拉函数:<br><div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">eular</span>(<span style="font-weight: bold; color: #98fb98;">int</span> n)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span>n;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(n<span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">==</span><span style="color: #add8e6;">0</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    n<span style="color: #f5deb3;">/=</span><span style="color: #f5deb3;">i</span><br>                    <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>                    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">==</span>n<span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">i</span>)<br>                        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//这里还是那个公式的应用</span><br>                            n<span style="color: #f5deb3;">/=</span><span style="color: #f5deb3;">i</span><br>                            <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;"><em>=</em></span><span style="color: #f5deb3;">i</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(n<span style="color: #f5deb3;">&gt;</span><span style="color: #add8e6;">1</span>)<span style="color: #da70d6;">//如果剩下的n是素数</span><br>        <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span>n<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">ret</span><br><span style="color: #f5deb3;">}</span></div>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-03-30 </div>
+			<div class="article-title"><a href="/2011/03/30/pointers-on-c-10-struct-union/" >C和指针 第十章 结构和联合</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>1.数组和结构:数组是相同类型的元素的集合,每个元素通过下标引用或指针间接访问来选择.结构也是一些值的集合,这些值是它的成员,但成员可以是不同的类型.<br>2警惕下面的陷阱:<br>typedef struct<br>{<br>int a;<br>SELF_REF3 <em>b;<br>int c;<br>}SELF_REF3;<br>这个声明的目的是为这个结构创建类型名SELF_REF3.但是,它失败了.类型名直到声明的末尾才定义,所以在结构声明的内部它尚未定义<br>3.如果把一个结构体当做参数传到函数里面或者当做返回值传出来的话,你可以选择使用结构体指针来提升效率,因为传值和返回值的话会先拷贝一份,这样的话,如果结构体的字节数大的话,这样速度会提升不少.当然也可以声明为寄存器类型.<br>4.位段,I.声明的时候如果最好别声明为int 二是直接写成signed和unsigned.因为int会根据具体的机器来决定是有符号还是无符号.II.位段中位的最大数目,许多编译器把位段成员的长度限制在一个整形的长度之内,所以一个能够运行于32位整形的机器上的位段声明可能在16位的整数机器上无法运行.III.位段的成员在内存中可能从右到左分配,也可能从左到右分配.IV.当一个声明指定了两个位段,第2个位段比较大,无法容纳于第1个位段剩余的位时,编译器有可能把第2个位段放在内存的下一个字,也可能直接放在第1个位段后面,从而在两个内存位置的边界上形成重叠.V.位段能够把长度为奇数的数据包装在一起,节省存储空间.当程序需要使用成千上万的这类结构时,这种节省方法就会变得相当重要.<br>5.联合:长度和最长的那个变量的长度一样.联合的初始化,必须是联合的第一个成员的类型,而且它必须位于一对花括号里面.<br>下面给出一个比较易错的东西.<br>1.sizeof(结构体)到底是多少.<br>比如strcut{char a;int b;char c}A;struct{int a,char b,char c}B;sizeof(A)和sizeof(B)是多少,下面是一个简单分析<br><!--easy2hide start reply to this=true--><br>答案是第一个是12,第二个是8.知道为什么吗?首先你要知道整型占4个字节.起始存储位置必须能够被4整除,然后第一个的话,首先a占了1个,然后b只能从下一个字开始,也就是会浪费三个字节,同理c也会浪费3个字节.但是第二个的话,首先a是占4个字节,然后b和c各占一个字节,这样的话,就只占了2个字.<br><!--easy2hide end--><br>还有一个就是要注意’</em>‘ ‘.’和’-&gt;’的先后顺序,比如<em>nodes.a和(</em>nodes).a的区别.</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -281,77 +353,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-03-25 </div>
-			<div class="article-title"><a href="/2011/03/25/usaco-5-1-1-fencing-the-cows/" >USACO 5.1.1Fencing the Cows</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://www.nocow.cn/index.php/Translate:USACO/fc" target="_blank" rel="external">中文题意</a></p>
-<p>凸包模板题,直接用melkman算法就OK了,melkman比其他的两种要好写[至少我这么认为],而且复杂度低.对于melkman算法就是用一个双端队列一直维护,使得在这个双端队列里面的一直是一个凸包[如果是乱序的就必须先排好序,可以就按y坐标排序如果需要再按x坐标排序,下面会有为什么要排序的一个例子].首先我们选三个点[这三个点不共线],入队列,保证队头一段时左转,队尾一端是右转.然后就把整个平面分成了下面的这样一个区域了,<a href="http://www.klion26.com/wp-content/uploads/2011/03/5.1.11.bmp" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2011/03/5.1.11.bmp" alt="" title="5.1.1"></a></p>
-<p>首先选前三个不共线的点入队,对头保证左转弯,队尾满足右转弯,然后队的两端是同一个点,也就是加入的最后一个点.之后就把整个平面分成了如上几个区域,I,II,III,IV,V.但是排好序之后V是不可能出现的[那里为什么要排序,也是为了防止出现V这种情况],也就是说现在只可能出现其他的四个区域了,但是区域I是不行的,因为进入了凸包的内部,如果在II区域的话,那么队顶退出直至满足凸包性质为止[左转弯],III区域的话就是操作队尾,然后IV区域的话就要同时操作队顶和队尾了.这样就OK了.然后这题就是要输出凸包的周长,有了凸包,周长神马的都是浮云了~~~</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-03-25 </div>
-			<div class="article-title"><a href="/2011/03/25/undefined-reference-to-sqrt-c/" >C语言编译时的undefined reference to &#39;sqrt&#39;</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>今天编译一C程序时,发现无论如何sqrt就是没定义,math.h也加了.实在是无语阿,后来搜了一下,发现是链接时的问题,也就是需要自己链接数学库,似乎Linux下的数学库是不自动链接的,也就是说需要你去链接.不过有些系统还是自动链接的.如果发现你加了某个系统函数的头文件还是出现没定义的错误的话,可是试着自己在编译时加上链接该库的指令,链接数学库是用的 -lm 也就是gcc -o example.out example.c -lm</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-03-24 </div>
-			<div class="article-title"><a href="/2011/03/24/hdu-3389/" >HDU 3389</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>首先你可以枚举前几个,然后可以看出分成了三个完全不相干的游戏,[1-2-7-8-13……][3-6-9-12-15……][4-5-10-11……],然后接下来你会发现2可以到1,7可以到2,8可以到7和1,6可以到3,12可以到3和9,5可以到4,11可以到10和4,也就是说如果n%3==0的话,那么如果n是偶数,就可以转移到奇数上,其他的是如果n%3==2的话,那么一定可以转移到n%3==1上,然后我们可以知道最后结果只与n%3==0&amp;n%2==0的位置上的和n%3==2上的数确定,那么我们把上面这两个设置设为集合A,其他的放在B集合,那么如果现在的局势是败局的话,玩家可以移动A集合里面的使之到一个胜局,或者移动B集合里面的东西到A集合,到达一个胜局,如果是从B移过来的,那么接下来的玩家只需要移走这些就行了,如果是从A中移走的话,那么我们继续移走A中的一部分,使之到一个败局.如果是胜局的话,只需要从A集合移动一些数到B集合就OK了,然后接下来的玩家就面临败局了.也就是这题的结果只与n%3==0&amp;&amp;n%2==0和n%3==2的位置上的card数有关</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -362,13 +363,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/13/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
+    	<li class="prev"><a href="/page/13/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/15/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/15/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -388,7 +389,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -397,16 +398,16 @@
 		
 			
 	<div class="widget">
-		<h4>Categorias</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -426,19 +427,21 @@
 		
 			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
 		
-			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+			<li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li>
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
-			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+			<li><a href="/categories/我的生活/">我的生活<span>9</span></a></li>
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
@@ -448,25 +451,29 @@
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
+			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>2</span></a></li>
 		
 		</ul>
 	</div>
@@ -477,48 +484,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/rmvb/">rmvb<span>1</span></a></li>
+			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
 		
-			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
+			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/数学/">数学<span>5</span></a></li>
+			<li><a href="/tags/thinking/">thinking<span>2</span></a></li>
 		
-			<li><a href="/tags/微信/">微信<span>1</span></a></li>
+			<li><a href="/tags/chain-matrix-multiplication/">chain matrix multiplication<span>1</span></a></li>
 		
-			<li><a href="/tags/select/">select<span>2</span></a></li>
+			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
 		
-			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
+			<li><a href="/tags/java/">java<span>1</span></a></li>
 		
-			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
+			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
 		
-			<li><a href="/tags/compter-graphics/">compter graphics<span>1</span></a></li>
+			<li><a href="/tags/spark/">spark<span>6</span></a></li>
 		
-			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
+			<li><a href="/tags/source-code/">source_code<span>1</span></a></li>
+		
+			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
+		
+			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
+		
+			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
+		
+			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+		
+			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
+		
+			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+		
+			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
+		
+			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
 		
 			<li><a href="/tags/concrete-mathematics/">concrete-mathematics<span>2</span></a></li>
 		
-			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
+			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
 		
-			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
-		
-			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
-		
-			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
-		
-			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
-		
-			<li><a href="/tags/no-recursive/">no-recursive<span>1</span></a></li>
-		
-			<li><a href="/tags/教师/">教师<span>1</span></a></li>
-		
-			<li><a href="/tags/vundle/">vundle<span>1</span></a></li>
-		
-			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
-		
-			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
+			<li><a href="/tags/topic/">topic<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>266</span></a></li>
+		   <li><a href="/tags">...<span>270</span></a></li>
 		 
 		</ul>
 	</div>
@@ -527,7 +534,7 @@
 		
 			
 <div class="widget">
-  <h4>Posts recentes</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
     
       <li>
@@ -543,11 +550,11 @@
       </li>
     
       <li>
-        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+        <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
       <li>
-        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+        <a href="/2017/05/10/Python-代码实践小结/" ><i class="fa fa-file-o"></i>Python 代码实践小结</a>
       </li>
     
   </ul>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Página 4 | klion26</title>
+  <title>Page 4 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -114,6 +114,273 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-01-03 </div>
+			<div class="article-title"><a href="/2015/01/03/algorithm-series/" >Algorithm series</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>最近突然有想把自己知道的，学过的算法写成一个系列的想法，即可以理清自己的思路，督促自己学习(复习)相关知识，也可以帮助一部分人，暂时的想法是在自己的能力范围之内，把一些算法尽量的讲解透彻，做到从零开始，也可算是一个入门级别的吧，所以很多东西会讲的很基础，简单。当然由于自己水平有限，如果有些东西讲的不是很详细，明白的话，可以相互讨论，我会尽己所能，把自己想要讲解的东西，写出来。由于每一篇可能都会比较长，所以这个系列的更新频率会比较低，争取一周一篇。现在的预拟的目录如下（可能随着时间的推移而更改）：</p>
+<p>1. <a href="http://www.klion26.com/dynamic-programming.html" target="_blank" rel="external">Dynamic Programming</a></p>
+<p>2. Tree {Binary Tree, 2-3-4 Tree, Red Black Tree, AVL Tree, B/B+ Tree}</p>
+<p>3. Greedy {Huffman encoding, Minimum spanning Tree}</p>
+<p>4. Graph {shortest path, Minimum spanning tree, strongly connected components}</p>
+<p>5. Hash</p>
+<p>6. String {Longest common subsequence, String matching}</p>
+<p>7. Sorting {Bubble sort, Quick sort, Merge sort, Insertion sort, Shell sort, Heap sort}</p>
+<p>8. Searching {DFS, BFS, Binary search}</p>
+<p>9. Bit</p>
+<p>10. Data Compression</p>
+<p>11. Linked list</p>
+<p>12. <a href="http://www.klion26.com/recursion.html" target="_blank" rel="external">Recursion</a></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-12-29 </div>
+			<div class="article-title"><a href="/2014/12/29/show-me-the-code/" >Show me the code</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>想着好好的学习下 Python，只看书当然是不行的，就在网上找一些项目做，想找合适的项目太难的，每个人的情况不一样，对 A 是合适的，对 B 就不一定合适，后来找到 <a href="https://github.com/karan/Projects" target="_blank" rel="external">100 project </a>和 <a href="https://github.com/Yixiaohan/show-me-the-code" target="_blank" rel="external">show-me-the-code </a>这两个 Github 上的 repo，想着自己先做做，等逐渐熟练了之后，再去解决其他的问题。期间问了一个美团公司的工程师有什么可以推荐的不，他建议找自己想解决的问题，我当时想着在桌面写一个<a href="http://www.meituan.com/lottery/past?mtt=1.index%2Ffloor.rd.1.i49jroiy" target="_blank" rel="external">美团网自动抽奖</a>的程序，由于自己不熟悉前端，有些地方不懂，问了好几个搞前端的同学，也没搞定。想着干脆先照着前面两个 repo 写，另外写个爬虫，熟悉下。等自己熟悉那个抽奖系统的链接跳转之后，再去搞定它。</p>
+<p>下面是我做这些 project 时遇到的一些问题，这里会逐渐更新，所有的代码都放到<a href="https://github.com/klion26/Projects" target="_blank" rel="external">这个库中</a>。</p>
+<p>1. 在图片的右上角加一个红色的数字（类似 QQ 消息的信息数目提示），直接用 PIL 库可以解决，不过由于在 windows 确实某个库 _imagingft  C，照着网上的安装之后还是不行，不能更改字体，导致添加的数字字体太小。另外应该可以用 PyQt 或者 Opencv来解决。</p>
+<p>2. 生成一个定长的随机字符串：这个学到了好几种方法，个人觉得较好的是 a)跑 for 循环，每次生成一个字符; b) 用 random.sample ；c)用 random.shuffle。写这个的时候，以及其他一些东西的时候，自己还是用 c/c++ 的思想在写 python，另外一个比较明显的例子是交换两个数，这个要慢慢改过来。</p>
+<p>至于用生成的随机字符串生成验证码，也可以用 PIL 库解决，将字符串画到图片上，再在图片上画一些黑点/黑线，然后对图片进行扭曲操作，不过不要操作过头了，导致用户都不认识。</p>
+<p>3. 找出 html 文件中的正文，链接，或者下载某个页面中的所有图片。自己用的正则表达式处理，正文直接匹配的 <body[\s\s]*&lt; body="">，这里中间用 “[\s\S]”表示所有字符，不用通配符 <em>，是因为会有换行等特殊字符在里面；链接用的是 href=\”[^\”]</em>\”, 至于下载某个页面中的所有图片，首先利用正则表达式 src=\”http[^\”]*jpg\”（这里需要考虑多种图片格式），找出所有图片的 url，然后用urllib.urlretrieve() 函数将远程的图片下载到本地。</body[\s\s]*&lt;></p>
+<p>4. 对密码进行加密，直接用 hashlib 库就行了，可以用不同的加密函数，至于加密密码的时候，需要添加 salt，salt可以由用户提供，也可以用 uuid 生成一个随机的字符串，最后把 salt 添加到 hash 后的密码后面，为了后面验证需要。</p>
+<p>未完待续…</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-11-02 </div>
+			<div class="article-title"><a href="/2014/11/02/least-recently-used-algorithm/" >Least Recently Used Algorithm</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>LRU（_<a href="http://en.wikipedia.org/wiki/Cache_algorithms#LRU" target="_blank" rel="external">Least Recently Used</a>）_算法是操作系统中的一种页面置换（在缓存系统中也会用到），思想就是：每次都把<span style="color: #0000ff;">最近最少</span>使用的那个页面置换出去，这个思想基于，当前使用的页面在不久的将来也会使用。</p>
+<p>比如在内存为 3 的情况下，依次请求如下页面2，3，4，2，1，3，7，5，4，3.那么内存中保存的依次保存的页面会变成如下所示（每一行表示当前页面请求之后，内存中的页面情况，左边的页面比右边页面旧（也就是最后一次访问的时间早），<a href="http://www.youtube.com/watch?v=I9_BpSXBodU" target="_blank" rel="external">这里</a>有一个动态视频，给出每一次的情况（需要翻墙）</p>
+<ol>
+<li>2</li>
+<li>2 3</li>
+<li>2 3 4</li>
+<li>3 4 2</li>
+<li>4 2 1</li>
+<li>2 1 3</li>
+<li>1 3 7</li>
+<li>3 7 5</li>
+<li>7 5 4</li>
+<li>5 4 3<br>到这里基本想法就结束了，剩下的就是怎么实现的问题了。对于不同的要求，有不同的实现。</li>
+</ol>
+<p>第一种：最简单的模拟，用一个单链表表示 LRU 的大小，表头存最旧的页面，表尾存最新的页面，然后每次 get 和 put 的时候，都遍历一次单链表进行相应操作。由于每次都要遍历单链表，所以每次操作都是 O（L）的复杂度，其中 L 表示 LRU 的大小。代码如下</p>
+<pre class="lang:c++ decode:true ">typedef struct {
+    int key;
+    int val;
+} elem;
+class LRUCache{
+public:
+    elem *arr;  // lru cache
+    int sz; // total number of elements in the list currently.
+    int cap; //capacity
+    LRUCache(int capacity) {  //init LRUCache
+        arr = new elem[capacity];  //
+        sz = 0;
+        cap = capacity;
+ }
+ /* move the used element to the end of list */
+ void adjust(int a) {
+     if (a == sz - 1) {//the last one
+        return ;
+     }
+     elem cur = arr[a];
+     for (int i = a; i lt; sz - 1; i ++) {
+        arr[i] = arr[i + 1]; // move all elements after position a 1 step left
+     }
+     arr[sz - 1] = cur; // move arr[a] to the end
+ }
+ //get the value of key, return -1 if it doesn't exit
+ int get(int key) {
+     //iterate the whole list to find if the key exits
+     for (int i = 0; i lt; sz; i ++) {
+         if (arr[i].key == key) {
+            int a = arr[i].val;
+            adjust(i);
+            return a; // existent key
+         }
+    }
+    return -1;
+ }
+ //update the key/value
+ void set(int key, int value) {
+     for (int i = 0; i lt; sz; i ++) {
+         if (arr[i].key == key) { // existent
+            arr[i].val = value; //update value ,and adjust the list
+            adjust(i);
+            return;
+         }
+     }
+     if (sz == cap) { // check if reach the capacity
+         for (int i = 0; i lt; sz - 1; i ++) {
+             arr[i] = arr[i + 1]; // delete the least used element
+         }
+         arr[sz - 1].key = key;
+         arr[sz - 1].val = value;
+     } else {
+         arr[sz].key = key;
+         arr[sz].val = value;
+         sz ++; // increase the size
+     }
+ }
+};</pre> 
+
+<p>第二种写法就是用双链表存 LRU 中保存的实际内容，然后用 HASH 表保存每一个 key 所对应的内容在双链表中的位置，其中双链表还是表头存最旧的，表尾存最新的，用 HASH 就可以加速查找，用双链表则是更新的时候可以达到 O(1)[单链表不能获得前驱节点的信息]，<span style="color: #0000ff;">如果这里用 map 实现，而不是 hash_map 的话，那么复杂度是 log(L)，这个是由 map 的复杂度决定的</span>。代码如下：</p>
+<pre class="lang:c++ decode:true ">#include <iostream>
+#include <vector>
+#include <hash_map>
+
+using namespace std;
+using namespace stdext;
+
+template<class k,="" class="" t="">
+struct LRUCacheEntry
+{
+    K key;
+    T data;
+    LRUCacheEntry* prev;
+    LRUCacheEntry* next;
+};
+
+template<class k,="" class="" t="">
+class LRUCache
+{
+private:
+    hash_map< K, LRUCacheEntry&lt;K,T>* &gt; _mapping;
+    vector< LRUCacheEntry&lt;K,T>* &gt; _freeEntries;
+    LRUCacheEntry<k,t> * head;
+    LRUCacheEntry<k,t> * tail;
+    LRUCacheEntry<k,t> * entries;
+public:
+    LRUCache(size_t size){
+    entries = new LRUCacheEntry<k,t>[size];
+    for (int i=0; i<size; i++)="" _freeentries.push_back(entries+i);="" head="new" lrucacheentry<k,t="">;
+    tail = new LRUCacheEntry<k,t>;
+    head->prev = NULL;
+    head->next = tail;
+    tail->next = NULL;
+    tail->prev = head;
+ }
+ ~LRUCache()
+ {
+    delete head;
+    delete tail;
+    delete [] entries;
+ }
+ void put(K key, T data)
+ {
+    LRUCacheEntry<k,t>* node = _mapping[key];
+    if(node)
+      {
+        // refresh the link list
+        detach(node);
+        node->data = data;
+        attach(node);
+      }
+    else{
+       if ( _freeEntries.empty() )
+         {// lru cache is full
+             node = tail->prev;
+             detach(node);//delete a node
+             _mapping.erase(node->key);
+             node->data = data;
+             node->key = key;
+             _mapping[key] = node;
+             attach(node);//add the new node
+         }
+       else{
+             node = _freeEntries.back();
+             _freeEntries.pop_back();
+             node->key = key;
+             node->data = data;
+             _mapping[key] = node;
+             attach(node);
+           }
+       }
+ }
+
+ T get(K key)
+ {
+      LRUCacheEntry<k,t>* node = _mapping[key];
+      if(node)
+        {//if node is already in, refresh the double-link-list
+           detach(node);
+           attach(node);
+           return node->data;
+        }
+       else return NULL;
+ }
+
+private:
+    void detach(LRUCacheEntry<k,t>* node)
+    {// delete the node from the double-link-list
+         node->prev-&gt;next = node-&gt;next;
+         node->next-&gt;prev = node-&gt;prev;
+    }
+    void attach(LRUCacheEntry<k,t>* node)
+    {//add node to the head of double-link-list
+         node->next = head-&gt;next;
+         node->prev = head;
+         head->next = node;
+         node->next-&gt;prev = node;
+    }
+};</k,t></k,t></k,t></k,t></k,t></size;></k,t></k,t></k,t></k,t></class></class></hash_map></vector></iostream></pre> 
+
+<p>第二种方法利用双链表保存实际的 cache 内容，然后用 hash 来加速查找，hash 存的是每一个 key/value 的地址，这样就可以直接找到相应的 key/value 元素了。这种方法中，查找的复杂度是 O(1)，更新的复杂度，只需要进行一次查找，一次 detach，一次 attach，所以也是 O(1)的，较之第一种方法的优势就体现出来了。</p>
+<p>最后，如果你想看下自己写的 LRU 是否正确，速度如何，可以在 Leetcode 上进行提交，地址：<a href="https://oj.leetcode.com/problems/lru-cache/" target="_blank" rel="external">https://oj.leetcode.com/problems/lru-cache/</a>，提交之后可以查看是否正确，正确的话，查看用时多少（第一种方法，可能可以在 Leetcode 上通过，也可能会得到一个 <strong>Time Limit Exceeded </strong>的结果，这个就看你人品了）</p>
+<p>Reference</p>
+<p><a href="http://www.cs.uml.edu/~jlu1/doc/codes/lruCache.html" target="_blank" rel="external">Implement a LRU Cache in C++</a></p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -407,136 +674,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2014-05-17 </div>
-			<div class="article-title"><a href="/2014/05/17/srm-620-randomgraph/" >SRM 620 RandomGraph</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://community.topcoder.com/stat?c=problem_statementpm=13143&amp;rd=15853" target="_blank" rel="external">题目链接</a></p>
-<p>题目大意：给你一个图无向图G，G有n个顶点，所有的边<i,j>都是以概率p存在。然后给定 n 和 p, 问图 G 中至少有一个联通子图含有4个以上（包括4个）顶点的概率。其中 2&lt;= n &lt;= 50</i,j></p>
-<p>这个题目还是比较有意思的。</p>
-<p>首先我们可以把4个以上转化为<span style="color: #ff0000;">不超过4个</span>，也就是说变成求这个问题的一个互补问题，因为转化之后的问题情况就变得少了很多，从而能够更好的求解</p>
-<p>接下来我们考虑怎么求图 G 中所有联通子图的顶点数都不超过4个的概率。首先不超过4个的情况只有如下几种<a href="http://www.klion26.com/wp-content/uploads/2014/05/graph1svg.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2014/05/graph1svg-300x115.png" alt="" title="graph1svg"></a></p>
-<p>第一种情况就是只有一个点在子图中，第二种情况是有两个顶点在图中，第三种和第四种是有3个顶点在子图中。我们可以把一个图中 第一种情况的个数设为 a,第二种情况的个数设为 b, 第三种和第四种情况的个数设为 c, 那么我们要求的就是图中只有这四种情况的概率。我们设<span style="color: #ff0000;"> f(r, a, b, c)</span> 表示 r 个顶点中 a 个第一种情况，b 个第二种情况，c个第三和第四种情况的概率。那么我们要求的就是 f(n, a, b, c) 且 a + 2b + 3c == n 的概率（其中 n 是图 G 的顶点个数）。那么接下来就是怎么算 f(r, a, b, c) 的事情了。</p>
-<p>我们假设现在有一个图 T，其中有 a 个第一种情况， b 个第二种情况， c 个第三和第四种情况。那么我们再加入一个顶点的时候，会发生什么呢？</p>
-<ol>
-<li>我们加入的点单独成为一个子图，也就是说不和任何的点有边连接，变成<span style="color: #ff0000;"> f(r+1, a+1, b, c),</span> 那么这种情况的概率是 (1-p)^(a+2b+3c)</li>
-<li>我们和第一种情况中的任何一个点有连接，那么就变成了<span style="color: #ff0000;"> f(r+1, a-1, b+1, c)</span>, 这样情况的概率是 (a<em>p)</em>(1-p)^(a-1)*(1-p)^(2b+3c)，首先是从 a 个点中选择一个，然后算概率</li>
-<li>我们和第一种情况种的任何两个点连接，变成一个第三种情况，那么就变成了<span style="color: #ff0000;"> f(r+1, a-2, b, c+1)</span>, 概率为 (a<em>(a-1))/2</em>p^2 <em> (1-p)^(a-2)</em>(1-p)^(2b+3c)</li>
-<li>我们和第二种情况种的某一个点连接，把连接的这个第二种情况变成第<span style="color: #ff0000;">三</span>种情况，也就是<span style="color: #ff0000;"> f(r+1, a, b-1, c+1)</span>, 概率为 (1-p)^a <em> <span style="color: #0000ff;">(2b)</span></em>p<em>(1-p)^(2b-1) </em> (1-p)^3c,其中标记出来的是从第二种情况种选择一个点进行连接，然后算的概率</li>
-<li>我们和第二种情况种的两个点进行连接，从而变成第<span style="color: #ff0000;">四</span>种情况（<span style="color: #ff0000;">注意这里和上面的区别</span>），也就是<span style="color: #ff0000;"> f(r+1, a, b-1, c+1)</span>, 概率为 (1-p)^a <em> b </em> p^2 <em> (1-p)^(2b-2)</em>(1-p)^3c.<br>接下来就可以用动态规划的思想来计算所有的 f(r, a, b, c) 了，然后计算出来之后我们求的所有 a+2b+3c == n 的 f(n, a, b, c)，记这个为 s 的话，那么我们最终要求的结果就是 1-s。到这里结束了</li>
-</ol>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2014-05-09 </div>
-			<div class="article-title"><a href="/2014/05/09/linux-dbm/" >数据库函数库</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><span style="color: #0000ff;">由于这里贴代码效果不太好，而且很多东西讲起来不是很清楚，所以我把自己重写一次，然后加上注释的<span style="color: #ff0000;"><a href="https://github.com/klion26/APUE/blob/master/ch20/20-1.c" target="_blank" rel="external"><span style="color: #ff0000;">代码放在这里</span></a></span>，有意思的可以看下。</span></p>
-<p>本文基于APUE2e第20章，准确的说是自己对这一章的一个解读，如果需要了解更详细的东西，请参考书本。</p>
-<p>本章开发的函数库类似于ndbm函数库，但是增加了并发控制机制，从而允许多进程同时更新同一数据库，主要接口如下</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #98fb98; font-weight: bold;">void</span><span style="color: #f5deb3;"><em></em></span> <span style="color: #f5deb3;">DBHANDLE</span><span style="color: #f5deb3;">DBHANDLE</span>     <span style="color: #f5deb3;">db_open</span>(<span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"></span> pathname<span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">int</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">…);     //用来打开数据库</span><br><span style="color: #98fb98; font-weight: bold;">void</span>         <span style="color: #f5deb3;">db_close</span>(<span style="color: #f5deb3;">DBHANDLE db</span>);                  //用来关闭数据库<br><span style="color: #98fb98; font-weight: bold;">char</span>         <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">db_fetch</span>(<span style="color: #f5deb3;">DBHANDLE db</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"> key</span>);    //用来取特定数据库中特定key所对应的数据<br><span style="color: #98fb98; font-weight: bold;">int</span>         <span style="color: #f5deb3;">db_store</span>(<span style="color: #f5deb3;">DBHANDLE db</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"><em> key</em></span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"> data</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">int flag</span>); //用来更新数据库（插入或者更新）<br><span style="color: #98fb98; font-weight: bold;">int</span>         <span style="color: #f5deb3;">db_delete</span>(<span style="color: #f5deb3;">DBHANDLE db</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;">* key</span>);     //用来删除指定数据库中key所对应的记录<br><span style="color: #98fb98; font-weight: bold;">void</span>         <span style="color: #f5deb3;">db_rewind</span>(<span style="color: #f5deb3;">DBHANDLE db</span>);                     //回滚到数据库的第一条记录</div></p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"><em></em></span>         <span style="color: #f5deb3;">db_nextrec</span>(<span style="color: #f5deb3;">DBHANDLE db</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">key</span>);        //取下一条记录（不保证访问顺序，只保证每条记录访问一次）</div><br>这里给的程序把索引和数据单独存在不同的文件里面。分别对应为 pathname.idx 和 pathname.dat ，对于组织索引，常用的方法有散列（又叫哈希）和B+树，这里用的是固定大小的散列，并采用链表来解决散列冲突（类似于图的邻接表），大致关系图如下：</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2014/05/20-1.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2014/05/20-1-300x247.png" alt="" title="20-1"></a></p>
-<p>上图中给出了索引文件的格式，以及索引文件怎么和数据文件结合起来的。通过这张图对数据库函数库的整体有一个了解。</p>
-<p>对于有多个进程访问同一数据库时，有两种方法可实现库函数：（1）集中式：由一个进程作为数据库管理者，所有的数据库访问工作由此进程完成。其他进程通过IPC机制与此中心进程进行联系。（2）非集中式：每个库函数独立申请并发控制（加锁），然后自己调用I/O函数。使用第一种方法，需要使用IPC，不过可以控制不同进程的优先级，另外在出错的情况下也更容易进行复原。这里使用的是第二种方法。</p>
-<p>因为我们使用了<span style="color: #0000ff;">索引文件</span>和<span style="color: #0000ff;">数据文件</span>两个文件，所以在加锁的情况下，就有两种情况：（1）粗锁：对其中一个文件上锁，然后控制整个过程，这样的缺点是限制了最大程度的并发，因为不能有多个进程同时对数据库进行只读访问。（2）：细锁：如果对数据库进行读/写访问的时候，先获得数据所在散列链的读锁/写锁，允许对同一条散列链有多个读进程，但只能有一个写进程。一个写进程在操作空闲链表前，必须获得空闲链表的写锁。当 db_store 向索引文件或数据文件末尾追加一条新纪录时，必须获得对应文件相应区域的写锁。</p>
-<p>接下来是源代码的分析，借鉴本书的注释，另外加上自己的理解，争取把整个程序讲清楚。</p>
-<p>1. 如果我们想在C里面实现私有函数（类似于C++的 private 函数，那么可以用 static，这样函数就只能在本文件里访问了），上面我们提供了7个对数据库进行操作的函数，当然我们希望这7个函数通过调用其他辅助函数来完成实际的工作，这样能够更好的实现模块化和重用。但是辅助函数我们希望只能够在本文件进行访问，这里就可以用 static 来进行控制了。</p>
-<p>2. 需要说明的是DB结构，该结构用来记录一个打开数据库的所有信息</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span>    <span style="color: #f5deb3;">idxfd</span>  <span style="color: #da70d6;">/<em> 记录文件的文件描述符 </em>/</span><br><span style="color: #98fb98; font-weight: bold;">int</span>    <span style="color: #f5deb3;">datfd</span>  <span style="color: #da70d6;">/<em> 数据文件的文件描述符 </em>/</span><br><span style="color: #98fb98; font-weight: bold;">char</span>  <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idxbuf</span> <span style="color: #da70d6;">/ 为单条记录信息分配的内存 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">char</span>  <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">datbuf</span> <span style="color: #da70d6;">/<em> 为单条数据信息分配的内存</em>/</span><br><span style="color: #98fb98; font-weight: bold;">char</span>  <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">name</span>   <span style="color: #da70d6;">/ 当前打开的数据库（有 .idx/.dat 后缀） 用来打开对应的文件<em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">idxoff</span> <span style="color: #da70d6;">/ 索引文件中索引记录的偏移量 <em>/</em></span><br><span style="color: #da70d6;">/ key is at (idxoff + PTR_SZ + IDXLEN_SZ) 其中PTR_SZ标识链表指针的字节数，IDXLEN_SZ标识索引记录长度，见上图<em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">size_t</span> <span style="color: #f5deb3;">idxlen</span> <span style="color: #da70d6;">/ 索引记录长度 <em>/</em></span><br><span style="color: #da70d6;">/ 从key开始到’\n’结尾 具体的见上图 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">datoff</span> <span style="color: #da70d6;">/ <em>当前</em>数据记录的偏移量 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">size_t</span> <span style="color: #f5deb3;">datlen</span> <span style="color: #da70d6;">/ <em>当前</em>数据记录长度，包括后面的’\n’<em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">ptrval</span> <span style="color: #da70d6;">/ contents of chain ptr in index record <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">ptroff</span> <span style="color: #da70d6;">/ 该条记录链表（已散列）中下一条记录的偏移量 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">chainoff</span> <span style="color: #da70d6;">/ 该条记录散列之后所对应的链表的偏移量 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">hashoff</span>  <span style="color: #da70d6;">/ 散列表的偏移量 <em>/</em></span><br><span style="color: #f5deb3;">DBHASH</span> <span style="color: #f5deb3;">nhash</span>    <span style="color: #da70d6;">/ 当前的散列表大小，DBHASH是unsigned long的typedef <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_delok</span>    <span style="color: #da70d6;">/ delete OK, COUNT是unsigned long的typedef 这些COUNT是统计效率用的，比如删除成功多少次，失败多少次<em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_delerr</span>   <span style="color: #da70d6;">/ delete error <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_fetchok</span>  <span style="color: #da70d6;">/ fetch OK <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_fetcherr</span> <span style="color: #da70d6;">/ fetch error <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_nextrec</span>  <span style="color: #da70d6;">/ nextrec <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_stor1</span>    <span style="color: #da70d6;">/ store: DB_INSERT, no empty, appended <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_stor2</span>    <span style="color: #da70d6;">/ store: DB_INSERT, found empty, reused <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_stor3</span>    <span style="color: #da70d6;">/ store: DB_REPLACE, diff len, appended <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_stor4</span>    <span style="color: #da70d6;">/ store: DB_REPLACE, same len, overwrote <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_storerr</span>  <span style="color: #da70d6;">/ store error */</span><br><span style="color: #f5deb3;">}</span> <span style="color: #f5deb3;">DB</span></div><br>接下来就是打开数据库函数 db_open, 这个函数负责分析调用参数（oflag 是否带 O_CREAT ), 然后打开相应的索引文件和数据文件， 利用一个私有函数 _db_alloc(int) 该函数负责分配一个DB结构所需要的内存，然后返回给调用者。然后打开之后我们需要对数据库进行初始化，这里需要进行加锁，如果不加锁的话，可能会导致数据出错（多进程同时访问一个数据库）。代码如下：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">if</span> ((<span style="color: #f5deb3;">oflag</span> <span style="color: #f5deb3;"></span> (<span style="color: #f5deb3;">O_CREAT</span> | <span style="color: #f5deb3;">O_TRUNC</span>)) <span style="color: #f5deb3;">==</span> (<span style="color: #f5deb3;">O_CREAT</span> | <span style="color: #f5deb3;">O_TRUNC</span>)) <span style="color: #f5deb3;">{  //如果有O_CREAT 和 O_TRUNC 标识</span><br><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      If the database was created, we have to initialize</span><br><span style="color: #da70d6;">     <em> it.  Write lock the entire file so that we can stat</em></span><br><span style="color: #da70d6;">      it, check its size, and initialize it, atomically.</span><br><span style="color: #da70d6;">     */</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">writew_lock</span>(<span style="color: #f5deb3;">db</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">idxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">SEEK_SET</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)  // 在创建成功之后，对文件加一把写锁（其他进程不能读写该文件）<br><span style="color: #f5deb3;">err_dump</span>(<span style="color: #7fffd4;">“db_open: writew_lock error”</span>);      //加锁，是防止出现两个进程交替访问同一个数据库的情况，造成数据不统一<span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">fstat</span>(<span style="color: #f5deb3;">db</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">idxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">statbuff</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)            //得到索引文件的信息<br><span style="color: #f5deb3;">err_sys</span>(<span style="color: #7fffd4;">“db_open: fstat error”</span>);</div></p>
-<p><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">statbuff</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">st_size</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">{                   //如果索引文件长度为0</span><br><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">          We have to build a list of (NHASH_DEF + 1) chain</span><br><span style="color: #da70d6;">         <em> ptrs with a value of 0.  The +1 is for the free</em></span><br><span style="color: #da70d6;">          list pointer that precedes the hash table.</span><br><span style="color: #da70d6;">         <em>/</em></span><br><span style="color: #f5deb3;">sprintf</span>(<span style="color: #f5deb3;">asciiptr</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">PTR_SZ</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>);           //全部设置为0, 其中 %*d, 标识一共占PTR_SZ个位置，值为0<br><span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> (<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">NHASH_DEF</span> <span style="color: #f5deb3;">+</span> <span style="color: #add8e6;">1</span>; <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)            //所有的散列链都置为0, 标识所有散列链都没有数据<br><span style="color: #f5deb3;">strcat</span>(<span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">asciiptr</span>);<br><span style="color: #f5deb3;">strcat</span>(<span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">strlen</span>(<span style="color: #f5deb3;">hash</span>);<br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">write</span>(<span style="color: #f5deb3;">db</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">idxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">i</span>) <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">i</span>)            //初始化散列部分<br><span style="color: #f5deb3;">err_dump</span>(<span style="color: #7fffd4;">“db_open: index file init write error”</span>);<br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">un_lock</span>(<span style="color: #f5deb3;">db</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">idxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">SEEK_SET</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)        //不管初始化成功与否，对文件进行解锁<br><span style="color: #f5deb3;">err_dump</span>(<span style="color: #7fffd4;">“db_open: un_lock error”</span>);<br><span style="color: #f5deb3;">}</span></p>
-<p><br>接下来是关闭数据库 db_close(DBHANDLE h), 这个函数调用了一个内部函数 _db_free(DB*); 对打开的文件描述符进行关闭（在初始化的时候把文件描述符置为-1,在这里就派上用场了），释放分配的内存。 _db_free 函数在其他很多地方也会被调用，比如数据库打开出错的情况下，需要释放分配的内存，然后返回出错。</p>
-<p>接下来是 db_fetch(DBHANDLE, const char<em>) 函数，这个函数返回 指定数据库的特定 key 值的数据项，在这里调用 _db_find_and_lock(DB</em>, const char<em> key, int writelock) 函数进行加锁以及查询， 如果查询成功，那么就使用 _db_readdat(DB</em>)进行数据读取。在处理完成之后，需要在 db_fetch 函数中对加锁文件进行解锁</p>
-<p>_db_find_and_lock(DB<em> db, const char</em> key, int writelock) 对指定指定索引进行查询，并加锁。如果 writelock 非0则加写锁，否则加读锁。这里的锁只加在 key 散列之后所在的散列链上（这样运行不同的进程同时访问不同的散列链，从而增加并发性）。 然后调用 _db_readptr(DB*, off_t offset) 得到散列链中的第一个指针，如果这个函数返回0, 表示散列链为空。然后对散列链进行遍历，一查看是否存在一条需要查询的记录。</p>
-<p>接下来是 db_delete() 函数，首先进行加锁并查找， 如果查找成功，则用 _db_dodelete() 进行删除， 最后不管成功与否，都需要对加锁的数据段进行解锁。因为可能需要更改散列链，所以这里加的是一把写锁。</p>
-<p>_db_dodelete 函数用来实际进行删除操作。操作过程中更新空闲链表以及对应的散列链。更新索引文件和数据为空格（这里在后面的 db_nextrec 会用到）</p>
-<p>_db_writedate 实际进行一个数据的更新，把数据写到相应的内存位置，如果是有 db_store 进行调用，且是追加数据的话，需要对文件进行加写锁。</p>
-<p>_db_writeidx 更新索引数据，与上一个函数类似</p>
-<p>_db_writeptr 将一个链表指针写至索引文件中。</p>
-<p>db_store() 对数据库进行操作，插入，更新。这里面首先需要进行加锁，查找。然后分为四种情况：第一种没有查找到，所以需要添加记录，添加的时候，通过查找我们以前删除过的记录，它的键长度和数据长度与当前的键长度和数据长度一致，如果没有找到，就将这条数据添加到索引文件和数据文件的末尾，然后更新数据，索引部分。第二种，我们在以前删除过的记录中查找到了，那么直接重用就行了。第三种，替换已有数据，且新记录的长度和已有记录的长度不一样，那么直接删除旧数据（前面已经有了），再添加新数据就行了。第四种，新纪录的长度和已有记录的长度一样，直接更新记录即可。</p>
-<p>_db_findfree(DB* db, int keylen, int datlen) 查找一块已经删除了的指定大小的数据块。通过遍历空闲链表，查找合适的数据块，找到就从空闲链表中删除，找不到的话就返回一个出错信息。</p>
-<p>db_rewind() 将索引文件的文件偏移量置为第一条索引记录</p>
-<p>db_nextrec() 遍历索引文件，返回下一条记录。返回的是一个只想DB结构里面的内存区域。</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2014-05-02 </div>
-			<div class="article-title"><a href="/2014/05/02/linux-daemon/" >Linux下的守护进程</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>在Linux下，守护进程一般是随着系统启动而启动，直到系统关闭才关闭，没有控制终端，在后台运行。经常用作服务器进程。</p>
-<p>编写一个守护进程一般有如下几步：</p>
-<ol>
-<li>调用umask将文件模式创建屏蔽字设置为0.由继承得到的文件模式屏蔽字可能会拒绝设置某些权限。</li>
-<li>调用fork，然后父进程退出（exit）。</li>
-<li>调用setsid以创建一个新会话。</li>
-<li>将当前工作目录更改为更目录。</li>
-<li>关闭不需要的文件描述符。</li>
-<li>某些守护进程打开/dev/null使其具有文件描述符0,1,2,这样，任何一个试图读标准输入，写标准输出或标准出错的库例程都不会产生任何效果。<br>大致代码如下：<br><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #ffffff;">daemonize</span>(<span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"><em></em></span> <span style="color: #f5deb3;">cmd</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd0</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd2</span><span style="color: #da70d6;">///fd0,fd1,fd2分表表示打开的文件描述符，正确的话分别是0,1,2</span><br><span style="color: #f5deb3;">pid_t</span> <span style="color: #f5deb3;">pid</span><span style="color: #da70d6;">//子进程id</span><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">rlimit</span> <span style="color: #f5deb3;">rl</span>;<span style="color: #da70d6;">//getrlimit所需要的结构，查看文件描述符的最大值</span><br><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">sigaction</span> <span style="color: #f5deb3;">sa</span><span style="color: #da70d6;">//siaaction结构</span><br><span style="color: #da70d6;">/ clear file creation mask. <em>/</em></span><br><span style="color: #f5deb3;">umask</span>(<span style="color: #add8e6;">0</span>);<span style="color: #da70d6;">//设置umask值</span><br><span style="color: #da70d6;">/</span><br><span style="color: #da70d6;">     <em> Get maximum number of file descriptors.</em></span><br><span style="color: #da70d6;">     /</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">getrlimit</span>(<span style="color: #f5deb3;">RLIMIT_NOFILE</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rl</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<span style="color: #da70d6;">//得到文件描述符的最大值</span><br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“%s: can’t get file limit”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cmd</span>);<span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      Become a session leader to loss controlling TTY.</span><br><span style="color: #da70d6;">     */</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>((<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">fork</span>()) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<span style="color: #da70d6;">//创建一个子进程</span><br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“%s: can’t fork”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cmd</span>);<br><span style="color: #b0c4de; font-weight: bold;">else</span> <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">0</span>)  <span style="color: #da70d6;">//parent</span><br><span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">0</span>);<span style="color: #da70d6;">//父进程退出</span><br><span style="color: #f5deb3;">setsid</span>();<span style="color: #da70d6;">//创建一个新会话，上面调用fork，父进程退出，所以保证流setsid的正确执行</span></div></li>
-</ol>
-<p><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“setsid success</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      Ensure future opens won’t allocate controlling TTYs.</span><br><span style="color: #da70d6;">     */</span><br><span style="color: #f5deb3;">sa</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sa_handler</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">SIG_IGN</span><br><span style="color: #f5deb3;">sigemptyset</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">sa</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sa_mask</span>);<br><span style="color: #f5deb3;">sa</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sa_flags</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">sigaction</span>(<span style="color: #f5deb3;">SIGHUP</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">sa</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<span style="color: #da70d6;">//忽略控制终端的信号</span><br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“%s: can’t ignore SIGHUP”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cmd</span>);<br><span style="color: #b0c4de; font-weight: bold;">if</span>((<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">fork</span>()) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“%s: can’t fork”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cmd</span>);<br><span style="color: #b0c4de; font-weight: bold;">else</span> <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">0</span>)  <span style="color: #da70d6;">//parent</span><br><span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">0</span>);</p>
-<p><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“second child</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      change the current working directory to the root so</span><br><span style="color: #da70d6;">     <em> we won’t prevent file systems from being unmounted.</em></span><br><span style="color: #da70d6;">     /</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">chdir</span>(<span style="color: #7fffd4;">“/tmp”</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<span style="color: #da70d6;">//设置工作目录</span><br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“%s: can’t change directory to /“</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cmd</span>);<br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“chdir successed</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      Close all open file descriptors.</span><br><span style="color: #da70d6;">     <em>/</em></span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">rl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">rlim_max</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">RLIM_INFINITY</span>)<br><span style="color: #f5deb3;">rl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">rlim_max</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1024</span><br><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">rl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">rlim_max</span>; <span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">i</span>)<br><span style="color: #f5deb3;">close</span>(<span style="color: #f5deb3;">i</span>);<span style="color: #da70d6;">//关闭所有的文件描述符</span><br><span style="color: #da70d6;">//从这里开始，所有的文件描述符都已经关闭流，因此printf的所有输出都不会有任何效果</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“rlimit_max:%d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">rl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">rlim_max</span>);<br><span style="color: #da70d6;">/</span><br><span style="color: #da70d6;">     <em> Attach file descriptors 0, 1 and 2 to /dev/null</em></span><br><span style="color: #da70d6;">     /</span><br><span style="color: #f5deb3;">fd0</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">open</span>(<span style="color: #7fffd4;">“/dev/null”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">O_RDWR</span>);<span style="color: #da70d6;">//这个会返回0</span><br><span style="color: #f5deb3;">fd1</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">dup</span>(<span style="color: #add8e6;">0</span>);<span style="color: #da70d6;">//返回1</span><br><span style="color: #f5deb3;">fd2</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">dup</span>(<span style="color: #add8e6;">0</span>);<span style="color: #da70d6;">//返回2</span></p>
-<p><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      Initialize to log file.</span><br><span style="color: #da70d6;">     */</span><br><span style="color: #eeee00;">#if 1</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“before openlog</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<span style="color: #da70d6;">//这些已经没有效果了</span><br><span style="color: #f5deb3;">openlog</span>(<span style="color: #f5deb3;">cmd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">LOG_CONS</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">LOG_DAEMON</span>);<span style="color: #da70d6;">//openlog是记录出错信息用的</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“after openlog</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">fd0</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">0</span> || <span style="color: #f5deb3;">fd1</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">1</span> || <span style="color: #f5deb3;">fd2</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">2</span>)<span style="color: #da70d6;">//如果出错</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">syslog</span>(<span style="color: #f5deb3;">LOG_ERR</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“unexpected file descriptors %d %d %d”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd0</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd2</span>);<br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“fd error</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">1</span>);<br><span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#endif</span><br><span style="color: #f5deb3;">}</span></p>
-<p><br>这样我们就得到了一个守护进程了，可以在main函数里面调用，然后用ps查看结果。至于为什么需要利用两次fork。原因是第一次fork得到的子进程（first child）是它所在的session的组长，但是<span style="color: #ff0000;">每个session的组长是可以控制一个终端的</span>，只调用一次fork的话，那么就可能达不到我们的要求（<span style="color: #ff0000;">守护进程不能有控制终端</span>），第二次fork（first child会直接退出）得到的进程（second child）不是所在session的组长，不能控制终端，这样就确保了守护进程没有控制终端。</p>
-<p>由于守护进程木有控制终端，所以出错记录需要另外记录，且要方便记录查看。这里就可以使用syslog来产生错误消息。上面代码中的openlog和syslog就是用来干这个事的，openlog是配置log文件的一些信息，syslog用来输出出错记录。</p>
-<p>有时我们需要只运行守护进程的一个副本[如果有多个实例运行的话，可能导致任务运行多次，而产生错误]，这样的话我们就需要用到单例守护进程。我们可以使用文件和记录锁机制来实现这个效果。即第一次运行的时候，给文件上锁，以后需要运行的时候，先查看文件是否上锁，如果上锁就退出，否则继续运行。代码如下</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #eeee00;">#define LOCKFILE “/var/run/daemon.pid”</span><br><span style="color: #eeee00;">#define LOCKMODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)</span><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">lockfile</span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">fd</span>)<span style="color: #da70d6;">//给文件上锁</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">flock</span> <span style="color: #f5deb3;">fl</span><br><span style="color: #f5deb3;">fl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">l_type</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">F_WRLCK</span><br><span style="color: #f5deb3;">fl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">l_start</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">fl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">l_whence</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">SEEK_SET</span><br><span style="color: #f5deb3;">fl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">l_len</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> (<span style="color: #f5deb3;">fcntl</span>(<span style="color: #f5deb3;">fd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">F_SETLK</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">fl</span>));<br><span style="color: #f5deb3;">}</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">already_running</span>(<span style="color: #98fb98; font-weight: bold;">void</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">fd</span><br><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">16</span><span style="color: #f5deb3;">];</span></div></p>
-<p><span style="color: #f5deb3;">fd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">open</span>(<span style="color: #f5deb3;">LOCKFILE</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">O_RDWR</span> | <span style="color: #f5deb3;">O_CREAT</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">LOCKMODE</span>);<br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">fd</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">syslog</span>(<span style="color: #f5deb3;">LOG_ERR</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“can’t open %s: %s</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">LOCKFILE</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">strerror</span>(<span style="color: #f5deb3;">errno</span>));<br><span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">1</span>);<br><span style="color: #f5deb3;">}</span></p>
-<p><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">lockfile</span>(<span style="color: #f5deb3;">fd</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">errno</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">EACCES</span> || <span style="color: #f5deb3;">errno</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">EAGAIN</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">close</span>(<span style="color: #f5deb3;">fd</span>);<br><span style="color: #b0c4de; font-weight: bold;">return</span> (<span style="color: #add8e6;">1</span>);<br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">syslog</span>(<span style="color: #f5deb3;">LOG_ERR</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“can’t lock %s: %s</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">LOCKFILE</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">strerror</span>(<span style="color: #f5deb3;">errno</span>));<br><span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">1</span>);<br><span style="color: #f5deb3;">}</span></p>
-<p><span style="color: #f5deb3;">ftruncate</span>(<span style="color: #f5deb3;">fd</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>);<br><span style="color: #f5deb3;">sprintf</span>(<span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“%ld”</span><span style="color: #f5deb3;">,</span> (<span style="color: #98fb98; font-weight: bold;">long</span>)<span style="color: #f5deb3;">getpid</span>());<br><span style="color: #f5deb3;">write</span>(<span style="color: #f5deb3;">fd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">strlen</span>(<span style="color: #f5deb3;">buf</span>) <span style="color: #f5deb3;">+</span> <span style="color: #add8e6;">1</span>);<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></p>
-<p><br>这样的话，任何时候都只可能有一个进程副本在运行。</p>
-<p>如果在守护进程中需要打开文件，而且调用openlog前先调用了chroot，那么怎么确保能够正确的打开文件呢？这个只需要用文件描述符就行了，文件描述符在chroot之后是不会更改的。</p>
-<p>这篇文章大部分内容来自APUE第13章，更详细的内容请移步APUE。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -547,13 +684,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/3/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
+    	<li class="prev"><a href="/page/3/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/5/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/5/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -573,7 +710,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -582,16 +719,16 @@
 		
 			
 	<div class="widget">
-		<h4>Categorias</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -611,19 +748,21 @@
 		
 			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
 		
-			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+			<li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li>
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
-			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+			<li><a href="/categories/我的生活/">我的生活<span>9</span></a></li>
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
@@ -633,25 +772,29 @@
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
+			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>2</span></a></li>
 		
 		</ul>
 	</div>
@@ -662,48 +805,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
+			<li><a href="/tags/notes/">notes<span>0</span></a></li>
 		
-			<li><a href="/tags/top排序/">top排序<span>2</span></a></li>
+			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
 		
-			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
+			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
 		
-			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+			<li><a href="/tags/chinese/">chinese<span>1</span></a></li>
 		
-			<li><a href="/tags/select/">select<span>2</span></a></li>
+			<li><a href="/tags/火柴棍式程序题/">火柴棍式程序题<span>1</span></a></li>
 		
-			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
+			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
 		
-			<li><a href="/tags/ln/">ln<span>1</span></a></li>
+			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
 		
-			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
+			<li><a href="/tags/c/">c++<span>1</span></a></li>
 		
-			<li><a href="/tags/free/">free<span>1</span></a></li>
+			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
 		
-			<li><a href="/tags/method/">method<span>1</span></a></li>
+			<li><a href="/tags/vim/">vim<span>2</span></a></li>
 		
-			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
+			<li><a href="/tags/linux/">linux<span>24</span></a></li>
 		
-			<li><a href="/tags/proof/">proof<span>1</span></a></li>
+			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
 		
-			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+			<li><a href="/tags/老师/">老师<span>1</span></a></li>
 		
-			<li><a href="/tags/thinking/">thinking<span>2</span></a></li>
+			<li><a href="/tags/数论/">数论<span>5</span></a></li>
 		
-			<li><a href="/tags/google-adsense/">google-adsense<span>1</span></a></li>
+			<li><a href="/tags/alibaba/">alibaba<span>1</span></a></li>
 		
-			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
+			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
 		
-			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
+			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
 		
-			<li><a href="/tags/longest-increasing-subsequences/">longest increasing subsequences<span>1</span></a></li>
+			<li><a href="/tags/写作/">写作<span>1</span></a></li>
 		
-			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
+			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
 		
-			<li><a href="/tags/pair/">pair<span>1</span></a></li>
+			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>266</span></a></li>
+		   <li><a href="/tags">...<span>270</span></a></li>
 		 
 		</ul>
 	</div>
@@ -712,7 +855,7 @@
 		
 			
 <div class="widget">
-  <h4>Posts recentes</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
     
       <li>
@@ -728,11 +871,11 @@
       </li>
     
       <li>
-        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+        <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
       <li>
-        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+        <a href="/2017/05/10/Python-代码实践小结/" ><i class="fa fa-file-o"></i>Python 代码实践小结</a>
       </li>
     
   </ul>

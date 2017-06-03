@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Página 8 | klion26</title>
+  <title>Page 8 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -114,6 +114,92 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-11-26 </div>
+			<div class="article-title"><a href="/2012/11/26/fedora-13-movie-mkv-mp4-rmvb-rm-song/" >Fedora13 下看视频，听歌</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>一开始没想在Linux下装视频，不过四宝在fedora-17下装了个视频之后，我也想装了。而且如果想只用Linux的话，那么视频这东西肯定需要的。然后上网搜了下，搜到<a href="http://www.cxybase.com/201104/fedora-13%E5%AE%89%E8%A3%85%E6%92%AD%E6%94%BE%E5%99%A8%E6%92%AD%E6%94%BEmp4%E8%A7%86%E9%A2%91/" target="_blank" rel="external">一篇文章</a>，说怎么安装文件使的可以打开mp4.rmvb，mkv等文件。然后我照着做的时候发现居然要求系统版本在15以上，fuck。。对于一直用fedora-13的我来说，压力很大。就想着去这个<a href="http://download1.rpmfusion.org/free/fedora/这里查看下，然后发现这个网页直接列出来的，系统版本最低要求是14.但是有一个release文件夹。点进去有一个文件夹13的文件夹。然后在里面找到一个文件[rpmfusion-free-release-13-2.noarch.rpm](http://download1.rpmfusion.org/free/fedora/releases/13/Everything/x86_64/os/rpmfusion-free-release-13-2.noarch.rpm)，然后在rpm" target="_blank" rel="external">http://download1.rpmfusion.org/free/fedora/这里查看下，然后发现这个网页直接列出来的，系统版本最低要求是14.但是有一个release文件夹。点进去有一个文件夹13的文件夹。然后在里面找到一个文件[rpmfusion-free-release-13-2.noarch.rpm](http://download1.rpmfusion.org/free/fedora/releases/13/Everything/x86_64/os/rpmfusion-free-release-13-2.noarch.rpm)，然后在rpm</a> -ivh 后面的地址改成这个文件的地址OK了。即就可以添加文件源了。然后yum install gstreamer-plugins-bad gstreamer-ffmpeg gstreamer-plugins-ugly 就行了。这两句需要用sudo来执行。接下来你就可以用Movie Player打开mp4,mkv，rmvb等文件。不过不知道为什么用QQ影音截取的一段rmvb文件却不可以播放。如果知道的还希望告知一声。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-11-21 </div>
+			<div class="article-title"><a href="/2012/11/21/apue-chapter-3-excise-3-2/" >UNIX环境高级编程第3章的一些问题和习题3.2</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>APUE第3章讲的是文件IO，需要了解一些Linux底层的东西，不然看起来好费劲（我现在就这样- -|）。</p>
+<p>首先，讲了文件描述符，文件描述符简单的说就是一个非负整数，你可以通过这个整数来找到打开的文件，比如我们用open函数时返回的是一个整数，这就是open所打开的这个文件的文件描述符，文件描述符是内核向进程返回的。另外shell中的标准输入的文件描述符是0,标准输出是1,错误输出是2,这个是默认这么做的，与内核无关。但是不遵照这个惯例的话，那么很多系统应用程序就不能正常工作。文件描述符的范围是0~OPEN_MAX(每个进程的最大打开文件数)，早期的上限是19（即允许每个进程打开20个文件），现在很多系统则增至63.</p>
+<p>讲了一个文件空洞的东西，就是如果你现在的文件长度是n，然后你用lseek把文件指针位置定位到了一个大于n的位置，接下来你写一些东西，那么就形成了一个文件空洞，中间那一部分就是文件空洞，文件空洞是不占空间的，你可以用两个同样长度的文件，然后比较他们的文件大小，还有没有写过的字节读出来通通为0</p>
+<p>dup和dup2函数，都包含在unistd.h文件中。看到这两个函数的时候，不怎么懂，现在也不保证很懂(-_-|).</p>
+<p>dup的原型是int dup(int filedes) ;//传入参数是已打开的文件描述符，返回一个未用的最小的文件描述符。</p>
+<p>dup2的原型是int dup2(int oldfiledes,int newfiledes);//返回oldfiledes的一个文件描述符copy，然后返回的文件描述符是newfiledes。如果newfiledes已经打开，就先关闭，如果oldfiledes和newfiledes相等，那么就返回newfiledes，而不关闭它。这些返回的新文件描述符和原来的文件描述符（dup中的filedes和dup2中的oldfiledes）共享一个文件表项。如果出错返回-1,比如dup中的参数filedes是一个未打开的文件描述符</p>
+<p>当然这两个函数都可以由fcntl函数来替代，虽然可能不完全等效。比如原子性。</p>
+<p>fcntl原型int fcntl(int filedes,int cmd, … /<em> int arg </em>/ );</p>
+<p>fcntl可以复制文件描述符[cmd=F_DUPFD]，可以获得/设置文件描述符[cmd=F_GETFD/F_SETFD]，可以获得/设置文件状态标志[cmd=F_GETFL/F_SETFL]，可以获得/设置异步I/O所有权[cmd=F_GETOWN/F_SETOWN]，可以获得/设置记录锁[cmd=F_GETLK / F_SETLK / F_SETLKW]。出错返回-1.</p>
+<p>习题3.2需要自己不用fcntl来实现一个dup2函数，有出错提示。一开始脑袋一团浆糊，网上搜到一篇写这个的，用dup函数实现，出错信息要考虑齐全，另外，就是从0到newfiledes这些描述符中，看是否打开，每个都需要试，最后如果所有条件都符合，就可以返回newfiledes，不过刚开始的童鞋可以先照着网上那份写，再自己慢慢揣摩。</p>
+<p>习题3-4中给出，很多程序中都包含下面一段代码：<br>dup2(fd,0);<br>dup2(fd,1);<br>dup2(fd,2);<br>if(fd &gt; 2)<br>close(fd);<br>问为啥要关闭，也就是最后的if意义和在，还需要画出fd=1和fd=3时每次调用dup2时3个描述符项及相应的文件表项的变化情况。</p>
+<p>首先，前面3句就是相当于重定向，所有的标准输入，标准输出和错误输出都会写道fd所指的文件中去。那么如果fd&gt;2的话，执行那3句之后就有4个文件描述符指向同一个文件表项了。但是如果fd&lt;3的话，就只有3个。所以需要手动的把fd关闭掉</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-11-15 </div>
+			<div class="article-title"><a href="/2012/11/15/advanced-programming-in-the-unix-environment-apue-h/" >Unix环境高级编程中大apue.h问题</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>看《Unix环境高级编程》第一章的时候，遇到的第一个问题就是书中的第一个例子找不到”apue.h”头文件，这个文件是作者编写的，处理的办法是：</p>
+<p>1.从<a href="http://www.apuebook.com/apue2e.html" target="_blank" rel="external">这里</a>下载所需要的文件。</p>
+<p>2.把src.tar.gz解压缩到你的home目录下（当然随便解压到哪都是一样的，这里只是为了方便描述）。</p>
+<p>3.进入到刚解压大apue.2e目录下，修改Make.defines.linux中的WKDIR，改成/home/user/apue.2e  [其中user是你的用户名]，然后把/apue.2e/std/中的linux.mk文件中大所有nawk改为awk</p>
+<p>4.把/home/user/apue.2e/include/apue.h和/home/user/apue.2e/lib/error.c两个文件都copy到/usr/include目录下,这一步需要root权限</p>
+<p>5.修改/usr/include/apue.h文件，在最后一行#endif的前面一行加上一句#include “error.c”然后就完工了，编译通过！</p>
+<p>好好学习，天天向上！</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -386,222 +472,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-10-16 </div>
-			<div class="article-title"><a href="/2012/10/16/structure-and-interpretation-of-computer-programs-1-1/" >Structure and Interpretation of Computer Programs 1.1</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>这几天没啥事的时候就看看这本书，感觉这书看上去就5章，可是每一章都好多内容，习题也不少，以前还打算每一章写一次习题报告，现在改变想法了，每一节写一下相关知识点习题解答，有些习题解答不怎么好描述，就在网上找了相关的链接放在这里。</p>
-<p>1.1 <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1" target="_blank" rel="external">The Elements of Programming</a></p>
-<p>主要介绍了一些基本东西，然后还介绍了一些scheme的基本语法之类的，分为3个方面讲: 1.<strong>primitive expressions; 2.<strong>means of combination; 3.<strong>means of abstraction. </strong></strong></strong>这个过程中讲解了scheme的一些基本语法，scheme的procedure怎么跑的，怎么写基本的procedure，以保证读者可以用scheme来完成接下来的习题。</p>
-<p>另外讲述了用Newton方法求平方根以及一些优化，Newton方法求平方根就是首先猜测一个值，然后看这个值是否足够好(平方之后是否和这个数相差很小)，然后如果不足够好的话，就用(y+x/y)/2来更新y，其中y是猜测的值，x是我们需要求平方根的值。</p>
-<p>函数/过程再调用的时候应该是一个黑箱操作，也就是我们只需要知道参数是什么，会返回什么，但是我们不需要知道里面的具体实现是什么。相应的，在实现函数/过程的时候，参数的取名就尽量取得有意义些，让调用这个函数/过程的人能够更好的使用它。</p>
-<p>下面是1.1节习题以及简要说明</p>
-<p>1.1 要读者写出每条语句会输出的答案，这个题目看过前面的知识之后，就没问题了，可以看<a href="http://community.schemewiki.org/?sicp-ex-1.1" target="_blank" rel="external">这里</a>对照答案</p>
-<p>1.2 把一个算术表达式转化为前缀表达式，(/ (+ 5 4 (- 2 (- 3 (+ 6 (/ 1 3))))) (* 3 (- 6 2) (- 2 7))), 注意括号</p>
-<p>1.3 定义一个procedure，接受3个参数，然后返回其中2个较大的值的平方和 我的程序:</p>
-<div class="dp-highlighter">
-
-<ol>
-<li><span><span>(define (square-larger x y z)   </span></span></li>
-<li><span>   (</span><span class="keyword">if</span><span> (&gt; x y)   </span></li>
-<li><span>      (</span><span class="keyword">if</span><span> (&gt; z y)   </span></li>
-<li><span>         (+ (square x) (square z))   </span></li>
-<li><span>         (+ (square x) (square y))   </span></li>
-<li><span>      )   </span></li>
-<li><span>      (</span><span class="keyword">if</span><span> (&gt; z x)   </span></li>
-<li><span>         (+ (square y) (square z))   </span></li>
-<li><span>         (+ (square y) (square x))   </span></li>
-<li><span>      )   </span></li>
-<li><span>   )   </span></li>
-<li><span>)  </span><br></li></ol></div><br>可以在<a href="http://community.schemewiki.org/?sicp-ex-1.3" target="_blank" rel="external">这里</a>看到更多种方法来解决这个问题
-
-<p>1.4给出一个procedure，让你解释这个procedure。”如果b &gt; 0 那么返回a+b 否则返回a-b”</p>
-<p>1.5给出一个procedure和调用procedure的语句，然后让你用applicative-order和normal-order分析这个procedure会输出什么，你看过applicative-order和normal-order的知识之后，就基本可以得到了，applicative-order是每次参数是procedure的话，就会调用procedure得到相应的答案，所以这里的话就会出现死循环了，但是normal-order的话就不管这么多了，等到需要这个procedure的返回值的时候，它才会去调用相应的procedure，所以这里就返回0</p>
-<p>1.6给你一个代替if的new-if  procedure，然后让你判断用new-if写出来的Newton方法在scheme下运行会输出什么。这个就用到了1.5中的相关知识了，因为scheme解释器用的是applicative-order，所以会死循环。</p>
-<p>1.7Newton求平方根的时候，怎么判断足够好，请你给出一个足够好的判断函数。这里可以通过判断每次更新的猜测值后更新前的猜测值之间的关系来判断(用y^2-x的差值来判断的话，对于很小的x和很大的x就会出现大误差)，比如更新后的猜测值和更新后的猜测值相差比小于0.01%等，也可以<a href="http://community.schemewiki.org/?sicp-ex-1.7" target="_blank" rel="external">查看这里</a>。</p>
-<p>1.8 给你一个更新函数，让你用Newton方法求一个数的三次方根，这个直接可以通过平方根的程序改编而来，当然判断足够好的函数还是需要自己来斟酌的。</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-10-08 </div>
-			<div class="article-title"><a href="/2012/10/08/scheme-and-the-little-scheme/" >Scheme &amp; The Little Scheme</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>很早前就想学一门脚本语言来玩玩，看了一段时间的python，可是没有继续好好的学下去，导致现在python基<br>本不会。暑假的时候看到<a href="http://blog.sina.com.cn/yinwang0" target="_blank" rel="external">王垠</a>的博客写了一篇文章，推荐了Scheme语言和SICP这本书，上网搜了下后面这本书，发现评论非常好，评价非常高，可以和TAOCP相比了。就打算看看这本神书，顺便做做后面的习题，网上很多大神已经写过题解，不过都是Scheme语言写的，所以就打算先学学Scheme语言。暑假看了《The Little Scheme》和《teach yourself scheme in fixnum days》的一部分，前面一本书是以Scheme语言为基础，主讲递归的思想(个人觉得讲的非常好，不过后面的章节需要一定的scheme语言基础)<br>后面这本书就是一本介绍scheme的书，比较薄，不过作为入门书还是可以的(用的scheme版本是R5RS)。<br>t-y Scheme里面首先也是讲数据类型 有boolean number string real等。在scheme里面最基本的东西就属<br>括号了，每一个过程都是用括号来表示，所以scheme的程序会有非常多的括号。而且表达式是前缀表达式，形如(+ 3 2)计算3+2的值，字符使用#\后面加上相应的字母来表示的，其他的和C语言差不多，<br>第三章讲述的是过程，类似于C语言中的函数，下面是一个例子</p>
-<div class="dp-highlighter"><br><div class="bar"></div>
-
-<ol>
-<li><span><span>(define area                                          ;定义过程 名字叫做area   </span></span></li>
-<li><span>   (lambda (length breadth)                           ;两个参数 分别是length 和breadth   </span></li>
-<li><span>      (* length breadth)                              ;计算并返回   </span></li>
-<li><span>   )   </span></li>
-<li><span>)   </span></li>
-<li><p><span>(area </span><span class="number">4</span><span> </span><span class="number">6</span><span>)                                            ;用area过程求值 结果为</span><span class="number">24</span><span>=</span><span class="number">4</span><span>*</span><span class="number">6</span><span>  </span><br></p></li></ol></div><br>过程可以用匿名过程，就是没有define那一行，其他地方都一样<br>第四章讲述的是各种判断，if、when等<p></p>
-<div class="dp-highlighter"><br><div class="bar"></div>
-
-<li><p><span><span>(define p </span><span class="number">80</span><span>)   </span></span></p>
-</li>
-<li><span>(</span><span class="keyword">if</span><span> (&gt; p </span><span class="number">70</span><span>)   </span></li>
-<li><span>    ‘safe         ;如果p &gt; </span><span class="number">70</span><span>  </span></li>
-<li><span>    ‘unsafe       ;</span><span class="keyword">else</span><span>  </span></li>
-<li><p><span>)  </span><br></p></li></div><br>;unless 貌似是不会循环的 ，我试验的结果是只运行了一次<p></p>
-<div class="dp-highlighter"><br><div class="bar"></div>
-
-<li><p><span><span>(unless (&gt; p </span><span class="number">90</span><span>)   </span></span></p>
-</li>
-<li><span> ; (begin   </span></li>
-<li><span>    (set! p (+ p </span><span class="number">1</span><span>))    ;   </span></li>
-<li><span>    (display p)   </span></li>
-<li><span>  ;  )   </span></li>
-<li><p><span> )  </span><br></p></li></div><br>when和unless类似，另外我们可以用过程来写递归或者循环，这里面的递归貌似都是尾递归的。不过循环还有<br>一种表达方式就是do表达式，语法如下<br>(do ((var1 val1 update1)…)(test res …) exp …)<br>;说明：类似于C语言的for循环。先将val1赋值给var1,…之后循环开始，在每次循环的开始，先执行表达式<br>test,<br>;如果返回布尔值真，则循环终止，并返回结果res，如果表达式test返回#f，则运行表达式exp…，之后依次<br>;用update1…的值来为变量var1…重新赋值<br>例子如下：<p></p>
-<div class="dp-highlighter"><br><div class="bar"></div>
-
-<li><p><span><span>(define </span><span class="keyword">do</span><span>-test                                 ;定义过程   </span></span></p>
-</li>
-<li><span>  (lambda (n)                                   ;一个参数 为n   </span></li>
-<li><span>    (</span><span class="keyword">do</span><span> ((sum </span><span class="number">0</span><span> (+ sum i)) (i </span><span class="number">1</span><span> (+ i </span><span class="number">1</span><span>)) )      ;sum 和i都赋初值，然后每次循环分别用 (+ sum i)和   </span>(+ i <span class="number">1</span>)来改变</li>
-<li><span>         ((&gt; i n) sum)                          ;如果i &gt; n则推出循环 返回sum   </span></li>
-<li><span>         (display sum)                          ;如果i &lt;= n 则循环    </span></li>
-<li><span>       )   </span></li>
-<li><span>      )   </span></li>
-<li><p><span>    )  </span><br></p></li></div><br>第五章讲的是变量的作用域，一般定义的是全局变量，在函数里面定义的只能在函数里面用，而且会屏蔽全局<br>同名变量，可以用let和let<em>来确定一个变量的作用域，let里面局部变量赋初值的时候不能用let里面定义的<br>变量，但是let</em>里面定义的局部变量可以用let*前面已经定义的局部变量来赋初值。例子如下<p></p>
-<div class="dp-highlighter"><br><div class="bar"></div>
-
-<li><p><span><span>(define x </span><span class="number">20</span><span>)   </span></span></p>
-</li>
-<li><span>(let (   </span></li>
-<li><span>      (x </span><span class="number">2</span><span>)   </span></li>
-<li><span>      (y x)         </span> ;let:a reference to x in the initialization will refer to the global,not the local x</li>
-<li><span>      )   </span></li>
-<li><span>  (+ x y)                         ;结果是</span><span class="number">20</span><span>+</span><span class="number">2</span><span>  </span></li>
-<li><span>  )   </span></li>
-<li><span>(let* (   </span></li>
-<li><span>       (x </span><span class="number">1</span><span>)   </span></li>
-<li><span>       (z </span><span class="number">2</span><span>)   </span></li>
-<li><span>       (y x)   </span></li>
-<li><span>       )   </span></li>
-<li><span>  (+ x y)                         ;结果是</span><span class="number">1</span><span>+</span><span class="number">1</span><span>  </span></li>
-<li><p><span>  )  </span><br></p></li></div><br>第六章里面讲了多个函数相互调用的递归和letrec，letrec和let，let<em>的功能类似，不过let</em>里面的赋初值<br>只能用前面已经出现过的局部变量，但是不能用没有出现过的，letrec却可以用后面才出现的局部变量和局部<br>过程。例子如下：<p></p>
-<div class="dp-highlighter"><br><div class="bar"></div>
-
-<li><p><span><span>(letrec ((local-even? (lambda (n) (</span><span class="keyword">if</span><span> (= n </span><span class="number">0</span><span>) #t (local-odd? (- n </span><span class="number">1</span><span>)))))   </span></span></p>
-</li>
-<li><span>      ;如果用let* 那么上面的local-odd?过程就会是未定义的   </span></li>
-<li><span>         (local-odd? (lambda (n) (</span><span class="keyword">if</span><span> (= n </span><span class="number">0</span><span>) #f (local-even? (- n </span><span class="number">1</span><span>))))))   </span></li>
-<li><p><span>      (list (local-even? </span><span class="number">23</span><span>) (local-odd? </span><span class="number">23</span><span>)))  </span><br></p></li></div><br>这一章还讲了一个用来翻转list的过程，不过由于R6RS中已经不能用set-cdr!了，所以只能用R5RS来实现，过<br>程如下:<p></p>
-<div class="dp-highlighter"><br><div class="bar"></div>
-
-<li><p><span><span>(define reverse!   </span></span></p>
-</li>
-<li><span>  (lambda (s)   </span></li>
-<li><span>    (let loop ((s s) (r ‘()))  ;定义s 和r 并赋初值   </span></li>
-<li><span>      (</span><span class="keyword">if</span><span> (</span><span class="keyword">null</span><span>? s) r   </span></li>
-<li><span>          (let ((d (cdr s)))   ;定义d 并赋初值   </span></li>
-<li><span>            (set-cdr! s r)   </span></li>
-<li><span>            (loop d s)   </span></li>
-<li><span>            )   </span></li>
-<li><span>          )   </span></li>
-<li><span>      )   </span></li>
-<li><span>    )   </span></li>
-<li><p><span>  )  </span><br></p></li></div><br>还有for-each 和 map两个东西，例子如下<p></p>
-<div class="dp-highlighter"><br><div class="bar"></div>
-
-<li><p><span><span>(</span><span class="keyword">for</span><span>-each display   </span></span></p>
-</li>
-<li><span>          (list </span><span class="string">“one”</span><span> </span><span class="string">“two”</span><span> </span><span class="string">“buckle my shoe”</span><span>)         ;输出onetwobuckle my shoe   </span></li>
-<li><span> )   </span></li>
-<li><p><span>(display (map cons ‘(</span><span class="number">1</span><span> </span><span class="number">2</span><span> </span><span class="number">3</span><span> </span><span class="number">4</span><span>) ‘(</span><span class="number">10</span><span> </span><span class="number">20</span><span> </span><span class="number">30</span><span> ())))        ;输出((</span><span class="number">1.10</span><span>) (</span><span class="number">2.20</span><span>) (</span><span class="number">3.30</span><span>) (</span><span class="number">4</span><span>));注意这里连接的两部分元素必须一样多  </span><br></p></li></div><br>第七章讲述了文件的基本操作，默认打开的是控制台，可以用open-input-file filename来打开输入文件，<br>open-output-file filename来打开输出文件，最后一定要关闭，不然操作的数据不会对文件进行相应的操作(<br>特指写功能)，可以用call-with-input-file  call-with-output-file来代替，这样的话可以不需要自己关<br>闭文件，处理完当前的任务就会自动关闭相应的文件，如果用open-output-file打开一个已经存在的文件的时<br>候，不加其他参数的话，是会报错的，如果想打开已经存在的文件可以加参数 #:extis ‘update/‘truncate<br>update的话是直接在原文件上从头开始修改，而truncate则是删掉旧文件，重新建一个新文件。例子如下<p></p>
-<div class="dp-highlighter"><br><div class="bar"></div>
-
-<li><p><span><span>(define i (open-input-file </span><span class="string">“hello.txt”</span><span>))           ;打开文件   </span></span></p>
-</li>
-<li><span>(read-</span><span class="keyword">char</span><span> i)                                      ;读取一个字符   </span></li>
-<li><span>(define j (read i))                                ;定义j为读取剩下的所有字符的一个字符串   </span></li>
-<li><span>(define o (open-output-file </span><span class="string">“greeting.txt”</span><span> #:exists ‘update))      ;以update方式打开一个文件   </span></li>
-<li><span>(display </span><span class="string">“hello”</span><span> o)                                ;输出hello   </span></li>
-<li><span>(write-</span><span class="keyword">char</span><span> #\space o)                             ;输出空格   </span></li>
-<li><span>(display ‘world o)                                 ;输出world   </span></li>
-<li><span>(newline o)                                        ;输出空行  </span><br></li></div><br>如果greeting.txt文件里面的文字原来是”abcdefthijklmn”的话,那么上述操作会使得文件的内容变成”hello<br>worldlmn”,但是如果用truncate方式打开的话，那么就会变成”hello world”
-
-<p>顺便把The Little Scheme的commandment贴在这</p>
-<p><span style="color: #ff0000;">First</span>: When recurring on a list of atoms, lat, ask two questions about it: (null? lat) and else.<br>When recurring on a number, n, ask two questions about it: (zero? n) and else.<br>When recurring on a list of S-expressions, l, ask three questions about it: (null? l), (atom? (car l)), and else.</p>
-<p><span style="color: #ff0000;">Second</span>: Use cons to build lists.</p>
-<p><span style="color: #ff0000;">Third</span>: When building a list, describe the first typical element, and then cons it onto the natural recursion.</p>
-<p><span style="color: #ff0000;">Fourth</span>: Always change at least one argument while recurring .When recurring on a list of atoms, lat, use(cdr lat). When recurring on a number, n, user (sub1 n). And when recurring on a list of S-expressions, l, use (car l) and (cdr l) if neither (null? l) nor (atom? (car l)) are true.<br>It must be changed to be closer to termination. The changing argument must be tested in the termination condition:<br>when using cdr, test termination with null? and<br>when using sub1, test termination with zero?.</p>
-<p><span style="color: #ff0000;">Fifth</span>: When building a value with + , always use 0 for the value of the terminating line, for adding 0 does not change the value of an addition.<br>When building a value with x[multiply] , always use 1 for the value of the terminating line, for multiplying by 1 does not change the value of a multiplication.<br><span style="color: #ff0000;">Sixth</span>: Simplify only after the function is correct.</p>
-<p><span style="color: #ff0000;">Seventh</span>: Recur on the subparts that are of the smae nature:<br>On the sublists of a list.<br>On the subexpressions of an arithmetic expression.</p>
-<p><span style="color: #ff0000;">Eighth</span>: Use help functions to abstract from representations.</p>
-<p><span style="color: #ff0000;">Ninth</span>:  Abstract common patterns with a new function.</p>
-<p><span style="color: #ff0000;">Tenth</span>:  Build functions to collect more than one value at a time.<br>这书断断续续的看了一段时间，打算现在开始边看t-y-scheme边看SICP，然后把SICP的每一章课后习题都做了<br>，也好督促自己好好学习。</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-09-27 </div>
-			<div class="article-title"><a href="/2012/09/27/concrete-mathematics-chapter-1-homework-exercises/" >具体数学第一章习题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>对于《具体数学》的所有问题，欢迎邮件联系讨论 Email:qcx978132955#gmail.com</p>
-<p>上一篇已经写了第一章大致的内容，这里写一下第一章的Homework Exercises的习题简单分析，有些是参考了后面的习题解答。</p>
-<p>8.可以自己推出Q[0],Q[1],Q[2],Q[3],Q[4],Q[5],Q[6],然后就可以看到循环了。</p>
-<p>9. a)直接把x[n]=(x[1]+…x[n-1])/(n-1)代入两边，然后化简之后就可以得到P[n-1]了</p>
-<p>b)x[1]<em>…</em>x[n]&lt;=((x[1]+…x[n])/n*(x[n+1]+…x[2n])/n)^2n<br>&lt;=((x[1]+…+x[2n])/2n)^2n         ====&gt;这里用到了P[2]</p>
-<p>c)不是很懂，<del>一开始以为不能用a)的那个式子，后来找了好多加看了习题解貌似是承认a)中的那个式子的</del>，对于a)中的那个其实是成立的，只不过a)中给出来，让我们更好证明一些(对于a中的证明，我们需要考虑的是x[1]*…x[n-1]&lt;=((x[1]+…+x[n-1]/(n-1))^(n-1)  首先我们知道P[n]是对x[n]为任意数成立的，那么我们就可以设x[n]=(x[1]+…+x[n-1])/(n-1)，然后就证明了)然后P[2]-&gt;P[4], P[4]-&gt;P[3],P[3]P[2]-&gt;P[5],依次类推，就可以知道所有的P[n]都成立。</p>
-<p>10.照着前面汉诺塔的模式推导就OK了</p>
-<p>11.a)假设最后所需的是T[n]，那么T[n]=T[n-1]+2+T[n-1]{首先把上面2n-2个放到第2个柱子上，然后把最下面两个放到第3个柱子上，因为不用考虑顺序，所以这样放就行了，最后把第2个柱子上的2n-2个移到第3个柱子上就行了}，最后得到T[n]=2^(n+1)+2<br>b)假设最后所需要的是S[n],首先我们从a)中可以知道如下一个结论，也就是在a)的规则中，最后只有最下面两个是互换顺寻的，上面的n-1对中，相同大小的Hanoi是没有换位置的(移了2次，第一次之后换了位置，然后第二次又换回来了).那么我们就可以的得到S[n]=T[n-1]+2+T[n-1]+2+S<a href="先把上面2n-2个移到第3个柱子上，然后把最下面的两个移到第2个柱子上，此时这两个的顺序是颠倒的，然后把上面2n-2个移会第1个柱子上，然后再把最下面的2个移到第3个柱子上，最后把上面2n-2个移到第3个柱子上">n-1</a>。</p>
-<p>12可以由11.a)扩展得到 如果所有的m[k]&gt;0,那么A(m[1],…m[n])=A(m[1],…,m[n-1])+m[n],另外如果最后顺序不能颠倒的话用B(m[1],…m[n])表示，那么最后B(m[1],…m[n])的表达式为<br>{                      A(m[1],….m[n])               if  m[n]=1<br>B(m[1],…m[n])       =    {                      2<em>m[n]-1                              if   n=1<br>{                      2</em>A(m[1],…m[n-1])+2*m[n]+B(m[1],…m[n-1])   if  n&gt;1 &amp; m[n]&gt;1</p>
-<p>13.照着书上给的那个射线的样子分析就行了，这里在ZZ[n-1]的情况下，然后考虑加入第n条ZZ线，可以知道只有让第n条ZZ线的3条”线”和前面的n-1条ZZ线都相交这样得到的区域最多，然后第n条ZZ线自己可以多出几个区域(因为是ZZ型的，注意拐角两边的区域是同一个区域，不要多算了)，这样就得到一个通式ZZ[n]=ZZ[n-1]+9*n-8</p>
-<p>14.这个最后得到1维是C(n,0)+C(n,1)  2维是C(n,0)+C(n,1)+C(n,2)   3维是C(n,0)+C(n,1)+C(n,2)+C(n,3)</p>
-<p>15.可以照着书上第15页那个展开式来写，这样的话只要考虑最后I[n]中n必须大于1，I(1)没有意义。另外可以按照书上Josephus Problem最开始的解法那样，写出递推式,然后可以解出来或者写出1-16(上限大一点好看规律，当然这也可以退出来)。然后可以得到最后的I(3<em>2^n+l)=2</em>l+1 其中m&gt;=0 &amp; 0&lt;=l&lt;3*2^m &amp;&amp; I(2) = 2</p>
-<p>16.由repertoire method我们可以假设g[n]=α<em>A[n]+β[0]</em>B[n]+β[1]<em>C[n]+γ</em>D[n].但是我一直只能找到两个式子，g[n]=1和g[n]=2这两个式子会得到  A[n]-2<em>B[n]-2</em>C[n]=1 &amp; A[n]+C[n]-D[n]=n，但是当我去解g[n]=n^2或者g[n]=1/n等其他的时候总是得到一些矛盾的东西，后来看了书后的解答，可以没有看出其中的奥秘，然后在网上各种搜题解，看到<a href="http://blog.wakatta.jp/blog/2012/01/14/concrete-mathematics-repertoire-method/" target="_blank" rel="external">这里</a>和<a href="http://ishare.iask.sina.com.cn/f/33662431.html" target="_blank" rel="external">这里</a>,才发现自己对那个repertoire method还是没有完全了解，照着上面给的两个链接我们可以得到最后的结果。</p>
-<p>继续加油，好好努力，天天向上。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -612,13 +482,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/7/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
+    	<li class="prev"><a href="/page/7/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/9/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/9/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -638,7 +508,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -647,16 +517,16 @@
 		
 			
 	<div class="widget">
-		<h4>Categorias</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -676,19 +546,21 @@
 		
 			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
 		
-			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+			<li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li>
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
-			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+			<li><a href="/categories/我的生活/">我的生活<span>9</span></a></li>
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
@@ -698,25 +570,29 @@
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
+			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>2</span></a></li>
 		
 		</ul>
 	</div>
@@ -727,48 +603,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
+			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
 		
-			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
+			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
 		
-			<li><a href="/tags/zookeeper/">zookeeper<span>3</span></a></li>
+			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
 		
-			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
-		
-			<li><a href="/tags/sap/">sap<span>1</span></a></li>
-		
-			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
-		
-			<li><a href="/tags/read/">read<span>3</span></a></li>
-		
-			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
-		
-			<li><a href="/tags/storm/">storm<span>3</span></a></li>
-		
-			<li><a href="/tags/reservior/">reservior<span>1</span></a></li>
-		
-			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
-		
-			<li><a href="/tags/office/">office<span>1</span></a></li>
-		
-			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
+			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
 		
 			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
 		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
+			<li><a href="/tags/chinese/">chinese<span>1</span></a></li>
 		
-			<li><a href="/tags/fork/">fork<span>2</span></a></li>
+			<li><a href="/tags/windows/">windows<span>4</span></a></li>
 		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
+			<li><a href="/tags/code/">code<span>2</span></a></li>
 		
-			<li><a href="/tags/i-o-multiplexing/">i/o multiplexing<span>1</span></a></li>
+			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
 		
-			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
+			<li><a href="/tags/zookeeper/">zookeeper<span>3</span></a></li>
 		
-			<li><a href="/tags/rename/">rename<span>1</span></a></li>
+			<li><a href="/tags/command/">command<span>1</span></a></li>
+		
+			<li><a href="/tags/数论/">数论<span>5</span></a></li>
+		
+			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
+		
+			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+		
+			<li><a href="/tags/latex/">latex<span>1</span></a></li>
+		
+			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
+		
+			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
+		
+			<li><a href="/tags/horn-formulas/">horn formulas<span>1</span></a></li>
+		
+			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
+		
+			<li><a href="/tags/递归/">递归<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>266</span></a></li>
+		   <li><a href="/tags">...<span>270</span></a></li>
 		 
 		</ul>
 	</div>
@@ -777,7 +653,7 @@
 		
 			
 <div class="widget">
-  <h4>Posts recentes</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
     
       <li>
@@ -793,11 +669,11 @@
       </li>
     
       <li>
-        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+        <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
       <li>
-        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+        <a href="/2017/05/10/Python-代码实践小结/" ><i class="fa fa-file-o"></i>Python 代码实践小结</a>
       </li>
     
   </ul>

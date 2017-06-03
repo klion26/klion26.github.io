@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Página 17 | klion26</title>
+  <title>Page 17 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -114,6 +114,155 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-02-11 </div>
+			<div class="article-title"><a href="/2011/02/11/usaco-4-2-2-the-perfect-stall-dinic/" >USACO 4-2-2 The Perfect Stall --网络流dinic算法</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://www.nocow.cn/index.php/Translate:USACO/stall4" target="_blank" rel="external">题意</a></p>
+<p>利用这题学习了下dinic.题意就不说了,很容易理解的一题</p>
+<p>以前网络流的算法一直只懂最白痴的EK,后来大家说sap是万能的,于是就想学学sap,可是找了些资料之后发现我先学会的是dinic.下面说说我的理解吧.如有错误还请指出.<br>首先说明下层次图的概念:对原图的每一个点设置一个层次,这个新图就成了所谓的层次图了.然后允许弧就是层次图中有边且原图中也有边的弧.<br>dinic就是利用层次图,然后每次找增广路径的时候就只走允许弧,如果单纯这样的话,个人认为和EK算法还是差不了多少的,毕竟dinic也是多次bfs然后再dfs找增广路,那我不还如EK呢,何况EK还简单不易写错.dinic的精华应该是退栈,也就是dfs找到一条增广路之后,并不是再从源点开始找一次,而是退到从源点可达的最远一个点[这样说来很抽象]比如下面的例子<br>ab = 10  bc = 5 cd = 5 bf=5 fd=5 de=10[abcdef是顶点]<br>那么源点是a汇点是f的话<br>栈中情况是a-&gt;ab-&gt;abc-&gt;abcd-&gt;abcde–增广—然后退到b因为b是栈中a现在能够到达的最远的顶点了.现在从b开始增广就会出现时ab-&gt;abf-&gt;abfd-&gt;abfde—增广也就是dinic的精华在这里;具体的大家可以看2007年王上欣的论文&lt;浅谈基于分层思想的网络流算法&gt;<br>下面给出我的一份代码,经供参考</p>
+<p><div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">ID:qcx97811</span><br><span style="color: #da70d6;">LANG:C</span><br><span style="color: #da70d6;">TASK:stall4</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><span style="color: #eeee00;">#include <limits.h></limits.h></span></div><br><span style="font-weight: bold; color: #98fb98;">int</span> N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">maxflow</span><span style="color: #da70d6;">//N和M是题目中的意思 maxflow就是最大流的值</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">406</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">406</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">406</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">d</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">406</span><span style="color: #f5deb3;">];</span><span style="color: #da70d6;">//graph是图 pre是每个节点的前驱 d表示每个节点的层次</span></p>
+<p><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">outdegree</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">now</span>)<br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//返回传入顶点的出度包括在层次图中的信息</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">out</span><br>    <span style="color: #f5deb3;">out</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #da70d6;">//out代表传入顶点的出度</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;=</span> (N<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>);<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">if</span>(((<span style="color: #f5deb3;">d</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">now</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+</span> <span style="color: #add8e6;">1</span>) <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">d</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span> <span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">now</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #add8e6;">0</span>)<br>            <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//这里用break是因为只需要知道出度是否为0 不需要知道度为多少</span><br>                <span style="color: #f5deb3;">out</span><span style="color: #f5deb3;">++</span><br>                <span style="font-weight: bold; color: #b0c4de;">break</span><br>            <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">out</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">dinic</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">front</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">out</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">top</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">add</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">406</span><span style="color: #f5deb3;">];</span><br>    <span style="color: #f5deb3;">maxflow</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #add8e6;">1</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #da70d6;">//通过bfs重构层次图</span><br>            <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">d</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">d</span>));<br>            <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">pre</span>));<br>            <span style="color: #f5deb3;">d</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #da70d6;">//这里pre数组相当于一个bool数组记录某个顶点是否被用</span><br>            <span style="color: #f5deb3;">rear</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">front</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>            <span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">++</span><br>            <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br>            <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #f5deb3;">front</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">rear</span>)<br>                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//bfs构建层次图</span><br>                    <span style="color: #f5deb3;">u</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">front</span><span style="color: #f5deb3;">];</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;=</span> (N<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>);<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                        <span style="color: #f5deb3;">{</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #add8e6;">0</span>)<br>                                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//如果这个点没有被用而且残留网络中有边</span><br>                                    <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">u</span><span style="color: #da70d6;">//记录当前顶点已经被用</span><br>                                    <span style="color: #f5deb3;">d</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">d</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+</span> <span style="color: #add8e6;">1</span><span style="color: #da70d6;">//层次加1</span><br>                                    <span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">++</span><span style="color: #da70d6;">//入队</span><br>                                    <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><br>                                <span style="color: #f5deb3;">}</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span></p>
+<pre><code>    &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;if&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color: #add8e6;&quot;&gt;1&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;==&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;pre&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;N&lt;span style=&quot;color: #f5deb3;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;M&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color: #add8e6;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;])&lt;/span&gt;
+        &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;break&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//如果汇点不在层次图中标明已无增广路径&lt;/span&gt;
+
+    &lt;span style=&quot;color: #f5deb3;&quot;&gt;out&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;outdegree&lt;/span&gt;(&lt;span style=&quot;color: #add8e6;&quot;&gt;0&lt;/span&gt;);
+
+    &lt;span style=&quot;color: #f5deb3;&quot;&gt;top&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #add8e6;&quot;&gt;0&lt;/span&gt;
+    &lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;top&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #add8e6;&quot;&gt;0&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//这里的q是用来记录增广路径上的点&lt;/span&gt;
+    &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;while&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;out&lt;/span&gt;)&lt;span style=&quot;color: #da70d6;&quot;&gt;//循环直到源点的出度为0&lt;/span&gt;
+        &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;
+            &lt;span style=&quot;color: #f5deb3;&quot;&gt;u&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;top&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;];&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//取栈顶元素&lt;/span&gt;
+            &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;if&lt;/span&gt;((N&lt;span style=&quot;color: #f5deb3;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;M&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color: #add8e6;&quot;&gt;1&lt;/span&gt;) &lt;span style=&quot;color: #f5deb3;&quot;&gt;==&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;u&lt;/span&gt;)&lt;span style=&quot;color: #da70d6;&quot;&gt;//如果已经找到一条增广路径&lt;/span&gt;
+                &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//增广 然后队列回退到从源点可达的最远点&lt;/span&gt;
+                    &lt;span style=&quot;color: #f5deb3;&quot;&gt;add&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;INT_MAX&lt;/span&gt;
+                    &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;for&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #add8e6;&quot;&gt;0&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;&lt;&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;top&lt;/span&gt;;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;++&lt;/span&gt;)
+                        &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//判定本次可增广的流量&lt;/span&gt;
+                            &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;if&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;graph&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]][&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color: #add8e6;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]]&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;&lt;&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;add&lt;/span&gt;)
+                                &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;
+                                    &lt;span style=&quot;color: #f5deb3;&quot;&gt;add&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;graph&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]][&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color: #add8e6;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]];&lt;/span&gt;
+                                &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+                        &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;   
+                    &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;for&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #add8e6;&quot;&gt;0&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;&lt;&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;top&lt;/span&gt;;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;++&lt;/span&gt;)
+                        &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//更新残留网络&lt;/span&gt;
+                            &lt;span style=&quot;color: #f5deb3;&quot;&gt;graph&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]][&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color: #add8e6;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]]&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;-=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;add&lt;/span&gt;
+                            &lt;span style=&quot;color: #f5deb3;&quot;&gt;graph&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color: #add8e6;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]][&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]]&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;+=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;add&lt;/span&gt;
+                        &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+                    &lt;span style=&quot;color: #f5deb3;&quot;&gt;maxflow&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;+=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;add&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//增加网络流量&lt;/span&gt;
+                    &lt;span style=&quot;color: #da70d6;&quot;&gt;//下面回退到从源点可达的最远的一个点&lt;/span&gt;
+                    &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;for&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #add8e6;&quot;&gt;0&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;&lt;=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;top&lt;/span&gt;;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;++&lt;/span&gt;)
+                        &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;
+                            &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;if&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;outdegree&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;])&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;==&lt;/span&gt; &lt;span style=&quot;color: #add8e6;&quot;&gt;0&lt;/span&gt;)
+                                &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//这里不应该只考虑出度还应该考虑和q中的下一个元素是否有边(包括层次图和残留网络)&lt;/span&gt;
+                                    &lt;span style=&quot;color: #f5deb3;&quot;&gt;top&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color: #add8e6;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//这个地方如果出现top=-1应该也没问题的 因为这样的话out已经为0了&lt;/span&gt;
+                                    &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;break&lt;/span&gt;
+                                &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+                            &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;if&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;graph&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]][&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color: #add8e6;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]]&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;&lt;=&lt;/span&gt; &lt;span style=&quot;color: #add8e6;&quot;&gt;0&lt;/span&gt;)
+                                &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//这个是防止某个点出度不为0但是q中这个点和下一个点的边已经为0了 那么就会一直死循环在里面这个while里&lt;/span&gt;
+                                    &lt;span style=&quot;color: #f5deb3;&quot;&gt;top&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;
+                                    &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;break&lt;/span&gt;
+                                &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+                        &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+                &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+            &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;else&lt;/span&gt;
+                &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;
+                    &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;if&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;outdegree&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;u&lt;/span&gt;) &lt;span style=&quot;color: #f5deb3;&quot;&gt;&gt;&lt;/span&gt; &lt;span style=&quot;color: #add8e6;&quot;&gt;0&lt;/span&gt;)
+                        &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//该点的出度不为0 则改变队列 把当前顶点入队这里的出度包括层次图的信息&lt;/span&gt;
+                            &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;for&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #add8e6;&quot;&gt;0&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;&lt;=&lt;/span&gt; (N&lt;span style=&quot;color: #f5deb3;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;M&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color: #add8e6;&quot;&gt;1&lt;/span&gt;);&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;++&lt;/span&gt;)
+                                &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//寻找u顶点的下一个顶点&lt;/span&gt;
+                                    &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;if&lt;/span&gt;(&lt;span style=&quot;color: #f5deb3;&quot;&gt;d&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;u&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color: #add8e6;&quot;&gt;1&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;==&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;d&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;graph&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;u&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;][&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;&gt;&lt;/span&gt; &lt;span style=&quot;color: #add8e6;&quot;&gt;0&lt;/span&gt;)
+                                        &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;
+                                            &lt;span style=&quot;color: #f5deb3;&quot;&gt;top&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;++&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//入栈&lt;/span&gt;
+                                            &lt;span style=&quot;color: #f5deb3;&quot;&gt;q&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;top&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;i&lt;/span&gt;
+                                            &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;break&lt;/span&gt;
+                                        &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+                                &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+                        &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+                    &lt;span style=&quot;font-weight: bold; color: #b0c4de;&quot;&gt;else&lt;/span&gt;
+                        &lt;span style=&quot;color: #f5deb3;&quot;&gt;{&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//弹出队列的最高顶点&lt;/span&gt;
+                            &lt;span style=&quot;color: #f5deb3;&quot;&gt;d&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;u&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;]&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color: #add8e6;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//当前顶点从层次图中删除&lt;/span&gt;
+                            &lt;span style=&quot;color: #f5deb3;&quot;&gt;top&lt;/span&gt;&lt;span style=&quot;color: #f5deb3;&quot;&gt;--&lt;/span&gt;&lt;span style=&quot;color: #da70d6;&quot;&gt;//从栈中删除&lt;/span&gt;
+                        &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+                &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+            &lt;span style=&quot;color: #f5deb3;&quot;&gt;out&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;=&lt;/span&gt; &lt;span style=&quot;color: #f5deb3;&quot;&gt;outdegree&lt;/span&gt;(&lt;span style=&quot;color: #add8e6;&quot;&gt;0&lt;/span&gt;);&lt;span style=&quot;color: #da70d6;&quot;&gt;//判定当前源点的出度&lt;/span&gt;
+        &lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+&lt;span style=&quot;color: #f5deb3;&quot;&gt;}&lt;/span&gt;
+</code></pre><p><span style="color: #f5deb3;">}</span></p>
+<p><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">main</span>(<span style="font-weight: bold; color: #98fb98;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“stall4.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdin</span>);<br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“stall4.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdout</span>);<br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">ct</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">c</span><br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">graph</span>));<br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">M</span>);<br>    <span style="color: #da70d6;">/<em>下面是初始化图</em>/</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;=</span> N;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">ct</span>);<br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">ct</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">c</span>);<br>                    <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">+</span>N<span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;=</span> N;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> N<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;=</span> (N<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">M</span>);<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span>N<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><br>    <span style="color: #da70d6;">/<em>上面是初始化图</em>/</span><br>    <span style="color: #f5deb3;">dinic</span>();<span style="color: #da70d6;">//调用dinic求最大流</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">maxflow</span>);<span style="color: #da70d6;">//输出最大流</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-02-10 </div>
+			<div class="article-title"><a href="/2011/02/10/networkflow-1-maximum-matching/" >网络流24题之一最大匹配</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://acm.nankai.edu.cn/p2121.html" target="_blank" rel="external">此处可提交</a></p>
+<p>我用的还是最原始的EK算法,建图也比较简单,只要某两个人能配合好就给一个权值为1的边,然后增加一个超级源点和汇点,剩下的就是最大流了.不过最后输出时注意下(输出配对关系的时候),比如下面这组数据</p>
+<p>2 4</p>
+<p>1 3</p>
+<p>1 4</p>
+<p>2 3</p>
+<p>-1 -1</p>
+<p>代码如下:</p>
+<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">  LANG:C</span><br><span style="color: #da70d6;">  TASK:</span><br><span style="color: #da70d6;">  ID:qcx97811</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">106</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">106</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">106</span><span style="color: #f5deb3;">];</span><br><span style="font-weight: bold; color: #98fb98;">int</span> N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">maxflow</span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">bfs</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">206</span><span style="color: #f5deb3;">];</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">front</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">rear</span><br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">pre</span>));<br>    <span style="color: #f5deb3;">front</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">rear</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>    <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #f5deb3;">front</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">rear</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">front</span><span style="color: #f5deb3;">];</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">&lt;=</span> (N<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>);<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #add8e6;">0</span>)<br>                        <span style="color: #f5deb3;">{</span><br>                            <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><br>                            <span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">++</span><br>                            <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">j</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">==</span> (N<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>))<br>                                <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">1</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">max_flow</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">add</span><br>    <span style="color: #f5deb3;">maxflow</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">!=</span> (<span style="color: #f5deb3;">add</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">bfs</span>()))<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">add</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">10000006</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> (N<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>);<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">add</span>)<br>                        <span style="color: #f5deb3;">add</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> (N<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>);<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                    <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">-=</span> <span style="color: #f5deb3;">add</span><br>                    <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">add</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="color: #f5deb3;">maxflow</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">add</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">main</span>(<span style="font-weight: bold; color: #98fb98;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“24-1.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdin</span>);<br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“24-1.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdout</span>);<br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span>s<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">e</span><br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span>N);<br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">graph</span>));<br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #add8e6;">1</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>s<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">e</span>);<br>            <span style="font-weight: bold; color: #b0c4de;">if</span>((<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">==</span> s) <span style="color: #f5deb3;">&amp;</span> (<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">e</span>))<br>                <span style="font-weight: bold; color: #b0c4de;">break</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(s <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">e</span>)<br>                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//确定是从一个方向流往另外一个方向</span><br>                    <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> s;<br>                    s <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">e</span><br>                    <span style="color: #f5deb3;">e</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span>s<span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #f5deb3;">M</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<span style="color: #da70d6;">//超级源点</span><br>        <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;=</span> N;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<span style="color: #da70d6;">//超级汇点</span><br>        <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span>N<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><br>    <span style="color: #f5deb3;">max_flow</span>();<br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">maxflow</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“No Solution</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">else</span><br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">maxflow</span>);<br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #f5deb3;">M</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>);<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">&lt;=</span> N;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                        <span style="color: #f5deb3;">{</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">1</span>)<br>                                <span style="color: #f5deb3;">{</span><br>                                    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%d %d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>);<br>                                <span style="color: #da70d6;">//这里的输出注意下 附数据如下</span><br>                                <span style="color: #da70d6;">//2 4</span><br>                                <span style="color: #da70d6;">//1 3</span><br>                                <span style="color: #da70d6;">//1 4</span><br>                                <span style="color: #da70d6;">//2 3</span><br>                                <span style="color: #da70d6;">//-1 -1</span><br>                                <span style="color: #f5deb3;">}</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-02-10 </div>
+			<div class="article-title"><a href="/2011/02/10/usaco-4-2-1-drainage-ditches/" >USACO 4-2-1Drainage Ditches</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://www.nocow.cn/index.php/Translate:USACO/ditch" target="_blank" rel="external">题目翻译</a></p>
+<p>一个入门的网络流题目,由于点和边都不多,所以我用了原始的EK算法(其实当时我也只会这最原始的算法),也就是每次用bfs找增广路,复杂度是O(V*E^2)。下面直接给出代码</p>
+<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">  LANG:C</span><br><span style="color: #da70d6;">  TASK:ditch</span><br><span style="color: #da70d6;">  ID:qcx97811</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">206</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">206</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">206</span><span style="color: #f5deb3;">];</span><span style="color: #da70d6;">//graph是原图,pre是用来存每个点的前驱的</span><br><span style="font-weight: bold; color: #98fb98;">int</span> N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">maxflow</span><span style="color: #da70d6;">//N和M是题中的 maxlfow就是结果了</span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">bfs</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">206</span><span style="color: #f5deb3;">];</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">front</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">rear</span><br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">pre</span>));<br>    <span style="color: #f5deb3;">front</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">rear</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>    <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #f5deb3;">front</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">rear</span>)<span style="color: #da70d6;">//bfs找一条从源点到汇点的路径</span><br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">front</span><span style="color: #f5deb3;">];</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #f5deb3;">M</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #add8e6;">0</span>)<br>                        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//如果当前点没有没用而且可用</span><br>                            <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><br>                            <span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">++</span><br>                            <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">j</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">M</span>)<span style="color: #da70d6;">//如果已经到了汇点 也就是已经找到一条增广路径</span><br>                                <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">1</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">max_flow</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">add</span><br>    <span style="color: #f5deb3;">maxflow</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">!=</span> (<span style="color: #f5deb3;">add</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">bfs</span>()))<br>        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//如果还有增广路径</span><br>            <span style="color: #f5deb3;">add</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">10000006</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">1</span>;<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//找出本次能增广的最大流量</span><br>                    <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">add</span>)<br>                        <span style="color: #f5deb3;">add</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">1</span>;<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//改变残留网络</span><br>                    <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                    <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">-=</span> <span style="color: #f5deb3;">add</span><br>                    <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">add</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="color: #f5deb3;">maxflow</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">add</span><span style="color: #da70d6;">//更改结果</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">main</span>(<span style="font-weight: bold; color: #98fb98;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“ditch.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdin</span>);<br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“ditch.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdout</span>);<br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span>s<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">c</span><br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">M</span>);<br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">graph</span>));<br>    <span style="color: #da70d6;">//下面是建图</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> N;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>s<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">c</span>);<br>            <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span>s<span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">c</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">max_flow</span>();<span style="color: #da70d6;">//调用max_flow得到结果</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">maxflow</span>);<br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -343,83 +492,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2010-12-16 </div>
-			<div class="article-title"><a href="/2010/12/16/wordpress-link-order/" >WordPress链接自定义排序[不用插件]</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>wordpress的链接默认排序是按字典序的,这点有些不爽,有时需要自己改变某些顺序,可是改不了.这就让人很郁闷了,今天上网搜了下,发现原来wordpress是提供的,具体的如下</p>
-<p>打开sidebar.php,找到wp_list_bookmarks,然后用orderby=””[后面填你想用的排序方式]</p>
-<p>orderby： 显示链接的排序方式，默认是 name，要自定义排序，就用这个参数</p>
-<p>取值范围：</p>
-<p>‘id’ – 链接的后台ID编号<br>‘url’ – 链接的URL地址<br>‘name’ – 链接的网站名称<br>‘target’ – 链接的打开方式<br>‘description’ – 链接的描述<br>‘owner’ – 链接的创建者<br>‘rating’ – 链接的分级<br>‘updated’ – 链接的发布时间<br>‘rel’ – 链接与本站的关系 (XFN).<br>‘notes’ – 链接的备注<br>‘rss’   – 链接的feed地址<br>‘length’ – 链接的网站名称的字符串长度<br>‘rand’ – 随机排序</p>
-<p>limit:  显示的链接个数，默认是 -1（全部），要限制显示条数，就用这个参数</p>
-<p>order: 排序的升降， 默认是 升序 ASC， 如果降序，用 DESC<br>参考<a href="http://www.mxyge.cn/?p=1123" target="_blank" rel="external">这位博主的</a></p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2010-12-15 </div>
-			<div class="article-title"><a href="/2010/12/15/xampp-apache-cant-work-80-port/" >xampp的apache无法启动【无软件占用80端口】</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>非常郁闷的事情,xampp的apache一直无法启动,以为是其他什么软件占用了80端口,一顿狂扫,发现遨游在用,于是乎关掉遨游,可是奇怪的是关掉之后,还是不行.netstat一下发现没人在用80端口,可是xampp就一直报错,去网上找啊找,有人说改tcp/ip的属性,好吧,那就试试,可是改了还是不行,那就继续找解决办法呗,找到一个说是oracle10g引起的,于是想起前几天我刚装oracle,就试试吧,可是找不到环境变量中的perl5lib，那就把oracle的服务一个一个关掉,果然关掉之后就可以启动了,一起顺利,啦啦啦～～～</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2010-12-15 </div>
-			<div class="article-title"><a href="/2010/12/15/vmware-redhat9-cant-mount/" >VMware 安装RedHat9时光盘无法挂载</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>昨天,同学把我叫过去,让我帮他装RedHat9.以前我也没装过RedHat9,不过我想应该很容易的,和其他的Linux系统应该没什么差别.不过中间还是遇到了一个小问题。问题如下 当第一个ISO文件安装完成后,得换盘.这时问题来了,换了盘之后出现无法挂载(could not mount).这个原因其实是VMware造成的.也就是说,当你的第一个ISO完成安装后,VMware把它弹出来了,这时它会断掉CD connection.如下图:[红色的地方]</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/vware.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/vware-300x194.jpg" alt="" title="vware"></a></p>
-<p>这时红色箭头所指的地方是没勾上的.也就是会出线无法挂载的问题.只要勾上就行了,然后换盘就可以继续安装了。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -430,13 +502,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/16/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
+    	<li class="prev"><a href="/page/16/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/18/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/18/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -456,7 +528,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -465,16 +537,16 @@
 		
 			
 	<div class="widget">
-		<h4>Categorias</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -494,19 +566,21 @@
 		
 			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
 		
-			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
+			<li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li>
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
-			<li><a href="/categories/我的生活/">我的生活<span>8</span></a></li>
+			<li><a href="/categories/我的生活/">我的生活<span>9</span></a></li>
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
@@ -516,25 +590,29 @@
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
+			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>2</span></a></li>
 		
 		</ul>
 	</div>
@@ -545,48 +623,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
+			<li><a href="/tags/MST/">MST<span>1</span></a></li>
 		
 			<li><a href="/tags/安全/">安全<span>1</span></a></li>
 		
-			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
+			<li><a href="/tags/数论/">数论<span>5</span></a></li>
 		
-			<li><a href="/tags/top排序/">top排序<span>2</span></a></li>
+			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
 		
-			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
+			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
 		
-			<li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
+			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
 		
-			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
+			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
 		
-			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
+			<li><a href="/tags/gdb/">gdb<span>2</span></a></li>
 		
-			<li><a href="/tags/dag/">dag<span>1</span></a></li>
+			<li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li>
 		
-			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
 		
-			<li><a href="/tags/i-o-multiplexing/">i/o multiplexing<span>1</span></a></li>
+			<li><a href="/tags/grub/">grub<span>2</span></a></li>
 		
-			<li><a href="/tags/python/">python<span>1</span></a></li>
+			<li><a href="/tags/network/">network<span>1</span></a></li>
 		
-			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
+			<li><a href="/tags/command/">command<span>1</span></a></li>
 		
-			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
+			<li><a href="/tags/bit/">bit<span>0</span></a></li>
 		
-			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
 		
-			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+			<li><a href="/tags/写作/">写作<span>1</span></a></li>
 		
-			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
 		
-			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
+			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
+			<li><a href="/tags/metric/">metric<span>1</span></a></li>
 		
-			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
+			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>266</span></a></li>
+		   <li><a href="/tags">...<span>270</span></a></li>
 		 
 		</ul>
 	</div>
@@ -595,7 +673,7 @@
 		
 			
 <div class="widget">
-  <h4>Posts recentes</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
     
       <li>
@@ -611,11 +689,11 @@
       </li>
     
       <li>
-        <a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" ><i class="fa fa-file-o"></i>Spark Streaming 统一在每分钟的 00 ...</a>
+        <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
       <li>
-        <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
+        <a href="/2017/05/10/Python-代码实践小结/" ><i class="fa fa-file-o"></i>Python 代码实践小结</a>
       </li>
     
   </ul>

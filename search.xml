@@ -49,15 +49,15 @@
         
         <tags>
             
-            <tag> thinking </tag>
-            
-            <tag> kafka </tag>
-            
-            <tag> problem_solve </tag>
-            
             <tag> spark </tag>
             
             <tag> spark_streaming </tag>
+            
+            <tag> kafka </tag>
+            
+            <tag> thinking </tag>
+            
+            <tag> problem_solve </tag>
             
         </tags>
         
@@ -85,11 +85,11 @@
         
         <tags>
             
-            <tag> kafka </tag>
-            
             <tag> spark </tag>
             
             <tag> spark_streaming </tag>
+            
+            <tag> kafka </tag>
             
             <tag> zookeeper </tag>
             
@@ -143,6 +143,160 @@
     </entry>
     
     <entry>
+      <title><![CDATA[Streaming 中 Receiver 相关源码分析]]></title>
+      <url>/2017/05/19/Streaming-%E4%B8%AD-Receiver-%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</url>
+      <content type="html"><![CDATA[<p>本文基于 spark 1.6.2<br>本次的源码全来自 <code>org.apache.spark.streaming.receiver</code> 这个 package 下，包括 <code>BlockGenerator.scala</code>, <code>RateLimiter</code>, <code>ReceiverdBlock.scala</code>, <code>ReceivedBlockHandler.scala</code>, <code>Receiver.scala</code>, <code>ReceiverSupervisor.scala</code>, <code>ReceiverSupervisorImpl.scala</code></p>
+<a id="more"></a>
+<p>其中 <code>Receiver</code> 是所有接受数据的父类，主要定义一些接口，用户只需要继承 <code>Receiver</code>，然后实现其中的接口就行。</p>
+<p><code>ReceiverSupervisor</code> 则是负责和协调 <code>Receiver</code> 和其他组件，定义了一些接口，然后 <code>ReceiverSupervisorImpl</code> 是 <code>ReceiverSupervisor</code> 的具体实现，主要实现了协调其他组件（包括 <code>ReceivedBlockHandler</code> 和 <code>BlockGenerator</code> <code>BlockGeneratorListener</code> 以及远端 RPC 服务等）和 <code>Receiver</code> 的逻辑。</p>
+<p><code>BlockGenerator</code> 则主要负责接受 <code>Receiver</code> 接受到的数据，然后存储成 block（具体的有 <code>ReceivedBlockHandler</code> 负责），会起两个线程来做相应的事情，一个是定时的将接受到的数据生成 block，一个是将 block push 给 <code>ReceivedBlockHandler</code> 进行存储，具体的 block 管理则通过 Spark core 的 block 模块来进行管理。</p>
+<p><code>ReceivedBlockHandler</code> 则负责将 block 保存到具体的地方，包括指定的 storageLevel 以及 write ahead log。</p>
+<p>整个 Receiver 端的代码结构简化版如下所示，其中 Receiver 包含一个 ReceiverSupervisor 对象，ReceiverSupervisor 负责和 BlockGenerator 以及 ReceivedBlockHandler 交互。用户继承 Receiver，实现具体的接受数据的逻辑即可，对于数据接受之后，怎么处理，都通过 ReceiverSupervisor 中转给 BlockGenerator 来处理（BlockGenerator 会有一个定时器用于生成 block，还有一个单独的线程用于将生成的 block push 给 BlockManager）</p>
+<img src="/2017/05/19/Streaming-中-Receiver-相关源码分析/Receiver_sample.png" alt="Receiver_sample.png" title="">
+<p>整个 Receiver 端的详细代码结构图如下所示<br><img src="/2017/05/19/Streaming-中-Receiver-相关源码分析/Receiver.png" alt="Receiver.png" title=""></p>
+<h1 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h1><ol>
+<li>为什么需要将 <code>Receiver</code> 和 <code>ReceiverSupervisor</code> 进行分开呢，下面提供这两个类的函数对比图（其中第一列表示 <code>Receiver</code> 的所有函数；后面几列表示 <code>ReceiverSupervisor</code> 的所有函数，同一行的函数表示有相<img src="/2017/05/19/Streaming-中-Receiver-相关源码分析/Receiver_ReceiverSupervisor.png" alt="Receiver_ReceiverSupervisor.png" title="">
+</li>
+</ol>
+]]></content>
+      
+        <categories>
+            
+            <category> 分布式系统 </category>
+            
+            <category> 实时计算 </category>
+            
+            <category> 源码阅读 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> spark </tag>
+            
+            <tag> spark_streaming </tag>
+            
+            <tag> receiver </tag>
+            
+            <tag> source_code </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Python 代码实践小结]]></title>
+      <url>/2017/05/10/Python-%E4%BB%A3%E7%A0%81%E5%AE%9E%E8%B7%B5%E5%B0%8F%E7%BB%93/</url>
+      <content type="html"><![CDATA[<p>最近写了较多的 Python 脚本，将最近自己写的脚本进行一个总结，其中有些是 Python 独有的，有些是所有程序设计中共有的：</p>
+<ol>
+<li>考虑使用 Logger（logger 怎么配置，需要输出哪些信息 – 可以反向考虑，自己看到这个 logger 的时候想了解什么信息）</li>
+<li>传递的数据结构如何考虑（是否对调用方有先验知识的要求，比如返回一个 Tuple，则需要用户了解 tuple 中元素的顺序，这样情况是否应该进行封装；），数据结构定义清楚了，很多东西也就清楚了。</li>
+<li>如何操作数据库（可以学习 sqlalchemy，包括 core 和 orm 两种 api）</li>
+<li>异常如何处理（异常应该分开捕获 – 可以清楚的知道什么情况下导致的，异常之后应该打印日志说明出现什么问题，如果情况恶劣需要进行异常再次抛出或者报警）</li>
+<li>所有获取资源的地方都应该做 check（a. 没有获取到会怎么办；b.获取到异常的怎么办）</li>
+<li>所有操作资源的地方都应该检查是否操作成功</li>
+<li>每个函数都应该简短，如果函数过长应该进行拆分（有个建议值，函数包含的行数应该在 20-30 行之间，具体按照这个规范做过一次之后就会发现这样真好）</li>
+<li>使用 class 之后，考虑重构 <code>__str__</code> 函数，用户打印输出，如果对象放到 collection 中之后，需要实现 <code>__repr__</code> 函数，用于打印整个 collection 的时候，直观显示（如果不实现 <code>__str__</code>，会调用 <code>__repr__</code>)</li>
+<li>如果有些资源会发生变化，可以单独抽取出来，做成函数，这样后续调用就可以不用改变了</li>
+</ol>
+<p>上述总结肯定有片面的地方，也有不全的地方，欢迎指出</p>
+<a id="more"></a>
+<p>附上一份 Python2.7 代码（将一些私有的东西进行了修改）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div></pre></td><td class="code"><pre><div class="line"># -*- coding:utf-8 -*-</div><div class="line"></div><div class="line">from sqlalchemy import create_engine</div><div class="line">import logging</div><div class="line">from logging.config import fileConfig</div><div class="line">import requests</div><div class="line">import Clinet # 私有的模块</div><div class="line"></div><div class="line">fileConfig(&quot;logging_config.ini&quot;)</div><div class="line">logger = logging.getLogger(&quot;killduplicatedjob&quot;)</div><div class="line"></div><div class="line">#配置可以单独放到一个模块中</div><div class="line">DB_USER = &quot;xxxxxxx&quot;</div><div class="line">DB_PASSWORD = &quot;xxxxxxxx&quot;</div><div class="line">DB_PORT = 111111</div><div class="line">DB_HOST_PORT = &quot;xxxxxxxxxx&quot;</div><div class="line">DB_DATA_BASE = &quot;xxxxxxxxxxx&quot;</div><div class="line"></div><div class="line">REST_API_URL = &quot;http://sample.com&quot;</div><div class="line"></div><div class="line">engine = create_engine(&quot;mysql://%s:%s@%s:%s/%s&quot; % (DB_USER, DB_PASSWORD, DB_HOST_PORT, DB_PORT, DB_DATA_BASE))</div><div class="line"></div><div class="line"></div><div class="line"># 这个 class 是为了在函数间传递时，不需要使用方了解属性的具体顺序而写的，也可以放到一个单独的模块中</div><div class="line">class DuplicatedJobs(object):</div><div class="line">    def __init__(self, app_id, app_name, user):</div><div class="line">        self.app_id = app_id</div><div class="line">        self.app_name = app_name</div><div class="line">        self.user = user</div><div class="line"></div><div class="line">     def __repr__(self):</div><div class="line">        return &apos;[appid:%s, app_name:%s, user:%s]&apos; % (self.app_id, self.app_name, self.user)</div><div class="line"></div><div class="line"></div><div class="line">	def find_duplicated_jobs():</div><div class="line">		logger.info(&quot;starting find duplicated jobs&quot;)</div><div class="line">		(running_apps, app_name_to_user) = get_all_running_jobs()</div><div class="line">		all_apps_on_yarn = get_apps_from_yarn_with_queue(get_resource_queue())</div><div class="line"></div><div class="line">		duplicated_jobs = []</div><div class="line">		for app in all_apps_on_yarn:</div><div class="line">			(app_id, app_name) = app</div><div class="line"></div><div class="line">			if app_id not in running_apps:</div><div class="line">				if not app_name.startswith(&quot;test&quot;):</div><div class="line">					logger.info(&quot;find a duplicated job, prefixed_name[%s] with appid[%s]&quot; % (app_name, app_id))</div><div class="line">					user = app_name_to_user[app_name]</div><div class="line">					duplicated_jobs.append(DuplicatedJobs(app_id, app_name, user))</div><div class="line">	            else:</div><div class="line">				    logger.info(&quot;Job[%s] is a test job, would not kill it&quot; % app_name)</div><div class="line"></div><div class="line">	logger.info(&quot;Find duplicated jobs [%s]&quot; % duplicated_jobs)</div><div class="line"></div><div class="line">    return duplicated_jobs</div><div class="line"></div><div class="line"></div><div class="line">def get_apps_from_yarn_with_queue(queue):</div><div class="line">	param = &#123;&quot;queue&quot;: queue&#125;</div><div class="line">	r = requests.get(REST_API_URL, params=param)</div><div class="line">	apps_on_yarn = []</div><div class="line">	try:</div><div class="line">		jobs = r.json().get(&quot;apps&quot;)</div><div class="line">		app_list = jobs.get(&quot;app&quot;, [])</div><div class="line">		for app in app_list:</div><div class="line">			app_id = app.get(&quot;id&quot;)</div><div class="line">			name = app.get(&quot;name&quot;)</div><div class="line">			apps_on_yarn.append((app_id, name))</div><div class="line"></div><div class="line">	 except Exception as e: #Exception 最好进行单独的分开，针对每一种 Exception 进行不同的处理</div><div class="line">		logger.error(&quot;Get apps from Yarn Error, message[%s]&quot; % e.message)</div><div class="line"></div><div class="line">	logger.info(&quot;Fetch all apps from Yarn [%s]&quot; % apps_on_yarn)</div><div class="line"></div><div class="line">	return apps_on_yarn</div><div class="line"></div><div class="line"></div><div class="line">def get_all_running_jobs():</div><div class="line">	job_infos = get_result_from_mysql(&quot;select * from xxxx where xx=yy&quot;)</div><div class="line"></div><div class="line">	app_ids = []</div><div class="line">	app_name_to_user = &#123;&#125;</div><div class="line">	for (topology_id, topology_name) in job_infos:</div><div class="line">		status_set = get_result_from_mysql(&quot;select * from xxxx where xx=yy&quot;)</div><div class="line">		application_id = status_set[0][0]</div><div class="line">		if &quot;&quot; != application_id:</div><div class="line">			configed_resource_queue = get_result_from_mysql(&quot;select * from xxxx where xx=yy&quot;)</div><div class="line">			app_ids.append(application_id)</div><div class="line">	        app_name_to_user[topology_name] = configed_resource_queue[0][0].split(&quot;.&quot;)[1]</div><div class="line"></div><div class="line">	logger.info(&quot;All running jobs appids[%s] topology_name2user[%s]&quot; % (app_ids, app_name_to_user))</div><div class="line">	return app_ids, app_name_to_user</div><div class="line"></div><div class="line"></div><div class="line">def kill_duplicated_jobs(duplicated_jobs):</div><div class="line">	for job in duplicated_jobs:</div><div class="line">	app_id = job.app_id</div><div class="line">	app_name = job.app_name</div><div class="line">	user = job.user</div><div class="line">	logger.info(&quot;try to kill job[%s] with appid[%s] for user[%s]&quot; % (app_name, app_id, user))</div><div class="line">	try:</div><div class="line">		Client.kill_job(app_id, user)</div><div class="line">		logger.info(&quot;Job[%s] with appid[%s] for user[%s] has been killed&quot; % (app_name, app_id, user))</div><div class="line">	except Exception as e:</div><div class="line">		logger.error(&quot;Can&apos;t kill job[%s] with appid[%s] for user[%s]&quot; % (app_name, app_id, user))</div><div class="line"></div><div class="line"></div><div class="line">def get_result_from_mysql(sql):</div><div class="line">	a = engine.execute(sql)</div><div class="line">	return a.fetchall() </div><div class="line"></div><div class="line"></div><div class="line"># 因为下面的资源可能发生变化，而且可能包含一些具体的逻辑，因此单独抽取出来，独立成一个函数</div><div class="line">def get_resource_queue():</div><div class="line">	return &quot;xxxxxxxxxxxxx&quot;</div><div class="line"></div><div class="line">if __name__ == &quot;__main__&quot;:</div><div class="line">	kill_duplicated_jobs(find_duplicated_jobs())</div></pre></td></tr></table></figure>
+<p>其中 logger 配置文件如下（对于 Python 的 logger，官方文档写的非常好，建议读一次，并且实践一次）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">[loggers]</div><div class="line">keys=root, simpleLogger</div><div class="line"></div><div class="line">[handlers]</div><div class="line">keys=consoleHandler, logger_handler</div><div class="line"></div><div class="line">[formatters]</div><div class="line">keys=formatter</div><div class="line"></div><div class="line">[logger_root]</div><div class="line">level=WARN</div><div class="line">handlers=consoleHandler</div><div class="line"></div><div class="line">[logger_simpleLogger]</div><div class="line">level=INFO</div><div class="line">handlers=logger_handler</div><div class="line">propagate=0</div><div class="line">qualname=killduplicatedjob</div><div class="line"></div><div class="line">[handler_consoleHandler]</div><div class="line">class=StreamHandler</div><div class="line">level=WARN</div><div class="line">formatter=formatter</div><div class="line">args=(sys.stdout,)</div><div class="line"></div><div class="line">[handler_logger_handler]</div><div class="line">class=logging.handlers.RotatingFileHandler</div><div class="line">level=INFO</div><div class="line">formatter=formatter</div><div class="line">args=(&quot;kill_duplicated_streaming.log&quot;, &quot;a&quot;, 52428800, 3,)</div><div class="line"></div><div class="line">[formatter_formatter]</div><div class="line">format=%(asctime)s %(name)-12s %(levelname)-5s %(message)s</div></pre></td></tr></table></figure></p>
+]]></content>
+      
+        <categories>
+            
+            <category> 语言学习 </category>
+            
+            <category> 计算机基础 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> python </tag>
+            
+            <tag> code </tag>
+            
+            <tag> logger </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[从现在开始写作]]></title>
+      <url>/2017/04/15/%E4%BB%8E%E7%8E%B0%E5%9C%A8%E5%BC%80%E5%A7%8B%E5%86%99%E4%BD%9C/</url>
+      <content type="html"><![CDATA[<p>这里的写作不特指写长篇大论的文章</p>
+<h2 id="为什么要写作"><a href="#为什么要写作" class="headerlink" title="为什么要写作"></a>为什么要写作</h2><blockquote>
+<p>写作是了帮助自己更好的思考，提高自己的效率。</p>
+</blockquote>
+<p>首先，每个人同一时刻能记住的东西有限，而做一件事情可能需要考虑的条件往往会比较多，将所有的情况写到一张纸上，就能在需要的时候看到自己需要的条件。相信每个人都有这样的体验：做数学题的时候，将所有的已知条件，或者自己推导出来的结论写到草稿纸上，往往能更快的解出这道题目。这也是写作帮助自己思考的一个直接。</p>
+<p>其次，我遇到过这种情况，自己想着是这么回事，可是写下来的时候，发现无从下笔，根本写不出来，写出来之后，也很难向别人清楚、准确的表达自己的意思。这归根结底还是没有思考清楚导致的，而写作可以帮助我整理自己的思路。</p>
+<p>然后，当过客服的人肯定有一个体会，客服非常耗时间，而这些客服的问题大部分是差不多的，一对一的客服是非常低效的，就算在群组里面进行客服，其实很多后来遇到同样问题的人也是不看群历史记录（或者不知道以前有人遇到过类似的问题）的。这种情况下，虽然文档不是最优解，但能够省出自己足够多的时间，实际上这是一件杠杆率非常高（产出投入比高）的事件。</p>
+<a id="more"></a>
+<h2 id="写什么"><a href="#写什么" class="headerlink" title="写什么"></a>写什么</h2><p>既然明确了写作的目的，那么写什么也就清楚了。</p>
+<ol>
+<li><p>写对自己有用的东西</p>
+<ul>
+<li>读书笔记。看完一本书之后，可以写一个读书笔记，或者用思维导图整理书中内容，整理的过程是帮助自己加深书中思想印象的过程，可以帮助自己将整本书串起来，有一个全局的了解，也知道自己哪些地方暂时不太清楚。</li>
+<li>自己解决问题的总结。总结可以帮助自己复盘 – 有复盘才有改进的方向；备忘。我曾经在公司内网上记录了自己解决某个问题的过程与解决方案，后来有不少遇到同样问题的同事联系我，每个人的问题相似，但每个人的问题又都不一样，解决别人的问题，实际上也能扩大自己的知识储备。</li>
+<li>写教程 – 教是最好的学。在自己写教程的过程中，实际上也是自己再教自己一次相应的知识，对掌握的知识了解更深，对掌握不够的知识，去学习了解。</li>
+<li>自己对某件事的思考过程。将自己的思考过程写下来，能够更好的了解自己是怎么考虑问题的，在哪些地方可以进行改善，哪些地方是自己没有考虑到的，能够帮助自己更好的提高思考质量。</li>
+</ul>
+</li>
+<li><p>写对别人有用的东西</p>
+</li>
+</ol>
+<blockquote>
+<p>解决问题的思路和方案，以及教程对别人也是有用的。其他对别人有用的东西，暂时还在思考中。</p>
+</blockquote>
+<h2 id="怎么写"><a href="#怎么写" class="headerlink" title="怎么写"></a>怎么写</h2><blockquote>
+<p>用笔写</p>
+</blockquote>
+<p>为什么写，以及写什么都考虑清楚之后，怎么写就不再是个问题了。如果你习惯写在纸质的本子上，那么买一个自己喜欢的本子，一只自己喜欢的笔，直接写就好了；如果你习惯使用电脑或者手机写，那么新建一个文件夹，在里面写就好了。</p>
+<p>写的东西并不一定要公开，对于暂时不成熟的东西，或者私密的东西，保存在一个只有自己能看的地方就好了；对于成熟的东西，或者可以公开的东西，公开发表就好了。公开发表有一个好处，得到更多的反馈，这些反馈是非常利于自己进步的。</p>
+<p>另外，有一个很简单的小技巧。自己维护一个素材记录本（可以是纸质的本子，可以是电子产品 – 建议购买正版），里面记录自己觉得不错的句子，例子，表达方式等等，偶尔翻一翻，或者打算写作的时候进行一下搜索。</p>
+<h2 id="其他问题"><a href="#其他问题" class="headerlink" title="其他问题"></a>其他问题</h2><ol>
+<li>写的不好怎么办  <blockquote>
+<p>没有人一生下来就会吃饭吗？也没有人长大之后不会吃饭</p>
+</blockquote>
+</li>
+<li>不知道怎么写开头怎么办<blockquote>
+<p>如果不写开头的话，知道怎么写吗？知道的话，那就不要写开头了，为什么一定要写开头呢</p>
+</blockquote>
+</li>
+<li>要写多少才合适呢<blockquote>
+<p>没有一个统一的结论写多少才合适，只要能将自己想表达的东西讲清楚就行。写作最终受益的是自己，这不是在考试，不要为了凑字数而写。</p>
+</blockquote>
+</li>
+</ol>
+]]></content>
+      
+        <categories>
+            
+            <category> 我的生活 </category>
+            
+            <category> 想清楚 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 写作 </tag>
+            
+            <tag> 成长 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Spark Streaming 统一在每分钟的 00 秒消费 Kafka 数据的问题解决]]></title>
       <url>/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/</url>
       <content type="html"><![CDATA[<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据</p>
@@ -167,19 +321,19 @@
         
         <tags>
             
-            <tag> batchDuration </tag>
+            <tag> spark </tag>
             
-            <tag> JobGenerator </tag>
+            <tag> spark_streaming </tag>
             
             <tag> kafka </tag>
             
             <tag> problem_solve </tag>
             
+            <tag> batchDuration </tag>
+            
+            <tag> JobGenerator </tag>
+            
             <tag> RecurringTimer </tag>
-            
-            <tag> spark </tag>
-            
-            <tag> spark_streaming </tag>
             
         </tags>
         
@@ -209,9 +363,9 @@
         
         <tags>
             
-            <tag> kafka </tag>
-            
             <tag> spark_streaming </tag>
+            
+            <tag> kafka </tag>
             
             <tag> append </tag>
             
@@ -257,9 +411,9 @@
         
         <tags>
             
-            <tag> kafka </tag>
-            
             <tag> spark </tag>
+            
+            <tag> kafka </tag>
             
             <tag> spark-streaming </tag>
             
@@ -758,9 +912,9 @@
             
             <tag> exactly-once </tag>
             
-            <tag> offset </tag>
-            
             <tag> zookeeper </tag>
+            
+            <tag> offset </tag>
             
         </tags>
         
@@ -1064,13 +1218,13 @@
         
         <tags>
             
+            <tag> thinking </tag>
+            
             <tag> critical </tag>
             
             <tag> question </tag>
             
             <tag> read </tag>
-            
-            <tag> thinking </tag>
             
         </tags>
         
@@ -1788,13 +1942,13 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
         
         <tags>
             
+            <tag> python </tag>
+            
             <tag> exercise </tag>
             
             <tag> github </tag>
             
             <tag> project </tag>
-            
-            <tag> python </tag>
             
         </tags>
         
@@ -3650,7 +3804,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#x61;&#x69;&#108;&#116;&#x6f;&#x3a;&#x6a;&#99;&#109;&#x40;&#106;&#111;&#x6e;&#x6d;&#x61;&#115;&#x74;&#x65;&#114;&#115;&#x2e;&#111;&#114;&#103;">&#x6a;&#99;&#109;&#x40;&#106;&#111;&#x6e;&#x6d;&#x61;&#115;&#x74;&#x65;&#114;&#115;&#x2e;&#111;&#114;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#x6a;&#x63;&#x6d;&#64;&#106;&#111;&#110;&#109;&#97;&#x73;&#116;&#x65;&#114;&#115;&#46;&#x6f;&#x72;&#x67;">&#x6a;&#x63;&#x6d;&#64;&#106;&#111;&#110;&#109;&#97;&#x73;&#116;&#x65;&#114;&#115;&#46;&#x6f;&#x72;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
