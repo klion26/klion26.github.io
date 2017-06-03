@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>第 9 页 | klion26</title>
+  <title>Page 9 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -114,6 +114,34 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-09-26 </div>
+			<div class="article-title"><a href="/2012/09/26/concrete-mathmatics-chapter-1/" >具体数学第一章</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>具体数学都买了好久了，买的第一本英文版的书，可以一直没有看下去，看了N次还是第一章。现在刚好有同学一起看这本书，就打算从头开始好好的看一遍，然后把每一章的Homeword Exercises都做了，顺便再博客里面写下来，这次希望有人一起看的情况下，把这本书好好的看完一次。</p>
+<p>第一章作者用几个例子来讲述递归式，第一个是汉诺塔，第二个是N条直线可以把平面最多分成多少个区域，第三个是Josephus Problem.这里面在汉诺塔的时候，通过T[n]&lt;=2<em>T[n-1]+1 &amp; T[n]&gt;=2</em>T[n-1]+1从而得到T[n]=2<em>T[n-1]+1.其中第一个是足够性，即T[n]在最多2</em>T[n-1]+1步中一定可以做完(首先你把上面的N-1个移到第2个柱子上，然后把第N个移到第3个柱子上，最后再把第2个柱子上的移到第3个柱子上)，T[n]&gt;=2*T[n-1]+1则是必须性，(在你移动第N个的时候，那么上面的N-1个一定在第2个柱子上，这里至少需要T[n]次,然后移动第N个需要1次，另外把第2个柱子上的移动到第3个柱子上至少需要T[n-1]次)。</p>
+<p>第二个问题，就讲了一下一个扩展，就是每条直线变成了两条共起点射线，然后问最多分成多少个区域，这个问题，可以先延长是的变成2*n条直线，最后再减去多出的部分就行了</p>
+<p>第三个问题，主要讲述了repertoire method,对于书上的一开始没看懂，对于没看懂的同学可以借鉴下这里</p>
+<p><a href="http://blog.wakatta.jp/blog/2012/01/14/concrete-mathematics-repertoire-method/" target="_blank" rel="external">Concrete Mathematics Repertoire Method</a>和<a href="http://wenku.baidu.com/view/d9d35f07e87101f69e319592.html" target="_blank" rel="external">repertoire</a>。我的想法就是这个方法就是确定α,β,γ和A[n],B[n],C[n]无关，当然这个你可以证明出来是无关的，不过关键是你在毫不知情的时候想到这个。知道这些无关之后，那么你就可以另f[n]=某些特定的值，那样的话，α,β,γ会得到特定的值(α,β,γ组和f[n]是对应的)，然后你就可以得到A[n],B[n],C[n]的。最后就得到一个通式了。接下来可能还会把做的习题以文章的形式写出来。</p>
+<p>表示好久都没看书了，看这书看的好慢啊！！！</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -477,37 +505,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-02-12 </div>
-			<div class="article-title"><a href="/2012/02/12/xp-office-2010-error-1406/" >XP安装office 2010 Error 1406</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>好久没写文章了，这篇文章就当除草了</p>
-<p>安装office 2010时遇到错误1406的问题，安装几次都不行，网上搜了解决方案，说打开注册表(运行regedit)然后查找”Image File Execution Options”，记得搜索时选中全字匹配，不然可能会一直找不到你想要的项,具体位置在”<span style="font-family: Consolas, Monaco, 'Courier New', Courier, monospace; line-height: 18px; white-space: pre;">HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion”</span></p>
-<p><span style="font-family: Consolas, Monaco, 'Courier New', Courier, monospace; line-height: 18px; white-space: pre;">下面，貌似这还跟什么</span><span style="font-family: Consolas, Monaco, 'Courier New', Courier, monospace; line-height: 18px; white-space: pre;">IFEO劫持有关。找到之后右击Image File Execution Options然后选中权限，</span></p>
-<p><span style="font-family: Consolas, Monaco, 'Courier New', Courier, monospace; line-height: 18px; white-space: pre;">让system的权限变为完全控制，然后点击添加，输入你的用户名，把权限也变为完全控制。点击确定</span></p>
-<p><span style="font-family: Consolas, Monaco, 'Courier New', Courier, monospace; line-height: 18px; white-space: pre;">就OK了，然后再回来安装就OK了。</span></p>
-<p><span style="font-family: Consolas, Monaco, 'Courier New', Courier, monospace;"><span style="line-height: 18px; white-space: pre;">参考<a href="http://hi.baidu.com/nightcateryta/blog/item/8c536bf351a5985d352acce7.html" target="_blank" rel="external">http://hi.baidu.com/nightcateryta/blog/item/8c536bf351a5985d352acce7.html</a></span></span></p>
-<p><span style="font-family: Consolas, Monaco, 'Courier New', Courier, monospace;"><span style="line-height: 18px; white-space: pre;"><br></span></span></p>
-<p><span style="font-family: Consolas, Monaco, 'Courier New', Courier, monospace;"><span style="line-height: 18px; white-space: pre;"><br></span></span></p>
-<p><span style="font-family: Consolas, Monaco, 'Courier New', Courier, monospace; line-height: 18px; white-space: pre;"><br></span></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -518,13 +515,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/8/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
+    	<li class="prev"><a href="/page/8/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/10/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/10/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -544,7 +541,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -553,16 +550,16 @@
 		
 			
 	<div class="widget">
-		<h4>分类</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -608,17 +605,17 @@
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
-			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
-		
 			<li><a href="/categories/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
 		
 		</ul>
 	</div>
@@ -626,51 +623,51 @@
 		
 			
 	<div class="widget">
-		<h4>标签云</h4>
+		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/json/">json<span>1</span></a></li>
+			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
+		
+			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
+		
+			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
+		
+			<li><a href="/tags/ln/">ln<span>1</span></a></li>
+		
+			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
+		
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
+		
+			<li><a href="/tags/教师/">教师<span>1</span></a></li>
+		
+			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
+		
+			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
+		
+			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
+		
+			<li><a href="/tags/learning/">learning<span>1</span></a></li>
+		
+			<li><a href="/tags/method/">method<span>1</span></a></li>
+		
+			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
+		
+			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
+		
+			<li><a href="/tags/proof/">proof<span>1</span></a></li>
+		
+			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
+		
+			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
+		
+			<li><a href="/tags/free/">free<span>1</span></a></li>
+		
+			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
 		
 			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
 		
-			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
 		
-			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
-		
-			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
-		
-			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
-		
-			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
-		
-			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
-		
-			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
-		
-			<li><a href="/tags/greedy-algorithm/">greedy algorithm<span>1</span></a></li>
-		
-			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
-		
-			<li><a href="/tags/github/">github<span>5</span></a></li>
-		
-			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
-		
-			<li><a href="/tags/vim/">vim<span>2</span></a></li>
-		
-			<li><a href="/tags/火柴棍式程序题/">火柴棍式程序题<span>1</span></a></li>
-		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
-		
-			<li><a href="/tags/kv/">kv<span>1</span></a></li>
-		
-			<li><a href="/tags/blog/">blog<span>2</span></a></li>
-		
-			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
-		
-			<li><a href="/tags/chinese/">chinese<span>1</span></a></li>
-		
-		
-		   <li><a href="/tags">...<span>265</span></a></li>
+		   <li><a href="/tags">...<span>266</span></a></li>
 		 
 		</ul>
 	</div>
@@ -679,8 +676,12 @@
 		
 			
 <div class="widget">
-  <h4>最新文章</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/" ><i class="fa fa-file-o"></i>Streaming 程序调用 Producer.clo...</a>
+      </li>
     
       <li>
         <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
@@ -698,17 +699,13 @@
         <a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" ><i class="fa fa-file-o"></i>Spark Streaming 往 HDFS 追加 L...</a>
       </li>
     
-      <li>
-        <a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" ><i class="fa fa-file-o"></i>Spark Streaming Ran out of ...</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>链接</h4>
+	<h4>Links</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>
