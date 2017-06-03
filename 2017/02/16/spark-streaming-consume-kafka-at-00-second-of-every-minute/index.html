@@ -118,6 +118,7 @@
 	  		
 
 	  <h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据</p>
+<a id="more"></a>
 <h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><p>这一批作业的功能就是从 kafka 消费数据，进行转化后存储到外部可靠介质中。所有作业的 <code>batchDuration</code> 都设置为 60s。<br>我们追踪代码可以得到在 <code>JobGenerator</code> 中有一个变量 <code>timer : RecurringTimer</code>，改变量用于定时的启动 task 去消费数据。<br>从 <code>RecurringTimer#getStartTime</code> 我们可以得到作业第一个 batch 的启动时间，后续的 batch 启动时间则是在第一个 batch 的启动时间上加上 <code>batchDuration</code> 的整数倍。<br>第一个 batch 的起动时间实现如下：<br><code>(math.floor(clock.getTimeMillis().toDouble / period) + 1).toLong * period</code><br>其中 <code>clock.getTimeMillis()</code> 是当前时间，period 是<code>batchDuration</code> 的毫秒表示法。通过上述公式，我们可以知道作业的启动时间会对齐到 <code>batchDuration</code>，而我们把这一批作业的 <code>batchDuration</code> 都设置为 60s，因此都会在每分钟的 00 秒开始消费 kafka 数据。</p>
 <h2 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h2><p>我们可以通过下面两种方式进行解决</p>
 <ol>
@@ -136,13 +137,13 @@
 <ul class="pagination">
 	 
 				
-    	<li class="prev"><a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+    	<li class="prev"><a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Anterior</a></li>
   		
 
         <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
 
 		
-		   <li class="next"><a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+		   <li class="next"><a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a></li>         
         
 	
 </ul>
@@ -178,7 +179,7 @@
 	<!-- comment -->
 	
 <section id="comment">
-  <h2 class="title">Comments</h2>
+  <h2 class="title">Comentários</h2>
 
   
 </section>

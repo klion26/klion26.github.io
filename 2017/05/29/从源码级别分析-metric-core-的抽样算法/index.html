@@ -118,6 +118,7 @@
 	  		
 
 	  <p><a href="http://metrics.dropwizard.io" target="_blank" rel="external">metric-core</a> 是一个 java metric 库，用于统计 JVM 层面以及 服务级别 的各种 metric 信息。其中 metric-core 是其核心模块，代码量不多，总共 44 个文件，5700 行左右代码（包括注释）。算是一个很小的开源项目了。由于 metric 在所有项目中都非常重要，因此选择通读该项目，本文分析 metrci-core 中的抽样算法。</p>
+<a id="more"></a>
 <h2 id="metric-core-中的抽样算法"><a href="#metric-core-中的抽样算法" class="headerlink" title="metric-core 中的抽样算法"></a>metric-core 中的抽样算法</h2><p>在 metric-core 中总共有四种抽样算法，分别是 <code>ExponentiallyDecayingReservoir</code>, <code>SlidingTimeWindowReservoir</code>, <code>SlidingWindowReservoir</code>, <code>UniformReservoir</code>，其中后面三个抽样算法比较常规，也通常能见到，第一个则出于一篇论文<code>Forward Decay: A Practical Time Decay Model for Streaming Systems</code>，本文会通过源码分析自己对于这种抽样算法的理解。本文暂时只分析后面三种抽样算法，对于第一种，我会单独用一篇文章进行分析。</p>
 <h3 id="UniformReservoir-算法"><a href="#UniformReservoir-算法" class="headerlink" title="UniformReservoir 算法"></a>UniformReservoir 算法</h3><p>该算法来自于论文<code>Random Sampling with a Reservoir</code>，讲述了一种随机抽样的方法，主要思想是使用一个固定的“蓄水池”装满需要数量的样本，如果当前“蓄水池”未满，将接下来的样本直接放入“蓄水池”，如果“蓄水池”已满，则随机从”蓄水池“中挑选一个样本进行替换（也可能不进行替换），这样在理论上能够保证所有的样本以同样的概率被选中。代码如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public void update(long value) &#123;</div><div class="line">	final long c = count.incrementAndGet();//获得当前”蓄水池“的大小</div><div class="line">	if (c &lt;= values.length()) &#123; //如果”蓄水池“未满，直接将当前样本放入</div><div class="line">		values.set((int) c - 1, value);</div><div class="line">	&#125; else &#123;</div><div class="line">		final long r = nextLong(c);//随机挑选一个数据（这个随机挑选的数可能在&quot;蓄水池”中，也可能不在“蓄水池”中</div><div class="line">		if (r &lt; values.length()) &#123;//如果随机挑选的样本，在”蓄水池“中，则进行替换</div><div class="line">			values.set((int) r, value);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -148,13 +149,13 @@
 <ul class="pagination">
 	 
 				
-    	<li class="prev"><a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+    	<li class="prev"><a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Anterior</a></li>
   		
 
         <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
 
 		
-		   <li class="next"><a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+		   <li class="next"><a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a></li>         
         
 	
 </ul>
@@ -190,7 +191,7 @@
 	<!-- comment -->
 	
 <section id="comment">
-  <h2 class="title">Comments</h2>
+  <h2 class="title">Comentários</h2>
 
   
 </section>

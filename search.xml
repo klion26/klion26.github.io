@@ -6,6 +6,7 @@
       <title><![CDATA[Streaming 程序调用 Producer.close hang 住问题追查复盘]]></title>
       <url>/2017/06/03/Streaming-%E7%A8%8B%E5%BA%8F%E8%B0%83%E7%94%A8-Producer-close-hang-%E4%BD%8F%E9%97%AE%E9%A2%98%E8%BF%BD%E6%9F%A5%E5%A4%8D%E7%9B%98/</url>
       <content type="html"><![CDATA[<p>本文作为一个问题追查过程的复盘记录，主要希望找出自己在解决问题中可以优化改进的地方。以后遇到问题，能够快速的进行定位，解决。</p>
+<a id="more"></a>
 <h2 id="问题现象"><a href="#问题现象" class="headerlink" title="问题现象"></a>问题现象</h2><p>一个 Spark Streaming 作业从 Kafka 消费数据，写往 ES，在 Spark Streaming 作业中会采集一些 metric 指标发往一个特定的 topic A。每次往 A 发送完数据后会调用 <code>producer.close()</code> 方法，看到的现象为：作业启动一段时间之后 hang 住，类似下图</p>
 <img src="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/hang_job.jpg" alt="hang_job.jpg" title="">
 <h2 id="排查问题的过程"><a href="#排查问题的过程" class="headerlink" title="排查问题的过程"></a>排查问题的过程</h2><ol>
@@ -35,6 +36,16 @@
 </ol>
 ]]></content>
       
+        <categories>
+            
+            <category> 实时计算 </category>
+            
+            <category> 复盘 </category>
+            
+            <category> problem_solve </category>
+            
+        </categories>
+        
         
         <tags>
             
@@ -59,6 +70,7 @@
 <p>本文所有和 kafka 相关操作都基于 Direct 消费模式</p>
 </blockquote>
 <p>在 Spark Streaming 作业中，每个作业会消费一个或多个 topic，但是这些 topic 需要在作业启动之前确定好，在作业运行中不能进行调整，之前<a href="https://klion26.github.io/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/" target="_blank" rel="external">修改了源码</a>做到了自适应 topic partition 扩容的情况，但是无法动态调整消费的 topic。现在需要在不重启作业的情况下，动态调整消费的 topic。</p>
+<a id="more"></a>
 <h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><p>回顾之前自适应 partition 调整的方案，落到源码层面最终以 partition 为最小消费单元，而不是 topic。因此动态的调整消费的 topic 在理论上就是可行的 – 假设作业已经消费的 topic 为 A，在自适应 partition 扩容的时候，我们是增加了 A 的某些 partition，那么我们同样可以增加 B topic 的 partition，其中 B topic 是作业之前没有消费的。</p>
 <p>动态调整 partition 的方案中，只需要将现在消费的 parition 数不断的对齐现在 kafka 上相应 topic 的 partition 数目即可。动态调整作业消费的 topic 则需要有一个地方存储作业消费的 topic 数目，然后将这个信息周期性的同步给作业即可 – 可以理解前者使用 kafka 作为存储介质，保存了 topic 的 partition 数目。</p>
 <p>本方案中，选择 zookeeper 作业作为存储 topic 的介质。希望动态调整 topic 的时候，修改 zookeeper 中对应路径下的节点即可。然后作业定时的访问 zookeeper 的特定路径同步需要消费的 topic 数目即可。示意图如下</p>
@@ -89,6 +101,7 @@
       <title><![CDATA[从源码级别分析 metric-core 的抽样算法]]></title>
       <url>/2017/05/29/%E4%BB%8E%E6%BA%90%E7%A0%81%E7%BA%A7%E5%88%AB%E5%88%86%E6%9E%90-metric-core-%E7%9A%84%E6%8A%BD%E6%A0%B7%E7%AE%97%E6%B3%95/</url>
       <content type="html"><![CDATA[<p><a href="http://metrics.dropwizard.io" target="_blank" rel="external">metric-core</a> 是一个 java metric 库，用于统计 JVM 层面以及 服务级别 的各种 metric 信息。其中 metric-core 是其核心模块，代码量不多，总共 44 个文件，5700 行左右代码（包括注释）。算是一个很小的开源项目了。由于 metric 在所有项目中都非常重要，因此选择通读该项目，本文分析 metrci-core 中的抽样算法。</p>
+<a id="more"></a>
 <h2 id="metric-core-中的抽样算法"><a href="#metric-core-中的抽样算法" class="headerlink" title="metric-core 中的抽样算法"></a>metric-core 中的抽样算法</h2><p>在 metric-core 中总共有四种抽样算法，分别是 <code>ExponentiallyDecayingReservoir</code>, <code>SlidingTimeWindowReservoir</code>, <code>SlidingWindowReservoir</code>, <code>UniformReservoir</code>，其中后面三个抽样算法比较常规，也通常能见到，第一个则出于一篇论文<code>Forward Decay: A Practical Time Decay Model for Streaming Systems</code>，本文会通过源码分析自己对于这种抽样算法的理解。本文暂时只分析后面三种抽样算法，对于第一种，我会单独用一篇文章进行分析。</p>
 <h3 id="UniformReservoir-算法"><a href="#UniformReservoir-算法" class="headerlink" title="UniformReservoir 算法"></a>UniformReservoir 算法</h3><p>该算法来自于论文<code>Random Sampling with a Reservoir</code>，讲述了一种随机抽样的方法，主要思想是使用一个固定的“蓄水池”装满需要数量的样本，如果当前“蓄水池”未满，将接下来的样本直接放入“蓄水池”，如果“蓄水池”已满，则随机从”蓄水池“中挑选一个样本进行替换（也可能不进行替换），这样在理论上能够保证所有的样本以同样的概率被选中。代码如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public void update(long value) &#123;</div><div class="line">	final long c = count.incrementAndGet();//获得当前”蓄水池“的大小</div><div class="line">	if (c &lt;= values.length()) &#123; //如果”蓄水池“未满，直接将当前样本放入</div><div class="line">		values.set((int) c - 1, value);</div><div class="line">	&#125; else &#123;</div><div class="line">		final long r = nextLong(c);//随机挑选一个数据（这个随机挑选的数可能在&quot;蓄水池”中，也可能不在“蓄水池”中</div><div class="line">		if (r &lt; values.length()) &#123;//如果随机挑选的样本，在”蓄水池“中，则进行替换</div><div class="line">			values.set((int) r, value);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -133,6 +146,7 @@
       <title><![CDATA[Spark Streaming 统一在每分钟的 00 秒消费 Kafka 数据的问题解决]]></title>
       <url>/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/</url>
       <content type="html"><![CDATA[<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据</p>
+<a id="more"></a>
 <h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><p>这一批作业的功能就是从 kafka 消费数据，进行转化后存储到外部可靠介质中。所有作业的 <code>batchDuration</code> 都设置为 60s。<br>我们追踪代码可以得到在 <code>JobGenerator</code> 中有一个变量 <code>timer : RecurringTimer</code>，改变量用于定时的启动 task 去消费数据。<br>从 <code>RecurringTimer#getStartTime</code> 我们可以得到作业第一个 batch 的启动时间，后续的 batch 启动时间则是在第一个 batch 的启动时间上加上 <code>batchDuration</code> 的整数倍。<br>第一个 batch 的起动时间实现如下：<br><code>(math.floor(clock.getTimeMillis().toDouble / period) + 1).toLong * period</code><br>其中 <code>clock.getTimeMillis()</code> 是当前时间，period 是<code>batchDuration</code> 的毫秒表示法。通过上述公式，我们可以知道作业的启动时间会对齐到 <code>batchDuration</code>，而我们把这一批作业的 <code>batchDuration</code> 都设置为 60s，因此都会在每分钟的 00 秒开始消费 kafka 数据。</p>
 <h2 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h2><p>我们可以通过下面两种方式进行解决</p>
 <ol>
@@ -175,6 +189,7 @@
       <title><![CDATA[Spark Streaming 往 HDFS 追加 LZO 文件]]></title>
       <url>/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/</url>
       <content type="html"><![CDATA[<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将数据从 Kafka 同步到 Hive，并且目标格式希望是 lzo。我们通过 Spark Streaming 做这件事，将文件写成 lzo 格式，并且添加索引。</p>
+<a id="more"></a>
 <h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>要实现将数据从 Kafka 同步到 Hive 的功能，我们通过将数据直接写到 HDFS 路径来解决，由于担心小文件太多的问题（一个 batch 一个文件的话，可能造成小文件太多，对 HDFS 造成非常大的压力），所以我们通过追加的方式写 HDFS 文件。</p>
 <p>往 HDFS 追加写文件的方式，我们在前面一篇文章中描述了具体的方案。但是对于格式为 LZO 的文件，我们发现一个现象：通过 Hive 查询，只能查到第一个 batch 的数据（也就是说所有 append 的数据都不能被查询到）。这是因为 LZO 文件会在关闭的时候在文件末尾添加一个块结束标记符，导致解析的时候只能读取到块结束符之前的数据（Linux 自带的 lzop 文件可以解析包含块结束符的文件）。到这里我们有两个思路：</p>
 <pre><code>1. 在 Hive 层面进行修改，将 Hive 使用的 InputFormat 重新实现，从而可以解析 multipart 的文件；
@@ -214,6 +229,7 @@
       <title><![CDATA[Spark Streaming Ran out of messages before reaching ending offset 异常]]></title>
       <url>/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/</url>
       <content type="html"><![CDATA[<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>Spark Streaming 处理数据过程中遇到 <code>Ran out of messages before reaching ending offset</code> 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）</p>
+<a id="more"></a>
 <h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>通过异常栈信息，我们知道异常从 KafkaRDD.scala#211 行抛出，下面是相应代码</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">206 override def getNext(): R = &#123;</div><div class="line">	  if (iter == null || !iter.hasNext) &#123;</div><div class="line">208        iter = fetchBatch</div><div class="line">      &#125;</div><div class="line">210      if (!iter.hasNext) &#123;</div><div class="line">211        assert(requestOffset == part.untilOffset, errRanOutBeforeEnd(part))</div><div class="line">212        finished = true</div><div class="line">           null.asInstanceOf[R]</div><div class="line">		&#125; else &#123;</div><div class="line">		   	val item = iter.next()</div><div class="line">			if (item.offset &gt;= part.untilOffset) &#123;</div><div class="line">217 	        assert(item.offset == part.untilOffset, errOvershotEnd(item.offset, part))</div><div class="line">				finished = true</div><div class="line">				null.asInstanceOf[R]</div><div class="line">			&#125; else &#123;</div><div class="line">				requestOffset = item.nextOffset</div><div class="line">				messageHandler(new MessageAndMetadata(</div><div class="line">				part.topic, part.partition, item.message, item.offset, keyDecoder, valueDecoder))</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">226    &#125;</div></pre></td></tr></table></figure>
 <p>通过分析，我们知道这个地方是实际从 Kafka 读取数据的逻辑，首先会调用 <code>fetchBatch</code> 函数（208 行），然后进行逻辑判断，数据是否读取完毕，是否发生异常</p>
@@ -259,6 +275,7 @@
       <title><![CDATA[Spark Streaming 从指定时间戳开始消费 kafka 数据]]></title>
       <url>/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/</url>
       <content type="html"><![CDATA[<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>从指定时间戳（比如 2 小时）开始消费 Kafka 数据</p>
+<a id="more"></a>
 <h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>我们知道通过 Kafka 的 API 可以得到指定时间戳对应数据所在的 segment 的起始 offset。那么就可以通过这个功能来粗略的实现需求。</p>
 <h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>我们知道 <code>KafkaUitls.createDirectStream</code> 这个接口可以指定起始点的 offset，那么我们需要做的就变成如下三步：</p>
 <ol>
@@ -298,6 +315,7 @@
       <title><![CDATA[Spark Streaming 往 HDFS 写文件，自定义文件名]]></title>
       <url>/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/</url>
       <content type="html"><![CDATA[<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将 kafka 上的数据实时同步到 HDFS，不能有太多小文件</p>
+<a id="more"></a>
 <h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><p>Spark Streaming 支持 RDD#saveAsTextFile，将数据以 <strong>纯文本</strong> 方式写到 HDFS，我们查看 RDD#saveAsTextFile 可以看到</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">RDD.rddToPairRDDFunctions(r)(nullWritableClassTag, textClassTag, null)</div><div class="line">      .saveAsHadoopFile[TextOutputFormat[NullWritable, Text]](path)</div></pre></td></tr></table></figure>
 <p>从上面这句话我们可以知道，首先将 RDD 转化为 PariRDD，然后再调用 saveAsHadoopFile 函数进行实际的操作。上面的语句中 <code>r</code> 是原始 RDD，<code>nullWritableClassTag</code> 和 <code>textClassTag</code> 表示所写数据的类型，使用 <code>nullWritableClassTag</code> 是因为 HDFS 不会将这个数据进行实际写入（pariRDD 是 (K,V) 类型， 我们只需要写入 V），从效果上看就只写如后面的一个字段。<code>TextOutputFormat</code> 是一个格式化函数，后面我们再来看这个函数，<code>NullWritable</code> 则表示一个占位符，同样是这个字段不需要实际写入 HDFS，<code>Text</code> 表示我们将写入文本类型的数据。</p>
@@ -337,6 +355,7 @@
       <title><![CDATA[Spark Streaming 自适应上游 kafka topic partition 数目变化]]></title>
       <url>/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/</url>
       <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。</p>
+<a id="more"></a>
 <h2 id="思考过程"><a href="#思考过程" class="headerlink" title="思考过程"></a>思考过程</h2><p>为了作业能够长时间的运行，一开始遇到这种情况的时候，想到两种方案：</p>
 <ol>
 <li>感知上游 topic 的 partition 数目变化，然后发送报警，让用户重启</li>
@@ -392,7 +411,8 @@
       <url>/2016/10/26/e8-a6-81-e5-a4-9a-e5-bf-ab-e6-89-8d-e8-83-bd-e8-b7-91-e5-ae-8c-e4-b8-80-e5-9c-ba-e9-a9-ac-e6-8b-89-e6-9d-be/</url>
       <content type="html"><![CDATA[<h2 id="完成一场马拉松的最慢速度"><a href="#完成一场马拉松的最慢速度" class="headerlink" title="完成一场马拉松的最慢速度"></a>完成一场马拉松的最慢速度</h2><p>工作后身边跑马拉松的人突然就多起来了，或许你也蠢蠢欲动，但是一看到半程马拉松有 21 公理，全称马拉松 42 公理，就提前打退堂鼓了。那么你有没有想过</p>
 <pre><code>到底要多快我们才能跑完一场 半程/全程 马拉松？
-</code></pre><p>我们来算一算到底需要多快才能才可以跑完一场马拉松，鉴于体力原因，假设我们开始想完成一场半程马拉松，那么我们需要在 3 小时内跑完 21 公理，也就是说每小时需要跑完 7 公理，这样算还是不够直观，我们换一种方式，我们计算每公里平均最长耗时 M</p>
+</code></pre><a id="more"></a>
+<p>我们来算一算到底需要多快才能才可以跑完一场马拉松，鉴于体力原因，假设我们开始想完成一场半程马拉松，那么我们需要在 3 小时内跑完 21 公理，也就是说每小时需要跑完 7 公理，这样算还是不够直观，我们换一种方式，我们计算每公里平均最长耗时 M</p>
 <pre><code>M * 21 公里 = 3 小时
 </code></pre><p>这样，我们得到 M 的值为 3 * 60 / 21 约等于  8.57 分钟，即 8 分钟 34 秒。这个值告诉我们平均 8 分钟 34 秒跑完一公里  – 也就是快走的速度 – 以这个速度就能跑完一场半程马拉松比赛。</p>
 <h2 id="最慢速度的作用"><a href="#最慢速度的作用" class="headerlink" title="最慢速度的作用"></a>最慢速度的作用</h2><p>我们知道了跑完一场半程马拉松，最慢平均速度是 8 分 34 秒。</p>

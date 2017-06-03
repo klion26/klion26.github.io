@@ -480,34 +480,8 @@
 	
 	
 		<p>本文作为一个问题追查过程的复盘记录，主要希望找出自己在解决问题中可以优化改进的地方。以后遇到问题，能够快速的进行定位，解决。</p>
-<h2 id="问题现象"><a href="#问题现象" class="headerlink" title="问题现象"></a>问题现象</h2><p>一个 Spark Streaming 作业从 Kafka 消费数据，写往 ES，在 Spark Streaming 作业中会采集一些 metric 指标发往一个特定的 topic A。每次往 A 发送完数据后会调用 <code>producer.close()</code> 方法，看到的现象为：作业启动一段时间之后 hang 住，类似下图</p>
-<img src="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/hang_job.jpg" alt="hang_job.jpg" title="">
-<h2 id="排查问题的过程"><a href="#排查问题的过程" class="headerlink" title="排查问题的过程"></a>排查问题的过程</h2><ol>
-<li>看到现象后，知道作业 hang 住了，希望能找到为什么 hang 住。找到该作业的 executor 地址（如下图所示）</li>
-</ol>
-<img src="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/executor.jpg" alt="executor.jpg" title="">
-<p>然后登录到机器上，通过 lsof 查看对应的进程，再通过 jstack dump 出具体的线程栈信息。由于第一次解决线程 hang 住的问题，得到栈信息后，暂时无从下手，然后 google <code>jvm 线程 hang 住</code> 等关键词，检查死锁 – 发现没有。</p>
-<p>发现线程有 <code>RUNNABLE</code>，<code>WAITING</code>，<code>TIMED_WAITING</code> 等状态，然后一个个查看这些状态分别代表啥意思。到这就不知道怎么继续了 – 中间在 Spark Streaming 微信群里请教各路大神，有人说遇到链接关不掉的情况 – 多次重复查看 jstack 出来的信息，发现有一个 WAITING 线程在等待锁，具体如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">java.lang.Thread.State: WAITING (on object monitor)</div><div class="line">        at java.lang.Object.wait(Native Method)</div><div class="line">        - waiting on &lt;0x00000000c52cfba0&gt; (a org.apache.kafka.common.utils.KafkaThread)</div><div class="line">        at java.lang.Thread.join(Thread.java:1281)</div><div class="line">        - locked &lt;0x00000000c52cfba0&gt; (a org.apache.kafka.common.utils.KafkaThread)</div><div class="line">        at java.lang.Thread.join(Thread.java:1355)</div><div class="line">        at org.apache.kafka.clients.producer.KafkaProducer.close(KafkaProducer.java:422)</div><div class="line">        at org.elasticsearch.hadoop.rest.KafkaProducer.close(DSLKafkaProducer.java:60)</div></pre></td></tr></table></figure>
-<p>然后对照到代码，在 Producer.close() 中有一句代码如下 <code>ioThread.join()</code>，猜测是 ioThread 一直没有执行完毕导致的。</p>
-<ol>
-<li><p>注释掉 producer.close() 这一句代码之后，重新上线运行 Spark Streaming 作业，发现没有再次出现问题。大致确定问题出在 <code>producer.close()</code> 这里。但是不确定更深层次的问题是啥。期间猜测是由于 producer 发送数据的时候需要有 leader 确认（配置有关），然后将这个配置修改为无需 leader 确认立即返回，但是依然会导致作业 hang 住。然后阅读源码，发现 <code>producer.close()</code> 方法做了两件事：1）将还未发送出去的数据发送出去，2）等待正在发送的数据完成。暂时没有找到造成 <code>ioThread</code> 线程 hang 住的原因。暂时不知道具体 hang 住的地方在哪，至此暂时告一段落。</p>
-</li>
-<li><p>再次跟进该问题，尝试找出造成线程 hang 住的原因，尝试 jdb attach 到具体的线程。得到如下信息：</p>
-</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&gt; thread 0x1</div><div class="line">kafka-producer-network-thread | producer-12[1] where</div><div class="line">	  [1] sun.nio.ch.EPollArrayWrapper.epollWait (native method)</div><div class="line">	  [2] sun.nio.ch.EPollArrayWrapper.poll (EPollArrayWrapper.java:269)</div><div class="line">	  [3] sun.nio.ch.EPollSelectorImpl.doSelect (EPollSelectorImpl.java:79)</div><div class="line">	  [4] sun.nio.ch.SelectorImpl.lockAndDoSelect (SelectorImpl.java:87)</div><div class="line">	  [5] sun.nio.ch.SelectorImpl.select (SelectorImpl.java:98)</div><div class="line">	  [6] org.apache.kafka.common.network.Selector.select (Selector.java:328)</div><div class="line">	  [7] org.apache.kafka.common.network.Selector.poll (Selector.java:218)</div><div class="line">	  [8] org.apache.kafka.clients.NetworkClient.poll (NetworkClient.java:192)</div><div class="line">	  [9] org.apache.kafka.clients.producer.internals.Sender.run (Sender.java:191)</div><div class="line">	  [10] org.apache.kafka.clients.producer.internals.Sender.run (Sender.java:135)</div><div class="line">	  [11] java.lang.Thread.run (Thread.java:745)</div></pre></td></tr></table></figure>
-<p>到这里暂时不知道该怎么继续往下查了，知道在这里 hang 住了，但是暂时不知道怎么继续往下查，看着屏幕发呆，然后想着这个问题或许别人也遇到过，就从上面的 栈信息 中抽取一部分关键词进行 google，得到信息在 kafka 0.8.2.1 中 producer.close() 在某些情况下会 hang 住，详情参考 <a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-19+-+Add+a+request+timeout+to+NetworkClient" target="_blank" rel="external">KIP-19</a>，在 kafka 0.9.0.0 中提供一个带超时的 close 方法进行修复。</p>
-<h2 id="问题复盘"><a href="#问题复盘" class="headerlink" title="问题复盘"></a>问题复盘</h2><ol>
-<li><p>在知道作业 hang 住的情况，又不了解相应调试的情况下，能否快速了解定位问题的方法，能否询问其他人快速的定位问题，或者如何通过搜索引擎快速的获取自己需要的知识。这里自己有个小私心 – 觉得这是测试的作业，想保留现场，通过自己的努力完全把问题解决，好提升自己的能力。另外自己如何在平时积累一些查问题的经验（这次发现官方文档真是个好东西）</p>
-</li>
-<li><p>通过微信群询问是一个方法，但是提问需要有技巧，要能够提炼出自己的问题，以及自己进行了哪些尝试，有什么思考，而不是做伸手党。</p>
-</li>
-<li>为什么到最后才想着 Google 相关信息，而不是在知道 producer.close() 导致作业 hang 住的时候就 Google 相关信息。</li>
-<li>对 Java 排查问题的工具非常不熟练，在平时需要自己模拟各种 case 进行练手。jstack, jvisualvm, jdb 等都是第一次使用，这些工具需要在平时进行熟练。</li>
-<li>对常见的库或通用的写法要有一定的了解，比如看到 <code>org.apache.kafka.common.network.Selector.poll</code> 是否能想到没有超时而导致一直 hang 住，这些平时需要积累（思考这个怎么积累？）</li>
-</ol>
-
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/#more" class="btn btn-default more">Leia Mais</a>
 	
 	</div>
 </div>
@@ -533,16 +507,8 @@
 <p>本文所有和 kafka 相关操作都基于 Direct 消费模式</p>
 </blockquote>
 <p>在 Spark Streaming 作业中，每个作业会消费一个或多个 topic，但是这些 topic 需要在作业启动之前确定好，在作业运行中不能进行调整，之前<a href="https://klion26.github.io/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/" target="_blank" rel="external">修改了源码</a>做到了自适应 topic partition 扩容的情况，但是无法动态调整消费的 topic。现在需要在不重启作业的情况下，动态调整消费的 topic。</p>
-<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><p>回顾之前自适应 partition 调整的方案，落到源码层面最终以 partition 为最小消费单元，而不是 topic。因此动态的调整消费的 topic 在理论上就是可行的 – 假设作业已经消费的 topic 为 A，在自适应 partition 扩容的时候，我们是增加了 A 的某些 partition，那么我们同样可以增加 B topic 的 partition，其中 B topic 是作业之前没有消费的。</p>
-<p>动态调整 partition 的方案中，只需要将现在消费的 parition 数不断的对齐现在 kafka 上相应 topic 的 partition 数目即可。动态调整作业消费的 topic 则需要有一个地方存储作业消费的 topic 数目，然后将这个信息周期性的同步给作业即可 – 可以理解前者使用 kafka 作为存储介质，保存了 topic 的 partition 数目。</p>
-<p>本方案中，选择 zookeeper 作业作为存储 topic 的介质。希望动态调整 topic 的时候，修改 zookeeper 中对应路径下的节点即可。然后作业定时的访问 zookeeper 的特定路径同步需要消费的 topic 数目即可。示意图如下</p>
-<p><img src="https://c1.staticflickr.com/5/4275/34202432474_eb409ae6a5.jpg" alt=""></p>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>方案确定了，直接修改下上次自适应 partition 扩容的代码即可 – 本方案只实现了增加 topic 的功能，当前消费的 topic 不会被删除，如果需要的话可以自行修改源码满足这一点。</p>
-<p>在 <code>DirectKafkaInputStream</code> 的 <code>compute</code> 函数开始处添加如下逻辑</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">val topic = currentOffsets.head._1.topic</div><div class="line">var addedTopic : Set[String] = Set()</div><div class="line">val topics = getTopicsForJob()</div><div class="line">for (i &lt;- topics) &#123;</div><div class="line">      if (!i.equals(topic)) &#123;</div><div class="line">            addedTopic = addedTopic + i</div><div class="line">       &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">if (addedTopic.nonEmpty) &#123;</div><div class="line">     val topicLeaders = MTKafkaUtils.getPartitions(kafkaParams, addedTopic)</div><div class="line">     val largestOffset = MTKafkaUtils.getLeaderOffsets(kafkaParams, topicLeaders, OffsetRequest.LatestTime)</div><div class="line"></div><div class="line">     currentOffsets = currentOffsets ++ largestOffset</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>然后增加一个获取所有 topic 的函数，下面 Constants 包中使用了一些常量，自行替换即可</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">private def getTopicsForJob() : List[String] = &#123;</div><div class="line">        val jobName = SparkEnv.get.conf.get(Constants.JOB_PREFIXED_NAME_KEY)  //这个是提交 job 时添加的一个参数，用于区分每个作业，会当作 zk 中路径的一级</div><div class="line">        val zkHostPort: String =  &quot;xxxxxxxxx&quot;</div><div class="line">        val zkClient = new ZkClient(zkHostPort, Constants.DEFAULT_SESSION_TIMEOUT, Constants.DEFAULT_CONNECTION_TIMEOUT, new ZkOffsetSerializer) //ZkOffsetSerializer 自己实现了一个简单的序列化，反序列化类，就用了 String.getBytes 和 new String()</div><div class="line"></div><div class="line">        if (!zkClient.exists(s&quot;$&#123;Constants.ROOT_PATH_OF_MULTI_TOPIC_PER_JOB&#125;/$&#123;jobName&#125;&quot;)) &#123;</div><div class="line">									            ZkUtils.updatePersistentPath(zkClient, s&quot;$&#123;Constants.ROOT_PATH_OF_MULTI_TOPIC_PER_JOB&#125;/$&#123;jobName&#125;&quot;, s&quot;$&#123;jobName&#125;&quot;);</div><div class="line">														        &#125;</div><div class="line"></div><div class="line">        zkClient.getChildren(s&quot;$&#123;Constants.ROOT_PATH_OF_MULTI_TOPIC_PER_JOB&#125;/$&#123;jobName&#125;&quot;).asScala.toList</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/#more" class="btn btn-default more">Leia Mais</a>
 	
 	</div>
 </div>
@@ -565,28 +531,8 @@
 	
 	
 		<p><a href="http://metrics.dropwizard.io" target="_blank" rel="external">metric-core</a> 是一个 java metric 库，用于统计 JVM 层面以及 服务级别 的各种 metric 信息。其中 metric-core 是其核心模块，代码量不多，总共 44 个文件，5700 行左右代码（包括注释）。算是一个很小的开源项目了。由于 metric 在所有项目中都非常重要，因此选择通读该项目，本文分析 metrci-core 中的抽样算法。</p>
-<h2 id="metric-core-中的抽样算法"><a href="#metric-core-中的抽样算法" class="headerlink" title="metric-core 中的抽样算法"></a>metric-core 中的抽样算法</h2><p>在 metric-core 中总共有四种抽样算法，分别是 <code>ExponentiallyDecayingReservoir</code>, <code>SlidingTimeWindowReservoir</code>, <code>SlidingWindowReservoir</code>, <code>UniformReservoir</code>，其中后面三个抽样算法比较常规，也通常能见到，第一个则出于一篇论文<code>Forward Decay: A Practical Time Decay Model for Streaming Systems</code>，本文会通过源码分析自己对于这种抽样算法的理解。本文暂时只分析后面三种抽样算法，对于第一种，我会单独用一篇文章进行分析。</p>
-<h3 id="UniformReservoir-算法"><a href="#UniformReservoir-算法" class="headerlink" title="UniformReservoir 算法"></a>UniformReservoir 算法</h3><p>该算法来自于论文<code>Random Sampling with a Reservoir</code>，讲述了一种随机抽样的方法，主要思想是使用一个固定的“蓄水池”装满需要数量的样本，如果当前“蓄水池”未满，将接下来的样本直接放入“蓄水池”，如果“蓄水池”已满，则随机从”蓄水池“中挑选一个样本进行替换（也可能不进行替换），这样在理论上能够保证所有的样本以同样的概率被选中。代码如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public void update(long value) &#123;</div><div class="line">	final long c = count.incrementAndGet();//获得当前”蓄水池“的大小</div><div class="line">	if (c &lt;= values.length()) &#123; //如果”蓄水池“未满，直接将当前样本放入</div><div class="line">		values.set((int) c - 1, value);</div><div class="line">	&#125; else &#123;</div><div class="line">		final long r = nextLong(c);//随机挑选一个数据（这个随机挑选的数可能在&quot;蓄水池”中，也可能不在“蓄水池”中</div><div class="line">		if (r &lt; values.length()) &#123;//如果随机挑选的样本，在”蓄水池“中，则进行替换</div><div class="line">			values.set((int) r, value);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>为了能够更好的理解，先使用样例如下。假设现在总共来了 10 个数 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]，而“蓄水池“大小为 3. 那么”蓄水池”的 <strong>一种可能</strong> 变化如下（说是一种可能的变化，因为这里面牵涉到概率）</p>
-<ul>
-<li>[1]</li>
-<li>[1, 2]</li>
-<li>[1, 2, 3]</li>
-<li>[1, 2, 4]  # 当 4 来的时候，发现“蓄水池”已满，然后从中筛选一个进行替换掉，假设我们替换掉 3</li>
-<li>[1, 5, 4] # 当 5 来的时候，发现“蓄水池”已满，然后从中筛选一个进行替换掉，假设这次我们替换掉 2</li>
-<li>[1, 5, 4] # 当 6 来的时候，发现“蓄水池”已满，我们打算从之前的数字中筛选一个进行替换，这个时候假设我们得到的下标是 3 或者 4，发现下标为 3 和 4 的数字不在“蓄水池”中（“蓄水池”的最大下标为 2 – 从 0 开始），因此不进行替换，所以本次“蓄水池”不变</li>
-<li>[7, 5, 4] # 当 7 来的时候，发现“蓄水池”已满，随机一个下标，我们得到 0,那么将 7 放置到下标为 0 的位置</li>
-<li>[8, 5, 4] # 同上</li>
-<li>[8, 5, 9] # 同上</li>
-<li>[10, 5, 9] # 同上<h3 id="SlidingWindowReservoir-抽样算法"><a href="#SlidingWindowReservoir-抽样算法" class="headerlink" title="SlidingWindowReservoir 抽样算法"></a>SlidingWindowReservoir 抽样算法</h3><code>SlidingWindowReservoir</code> 抽样算法则以最近的 N 个样本作为整个数据集的子集，这样简单直接，对于数据波动不大，或者窗口大小 N 足够大的情况下，该算法会有较好的效果。代码如下：</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public synchronized void update(long value) &#123;//加锁保证线程安全</div><div class="line">	        //每次替换掉最旧的数据，保证”蓄水池“中的数据是最近的 N 个样本</div><div class="line">	        measurements[(int) (count++ % measurements.length)] = value;</div><div class="line">			    &#125;</div></pre></td></tr></table></figure>
-<h3 id="SlidingTimeWindowReservoir-抽样算法"><a href="#SlidingTimeWindowReservoir-抽样算法" class="headerlink" title="SlidingTimeWindowReservoir 抽样算法"></a>SlidingTimeWindowReservoir 抽样算法</h3><p>该算法是上面移动窗口算法的变种，保留的是最近 N 时间单位（支持 TimeUnit 的所有时间单位）内的数据，而不是最近的 N 个数据。代码如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">public void update(long value) &#123;</div><div class="line">//每 TRIM_THRESHOLD 次操作之后会进行一次 trim() 操作</div><div class="line">	if (count.incrementAndGet() % TRIM_THRESHOLD == 0) &#123;</div><div class="line">		trim();</div><div class="line">	&#125;</div><div class="line">			        //直接将该值加入到 ”蓄水池“ 中</div><div class="line">	measurements.put(getTick(), value);</div><div class="line">	&#125;</div><div class="line">//获得当前的时间</div><div class="line">private long getTick() &#123;</div><div class="line">	for (; ; ) &#123;</div><div class="line">		final long oldTick = lastTick.get();</div><div class="line">		final long tick = clock.getTick() * COLLISION_BUFFER;</div><div class="line">		// ensure the tick is strictly incrementing even if there are duplicate ticks</div><div class="line">		final long newTick = tick - oldTick &gt; 0 ? tick : oldTick + 1;</div><div class="line">		if (lastTick.compareAndSet(oldTick, newTick)) &#123;</div><div class="line">			return newTick;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void trim() &#123;</div><div class="line">	measurements.headMap(getTick() - window).clear();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这三种算法中，第二种和第三种是大家都很容易想到的，实现起来也很简单，第一种进行简单推导也不难，也算是一种现成的算法“蓄水池抽样”。</p>
-<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>如果某个系统每天会有 N 个人请求（N 不确定），需要从这些人中等概率的抽出 K 个中奖者，那么应该怎么做呢？是否可以使用上面抽样算法中的一种呢？</p>
-
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/#more" class="btn btn-default more">Leia Mais</a>
 	
 	</div>
 </div>
@@ -609,16 +555,8 @@
 	
 	
 		<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据</p>
-<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><p>这一批作业的功能就是从 kafka 消费数据，进行转化后存储到外部可靠介质中。所有作业的 <code>batchDuration</code> 都设置为 60s。<br>我们追踪代码可以得到在 <code>JobGenerator</code> 中有一个变量 <code>timer : RecurringTimer</code>，改变量用于定时的启动 task 去消费数据。<br>从 <code>RecurringTimer#getStartTime</code> 我们可以得到作业第一个 batch 的启动时间，后续的 batch 启动时间则是在第一个 batch 的启动时间上加上 <code>batchDuration</code> 的整数倍。<br>第一个 batch 的起动时间实现如下：<br><code>(math.floor(clock.getTimeMillis().toDouble / period) + 1).toLong * period</code><br>其中 <code>clock.getTimeMillis()</code> 是当前时间，period 是<code>batchDuration</code> 的毫秒表示法。通过上述公式，我们可以知道作业的启动时间会对齐到 <code>batchDuration</code>，而我们把这一批作业的 <code>batchDuration</code> 都设置为 60s，因此都会在每分钟的 00 秒开始消费 kafka 数据。</p>
-<h2 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h2><p>我们可以通过下面两种方式进行解决</p>
-<ol>
-<li>设置不同的 <code>batchDuration</code></li>
-<li>改写 <code>RecurringTimer#getStartTime</code> 的逻辑，在上述对齐的时间基础上加上一个 [0, period) 范围内的随机数</li>
-</ol>
-<p>我们知道在上述两种解决方案中，第一种，不同作业还是会在某一时刻重合，而且这个重合的时间点不可控，可能是作业运行一小时后，可能是运行一天后，也可能是运行一周后。而第二种作业则是可控的，在作业启动时就决定了。因此这里我们采用第二种方案。</p>
-<p>本文采用了一种新的排版方式，在进行实验，如果效果好的好，后续大部分内容都会以这种形式进行发布</p>
-<div class="markdown-here-wrapper" style="font-size: 16px; line-height: 1.8em; letter-spacing: 0.1em;" data-md-url="http://www.klion26.com/wp-admin/post-new.php"></div>
-
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/#more" class="btn btn-default more">Leia Mais</a>
 	
 	</div>
 </div>
@@ -641,15 +579,8 @@
 	
 	
 		<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将数据从 Kafka 同步到 Hive，并且目标格式希望是 lzo。我们通过 Spark Streaming 做这件事，将文件写成 lzo 格式，并且添加索引。</p>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>要实现将数据从 Kafka 同步到 Hive 的功能，我们通过将数据直接写到 HDFS 路径来解决，由于担心小文件太多的问题（一个 batch 一个文件的话，可能造成小文件太多，对 HDFS 造成非常大的压力），所以我们通过追加的方式写 HDFS 文件。</p>
-<p>往 HDFS 追加写文件的方式，我们在前面一篇文章中描述了具体的方案。但是对于格式为 LZO 的文件，我们发现一个现象：通过 Hive 查询，只能查到第一个 batch 的数据（也就是说所有 append 的数据都不能被查询到）。这是因为 LZO 文件会在关闭的时候在文件末尾添加一个块结束标记符，导致解析的时候只能读取到块结束符之前的数据（Linux 自带的 lzop 文件可以解析包含块结束符的文件）。到这里我们有两个思路：</p>
-<pre><code>1. 在 Hive 层面进行修改，将 Hive 使用的 InputFormat 重新实现，从而可以解析 multipart 的文件；
-2. 通过某种方式将文件进行追加，但是文件的中间不会出现结束块的标记符。
-</code></pre><p>由于第一种方式影响较大，实现起来周期较长，所以这里采用第二种方法。</p>
-<p>我们考虑如何做到往 HDFS 写完数据之后，文件流不进行关闭，在我们需要关闭的时候再手动关闭。也就是说同一个 Executor 上的多 batch 公用同一个文件流。</p>
-<p>查看<a href="http://spark.apache.org/docs/latest/streaming-programming-guide.html#design-patterns-for-using-foreachrdd" target="_blank" rel="external">官方文档</a>我们可以得到这是可以实现的，也就是文档中的 ConnectionPool 实现的方式，这可以做到在同一个 Executor 上执行的多个 batch 公用同一个文件流（个人觉得这里也可以从 JVM 的层面来考虑，就是利用了 static 变量的声明周期以及可访问范围）。</p>
-<p>当我们手动关闭某个文件的时候，再考虑将这个文件 move 到特定的地方（Hive 表对应的 HDFS 路径），然后添加索引，大致框架就完成了。当然这也仅仅是一个框架，需要处理的细节问题还有很多。</p>
-
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/#more" class="btn btn-default more">Leia Mais</a>
 	
 	</div>
 </div>
@@ -672,23 +603,8 @@
 	
 	
 		<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>Spark Streaming 处理数据过程中遇到 <code>Ran out of messages before reaching ending offset</code> 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）</p>
-<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>通过异常栈信息，我们知道异常从 KafkaRDD.scala#211 行抛出，下面是相应代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">206 override def getNext(): R = &#123;</div><div class="line">	  if (iter == null || !iter.hasNext) &#123;</div><div class="line">208        iter = fetchBatch</div><div class="line">      &#125;</div><div class="line">210      if (!iter.hasNext) &#123;</div><div class="line">211        assert(requestOffset == part.untilOffset, errRanOutBeforeEnd(part))</div><div class="line">212        finished = true</div><div class="line">           null.asInstanceOf[R]</div><div class="line">		&#125; else &#123;</div><div class="line">		   	val item = iter.next()</div><div class="line">			if (item.offset &gt;= part.untilOffset) &#123;</div><div class="line">217 	        assert(item.offset == part.untilOffset, errOvershotEnd(item.offset, part))</div><div class="line">				finished = true</div><div class="line">				null.asInstanceOf[R]</div><div class="line">			&#125; else &#123;</div><div class="line">				requestOffset = item.nextOffset</div><div class="line">				messageHandler(new MessageAndMetadata(</div><div class="line">				part.topic, part.partition, item.message, item.offset, keyDecoder, valueDecoder))</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">226    &#125;</div></pre></td></tr></table></figure>
-<p>通过分析，我们知道这个地方是实际从 Kafka 读取数据的逻辑，首先会调用 <code>fetchBatch</code> 函数（208 行），然后进行逻辑判断，数据是否读取完毕，是否发生异常</p>
-<p>其中 211 行的异常表示还未读取到 part.untilOffset 但是当前迭代器中没有数据了；217 行表示当前读取的数据如果超过了 part.untilOffset ，那么在这个时候退出当前 batch（offset 从 fromOffset 逐次加一增加的，正常的逻辑肯定会和 part.untilOffset 相等）</p>
-<p>我们知道异常从 211 行抛出来的，也知道了异常的最直接原因，那么这个原因是什么造成的呢？</p>
-<p>211 行的代码执行了，也就是 210 行的 if 语句未 true，这样的话，207 行的逻辑也应该为 true。这样的话 iter 就是 fetchBatch 返回的迭代器了。接下来我们看看 fetchBatch 的代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">188 private def fetchBatch: Iterator[MessageAndOffset] = &#123;</div><div class="line">189      val req = new FetchRequestBuilder()</div><div class="line">190         .addFetch(part.topic, part.partition, requestOffset, kc.config.fetchMessageMaxBytes)</div><div class="line">			.build()</div><div class="line">192      val resp = consumer.fetch(req)</div><div class="line">	   	 handleFetchErr(resp)</div><div class="line">		// kafka may return a batch that starts before the requested offset</div><div class="line">		 resp.messageSet(part.topic, part.partition)</div><div class="line">196       .iterator</div><div class="line">          .dropWhile(_.offset &lt; requestOffset)</div><div class="line">		&#125;</div></pre></td></tr></table></figure></p>
-<p>我们发现 192 行会通过 consumer 从 kafka 获取数据，本次从哪获取数据，以及获取多少分别由 190 行的 <code>topic</code>, <code>partition</code> 和 <code>kc.config.fetchMessageMaxBytes</code> 指定。我们查看 <code>kc.config.fetchMessageMaxBytes</code>，发现默认使用的是 1M</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">ConsumerConfig.scala</div><div class="line">29 val FetchSize = 1024 * 1024</div><div class="line"></div><div class="line">114 val fetchMessageMaxBytes = props.getInt(&quot;fetch.message.max.bytes&quot;, FetchSize)</div></pre></td></tr></table></figure>
-<p>从这里我们知道每次从 kafka 上最多获取 1M 的数据（这也是为什么需要在 <code>KafkaRDD.getNext</code> 函数的开头通过 <code>iter.hasNext()</code> 来判断是否需要调用 <code>fetchBatch</code> </p>
-<p>然后看到 fetchBatch 函数对应的 196 行，获取迭代器作为返回值，查看相应代码，跳转到 <code>ByteBufferMessageSet.scala</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">139 override def iterator: Iterator[MessageAndOffset] = internalIterator()</div><div class="line">145 private def internalIterator(isShallow: Boolean = false): Iterator[MessageAndOffset] = &#123;</div><div class="line">		    new IteratorTemplate[MessageAndOffset] &#123;</div><div class="line">				        ......</div><div class="line">152      def makeNextOuter: MessageAndOffset = &#123;</div><div class="line">             // if there isn&apos;t at least an offset and size, we are done</div><div class="line">			if (topIter.remaining &lt; 12)</div><div class="line">				return allDone()</div><div class="line">			    val offset = topIter.getLong()</div><div class="line">			    val size = topIter.getInt()</div><div class="line">		        if(size &lt; Message.MinHeaderSize)</div><div class="line">			         throw new InvalidMessageException(&quot;Message found with corrupt size (&quot; + size + &quot;)&quot;)</div><div class="line">					</div><div class="line">160       // we have an incomplete message</div><div class="line">161       if(topIter.remaining &lt; size)</div><div class="line">162         return allDone()</div><div class="line">		....</div><div class="line">185     &#125;</div></pre></td></tr></table></figure>
-<p>从 161 行我们可以看出，如果读取的消息是一条不完整的，那么本次不处理，默认本次消息读取完成。<br>上面所有的链条穿起来就抛出了我们文章开始的异常。</p>
-<pre><code>1. 从 kafka 读取 1M 的数据（默认大小）
-2. 发现读取的数据不完整（这个消息的大小大于 1M），所以本次读取的 迭代器 为空
-3. 发现迭代器为空，但是当前的 offset 和 part.untilOffset 不想等，抛出异常
-</code></pre><h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过设置 kafkaParam 的参数 <code>fetch.message.max.bytes</code> 就行了，我们设置成 2M（大于一条数据的最大值即可），就能够运行成功了</p>
-
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/#more" class="btn btn-default more">Leia Mais</a>
 	
 	</div>
 </div>
@@ -711,17 +627,8 @@
 	
 	
 		<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>从指定时间戳（比如 2 小时）开始消费 Kafka 数据</p>
-<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>我们知道通过 Kafka 的 API 可以得到指定时间戳对应数据所在的 segment 的起始 offset。那么就可以通过这个功能来粗略的实现需求。</p>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>我们知道 <code>KafkaUitls.createDirectStream</code> 这个接口可以指定起始点的 offset，那么我们需要做的就变成如下三步：</p>
-<ol>
-<li>获取 <code>topic</code> 对应的 <code>TopicAndPartitions</code>，得到当前 topic 有多少 partition</li>
-<li>从 Kafka 获取每个 partition 指定时间戳所在 segment 的起始 offset</li>
-<li>将步骤 2 中的 offset 作为参数传入 <code>createDirectStream</code> 即可<br>通过查看源码，我们知道步骤 1 和步骤 2 中的功能在 <code>org.apache.spark.streaming.kafka.KafkaCluster</code> 中都已经有现成的函数了：<code>getPartitions</code> 和 <code>getLeaderOffsets</code>，分别表示获取指定 topic 的 partition 以及获取 partition 指定时间戳所在的 segment 的起始 offset，那么我们需要做的就是如何调用这两个函数实现我们的功能了。</li>
-</ol>
-<p>我们知道 <code>KafkaCluster</code> 的作用域是 <code>private[spark]</code> 所以我们需要在自己的代码中使用 <code>package org.apache.spark(.xxx ... .yyy)</code>(小括号中表示可以省略）来限定自己的代码，因此我们可以将步骤 1 和步骤 2 中的功能实现如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">package org.apache.spark.streaming.kafka</div><div class="line">......      //省略其他不相关的代码</div><div class="line"></div><div class="line">def getPartitions(kafkaParams: Map[String, String], topics: Set[String]): Either[Err, Set[TopicAndPartition]] = &#123;</div><div class="line">        val kc = new KafkaCluster(kafkaParams)</div><div class="line">        kc.getPartitions(topics)    //我们可以在这里处理错误，也可以将错误继续往上传递</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    def getLeaderOffsets(kafkaParams: Map[String, String], topicAndPartitions: Set[TopicAndPartition], before: Long) : Map[TopicAndPartition, Long]  = &#123;</div><div class="line">        val kc = new KafkaCluster(kafkaParams)</div><div class="line">        val leaderOffsets = kc.getLeaderOffsets(topicAndPartitions, before)</div><div class="line">        if (leaderOffsets.isLeft) &#123;  //在本函数内部处理错误，如果有错误抛出异常</div><div class="line">            throw new RuntimeException(s&quot;### Exception when MTKafkaUtils#getLeaderOffsets $&#123;leaderOffsets.left.get&#125; ###&quot;)</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        leaderOffsets.right.get.map &#123; case (k, v) =&gt; (k, v.offset)&#125;  //将 Map[TopicAndPartition, LeaderOffset] 转变为 Map[TopicAndPartition, Long]（Long 为对应 partition 的 offset，从 LeaderOffset 中获取）</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p>步骤 3 直接传入参数即可，就可以从指定时间戳开始消费 Kafka 数据了</p>
-
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/#more" class="btn btn-default more">Leia Mais</a>
 	
 	</div>
 </div>
@@ -744,17 +651,8 @@
 	
 	
 		<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将 kafka 上的数据实时同步到 HDFS，不能有太多小文件</p>
-<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><p>Spark Streaming 支持 RDD#saveAsTextFile，将数据以 <strong>纯文本</strong> 方式写到 HDFS，我们查看 RDD#saveAsTextFile 可以看到</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">RDD.rddToPairRDDFunctions(r)(nullWritableClassTag, textClassTag, null)</div><div class="line">      .saveAsHadoopFile[TextOutputFormat[NullWritable, Text]](path)</div></pre></td></tr></table></figure>
-<p>从上面这句话我们可以知道，首先将 RDD 转化为 PariRDD，然后再调用 saveAsHadoopFile 函数进行实际的操作。上面的语句中 <code>r</code> 是原始 RDD，<code>nullWritableClassTag</code> 和 <code>textClassTag</code> 表示所写数据的类型，使用 <code>nullWritableClassTag</code> 是因为 HDFS 不会将这个数据进行实际写入（pariRDD 是 (K,V) 类型， 我们只需要写入 V），从效果上看就只写如后面的一个字段。<code>TextOutputFormat</code> 是一个格式化函数，后面我们再来看这个函数，<code>NullWritable</code> 则表示一个占位符，同样是这个字段不需要实际写入 HDFS，<code>Text</code> 表示我们将写入文本类型的数据。</p>
-<p>我们看到 <code>TextOutputFormat</code> 这个类中有一个函数是 <code>RecordWriter</code> 用于操作没一条记录的写入，代码如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">public RecordWriter&lt;K, V&gt; getRecordWriter(FileSystem ignored, JobConf job, String name, Progressable progress) throws IOException &#123;</div><div class="line">	boolean isCompressed = getCompressOutput(job);</div><div class="line">	String keyValueSeparator = job.get(&quot;mapreduce.output.textoutputformat.separator&quot;, &quot;\t&quot;);</div><div class="line">	if(!isCompressed) &#123;</div><div class="line">	    Path codecClass1 = FileOutputFormat.getTaskOutputPath(job, name);</div><div class="line">		FileSystem codec1 = codecClass1.getFileSystem(job);</div><div class="line">		FSDataOutputStream file1 = codec1.create(codecClass1, progress);</div><div class="line">		return new TextOutputFormat.LineRecordWriter(file1, keyValueSeparator);</div><div class="line">	&#125; else &#123;</div><div class="line">	    Class codecClass = getOutputCompressorClass(job, GzipCodec.class);</div><div class="line">		CompressionCodec codec = (CompressionCodec)ReflectionUtils.newInstance(codecClass, job);</div><div class="line">		Path file = FileOutputFormat.getTaskOutputPath(job, name + codec.getDefaultExtension());</div><div class="line">		FileSystem fs = file.getFileSystem(job);</div><div class="line">		FSDataOutputStream fileOut = fs.create(file, progress);</div><div class="line">		return new TextOutputFormat.LineRecordWriter(new DataOutputStream(codec.createOutputStream(fileOut)), keyValueSeparator);</div><div class="line">		&#125;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
-<p>文件中分为两部分：1）压缩文件，2）非压缩文件。然后剩下的事情就是打开文件，往文件中写数据了。</p>
-<p>说到压缩文件，就和写 lzo 格式关联起来了，因为 lzo 格式就是压缩的，那么我们从哪拿到这个压缩的格式的呢？实际上 PariRDDFunctions#saveAsHadoopFile 还可以传入压缩格式类，函数原型如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">def saveAsHadoopFile[F &lt;: OutputFormat[K, V]](</div><div class="line">    path: String,</div><div class="line">    codec: Class[_ &lt;: CompressionCodec])(implicit fm: ClassTag[F]): Unit = self.withScope &#123;</div></pre></td></tr></table></figure>
-<p>这里第二个参数表示压缩的类。如果需要我们传入一个压缩类即可，如 <code>classOf[com.hadoop.compression.lzo.LzopCodec]</code> 最终这个参数会传给 <code>TextOutputFormat#RecordWriter</code>.</p>
-<p>至此，我们以及可以写 lzo 格式的文件了。但是还没有结束，因为会产生小文件，每个 RDD 的每个 partition 都会在 HDFS 上产生一个文件，而且这些文件大小非常小，就形成了很多小文件，这对 HDFS 的压力会非常大。我们需要解决这个问题</p>
-
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/#more" class="btn btn-default more">Leia Mais</a>
 	
 	</div>
 </div>
@@ -777,30 +675,8 @@
 	
 	
 		<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。</p>
-<h2 id="思考过程"><a href="#思考过程" class="headerlink" title="思考过程"></a>思考过程</h2><p>为了作业能够长时间的运行，一开始遇到这种情况的时候，想到两种方案：</p>
-<ol>
-<li>感知上游 topic 的 partition 数目变化，然后发送报警，让用户重启</li>
-<li>直接在作业内部自适应上游 topic partition 的变化，完全不影响作业<br>方案 1 是简单直接，第一反应的结果，但是效果不好，需要用户人工介入，而且需要删除 checkpoint 文件</li>
-</ol>
-<p>方案 2 从根本上解决问题，用户不需要关心上游 partition 数目的变化，但是第一眼会觉得较难实现。</p>
-<p>方案 1 很快被 pass 掉，因为人工介入的成本太高，而且实现起来很别扭。接下来考虑方案 2.</p>
-<p>Spark Streaming 程序中使用 Kafka 的最原始方式为 <code>KafkaUtils.createDirectStream</code> 通过源码，我们找到调用链条大致是这样的</p>
-<p><span style="color: #0000ff;"><strong><code>KafkaUtils.createDirectStream</code></strong></span>   –&gt;   <strong><span style="color: #0000ff;"><code>new DirectKafkaInputDStream</code></span></strong> –&gt; 最终由 <code>DirectKafkaInputDStream#compute(validTime : Time)</code> 函数来生成 KafkaRDD。</p>
-<p>而 KafkaRDD 的 partition 数和 <strong><span style="color: #0000ff;">作业开始运行时</span></strong> topic 的 partition 数一致，topic 的 partition 数保存在 currentOffsets 变量中，currentOffsets 是一个 Map[TopicAndPartition, Long]类型的变量，保存每个 partition 当前消费的 offset 值，但是作业运行过程中 currentOffsets 不会增加 key，就是说不会增加 KafkaRDD 的 partition，这样导致每次生成 KafkaRDD 的时候都使用 <span style="color: #0000ff;"><strong>作业开始运行时</strong></span> topic 的 partition 数作为 KafkaRDD 的 partition 数，从而会造成数据的丢失。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>我们只需要在每次生成 KafkaRDD 的时候，将 currentOffsets 修正为正常的值（往里面增加对应的 partition 数，总共 B-A 个，以及每个增加的 partition 的当前 offset 从零开始）。</p>
-<ul>
-<li>第一个问题出现了，我们不能修改 Spark 的源代码，重新进行编译，因为这不是我们自己维护的。想到的一种方案是继承 DirectKafkaInputDStream。我们发现不能继承 DirectKafkaInputDStream 该类，因为这个类是使用 <code>private[streaming]</code> 修饰的。</li>
-<li>第二个问题出现了，怎么才能够继承 DirectKafkaInputDStream，这时我们只需要将希望继承 DirectKafkaInputDStream 的类放到一个单独的文件 F 中，文件 F 使用 <code>package org.apache.spark.streaming</code> 进行修饰即可，这样可以绕过不能继承 DirectKafkaInputDStream 的问题。这个问题解决后，我们还需要修改 <code>Object KafkaUtils</code>，让该 Object 内部调用我们修改后的 DirectKafkaInputDStream（我命名为 MTDirectKafkaInputDStream)</li>
-<li>第三个问题如何让 Spark 调用 MTDirectKafkaInputDStream，而不是 DirectKafkaInputDStream，这里我们使用简单粗暴的方式，将 KafkaUtils 的代码 copy 一份，然后将其中调用 DirectKafkaInputDStream 的部分都修改为 MTDirectKafkaInputDStream，这样就实现了我们的需要。当然该文件也需要使用 <code>package org.apache.spark.streaming</code> 进行修饰</li>
-<li>第二个和第三个问题的解决方案在  中国 Spark 技术峰会 2016  上，广点通的 林立伟 有提及，后续会进行尝试<br>总结下，我们需要做两件事</li>
-</ul>
-<ol>
-<li>修改 DirectKafkaInputDStream#compute 使得能够自适应 topic 的 partition 变更</li>
-<li>修改 KafkaUtils，使得我们能够调用修改过后的 DirectKafkaInputDStream</li>
-</ol>
-<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div></pre></td><td class="code"><pre><div class="line">package org.apache.spark.streaming.kafka.mt</div><div class="line"></div><div class="line">import com.meituan.data.util.Constants</div><div class="line">import com.meituan.service.inf.kms.client.Kms</div><div class="line">import kafka.common.&#123;ErrorMapping, TopicAndPartition&#125;</div><div class="line">import kafka.javaapi.&#123;TopicMetadata, TopicMetadataRequest&#125;</div><div class="line">import kafka.javaapi.consumer.SimpleConsumer</div><div class="line">import kafka.message.MessageAndMetadata</div><div class="line">import kafka.serializer.Decoder</div><div class="line">import org.apache.spark.streaming.&#123;StreamingContext, Time&#125;</div><div class="line">import org.apache.spark.streaming.kafka.&#123;DirectKafkaInputDStream, KafkaRDD&#125;</div><div class="line"></div><div class="line">import scala.collection.JavaConverters._</div><div class="line">import scala.util.control.Breaks._</div><div class="line">import scala.reflect.ClassTag</div><div class="line"></div><div class="line">/**</div><div class="line">  * Created by qiucongxian on 10/27/16.</div><div class="line">  */</div><div class="line">class MTDirectKafkaInputDStream[</div><div class="line">  K: ClassTag,</div><div class="line">  V: ClassTag,</div><div class="line">  U &lt;: Decoder[K]: ClassTag,</div><div class="line">  T &lt;: Decoder[V]: ClassTag,</div><div class="line">  R: ClassTag](</div><div class="line">    @transient ssc_ : StreamingContext,</div><div class="line">    val MTkafkaParams: Map[String, String],</div><div class="line">    val MTfromOffsets: Map[TopicAndPartition, Long],</div><div class="line">    messageHandler: MessageAndMetadata[K, V] =&gt; R</div><div class="line">) extends DirectKafkaInputDStream[K, V, U, T, R](ssc_, MTkafkaParams , MTfromOffsets, messageHandler) &#123;</div><div class="line">    private val kafkaBrokerList : String = &quot;host1:port1,host2:port2,host3:port3&quot; //根据自己的情况自行修改</div><div class="line"></div><div class="line">    override def compute(validTime: Time) : Option[KafkaRDD[K, V, U, T, R]] = &#123;</div><div class="line">      /**</div><div class="line">        * 在这更新 currentOffsets 从而做到自适应上游 partition 数目变化</div><div class="line">        */</div><div class="line">        updateCurrentOffsetForKafkaPartitionChange()</div><div class="line">        super.compute(validTime)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private def updateCurrentOffsetForKafkaPartitionChange() : Unit = &#123;</div><div class="line">      val topic = currentOffsets.head._1.topic</div><div class="line">      val nextPartitions : Int = getTopicMeta(topic) match &#123;</div><div class="line">          case Some(x) =&gt; x.partitionsMetadata.size()</div><div class="line">          case _ =&gt; 0</div><div class="line">      &#125;</div><div class="line">      val currPartitions = currentOffsets.keySet.size</div><div class="line"></div><div class="line">      if (nextPartitions &gt; currPartitions) &#123;</div><div class="line">        var i = currPartitions</div><div class="line">        while (i &lt; nextPartitions) &#123;</div><div class="line">           currentOffsets = currentOffsets + (TopicAndPartition(topic, i) -&gt; 0)</div><div class="line">           i = i + 1</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      logInfo(s&quot;######### $&#123;nextPartitions&#125;  currentParttions $&#123;currentOffsets.keySet.size&#125; ########&quot;)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private def getTopicMeta(topic: String) : Option[TopicMetadata] = &#123;</div><div class="line">        var metaData : Option[TopicMetadata] = None</div><div class="line">        var consumer : Option[SimpleConsumer] = None</div><div class="line"></div><div class="line">        val topics = List[String](topic)</div><div class="line">        val brokerList = kafkaBrokerList.split(&quot;,&quot;)</div><div class="line">        brokerList.foreach(</div><div class="line">          item =&gt; &#123;</div><div class="line">            val hostPort = item.split(&quot;:&quot;)</div><div class="line">            try &#123;</div><div class="line">              breakable &#123;</div><div class="line">                  for (i &lt;- 0 to 3) &#123;</div><div class="line">                      consumer = Some(new SimpleConsumer(host = hostPort(0), port = hostPort(1).toInt,</div><div class="line">                                            soTimeout = 10000, bufferSize = 64 * 1024, clientId = &quot;leaderLookup&quot;))</div><div class="line">                      val req : TopicMetadataRequest = new TopicMetadataRequest(topics.asJava)</div><div class="line">                      val resp = consumer.get.send(req)</div><div class="line"></div><div class="line">                      metaData = Some(resp.topicsMetadata.get(0))</div><div class="line">                      if (metaData.get.errorCode == ErrorMapping.NoError) break()</div><div class="line">                  &#125;</div><div class="line">              &#125;</div><div class="line">            &#125; catch &#123;</div><div class="line">              case e =&gt; logInfo(s&quot; ###### Error in MTDirectKafkaInputDStream $&#123;e&#125; ######&quot;)</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">        )</div><div class="line">        metaData</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>在修改过后的 KafkaUtils 文件中，将所有的 <code>DirectKafkaInputDStream</code> 都替换为 <code>MTDirectKafkaInputDStream</code> 即可</p>
-
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/#more" class="btn btn-default more">Leia Mais</a>
 	
 	</div>
 </div>
@@ -824,19 +700,9 @@
 	
 		<h2 id="完成一场马拉松的最慢速度"><a href="#完成一场马拉松的最慢速度" class="headerlink" title="完成一场马拉松的最慢速度"></a>完成一场马拉松的最慢速度</h2><p>工作后身边跑马拉松的人突然就多起来了，或许你也蠢蠢欲动，但是一看到半程马拉松有 21 公理，全称马拉松 42 公理，就提前打退堂鼓了。那么你有没有想过</p>
 <pre><code>到底要多快我们才能跑完一场 半程/全程 马拉松？
-</code></pre><p>我们来算一算到底需要多快才能才可以跑完一场马拉松，鉴于体力原因，假设我们开始想完成一场半程马拉松，那么我们需要在 3 小时内跑完 21 公理，也就是说每小时需要跑完 7 公理，这样算还是不够直观，我们换一种方式，我们计算每公里平均最长耗时 M</p>
-<pre><code>M * 21 公里 = 3 小时
-</code></pre><p>这样，我们得到 M 的值为 3 * 60 / 21 约等于  8.57 分钟，即 8 分钟 34 秒。这个值告诉我们平均 8 分钟 34 秒跑完一公里  – 也就是快走的速度 – 以这个速度就能跑完一场半程马拉松比赛。</p>
-<h2 id="最慢速度的作用"><a href="#最慢速度的作用" class="headerlink" title="最慢速度的作用"></a>最慢速度的作用</h2><p>我们知道了跑完一场半程马拉松，最慢平均速度是 8 分 34 秒。</p>
-<pre><code>那么我们知道这个速度有什么用呢？
-</code></pre><p>让我们从心底知道我们能完成这件事，这并不是一件只有少数人才能做的事情，并不需要你在体育方面有超过常人能力，只要你身体健康就行。卡耐基在《人性的优点》里面介绍一个应对恐惧的方法也是类似的：</p>
-<pre><code>把你恐惧的事情会导致的所有最坏可能性都一一罗列出来，然后一一检查它们。
-</code></pre><p>这个方法的好处是让你知道，就算最坏情况也就这样，让你从无边的恐惧中解放出来。</p>
-<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>如果你自己能够一个人跑完十公里，那么你的体力就能跑完半程马拉松。</p>
-<p>跑马拉松是一项群体运动，你会被大家带着跑，但是大家需要找到适合自己的节奏，根据自己的实际情况来确定你能跑完全程的速度。</p>
-<p>如果在比赛过程中有任何不适，要量力而行，千万不要硬撑。</p>
-<p>最后不建议在雾霾天跑马拉松。</p>
-
+</code></pre>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2016/10/26/e8-a6-81-e5-a4-9a-e5-bf-ab-e6-89-8d-e8-83-bd-e8-b7-91-e5-ae-8c-e4-b8-80-e5-9c-ba-e9-a9-ac-e6-8b-89-e6-9d-be/#more" class="btn btn-default more">Leia Mais</a>
 	
 	</div>
 </div>
@@ -853,13 +719,13 @@
 <ul class="pagination">
 	 
 		
-          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Anterior</a></li>
         
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/2/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/2/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -879,7 +745,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -888,16 +754,16 @@
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>Categorias</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
-		
 			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -911,15 +777,19 @@
 		
 			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
 		
+			<li><a href="/categories/实时计算/复盘/problem-solve/">problem_solve<span>1</span></a></li>
+		
 			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
 		
 			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/">分布式系统<span>8</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
+			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>6</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>4</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
 		
@@ -941,13 +811,13 @@
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -964,45 +834,45 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
+			<li><a href="/tags/latex/">latex<span>1</span></a></li>
 		
-			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
+			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
 		
-			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
-		
-			<li><a href="/tags/米聊/">米聊<span>1</span></a></li>
-		
-			<li><a href="/tags/scc/">scc<span>1</span></a></li>
-		
-			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
-		
-			<li><a href="/tags/github/">github<span>5</span></a></li>
+			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
 		
 			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
 		
-			<li><a href="/tags/spark/">spark<span>5</span></a></li>
+			<li><a href="/tags/chinese/">chinese<span>1</span></a></li>
 		
-			<li><a href="/tags/fork/">fork<span>2</span></a></li>
+			<li><a href="/tags/scala/">scala<span>1</span></a></li>
 		
-			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
+			<li><a href="/tags/半平面交/">半平面交<span>1</span></a></li>
 		
-			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
+			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
 		
-			<li><a href="/tags/shell/">shell<span>5</span></a></li>
+			<li><a href="/tags/数学/">数学<span>5</span></a></li>
 		
-			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
+			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
 		
-			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
+			<li><a href="/tags/method/">method<span>1</span></a></li>
 		
-			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
+			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
 		
-			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+			<li><a href="/tags/vi/">vi<span>2</span></a></li>
 		
-			<li><a href="/tags/text-plain/">text/plain<span>1</span></a></li>
+			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
 		
-			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
+			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
 		
-			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
+			<li><a href="/tags/databse/">databse<span>1</span></a></li>
+		
+			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
+		
+			<li><a href="/tags/stack/">stack<span>1</span></a></li>
+		
+			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
+		
+			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>266</span></a></li>
@@ -1014,7 +884,7 @@
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
     
       <li>
