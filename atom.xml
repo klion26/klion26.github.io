@@ -1,0 +1,1351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>klion26</title>
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yoursite.com/"/>
+  <updated>2017-06-03T03:43:27.000Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name>klion26</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Streaming 程序调用 Producer.close hang 住问题追查复盘</title>
+    <link href="http://yoursite.com/2017/06/03/Streaming-%E7%A8%8B%E5%BA%8F%E8%B0%83%E7%94%A8-Producer-close-hang-%E4%BD%8F%E9%97%AE%E9%A2%98%E8%BF%BD%E6%9F%A5%E5%A4%8D%E7%9B%98/"/>
+    <id>http://yoursite.com/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/</id>
+    <published>2017-06-03T02:44:55.000Z</published>
+    <updated>2017-06-03T03:43:27.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文作为一个问题追查过程的复盘记录，主要希望找出自己在解决问题中可以优化改进的地方。以后遇到问题，能够快速的进行定位，解决。</p>
+<a id="more"></a>
+<h2 id="问题现象"><a href="#问题现象" class="headerlink" title="问题现象"></a>问题现象</h2><p>一个 Spark Streaming 作业从 Kafka 消费数据，写往 ES，在 Spark Streaming 作业中会采集一些 metric 指标发往一个特定的 topic A。每次往 A 发送完数据后会调用 <code>producer.close()</code> 方法，看到的现象为：作业启动一段时间之后 hang 住，类似下图</p>
+<img src="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/hang_job.jpg" alt="hang_job.jpg" title="">
+<h2 id="排查问题的过程"><a href="#排查问题的过程" class="headerlink" title="排查问题的过程"></a>排查问题的过程</h2><ol>
+<li>看到现象后，知道作业 hang 住了，希望能找到为什么 hang 住。找到该作业的 executor 地址（如下图所示）</li>
+</ol>
+<img src="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/executor.jpg" alt="executor.jpg" title="">
+<p>然后登录到机器上，通过 lsof 查看对应的进程，再通过 jstack dump 出具体的线程栈信息。由于第一次解决线程 hang 住的问题，得到栈信息后，暂时无从下手，然后 google <code>jvm 线程 hang 住</code> 等关键词，检查死锁 – 发现没有。</p>
+<p>发现线程有 <code>RUNNABLE</code>，<code>WAITING</code>，<code>TIMED_WAITING</code> 等状态，然后一个个查看这些状态分别代表啥意思。到这就不知道怎么继续了 – 中间在 Spark Streaming 微信群里请教各路大神，有人说遇到链接关不掉的情况 – 多次重复查看 jstack 出来的信息，发现有一个 WAITING 线程在等待锁，具体如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">java.lang.Thread.State: WAITING (on object monitor)</div><div class="line">        at java.lang.Object.wait(Native Method)</div><div class="line">        - waiting on &lt;0x00000000c52cfba0&gt; (a org.apache.kafka.common.utils.KafkaThread)</div><div class="line">        at java.lang.Thread.join(Thread.java:1281)</div><div class="line">        - locked &lt;0x00000000c52cfba0&gt; (a org.apache.kafka.common.utils.KafkaThread)</div><div class="line">        at java.lang.Thread.join(Thread.java:1355)</div><div class="line">        at org.apache.kafka.clients.producer.KafkaProducer.close(KafkaProducer.java:422)</div><div class="line">        at org.elasticsearch.hadoop.rest.KafkaProducer.close(DSLKafkaProducer.java:60)</div></pre></td></tr></table></figure>
+<p>然后对照到代码，在 Producer.close() 中有一句代码如下 <code>ioThread.join()</code>，猜测是 ioThread 一直没有执行完毕导致的。</p>
+<ol>
+<li><p>注释掉 producer.close() 这一句代码之后，重新上线运行 Spark Streaming 作业，发现没有再次出现问题。大致确定问题出在 <code>producer.close()</code> 这里。但是不确定更深层次的问题是啥。期间猜测是由于 producer 发送数据的时候需要有 leader 确认（配置有关），然后将这个配置修改为无需 leader 确认立即返回，但是依然会导致作业 hang 住。然后阅读源码，发现 <code>producer.close()</code> 方法做了两件事：1）将还未发送出去的数据发送出去，2）等待正在发送的数据完成。暂时没有找到造成 <code>ioThread</code> 线程 hang 住的原因。暂时不知道具体 hang 住的地方在哪，至此暂时告一段落。</p>
+</li>
+<li><p>再次跟进该问题，尝试找出造成线程 hang 住的原因，尝试 jdb attach 到具体的线程。得到如下信息：</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&gt; thread 0x1</div><div class="line">kafka-producer-network-thread | producer-12[1] where</div><div class="line">	  [1] sun.nio.ch.EPollArrayWrapper.epollWait (native method)</div><div class="line">	  [2] sun.nio.ch.EPollArrayWrapper.poll (EPollArrayWrapper.java:269)</div><div class="line">	  [3] sun.nio.ch.EPollSelectorImpl.doSelect (EPollSelectorImpl.java:79)</div><div class="line">	  [4] sun.nio.ch.SelectorImpl.lockAndDoSelect (SelectorImpl.java:87)</div><div class="line">	  [5] sun.nio.ch.SelectorImpl.select (SelectorImpl.java:98)</div><div class="line">	  [6] org.apache.kafka.common.network.Selector.select (Selector.java:328)</div><div class="line">	  [7] org.apache.kafka.common.network.Selector.poll (Selector.java:218)</div><div class="line">	  [8] org.apache.kafka.clients.NetworkClient.poll (NetworkClient.java:192)</div><div class="line">	  [9] org.apache.kafka.clients.producer.internals.Sender.run (Sender.java:191)</div><div class="line">	  [10] org.apache.kafka.clients.producer.internals.Sender.run (Sender.java:135)</div><div class="line">	  [11] java.lang.Thread.run (Thread.java:745)</div></pre></td></tr></table></figure>
+<p>到这里暂时不知道该怎么继续往下查了，知道在这里 hang 住了，但是暂时不知道怎么继续往下查，看着屏幕发呆，然后想着这个问题或许别人也遇到过，就从上面的 栈信息 中抽取一部分关键词进行 google，得到信息在 kafka 0.8.2.1 中 producer.close() 在某些情况下会 hang 住，详情参考 <a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-19+-+Add+a+request+timeout+to+NetworkClient" target="_blank" rel="external">KIP-19</a>，在 kafka 0.9.0.0 中提供一个带超时的 close 方法进行修复。</p>
+<h2 id="问题复盘"><a href="#问题复盘" class="headerlink" title="问题复盘"></a>问题复盘</h2><ol>
+<li><p>在知道作业 hang 住的情况，又不了解相应调试的情况下，能否快速了解定位问题的方法，能否询问其他人快速的定位问题，或者如何通过搜索引擎快速的获取自己需要的知识。这里自己有个小私心 – 觉得这是测试的作业，想保留现场，通过自己的努力完全把问题解决，好提升自己的能力。另外自己如何在平时积累一些查问题的经验（这次发现官方文档真是个好东西）</p>
+</li>
+<li><p>通过微信群询问是一个方法，但是提问需要有技巧，要能够提炼出自己的问题，以及自己进行了哪些尝试，有什么思考，而不是做伸手党。</p>
+</li>
+<li>为什么到最后才想着 Google 相关信息，而不是在知道 producer.close() 导致作业 hang 住的时候就 Google 相关信息。</li>
+<li>对 Java 排查问题的工具非常不熟练，在平时需要自己模拟各种 case 进行练手。jstack, jvisualvm, jdb 等都是第一次使用，这些工具需要在平时进行熟练。</li>
+<li>对常见的库或通用的写法要有一定的了解，比如看到 <code>org.apache.kafka.common.network.Selector.poll</code> 是否能想到没有超时而导致一直 hang 住，这些平时需要积累（思考这个怎么积累？）</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文作为一个问题追查过程的复盘记录，主要希望找出自己在解决问题中可以优化改进的地方。以后遇到问题，能够快速的进行定位，解决。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
+    
+      <category term="复盘" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/%E5%A4%8D%E7%9B%98/"/>
+    
+      <category term="problem_solve" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/%E5%A4%8D%E7%9B%98/problem-solve/"/>
+    
+    
+      <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
+    
+      <category term="spark_streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
+    
+      <category term="thinking" scheme="http://yoursite.com/tags/thinking/"/>
+    
+      <category term="problem_solve" scheme="http://yoursite.com/tags/problem-solve/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>如何在不重启 Spark Streaming 作业的情况下，增加消费的 topic</title>
+    <link href="http://yoursite.com/2017/06/01/%E5%A6%82%E4%BD%95%E5%9C%A8%E4%B8%8D%E9%87%8D%E5%90%AF-Spark-Streaming-%E4%BD%9C%E4%B8%9A%E7%9A%84%E6%83%85%E5%86%B5%E4%B8%8B%EF%BC%8C%E5%A2%9E%E5%8A%A0%E6%B6%88%E8%B4%B9%E7%9A%84-topic/"/>
+    <id>http://yoursite.com/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/</id>
+    <published>2017-06-01T15:22:51.000Z</published>
+    <updated>2017-06-03T03:37:01.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>本文所有和 kafka 相关操作都基于 Direct 消费模式</p>
+</blockquote>
+<p>在 Spark Streaming 作业中，每个作业会消费一个或多个 topic，但是这些 topic 需要在作业启动之前确定好，在作业运行中不能进行调整，之前<a href="https://klion26.github.io/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/" target="_blank" rel="external">修改了源码</a>做到了自适应 topic partition 扩容的情况，但是无法动态调整消费的 topic。现在需要在不重启作业的情况下，动态调整消费的 topic。</p>
+<a id="more"></a>
+<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><p>回顾之前自适应 partition 调整的方案，落到源码层面最终以 partition 为最小消费单元，而不是 topic。因此动态的调整消费的 topic 在理论上就是可行的 – 假设作业已经消费的 topic 为 A，在自适应 partition 扩容的时候，我们是增加了 A 的某些 partition，那么我们同样可以增加 B topic 的 partition，其中 B topic 是作业之前没有消费的。</p>
+<p>动态调整 partition 的方案中，只需要将现在消费的 parition 数不断的对齐现在 kafka 上相应 topic 的 partition 数目即可。动态调整作业消费的 topic 则需要有一个地方存储作业消费的 topic 数目，然后将这个信息周期性的同步给作业即可 – 可以理解前者使用 kafka 作为存储介质，保存了 topic 的 partition 数目。</p>
+<p>本方案中，选择 zookeeper 作业作为存储 topic 的介质。希望动态调整 topic 的时候，修改 zookeeper 中对应路径下的节点即可。然后作业定时的访问 zookeeper 的特定路径同步需要消费的 topic 数目即可。示意图如下</p>
+<p><img src="https://c1.staticflickr.com/5/4275/34202432474_eb409ae6a5.jpg" alt=""></p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>方案确定了，直接修改下上次自适应 partition 扩容的代码即可 – 本方案只实现了增加 topic 的功能，当前消费的 topic 不会被删除，如果需要的话可以自行修改源码满足这一点。</p>
+<p>在 <code>DirectKafkaInputStream</code> 的 <code>compute</code> 函数开始处添加如下逻辑</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">val topic = currentOffsets.head._1.topic</div><div class="line">var addedTopic : Set[String] = Set()</div><div class="line">val topics = getTopicsForJob()</div><div class="line">for (i &lt;- topics) &#123;</div><div class="line">      if (!i.equals(topic)) &#123;</div><div class="line">            addedTopic = addedTopic + i</div><div class="line">       &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">if (addedTopic.nonEmpty) &#123;</div><div class="line">     val topicLeaders = MTKafkaUtils.getPartitions(kafkaParams, addedTopic)</div><div class="line">     val largestOffset = MTKafkaUtils.getLeaderOffsets(kafkaParams, topicLeaders, OffsetRequest.LatestTime)</div><div class="line"></div><div class="line">     currentOffsets = currentOffsets ++ largestOffset</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后增加一个获取所有 topic 的函数，下面 Constants 包中使用了一些常量，自行替换即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">private def getTopicsForJob() : List[String] = &#123;</div><div class="line">        val jobName = SparkEnv.get.conf.get(Constants.JOB_PREFIXED_NAME_KEY)  //这个是提交 job 时添加的一个参数，用于区分每个作业，会当作 zk 中路径的一级</div><div class="line">        val zkHostPort: String =  &quot;xxxxxxxxx&quot;</div><div class="line">        val zkClient = new ZkClient(zkHostPort, Constants.DEFAULT_SESSION_TIMEOUT, Constants.DEFAULT_CONNECTION_TIMEOUT, new ZkOffsetSerializer) //ZkOffsetSerializer 自己实现了一个简单的序列化，反序列化类，就用了 String.getBytes 和 new String()</div><div class="line"></div><div class="line">        if (!zkClient.exists(s&quot;$&#123;Constants.ROOT_PATH_OF_MULTI_TOPIC_PER_JOB&#125;/$&#123;jobName&#125;&quot;)) &#123;</div><div class="line">									            ZkUtils.updatePersistentPath(zkClient, s&quot;$&#123;Constants.ROOT_PATH_OF_MULTI_TOPIC_PER_JOB&#125;/$&#123;jobName&#125;&quot;, s&quot;$&#123;jobName&#125;&quot;);</div><div class="line">														        &#125;</div><div class="line"></div><div class="line">        zkClient.getChildren(s&quot;$&#123;Constants.ROOT_PATH_OF_MULTI_TOPIC_PER_JOB&#125;/$&#123;jobName&#125;&quot;).asScala.toList</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;本文所有和 kafka 相关操作都基于 Direct 消费模式&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;在 Spark Streaming 作业中，每个作业会消费一个或多个 topic，但是这些 topic 需要在作业启动之前确定好，在作业运行中不能进行调整，之前&lt;a href=&quot;https://klion26.github.io/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;修改了源码&lt;/a&gt;做到了自适应 topic partition 扩容的情况，但是无法动态调整消费的 topic。现在需要在不重启作业的情况下，动态调整消费的 topic。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
+    
+      <category term="spark_streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
+    
+      <category term="zookeeper" scheme="http://yoursite.com/tags/zookeeper/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>从源码级别分析 metric-core 的抽样算法</title>
+    <link href="http://yoursite.com/2017/05/29/%E4%BB%8E%E6%BA%90%E7%A0%81%E7%BA%A7%E5%88%AB%E5%88%86%E6%9E%90-metric-core-%E7%9A%84%E6%8A%BD%E6%A0%B7%E7%AE%97%E6%B3%95/"/>
+    <id>http://yoursite.com/2017/05/29/从源码级别分析-metric-core-的抽样算法/</id>
+    <published>2017-05-29T09:45:22.000Z</published>
+    <updated>2017-06-03T03:37:50.000Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="http://metrics.dropwizard.io" target="_blank" rel="external">metric-core</a> 是一个 java metric 库，用于统计 JVM 层面以及 服务级别 的各种 metric 信息。其中 metric-core 是其核心模块，代码量不多，总共 44 个文件，5700 行左右代码（包括注释）。算是一个很小的开源项目了。由于 metric 在所有项目中都非常重要，因此选择通读该项目，本文分析 metrci-core 中的抽样算法。</p>
+<a id="more"></a>
+<h2 id="metric-core-中的抽样算法"><a href="#metric-core-中的抽样算法" class="headerlink" title="metric-core 中的抽样算法"></a>metric-core 中的抽样算法</h2><p>在 metric-core 中总共有四种抽样算法，分别是 <code>ExponentiallyDecayingReservoir</code>, <code>SlidingTimeWindowReservoir</code>, <code>SlidingWindowReservoir</code>, <code>UniformReservoir</code>，其中后面三个抽样算法比较常规，也通常能见到，第一个则出于一篇论文<code>Forward Decay: A Practical Time Decay Model for Streaming Systems</code>，本文会通过源码分析自己对于这种抽样算法的理解。本文暂时只分析后面三种抽样算法，对于第一种，我会单独用一篇文章进行分析。</p>
+<h3 id="UniformReservoir-算法"><a href="#UniformReservoir-算法" class="headerlink" title="UniformReservoir 算法"></a>UniformReservoir 算法</h3><p>该算法来自于论文<code>Random Sampling with a Reservoir</code>，讲述了一种随机抽样的方法，主要思想是使用一个固定的“蓄水池”装满需要数量的样本，如果当前“蓄水池”未满，将接下来的样本直接放入“蓄水池”，如果“蓄水池”已满，则随机从”蓄水池“中挑选一个样本进行替换（也可能不进行替换），这样在理论上能够保证所有的样本以同样的概率被选中。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public void update(long value) &#123;</div><div class="line">	final long c = count.incrementAndGet();//获得当前”蓄水池“的大小</div><div class="line">	if (c &lt;= values.length()) &#123; //如果”蓄水池“未满，直接将当前样本放入</div><div class="line">		values.set((int) c - 1, value);</div><div class="line">	&#125; else &#123;</div><div class="line">		final long r = nextLong(c);//随机挑选一个数据（这个随机挑选的数可能在&quot;蓄水池”中，也可能不在“蓄水池”中</div><div class="line">		if (r &lt; values.length()) &#123;//如果随机挑选的样本，在”蓄水池“中，则进行替换</div><div class="line">			values.set((int) r, value);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>为了能够更好的理解，先使用样例如下。假设现在总共来了 10 个数 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]，而“蓄水池“大小为 3. 那么”蓄水池”的 <strong>一种可能</strong> 变化如下（说是一种可能的变化，因为这里面牵涉到概率）</p>
+<ul>
+<li>[1]</li>
+<li>[1, 2]</li>
+<li>[1, 2, 3]</li>
+<li>[1, 2, 4]  # 当 4 来的时候，发现“蓄水池”已满，然后从中筛选一个进行替换掉，假设我们替换掉 3</li>
+<li>[1, 5, 4] # 当 5 来的时候，发现“蓄水池”已满，然后从中筛选一个进行替换掉，假设这次我们替换掉 2</li>
+<li>[1, 5, 4] # 当 6 来的时候，发现“蓄水池”已满，我们打算从之前的数字中筛选一个进行替换，这个时候假设我们得到的下标是 3 或者 4，发现下标为 3 和 4 的数字不在“蓄水池”中（“蓄水池”的最大下标为 2 – 从 0 开始），因此不进行替换，所以本次“蓄水池”不变</li>
+<li>[7, 5, 4] # 当 7 来的时候，发现“蓄水池”已满，随机一个下标，我们得到 0,那么将 7 放置到下标为 0 的位置</li>
+<li>[8, 5, 4] # 同上</li>
+<li>[8, 5, 9] # 同上</li>
+<li>[10, 5, 9] # 同上<h3 id="SlidingWindowReservoir-抽样算法"><a href="#SlidingWindowReservoir-抽样算法" class="headerlink" title="SlidingWindowReservoir 抽样算法"></a>SlidingWindowReservoir 抽样算法</h3><code>SlidingWindowReservoir</code> 抽样算法则以最近的 N 个样本作为整个数据集的子集，这样简单直接，对于数据波动不大，或者窗口大小 N 足够大的情况下，该算法会有较好的效果。代码如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public synchronized void update(long value) &#123;//加锁保证线程安全</div><div class="line">	        //每次替换掉最旧的数据，保证”蓄水池“中的数据是最近的 N 个样本</div><div class="line">	        measurements[(int) (count++ % measurements.length)] = value;</div><div class="line">			    &#125;</div></pre></td></tr></table></figure>
+<h3 id="SlidingTimeWindowReservoir-抽样算法"><a href="#SlidingTimeWindowReservoir-抽样算法" class="headerlink" title="SlidingTimeWindowReservoir 抽样算法"></a>SlidingTimeWindowReservoir 抽样算法</h3><p>该算法是上面移动窗口算法的变种，保留的是最近 N 时间单位（支持 TimeUnit 的所有时间单位）内的数据，而不是最近的 N 个数据。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">public void update(long value) &#123;</div><div class="line">//每 TRIM_THRESHOLD 次操作之后会进行一次 trim() 操作</div><div class="line">	if (count.incrementAndGet() % TRIM_THRESHOLD == 0) &#123;</div><div class="line">		trim();</div><div class="line">	&#125;</div><div class="line">			        //直接将该值加入到 ”蓄水池“ 中</div><div class="line">	measurements.put(getTick(), value);</div><div class="line">	&#125;</div><div class="line">//获得当前的时间</div><div class="line">private long getTick() &#123;</div><div class="line">	for (; ; ) &#123;</div><div class="line">		final long oldTick = lastTick.get();</div><div class="line">		final long tick = clock.getTick() * COLLISION_BUFFER;</div><div class="line">		// ensure the tick is strictly incrementing even if there are duplicate ticks</div><div class="line">		final long newTick = tick - oldTick &gt; 0 ? tick : oldTick + 1;</div><div class="line">		if (lastTick.compareAndSet(oldTick, newTick)) &#123;</div><div class="line">			return newTick;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void trim() &#123;</div><div class="line">	measurements.headMap(getTick() - window).clear();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这三种算法中，第二种和第三种是大家都很容易想到的，实现起来也很简单，第一种进行简单推导也不难，也算是一种现成的算法“蓄水池抽样”。</p>
+<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>如果某个系统每天会有 N 个人请求（N 不确定），需要从这些人中等概率的抽出 K 个中奖者，那么应该怎么做呢？是否可以使用上面抽样算法中的一种呢？</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;a href=&quot;http://metrics.dropwizard.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;metric-core&lt;/a&gt; 是一个 java metric 库，用于统计 JVM 层面以及 服务级别 的各种 metric 信息。其中 metric-core 是其核心模块，代码量不多，总共 44 个文件，5700 行左右代码（包括注释）。算是一个很小的开源项目了。由于 metric 在所有项目中都非常重要，因此选择通读该项目，本文分析 metrci-core 中的抽样算法。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="code" scheme="http://yoursite.com/tags/code/"/>
+    
+      <category term="metric" scheme="http://yoursite.com/tags/metric/"/>
+    
+      <category term="reservior" scheme="http://yoursite.com/tags/reservior/"/>
+    
+      <category term="metric-core" scheme="http://yoursite.com/tags/metric-core/"/>
+    
+      <category term="java" scheme="http://yoursite.com/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Streaming 中 Receiver 相关源码分析</title>
+    <link href="http://yoursite.com/2017/05/19/Streaming-%E4%B8%AD-Receiver-%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/"/>
+    <id>http://yoursite.com/2017/05/19/Streaming-中-Receiver-相关源码分析/</id>
+    <published>2017-05-19T03:52:54.000Z</published>
+    <updated>2017-06-03T03:58:50.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文基于 spark 1.6.2<br>本次的源码全来自 <code>org.apache.spark.streaming.receiver</code> 这个 package 下，包括 <code>BlockGenerator.scala</code>, <code>RateLimiter</code>, <code>ReceiverdBlock.scala</code>, <code>ReceivedBlockHandler.scala</code>, <code>Receiver.scala</code>, <code>ReceiverSupervisor.scala</code>, <code>ReceiverSupervisorImpl.scala</code></p>
+<a id="more"></a>
+<p>其中 <code>Receiver</code> 是所有接受数据的父类，主要定义一些接口，用户只需要继承 <code>Receiver</code>，然后实现其中的接口就行。</p>
+<p><code>ReceiverSupervisor</code> 则是负责和协调 <code>Receiver</code> 和其他组件，定义了一些接口，然后 <code>ReceiverSupervisorImpl</code> 是 <code>ReceiverSupervisor</code> 的具体实现，主要实现了协调其他组件（包括 <code>ReceivedBlockHandler</code> 和 <code>BlockGenerator</code> <code>BlockGeneratorListener</code> 以及远端 RPC 服务等）和 <code>Receiver</code> 的逻辑。</p>
+<p><code>BlockGenerator</code> 则主要负责接受 <code>Receiver</code> 接受到的数据，然后存储成 block（具体的有 <code>ReceivedBlockHandler</code> 负责），会起两个线程来做相应的事情，一个是定时的将接受到的数据生成 block，一个是将 block push 给 <code>ReceivedBlockHandler</code> 进行存储，具体的 block 管理则通过 Spark core 的 block 模块来进行管理。</p>
+<p><code>ReceivedBlockHandler</code> 则负责将 block 保存到具体的地方，包括指定的 storageLevel 以及 write ahead log。</p>
+<p>整个 Receiver 端的代码结构简化版如下所示，其中 Receiver 包含一个 ReceiverSupervisor 对象，ReceiverSupervisor 负责和 BlockGenerator 以及 ReceivedBlockHandler 交互。用户继承 Receiver，实现具体的接受数据的逻辑即可，对于数据接受之后，怎么处理，都通过 ReceiverSupervisor 中转给 BlockGenerator 来处理（BlockGenerator 会有一个定时器用于生成 block，还有一个单独的线程用于将生成的 block push 给 BlockManager）</p>
+<img src="/2017/05/19/Streaming-中-Receiver-相关源码分析/Receiver_sample.png" alt="Receiver_sample.png" title="">
+<p>整个 Receiver 端的详细代码结构图如下所示<br><img src="/2017/05/19/Streaming-中-Receiver-相关源码分析/Receiver.png" alt="Receiver.png" title=""></p>
+<h1 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h1><ol>
+<li>为什么需要将 <code>Receiver</code> 和 <code>ReceiverSupervisor</code> 进行分开呢，下面提供这两个类的函数对比图（其中第一列表示 <code>Receiver</code> 的所有函数；后面几列表示 <code>ReceiverSupervisor</code> 的所有函数，同一行的函数表示有相<img src="/2017/05/19/Streaming-中-Receiver-相关源码分析/Receiver_ReceiverSupervisor.png" alt="Receiver_ReceiverSupervisor.png" title="">
+</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文基于 spark 1.6.2&lt;br&gt;本次的源码全来自 &lt;code&gt;org.apache.spark.streaming.receiver&lt;/code&gt; 这个 package 下，包括 &lt;code&gt;BlockGenerator.scala&lt;/code&gt;, &lt;code&gt;RateLimiter&lt;/code&gt;, &lt;code&gt;ReceiverdBlock.scala&lt;/code&gt;, &lt;code&gt;ReceivedBlockHandler.scala&lt;/code&gt;, &lt;code&gt;Receiver.scala&lt;/code&gt;, &lt;code&gt;ReceiverSupervisor.scala&lt;/code&gt;, &lt;code&gt;ReceiverSupervisorImpl.scala&lt;/code&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="分布式系统" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"/>
+    
+      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
+    
+      <category term="源码阅读" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/"/>
+    
+    
+      <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
+    
+      <category term="spark_streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="receiver" scheme="http://yoursite.com/tags/receiver/"/>
+    
+      <category term="source_code" scheme="http://yoursite.com/tags/source-code/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Python 代码实践小结</title>
+    <link href="http://yoursite.com/2017/05/10/Python-%E4%BB%A3%E7%A0%81%E5%AE%9E%E8%B7%B5%E5%B0%8F%E7%BB%93/"/>
+    <id>http://yoursite.com/2017/05/10/Python-代码实践小结/</id>
+    <published>2017-05-10T03:59:21.000Z</published>
+    <updated>2017-06-03T04:07:01.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近写了较多的 Python 脚本，将最近自己写的脚本进行一个总结，其中有些是 Python 独有的，有些是所有程序设计中共有的：</p>
+<ol>
+<li>考虑使用 Logger（logger 怎么配置，需要输出哪些信息 – 可以反向考虑，自己看到这个 logger 的时候想了解什么信息）</li>
+<li>传递的数据结构如何考虑（是否对调用方有先验知识的要求，比如返回一个 Tuple，则需要用户了解 tuple 中元素的顺序，这样情况是否应该进行封装；），数据结构定义清楚了，很多东西也就清楚了。</li>
+<li>如何操作数据库（可以学习 sqlalchemy，包括 core 和 orm 两种 api）</li>
+<li>异常如何处理（异常应该分开捕获 – 可以清楚的知道什么情况下导致的，异常之后应该打印日志说明出现什么问题，如果情况恶劣需要进行异常再次抛出或者报警）</li>
+<li>所有获取资源的地方都应该做 check（a. 没有获取到会怎么办；b.获取到异常的怎么办）</li>
+<li>所有操作资源的地方都应该检查是否操作成功</li>
+<li>每个函数都应该简短，如果函数过长应该进行拆分（有个建议值，函数包含的行数应该在 20-30 行之间，具体按照这个规范做过一次之后就会发现这样真好）</li>
+<li>使用 class 之后，考虑重构 <code>__str__</code> 函数，用户打印输出，如果对象放到 collection 中之后，需要实现 <code>__repr__</code> 函数，用于打印整个 collection 的时候，直观显示（如果不实现 <code>__str__</code>，会调用 <code>__repr__</code>)</li>
+<li>如果有些资源会发生变化，可以单独抽取出来，做成函数，这样后续调用就可以不用改变了</li>
+</ol>
+<p>上述总结肯定有片面的地方，也有不全的地方，欢迎指出</p>
+<a id="more"></a>
+<p>附上一份 Python2.7 代码（将一些私有的东西进行了修改）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div></pre></td><td class="code"><pre><div class="line"># -*- coding:utf-8 -*-</div><div class="line"></div><div class="line">from sqlalchemy import create_engine</div><div class="line">import logging</div><div class="line">from logging.config import fileConfig</div><div class="line">import requests</div><div class="line">import Clinet # 私有的模块</div><div class="line"></div><div class="line">fileConfig(&quot;logging_config.ini&quot;)</div><div class="line">logger = logging.getLogger(&quot;killduplicatedjob&quot;)</div><div class="line"></div><div class="line">#配置可以单独放到一个模块中</div><div class="line">DB_USER = &quot;xxxxxxx&quot;</div><div class="line">DB_PASSWORD = &quot;xxxxxxxx&quot;</div><div class="line">DB_PORT = 111111</div><div class="line">DB_HOST_PORT = &quot;xxxxxxxxxx&quot;</div><div class="line">DB_DATA_BASE = &quot;xxxxxxxxxxx&quot;</div><div class="line"></div><div class="line">REST_API_URL = &quot;http://sample.com&quot;</div><div class="line"></div><div class="line">engine = create_engine(&quot;mysql://%s:%s@%s:%s/%s&quot; % (DB_USER, DB_PASSWORD, DB_HOST_PORT, DB_PORT, DB_DATA_BASE))</div><div class="line"></div><div class="line"></div><div class="line"># 这个 class 是为了在函数间传递时，不需要使用方了解属性的具体顺序而写的，也可以放到一个单独的模块中</div><div class="line">class DuplicatedJobs(object):</div><div class="line">    def __init__(self, app_id, app_name, user):</div><div class="line">        self.app_id = app_id</div><div class="line">        self.app_name = app_name</div><div class="line">        self.user = user</div><div class="line"></div><div class="line">     def __repr__(self):</div><div class="line">        return &apos;[appid:%s, app_name:%s, user:%s]&apos; % (self.app_id, self.app_name, self.user)</div><div class="line"></div><div class="line"></div><div class="line">	def find_duplicated_jobs():</div><div class="line">		logger.info(&quot;starting find duplicated jobs&quot;)</div><div class="line">		(running_apps, app_name_to_user) = get_all_running_jobs()</div><div class="line">		all_apps_on_yarn = get_apps_from_yarn_with_queue(get_resource_queue())</div><div class="line"></div><div class="line">		duplicated_jobs = []</div><div class="line">		for app in all_apps_on_yarn:</div><div class="line">			(app_id, app_name) = app</div><div class="line"></div><div class="line">			if app_id not in running_apps:</div><div class="line">				if not app_name.startswith(&quot;test&quot;):</div><div class="line">					logger.info(&quot;find a duplicated job, prefixed_name[%s] with appid[%s]&quot; % (app_name, app_id))</div><div class="line">					user = app_name_to_user[app_name]</div><div class="line">					duplicated_jobs.append(DuplicatedJobs(app_id, app_name, user))</div><div class="line">	            else:</div><div class="line">				    logger.info(&quot;Job[%s] is a test job, would not kill it&quot; % app_name)</div><div class="line"></div><div class="line">	logger.info(&quot;Find duplicated jobs [%s]&quot; % duplicated_jobs)</div><div class="line"></div><div class="line">    return duplicated_jobs</div><div class="line"></div><div class="line"></div><div class="line">def get_apps_from_yarn_with_queue(queue):</div><div class="line">	param = &#123;&quot;queue&quot;: queue&#125;</div><div class="line">	r = requests.get(REST_API_URL, params=param)</div><div class="line">	apps_on_yarn = []</div><div class="line">	try:</div><div class="line">		jobs = r.json().get(&quot;apps&quot;)</div><div class="line">		app_list = jobs.get(&quot;app&quot;, [])</div><div class="line">		for app in app_list:</div><div class="line">			app_id = app.get(&quot;id&quot;)</div><div class="line">			name = app.get(&quot;name&quot;)</div><div class="line">			apps_on_yarn.append((app_id, name))</div><div class="line"></div><div class="line">	 except Exception as e: #Exception 最好进行单独的分开，针对每一种 Exception 进行不同的处理</div><div class="line">		logger.error(&quot;Get apps from Yarn Error, message[%s]&quot; % e.message)</div><div class="line"></div><div class="line">	logger.info(&quot;Fetch all apps from Yarn [%s]&quot; % apps_on_yarn)</div><div class="line"></div><div class="line">	return apps_on_yarn</div><div class="line"></div><div class="line"></div><div class="line">def get_all_running_jobs():</div><div class="line">	job_infos = get_result_from_mysql(&quot;select * from xxxx where xx=yy&quot;)</div><div class="line"></div><div class="line">	app_ids = []</div><div class="line">	app_name_to_user = &#123;&#125;</div><div class="line">	for (topology_id, topology_name) in job_infos:</div><div class="line">		status_set = get_result_from_mysql(&quot;select * from xxxx where xx=yy&quot;)</div><div class="line">		application_id = status_set[0][0]</div><div class="line">		if &quot;&quot; != application_id:</div><div class="line">			configed_resource_queue = get_result_from_mysql(&quot;select * from xxxx where xx=yy&quot;)</div><div class="line">			app_ids.append(application_id)</div><div class="line">	        app_name_to_user[topology_name] = configed_resource_queue[0][0].split(&quot;.&quot;)[1]</div><div class="line"></div><div class="line">	logger.info(&quot;All running jobs appids[%s] topology_name2user[%s]&quot; % (app_ids, app_name_to_user))</div><div class="line">	return app_ids, app_name_to_user</div><div class="line"></div><div class="line"></div><div class="line">def kill_duplicated_jobs(duplicated_jobs):</div><div class="line">	for job in duplicated_jobs:</div><div class="line">	app_id = job.app_id</div><div class="line">	app_name = job.app_name</div><div class="line">	user = job.user</div><div class="line">	logger.info(&quot;try to kill job[%s] with appid[%s] for user[%s]&quot; % (app_name, app_id, user))</div><div class="line">	try:</div><div class="line">		Client.kill_job(app_id, user)</div><div class="line">		logger.info(&quot;Job[%s] with appid[%s] for user[%s] has been killed&quot; % (app_name, app_id, user))</div><div class="line">	except Exception as e:</div><div class="line">		logger.error(&quot;Can&apos;t kill job[%s] with appid[%s] for user[%s]&quot; % (app_name, app_id, user))</div><div class="line"></div><div class="line"></div><div class="line">def get_result_from_mysql(sql):</div><div class="line">	a = engine.execute(sql)</div><div class="line">	return a.fetchall() </div><div class="line"></div><div class="line"></div><div class="line"># 因为下面的资源可能发生变化，而且可能包含一些具体的逻辑，因此单独抽取出来，独立成一个函数</div><div class="line">def get_resource_queue():</div><div class="line">	return &quot;xxxxxxxxxxxxx&quot;</div><div class="line"></div><div class="line">if __name__ == &quot;__main__&quot;:</div><div class="line">	kill_duplicated_jobs(find_duplicated_jobs())</div></pre></td></tr></table></figure>
+<p>其中 logger 配置文件如下（对于 Python 的 logger，官方文档写的非常好，建议读一次，并且实践一次）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">[loggers]</div><div class="line">keys=root, simpleLogger</div><div class="line"></div><div class="line">[handlers]</div><div class="line">keys=consoleHandler, logger_handler</div><div class="line"></div><div class="line">[formatters]</div><div class="line">keys=formatter</div><div class="line"></div><div class="line">[logger_root]</div><div class="line">level=WARN</div><div class="line">handlers=consoleHandler</div><div class="line"></div><div class="line">[logger_simpleLogger]</div><div class="line">level=INFO</div><div class="line">handlers=logger_handler</div><div class="line">propagate=0</div><div class="line">qualname=killduplicatedjob</div><div class="line"></div><div class="line">[handler_consoleHandler]</div><div class="line">class=StreamHandler</div><div class="line">level=WARN</div><div class="line">formatter=formatter</div><div class="line">args=(sys.stdout,)</div><div class="line"></div><div class="line">[handler_logger_handler]</div><div class="line">class=logging.handlers.RotatingFileHandler</div><div class="line">level=INFO</div><div class="line">formatter=formatter</div><div class="line">args=(&quot;kill_duplicated_streaming.log&quot;, &quot;a&quot;, 52428800, 3,)</div><div class="line"></div><div class="line">[formatter_formatter]</div><div class="line">format=%(asctime)s %(name)-12s %(levelname)-5s %(message)s</div></pre></td></tr></table></figure></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近写了较多的 Python 脚本，将最近自己写的脚本进行一个总结，其中有些是 Python 独有的，有些是所有程序设计中共有的：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;考虑使用 Logger（logger 怎么配置，需要输出哪些信息 – 可以反向考虑，自己看到这个 logger 的时候想了解什么信息）&lt;/li&gt;
+&lt;li&gt;传递的数据结构如何考虑（是否对调用方有先验知识的要求，比如返回一个 Tuple，则需要用户了解 tuple 中元素的顺序，这样情况是否应该进行封装；），数据结构定义清楚了，很多东西也就清楚了。&lt;/li&gt;
+&lt;li&gt;如何操作数据库（可以学习 sqlalchemy，包括 core 和 orm 两种 api）&lt;/li&gt;
+&lt;li&gt;异常如何处理（异常应该分开捕获 – 可以清楚的知道什么情况下导致的，异常之后应该打印日志说明出现什么问题，如果情况恶劣需要进行异常再次抛出或者报警）&lt;/li&gt;
+&lt;li&gt;所有获取资源的地方都应该做 check（a. 没有获取到会怎么办；b.获取到异常的怎么办）&lt;/li&gt;
+&lt;li&gt;所有操作资源的地方都应该检查是否操作成功&lt;/li&gt;
+&lt;li&gt;每个函数都应该简短，如果函数过长应该进行拆分（有个建议值，函数包含的行数应该在 20-30 行之间，具体按照这个规范做过一次之后就会发现这样真好）&lt;/li&gt;
+&lt;li&gt;使用 class 之后，考虑重构 &lt;code&gt;__str__&lt;/code&gt; 函数，用户打印输出，如果对象放到 collection 中之后，需要实现 &lt;code&gt;__repr__&lt;/code&gt; 函数，用于打印整个 collection 的时候，直观显示（如果不实现 &lt;code&gt;__str__&lt;/code&gt;，会调用 &lt;code&gt;__repr__&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;如果有些资源会发生变化，可以单独抽取出来，做成函数，这样后续调用就可以不用改变了&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;上述总结肯定有片面的地方，也有不全的地方，欢迎指出&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="语言学习" scheme="http://yoursite.com/categories/%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="计算机基础" scheme="http://yoursite.com/categories/%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/"/>
+    
+    
+      <category term="python" scheme="http://yoursite.com/tags/python/"/>
+    
+      <category term="code" scheme="http://yoursite.com/tags/code/"/>
+    
+      <category term="logger" scheme="http://yoursite.com/tags/logger/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>从现在开始写作</title>
+    <link href="http://yoursite.com/2017/04/15/%E4%BB%8E%E7%8E%B0%E5%9C%A8%E5%BC%80%E5%A7%8B%E5%86%99%E4%BD%9C/"/>
+    <id>http://yoursite.com/2017/04/15/从现在开始写作/</id>
+    <published>2017-04-15T04:07:32.000Z</published>
+    <updated>2017-06-03T04:11:28.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>这里的写作不特指写长篇大论的文章</p>
+<h2 id="为什么要写作"><a href="#为什么要写作" class="headerlink" title="为什么要写作"></a>为什么要写作</h2><blockquote>
+<p>写作是了帮助自己更好的思考，提高自己的效率。</p>
+</blockquote>
+<p>首先，每个人同一时刻能记住的东西有限，而做一件事情可能需要考虑的条件往往会比较多，将所有的情况写到一张纸上，就能在需要的时候看到自己需要的条件。相信每个人都有这样的体验：做数学题的时候，将所有的已知条件，或者自己推导出来的结论写到草稿纸上，往往能更快的解出这道题目。这也是写作帮助自己思考的一个直接。</p>
+<p>其次，我遇到过这种情况，自己想着是这么回事，可是写下来的时候，发现无从下笔，根本写不出来，写出来之后，也很难向别人清楚、准确的表达自己的意思。这归根结底还是没有思考清楚导致的，而写作可以帮助我整理自己的思路。</p>
+<p>然后，当过客服的人肯定有一个体会，客服非常耗时间，而这些客服的问题大部分是差不多的，一对一的客服是非常低效的，就算在群组里面进行客服，其实很多后来遇到同样问题的人也是不看群历史记录（或者不知道以前有人遇到过类似的问题）的。这种情况下，虽然文档不是最优解，但能够省出自己足够多的时间，实际上这是一件杠杆率非常高（产出投入比高）的事件。</p>
+<a id="more"></a>
+<h2 id="写什么"><a href="#写什么" class="headerlink" title="写什么"></a>写什么</h2><p>既然明确了写作的目的，那么写什么也就清楚了。</p>
+<ol>
+<li><p>写对自己有用的东西</p>
+<ul>
+<li>读书笔记。看完一本书之后，可以写一个读书笔记，或者用思维导图整理书中内容，整理的过程是帮助自己加深书中思想印象的过程，可以帮助自己将整本书串起来，有一个全局的了解，也知道自己哪些地方暂时不太清楚。</li>
+<li>自己解决问题的总结。总结可以帮助自己复盘 – 有复盘才有改进的方向；备忘。我曾经在公司内网上记录了自己解决某个问题的过程与解决方案，后来有不少遇到同样问题的同事联系我，每个人的问题相似，但每个人的问题又都不一样，解决别人的问题，实际上也能扩大自己的知识储备。</li>
+<li>写教程 – 教是最好的学。在自己写教程的过程中，实际上也是自己再教自己一次相应的知识，对掌握的知识了解更深，对掌握不够的知识，去学习了解。</li>
+<li>自己对某件事的思考过程。将自己的思考过程写下来，能够更好的了解自己是怎么考虑问题的，在哪些地方可以进行改善，哪些地方是自己没有考虑到的，能够帮助自己更好的提高思考质量。</li>
+</ul>
+</li>
+<li><p>写对别人有用的东西</p>
+</li>
+</ol>
+<blockquote>
+<p>解决问题的思路和方案，以及教程对别人也是有用的。其他对别人有用的东西，暂时还在思考中。</p>
+</blockquote>
+<h2 id="怎么写"><a href="#怎么写" class="headerlink" title="怎么写"></a>怎么写</h2><blockquote>
+<p>用笔写</p>
+</blockquote>
+<p>为什么写，以及写什么都考虑清楚之后，怎么写就不再是个问题了。如果你习惯写在纸质的本子上，那么买一个自己喜欢的本子，一只自己喜欢的笔，直接写就好了；如果你习惯使用电脑或者手机写，那么新建一个文件夹，在里面写就好了。</p>
+<p>写的东西并不一定要公开，对于暂时不成熟的东西，或者私密的东西，保存在一个只有自己能看的地方就好了；对于成熟的东西，或者可以公开的东西，公开发表就好了。公开发表有一个好处，得到更多的反馈，这些反馈是非常利于自己进步的。</p>
+<p>另外，有一个很简单的小技巧。自己维护一个素材记录本（可以是纸质的本子，可以是电子产品 – 建议购买正版），里面记录自己觉得不错的句子，例子，表达方式等等，偶尔翻一翻，或者打算写作的时候进行一下搜索。</p>
+<h2 id="其他问题"><a href="#其他问题" class="headerlink" title="其他问题"></a>其他问题</h2><ol>
+<li>写的不好怎么办  <blockquote>
+<p>没有人一生下来就会吃饭吗？也没有人长大之后不会吃饭</p>
+</blockquote>
+</li>
+<li>不知道怎么写开头怎么办<blockquote>
+<p>如果不写开头的话，知道怎么写吗？知道的话，那就不要写开头了，为什么一定要写开头呢</p>
+</blockquote>
+</li>
+<li>要写多少才合适呢<blockquote>
+<p>没有一个统一的结论写多少才合适，只要能将自己想表达的东西讲清楚就行。写作最终受益的是自己，这不是在考试，不要为了凑字数而写。</p>
+</blockquote>
+</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;这里的写作不特指写长篇大论的文章&lt;/p&gt;
+&lt;h2 id=&quot;为什么要写作&quot;&gt;&lt;a href=&quot;#为什么要写作&quot; class=&quot;headerlink&quot; title=&quot;为什么要写作&quot;&gt;&lt;/a&gt;为什么要写作&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;写作是了帮助自己更好的思考，提高自己的效率。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;首先，每个人同一时刻能记住的东西有限，而做一件事情可能需要考虑的条件往往会比较多，将所有的情况写到一张纸上，就能在需要的时候看到自己需要的条件。相信每个人都有这样的体验：做数学题的时候，将所有的已知条件，或者自己推导出来的结论写到草稿纸上，往往能更快的解出这道题目。这也是写作帮助自己思考的一个直接。&lt;/p&gt;
+&lt;p&gt;其次，我遇到过这种情况，自己想着是这么回事，可是写下来的时候，发现无从下笔，根本写不出来，写出来之后，也很难向别人清楚、准确的表达自己的意思。这归根结底还是没有思考清楚导致的，而写作可以帮助我整理自己的思路。&lt;/p&gt;
+&lt;p&gt;然后，当过客服的人肯定有一个体会，客服非常耗时间，而这些客服的问题大部分是差不多的，一对一的客服是非常低效的，就算在群组里面进行客服，其实很多后来遇到同样问题的人也是不看群历史记录（或者不知道以前有人遇到过类似的问题）的。这种情况下，虽然文档不是最优解，但能够省出自己足够多的时间，实际上这是一件杠杆率非常高（产出投入比高）的事件。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="我的生活" scheme="http://yoursite.com/categories/%E6%88%91%E7%9A%84%E7%94%9F%E6%B4%BB/"/>
+    
+      <category term="想清楚" scheme="http://yoursite.com/categories/%E6%88%91%E7%9A%84%E7%94%9F%E6%B4%BB/%E6%83%B3%E6%B8%85%E6%A5%9A/"/>
+    
+    
+      <category term="写作" scheme="http://yoursite.com/tags/%E5%86%99%E4%BD%9C/"/>
+    
+      <category term="成长" scheme="http://yoursite.com/tags/%E6%88%90%E9%95%BF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark Streaming 统一在每分钟的 00 秒消费 Kafka 数据的问题解决</title>
+    <link href="http://yoursite.com/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/"/>
+    <id>http://yoursite.com/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/</id>
+    <published>2017-02-16T15:44:31.000Z</published>
+    <updated>2017-06-03T03:38:41.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据</p>
+<a id="more"></a>
+<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><p>这一批作业的功能就是从 kafka 消费数据，进行转化后存储到外部可靠介质中。所有作业的 <code>batchDuration</code> 都设置为 60s。<br>我们追踪代码可以得到在 <code>JobGenerator</code> 中有一个变量 <code>timer : RecurringTimer</code>，改变量用于定时的启动 task 去消费数据。<br>从 <code>RecurringTimer#getStartTime</code> 我们可以得到作业第一个 batch 的启动时间，后续的 batch 启动时间则是在第一个 batch 的启动时间上加上 <code>batchDuration</code> 的整数倍。<br>第一个 batch 的起动时间实现如下：<br><code>(math.floor(clock.getTimeMillis().toDouble / period) + 1).toLong * period</code><br>其中 <code>clock.getTimeMillis()</code> 是当前时间，period 是<code>batchDuration</code> 的毫秒表示法。通过上述公式，我们可以知道作业的启动时间会对齐到 <code>batchDuration</code>，而我们把这一批作业的 <code>batchDuration</code> 都设置为 60s，因此都会在每分钟的 00 秒开始消费 kafka 数据。</p>
+<h2 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h2><p>我们可以通过下面两种方式进行解决</p>
+<ol>
+<li>设置不同的 <code>batchDuration</code></li>
+<li>改写 <code>RecurringTimer#getStartTime</code> 的逻辑，在上述对齐的时间基础上加上一个 [0, period) 范围内的随机数</li>
+</ol>
+<p>我们知道在上述两种解决方案中，第一种，不同作业还是会在某一时刻重合，而且这个重合的时间点不可控，可能是作业运行一小时后，可能是运行一天后，也可能是运行一周后。而第二种作业则是可控的，在作业启动时就决定了。因此这里我们采用第二种方案。</p>
+<p>本文采用了一种新的排版方式，在进行实验，如果效果好的好，后续大部分内容都会以这种形式进行发布</p>
+<div class="markdown-here-wrapper" style="font-size: 16px; line-height: 1.8em; letter-spacing: 0.1em;" data-md-url="http://www.klion26.com/wp-admin/post-new.php"></div>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;现象&quot;&gt;&lt;a href=&quot;#现象&quot; class=&quot;headerlink&quot; title=&quot;现象&quot;&gt;&lt;/a&gt;现象&lt;/h2&gt;&lt;p&gt;一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="分布式系统" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"/>
+    
+    
+      <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
+    
+      <category term="spark_streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
+    
+      <category term="problem_solve" scheme="http://yoursite.com/tags/problem-solve/"/>
+    
+      <category term="batchDuration" scheme="http://yoursite.com/tags/batchDuration/"/>
+    
+      <category term="JobGenerator" scheme="http://yoursite.com/tags/JobGenerator/"/>
+    
+      <category term="RecurringTimer" scheme="http://yoursite.com/tags/RecurringTimer/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark Streaming 往 HDFS 追加 LZO 文件</title>
+    <link href="http://yoursite.com/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/"/>
+    <id>http://yoursite.com/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/</id>
+    <published>2017-01-15T07:38:17.000Z</published>
+    <updated>2017-06-03T03:39:14.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将数据从 Kafka 同步到 Hive，并且目标格式希望是 lzo。我们通过 Spark Streaming 做这件事，将文件写成 lzo 格式，并且添加索引。</p>
+<a id="more"></a>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>要实现将数据从 Kafka 同步到 Hive 的功能，我们通过将数据直接写到 HDFS 路径来解决，由于担心小文件太多的问题（一个 batch 一个文件的话，可能造成小文件太多，对 HDFS 造成非常大的压力），所以我们通过追加的方式写 HDFS 文件。</p>
+<p>往 HDFS 追加写文件的方式，我们在前面一篇文章中描述了具体的方案。但是对于格式为 LZO 的文件，我们发现一个现象：通过 Hive 查询，只能查到第一个 batch 的数据（也就是说所有 append 的数据都不能被查询到）。这是因为 LZO 文件会在关闭的时候在文件末尾添加一个块结束标记符，导致解析的时候只能读取到块结束符之前的数据（Linux 自带的 lzop 文件可以解析包含块结束符的文件）。到这里我们有两个思路：</p>
+<pre><code>1. 在 Hive 层面进行修改，将 Hive 使用的 InputFormat 重新实现，从而可以解析 multipart 的文件；
+2. 通过某种方式将文件进行追加，但是文件的中间不会出现结束块的标记符。
+</code></pre><p>由于第一种方式影响较大，实现起来周期较长，所以这里采用第二种方法。</p>
+<p>我们考虑如何做到往 HDFS 写完数据之后，文件流不进行关闭，在我们需要关闭的时候再手动关闭。也就是说同一个 Executor 上的多 batch 公用同一个文件流。</p>
+<p>查看<a href="http://spark.apache.org/docs/latest/streaming-programming-guide.html#design-patterns-for-using-foreachrdd" target="_blank" rel="external">官方文档</a>我们可以得到这是可以实现的，也就是文档中的 ConnectionPool 实现的方式，这可以做到在同一个 Executor 上执行的多个 batch 公用同一个文件流（个人觉得这里也可以从 JVM 的层面来考虑，就是利用了 static 变量的声明周期以及可访问范围）。</p>
+<p>当我们手动关闭某个文件的时候，再考虑将这个文件 move 到特定的地方（Hive 表对应的 HDFS 路径），然后添加索引，大致框架就完成了。当然这也仅仅是一个框架，需要处理的细节问题还有很多。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;需求&quot;&gt;&lt;a href=&quot;#需求&quot; class=&quot;headerlink&quot; title=&quot;需求&quot;&gt;&lt;/a&gt;需求&lt;/h2&gt;&lt;p&gt;将数据从 Kafka 同步到 Hive，并且目标格式希望是 lzo。我们通过 Spark Streaming 做这件事，将文件写成 lzo 格式，并且添加索引。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
+    
+    
+      <category term="spark_streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
+    
+      <category term="append" scheme="http://yoursite.com/tags/append/"/>
+    
+      <category term="hdfs" scheme="http://yoursite.com/tags/hdfs/"/>
+    
+      <category term="hive" scheme="http://yoursite.com/tags/hive/"/>
+    
+      <category term="lzo" scheme="http://yoursite.com/tags/lzo/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark Streaming Ran out of messages before reaching ending offset 异常</title>
+    <link href="http://yoursite.com/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/"/>
+    <id>http://yoursite.com/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/</id>
+    <published>2016-12-16T06:23:13.000Z</published>
+    <updated>2017-06-03T03:39:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>Spark Streaming 处理数据过程中遇到 <code>Ran out of messages before reaching ending offset</code> 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）</p>
+<a id="more"></a>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>通过异常栈信息，我们知道异常从 KafkaRDD.scala#211 行抛出，下面是相应代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">206 override def getNext(): R = &#123;</div><div class="line">	  if (iter == null || !iter.hasNext) &#123;</div><div class="line">208        iter = fetchBatch</div><div class="line">      &#125;</div><div class="line">210      if (!iter.hasNext) &#123;</div><div class="line">211        assert(requestOffset == part.untilOffset, errRanOutBeforeEnd(part))</div><div class="line">212        finished = true</div><div class="line">           null.asInstanceOf[R]</div><div class="line">		&#125; else &#123;</div><div class="line">		   	val item = iter.next()</div><div class="line">			if (item.offset &gt;= part.untilOffset) &#123;</div><div class="line">217 	        assert(item.offset == part.untilOffset, errOvershotEnd(item.offset, part))</div><div class="line">				finished = true</div><div class="line">				null.asInstanceOf[R]</div><div class="line">			&#125; else &#123;</div><div class="line">				requestOffset = item.nextOffset</div><div class="line">				messageHandler(new MessageAndMetadata(</div><div class="line">				part.topic, part.partition, item.message, item.offset, keyDecoder, valueDecoder))</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">226    &#125;</div></pre></td></tr></table></figure>
+<p>通过分析，我们知道这个地方是实际从 Kafka 读取数据的逻辑，首先会调用 <code>fetchBatch</code> 函数（208 行），然后进行逻辑判断，数据是否读取完毕，是否发生异常</p>
+<p>其中 211 行的异常表示还未读取到 part.untilOffset 但是当前迭代器中没有数据了；217 行表示当前读取的数据如果超过了 part.untilOffset ，那么在这个时候退出当前 batch（offset 从 fromOffset 逐次加一增加的，正常的逻辑肯定会和 part.untilOffset 相等）</p>
+<p>我们知道异常从 211 行抛出来的，也知道了异常的最直接原因，那么这个原因是什么造成的呢？</p>
+<p>211 行的代码执行了，也就是 210 行的 if 语句未 true，这样的话，207 行的逻辑也应该为 true。这样的话 iter 就是 fetchBatch 返回的迭代器了。接下来我们看看 fetchBatch 的代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">188 private def fetchBatch: Iterator[MessageAndOffset] = &#123;</div><div class="line">189      val req = new FetchRequestBuilder()</div><div class="line">190         .addFetch(part.topic, part.partition, requestOffset, kc.config.fetchMessageMaxBytes)</div><div class="line">			.build()</div><div class="line">192      val resp = consumer.fetch(req)</div><div class="line">	   	 handleFetchErr(resp)</div><div class="line">		// kafka may return a batch that starts before the requested offset</div><div class="line">		 resp.messageSet(part.topic, part.partition)</div><div class="line">196       .iterator</div><div class="line">          .dropWhile(_.offset &lt; requestOffset)</div><div class="line">		&#125;</div></pre></td></tr></table></figure></p>
+<p>我们发现 192 行会通过 consumer 从 kafka 获取数据，本次从哪获取数据，以及获取多少分别由 190 行的 <code>topic</code>, <code>partition</code> 和 <code>kc.config.fetchMessageMaxBytes</code> 指定。我们查看 <code>kc.config.fetchMessageMaxBytes</code>，发现默认使用的是 1M</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">ConsumerConfig.scala</div><div class="line">29 val FetchSize = 1024 * 1024</div><div class="line"></div><div class="line">114 val fetchMessageMaxBytes = props.getInt(&quot;fetch.message.max.bytes&quot;, FetchSize)</div></pre></td></tr></table></figure>
+<p>从这里我们知道每次从 kafka 上最多获取 1M 的数据（这也是为什么需要在 <code>KafkaRDD.getNext</code> 函数的开头通过 <code>iter.hasNext()</code> 来判断是否需要调用 <code>fetchBatch</code> </p>
+<p>然后看到 fetchBatch 函数对应的 196 行，获取迭代器作为返回值，查看相应代码，跳转到 <code>ByteBufferMessageSet.scala</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">139 override def iterator: Iterator[MessageAndOffset] = internalIterator()</div><div class="line">145 private def internalIterator(isShallow: Boolean = false): Iterator[MessageAndOffset] = &#123;</div><div class="line">		    new IteratorTemplate[MessageAndOffset] &#123;</div><div class="line">				        ......</div><div class="line">152      def makeNextOuter: MessageAndOffset = &#123;</div><div class="line">             // if there isn&apos;t at least an offset and size, we are done</div><div class="line">			if (topIter.remaining &lt; 12)</div><div class="line">				return allDone()</div><div class="line">			    val offset = topIter.getLong()</div><div class="line">			    val size = topIter.getInt()</div><div class="line">		        if(size &lt; Message.MinHeaderSize)</div><div class="line">			         throw new InvalidMessageException(&quot;Message found with corrupt size (&quot; + size + &quot;)&quot;)</div><div class="line">					</div><div class="line">160       // we have an incomplete message</div><div class="line">161       if(topIter.remaining &lt; size)</div><div class="line">162         return allDone()</div><div class="line">		....</div><div class="line">185     &#125;</div></pre></td></tr></table></figure>
+<p>从 161 行我们可以看出，如果读取的消息是一条不完整的，那么本次不处理，默认本次消息读取完成。<br>上面所有的链条穿起来就抛出了我们文章开始的异常。</p>
+<pre><code>1. 从 kafka 读取 1M 的数据（默认大小）
+2. 发现读取的数据不完整（这个消息的大小大于 1M），所以本次读取的 迭代器 为空
+3. 发现迭代器为空，但是当前的 offset 和 part.untilOffset 不想等，抛出异常
+</code></pre><h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过设置 kafkaParam 的参数 <code>fetch.message.max.bytes</code> 就行了，我们设置成 2M（大于一条数据的最大值即可），就能够运行成功了</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;现象&quot;&gt;&lt;a href=&quot;#现象&quot; class=&quot;headerlink&quot; title=&quot;现象&quot;&gt;&lt;/a&gt;现象&lt;/h2&gt;&lt;p&gt;Spark Streaming 处理数据过程中遇到 &lt;code&gt;Ran out of messages before reaching ending offset&lt;/code&gt; 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
+    
+    
+      <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
+    
+      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
+    
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="exception" scheme="http://yoursite.com/tags/exception/"/>
+    
+      <category term="ran_out_of_messages" scheme="http://yoursite.com/tags/ran-out-of-messages/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark Streaming 从指定时间戳开始消费 kafka 数据</title>
+    <link href="http://yoursite.com/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/"/>
+    <id>http://yoursite.com/2016/12/02/spark-streaming-consume-kafka-message-from-specify-timestamp/</id>
+    <published>2016-12-02T11:27:49.000Z</published>
+    <updated>2017-06-03T03:39:56.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>从指定时间戳（比如 2 小时）开始消费 Kafka 数据</p>
+<a id="more"></a>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>我们知道通过 Kafka 的 API 可以得到指定时间戳对应数据所在的 segment 的起始 offset。那么就可以通过这个功能来粗略的实现需求。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>我们知道 <code>KafkaUitls.createDirectStream</code> 这个接口可以指定起始点的 offset，那么我们需要做的就变成如下三步：</p>
+<ol>
+<li>获取 <code>topic</code> 对应的 <code>TopicAndPartitions</code>，得到当前 topic 有多少 partition</li>
+<li>从 Kafka 获取每个 partition 指定时间戳所在 segment 的起始 offset</li>
+<li>将步骤 2 中的 offset 作为参数传入 <code>createDirectStream</code> 即可<br>通过查看源码，我们知道步骤 1 和步骤 2 中的功能在 <code>org.apache.spark.streaming.kafka.KafkaCluster</code> 中都已经有现成的函数了：<code>getPartitions</code> 和 <code>getLeaderOffsets</code>，分别表示获取指定 topic 的 partition 以及获取 partition 指定时间戳所在的 segment 的起始 offset，那么我们需要做的就是如何调用这两个函数实现我们的功能了。</li>
+</ol>
+<p>我们知道 <code>KafkaCluster</code> 的作用域是 <code>private[spark]</code> 所以我们需要在自己的代码中使用 <code>package org.apache.spark(.xxx ... .yyy)</code>(小括号中表示可以省略）来限定自己的代码，因此我们可以将步骤 1 和步骤 2 中的功能实现如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">package org.apache.spark.streaming.kafka</div><div class="line">......      //省略其他不相关的代码</div><div class="line"></div><div class="line">def getPartitions(kafkaParams: Map[String, String], topics: Set[String]): Either[Err, Set[TopicAndPartition]] = &#123;</div><div class="line">        val kc = new KafkaCluster(kafkaParams)</div><div class="line">        kc.getPartitions(topics)    //我们可以在这里处理错误，也可以将错误继续往上传递</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    def getLeaderOffsets(kafkaParams: Map[String, String], topicAndPartitions: Set[TopicAndPartition], before: Long) : Map[TopicAndPartition, Long]  = &#123;</div><div class="line">        val kc = new KafkaCluster(kafkaParams)</div><div class="line">        val leaderOffsets = kc.getLeaderOffsets(topicAndPartitions, before)</div><div class="line">        if (leaderOffsets.isLeft) &#123;  //在本函数内部处理错误，如果有错误抛出异常</div><div class="line">            throw new RuntimeException(s&quot;### Exception when MTKafkaUtils#getLeaderOffsets $&#123;leaderOffsets.left.get&#125; ###&quot;)</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        leaderOffsets.right.get.map &#123; case (k, v) =&gt; (k, v.offset)&#125;  //将 Map[TopicAndPartition, LeaderOffset] 转变为 Map[TopicAndPartition, Long]（Long 为对应 partition 的 offset，从 LeaderOffset 中获取）</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>步骤 3 直接传入参数即可，就可以从指定时间戳开始消费 Kafka 数据了</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;需求&quot;&gt;&lt;a href=&quot;#需求&quot; class=&quot;headerlink&quot; title=&quot;需求&quot;&gt;&lt;/a&gt;需求&lt;/h2&gt;&lt;p&gt;从指定时间戳（比如 2 小时）开始消费 Kafka 数据&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="分布式系统" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"/>
+    
+      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
+    
+    
+      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
+    
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="specify_timestamp" scheme="http://yoursite.com/tags/specify-timestamp/"/>
+    
+      <category term="timestamp" scheme="http://yoursite.com/tags/timestamp/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark Streaming 往 HDFS 写文件，自定义文件名</title>
+    <link href="http://yoursite.com/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/"/>
+    <id>http://yoursite.com/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/</id>
+    <published>2016-11-26T08:09:25.000Z</published>
+    <updated>2017-06-03T03:40:30.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将 kafka 上的数据实时同步到 HDFS，不能有太多小文件</p>
+<a id="more"></a>
+<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><p>Spark Streaming 支持 RDD#saveAsTextFile，将数据以 <strong>纯文本</strong> 方式写到 HDFS，我们查看 RDD#saveAsTextFile 可以看到</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">RDD.rddToPairRDDFunctions(r)(nullWritableClassTag, textClassTag, null)</div><div class="line">      .saveAsHadoopFile[TextOutputFormat[NullWritable, Text]](path)</div></pre></td></tr></table></figure>
+<p>从上面这句话我们可以知道，首先将 RDD 转化为 PariRDD，然后再调用 saveAsHadoopFile 函数进行实际的操作。上面的语句中 <code>r</code> 是原始 RDD，<code>nullWritableClassTag</code> 和 <code>textClassTag</code> 表示所写数据的类型，使用 <code>nullWritableClassTag</code> 是因为 HDFS 不会将这个数据进行实际写入（pariRDD 是 (K,V) 类型， 我们只需要写入 V），从效果上看就只写如后面的一个字段。<code>TextOutputFormat</code> 是一个格式化函数，后面我们再来看这个函数，<code>NullWritable</code> 则表示一个占位符，同样是这个字段不需要实际写入 HDFS，<code>Text</code> 表示我们将写入文本类型的数据。</p>
+<p>我们看到 <code>TextOutputFormat</code> 这个类中有一个函数是 <code>RecordWriter</code> 用于操作没一条记录的写入，代码如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">public RecordWriter&lt;K, V&gt; getRecordWriter(FileSystem ignored, JobConf job, String name, Progressable progress) throws IOException &#123;</div><div class="line">	boolean isCompressed = getCompressOutput(job);</div><div class="line">	String keyValueSeparator = job.get(&quot;mapreduce.output.textoutputformat.separator&quot;, &quot;\t&quot;);</div><div class="line">	if(!isCompressed) &#123;</div><div class="line">	    Path codecClass1 = FileOutputFormat.getTaskOutputPath(job, name);</div><div class="line">		FileSystem codec1 = codecClass1.getFileSystem(job);</div><div class="line">		FSDataOutputStream file1 = codec1.create(codecClass1, progress);</div><div class="line">		return new TextOutputFormat.LineRecordWriter(file1, keyValueSeparator);</div><div class="line">	&#125; else &#123;</div><div class="line">	    Class codecClass = getOutputCompressorClass(job, GzipCodec.class);</div><div class="line">		CompressionCodec codec = (CompressionCodec)ReflectionUtils.newInstance(codecClass, job);</div><div class="line">		Path file = FileOutputFormat.getTaskOutputPath(job, name + codec.getDefaultExtension());</div><div class="line">		FileSystem fs = file.getFileSystem(job);</div><div class="line">		FSDataOutputStream fileOut = fs.create(file, progress);</div><div class="line">		return new TextOutputFormat.LineRecordWriter(new DataOutputStream(codec.createOutputStream(fileOut)), keyValueSeparator);</div><div class="line">		&#125;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>文件中分为两部分：1）压缩文件，2）非压缩文件。然后剩下的事情就是打开文件，往文件中写数据了。</p>
+<p>说到压缩文件，就和写 lzo 格式关联起来了，因为 lzo 格式就是压缩的，那么我们从哪拿到这个压缩的格式的呢？实际上 PariRDDFunctions#saveAsHadoopFile 还可以传入压缩格式类，函数原型如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">def saveAsHadoopFile[F &lt;: OutputFormat[K, V]](</div><div class="line">    path: String,</div><div class="line">    codec: Class[_ &lt;: CompressionCodec])(implicit fm: ClassTag[F]): Unit = self.withScope &#123;</div></pre></td></tr></table></figure>
+<p>这里第二个参数表示压缩的类。如果需要我们传入一个压缩类即可，如 <code>classOf[com.hadoop.compression.lzo.LzopCodec]</code> 最终这个参数会传给 <code>TextOutputFormat#RecordWriter</code>.</p>
+<p>至此，我们以及可以写 lzo 格式的文件了。但是还没有结束，因为会产生小文件，每个 RDD 的每个 partition 都会在 HDFS 上产生一个文件，而且这些文件大小非常小，就形成了很多小文件，这对 HDFS 的压力会非常大。我们需要解决这个问题</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;需求&quot;&gt;&lt;a href=&quot;#需求&quot; class=&quot;headerlink&quot; title=&quot;需求&quot;&gt;&lt;/a&gt;需求&lt;/h2&gt;&lt;p&gt;将 kafka 上的数据实时同步到 HDFS，不能有太多小文件&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="分布式系统" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"/>
+    
+      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
+    
+    
+      <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
+    
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="append" scheme="http://yoursite.com/tags/append/"/>
+    
+      <category term="hdfs" scheme="http://yoursite.com/tags/hdfs/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark Streaming 自适应上游 kafka topic partition 数目变化</title>
+    <link href="http://yoursite.com/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/"/>
+    <id>http://yoursite.com/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/</id>
+    <published>2016-11-01T08:56:13.000Z</published>
+    <updated>2017-06-03T03:40:54.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。</p>
+<a id="more"></a>
+<h2 id="思考过程"><a href="#思考过程" class="headerlink" title="思考过程"></a>思考过程</h2><p>为了作业能够长时间的运行，一开始遇到这种情况的时候，想到两种方案：</p>
+<ol>
+<li>感知上游 topic 的 partition 数目变化，然后发送报警，让用户重启</li>
+<li>直接在作业内部自适应上游 topic partition 的变化，完全不影响作业<br>方案 1 是简单直接，第一反应的结果，但是效果不好，需要用户人工介入，而且需要删除 checkpoint 文件</li>
+</ol>
+<p>方案 2 从根本上解决问题，用户不需要关心上游 partition 数目的变化，但是第一眼会觉得较难实现。</p>
+<p>方案 1 很快被 pass 掉，因为人工介入的成本太高，而且实现起来很别扭。接下来考虑方案 2.</p>
+<p>Spark Streaming 程序中使用 Kafka 的最原始方式为 <code>KafkaUtils.createDirectStream</code> 通过源码，我们找到调用链条大致是这样的</p>
+<p><span style="color: #0000ff;"><strong><code>KafkaUtils.createDirectStream</code></strong></span>   –&gt;   <strong><span style="color: #0000ff;"><code>new DirectKafkaInputDStream</code></span></strong> –&gt; 最终由 <code>DirectKafkaInputDStream#compute(validTime : Time)</code> 函数来生成 KafkaRDD。</p>
+<p>而 KafkaRDD 的 partition 数和 <strong><span style="color: #0000ff;">作业开始运行时</span></strong> topic 的 partition 数一致，topic 的 partition 数保存在 currentOffsets 变量中，currentOffsets 是一个 Map[TopicAndPartition, Long]类型的变量，保存每个 partition 当前消费的 offset 值，但是作业运行过程中 currentOffsets 不会增加 key，就是说不会增加 KafkaRDD 的 partition，这样导致每次生成 KafkaRDD 的时候都使用 <span style="color: #0000ff;"><strong>作业开始运行时</strong></span> topic 的 partition 数作为 KafkaRDD 的 partition 数，从而会造成数据的丢失。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>我们只需要在每次生成 KafkaRDD 的时候，将 currentOffsets 修正为正常的值（往里面增加对应的 partition 数，总共 B-A 个，以及每个增加的 partition 的当前 offset 从零开始）。</p>
+<ul>
+<li>第一个问题出现了，我们不能修改 Spark 的源代码，重新进行编译，因为这不是我们自己维护的。想到的一种方案是继承 DirectKafkaInputDStream。我们发现不能继承 DirectKafkaInputDStream 该类，因为这个类是使用 <code>private[streaming]</code> 修饰的。</li>
+<li>第二个问题出现了，怎么才能够继承 DirectKafkaInputDStream，这时我们只需要将希望继承 DirectKafkaInputDStream 的类放到一个单独的文件 F 中，文件 F 使用 <code>package org.apache.spark.streaming</code> 进行修饰即可，这样可以绕过不能继承 DirectKafkaInputDStream 的问题。这个问题解决后，我们还需要修改 <code>Object KafkaUtils</code>，让该 Object 内部调用我们修改后的 DirectKafkaInputDStream（我命名为 MTDirectKafkaInputDStream)</li>
+<li>第三个问题如何让 Spark 调用 MTDirectKafkaInputDStream，而不是 DirectKafkaInputDStream，这里我们使用简单粗暴的方式，将 KafkaUtils 的代码 copy 一份，然后将其中调用 DirectKafkaInputDStream 的部分都修改为 MTDirectKafkaInputDStream，这样就实现了我们的需要。当然该文件也需要使用 <code>package org.apache.spark.streaming</code> 进行修饰</li>
+<li>第二个和第三个问题的解决方案在  中国 Spark 技术峰会 2016  上，广点通的 林立伟 有提及，后续会进行尝试<br>总结下，我们需要做两件事</li>
+</ul>
+<ol>
+<li>修改 DirectKafkaInputDStream#compute 使得能够自适应 topic 的 partition 变更</li>
+<li>修改 KafkaUtils，使得我们能够调用修改过后的 DirectKafkaInputDStream</li>
+</ol>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div></pre></td><td class="code"><pre><div class="line">package org.apache.spark.streaming.kafka.mt</div><div class="line"></div><div class="line">import com.meituan.data.util.Constants</div><div class="line">import com.meituan.service.inf.kms.client.Kms</div><div class="line">import kafka.common.&#123;ErrorMapping, TopicAndPartition&#125;</div><div class="line">import kafka.javaapi.&#123;TopicMetadata, TopicMetadataRequest&#125;</div><div class="line">import kafka.javaapi.consumer.SimpleConsumer</div><div class="line">import kafka.message.MessageAndMetadata</div><div class="line">import kafka.serializer.Decoder</div><div class="line">import org.apache.spark.streaming.&#123;StreamingContext, Time&#125;</div><div class="line">import org.apache.spark.streaming.kafka.&#123;DirectKafkaInputDStream, KafkaRDD&#125;</div><div class="line"></div><div class="line">import scala.collection.JavaConverters._</div><div class="line">import scala.util.control.Breaks._</div><div class="line">import scala.reflect.ClassTag</div><div class="line"></div><div class="line">/**</div><div class="line">  * Created by qiucongxian on 10/27/16.</div><div class="line">  */</div><div class="line">class MTDirectKafkaInputDStream[</div><div class="line">  K: ClassTag,</div><div class="line">  V: ClassTag,</div><div class="line">  U &lt;: Decoder[K]: ClassTag,</div><div class="line">  T &lt;: Decoder[V]: ClassTag,</div><div class="line">  R: ClassTag](</div><div class="line">    @transient ssc_ : StreamingContext,</div><div class="line">    val MTkafkaParams: Map[String, String],</div><div class="line">    val MTfromOffsets: Map[TopicAndPartition, Long],</div><div class="line">    messageHandler: MessageAndMetadata[K, V] =&gt; R</div><div class="line">) extends DirectKafkaInputDStream[K, V, U, T, R](ssc_, MTkafkaParams , MTfromOffsets, messageHandler) &#123;</div><div class="line">    private val kafkaBrokerList : String = &quot;host1:port1,host2:port2,host3:port3&quot; //根据自己的情况自行修改</div><div class="line"></div><div class="line">    override def compute(validTime: Time) : Option[KafkaRDD[K, V, U, T, R]] = &#123;</div><div class="line">      /**</div><div class="line">        * 在这更新 currentOffsets 从而做到自适应上游 partition 数目变化</div><div class="line">        */</div><div class="line">        updateCurrentOffsetForKafkaPartitionChange()</div><div class="line">        super.compute(validTime)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private def updateCurrentOffsetForKafkaPartitionChange() : Unit = &#123;</div><div class="line">      val topic = currentOffsets.head._1.topic</div><div class="line">      val nextPartitions : Int = getTopicMeta(topic) match &#123;</div><div class="line">          case Some(x) =&gt; x.partitionsMetadata.size()</div><div class="line">          case _ =&gt; 0</div><div class="line">      &#125;</div><div class="line">      val currPartitions = currentOffsets.keySet.size</div><div class="line"></div><div class="line">      if (nextPartitions &gt; currPartitions) &#123;</div><div class="line">        var i = currPartitions</div><div class="line">        while (i &lt; nextPartitions) &#123;</div><div class="line">           currentOffsets = currentOffsets + (TopicAndPartition(topic, i) -&gt; 0)</div><div class="line">           i = i + 1</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      logInfo(s&quot;######### $&#123;nextPartitions&#125;  currentParttions $&#123;currentOffsets.keySet.size&#125; ########&quot;)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private def getTopicMeta(topic: String) : Option[TopicMetadata] = &#123;</div><div class="line">        var metaData : Option[TopicMetadata] = None</div><div class="line">        var consumer : Option[SimpleConsumer] = None</div><div class="line"></div><div class="line">        val topics = List[String](topic)</div><div class="line">        val brokerList = kafkaBrokerList.split(&quot;,&quot;)</div><div class="line">        brokerList.foreach(</div><div class="line">          item =&gt; &#123;</div><div class="line">            val hostPort = item.split(&quot;:&quot;)</div><div class="line">            try &#123;</div><div class="line">              breakable &#123;</div><div class="line">                  for (i &lt;- 0 to 3) &#123;</div><div class="line">                      consumer = Some(new SimpleConsumer(host = hostPort(0), port = hostPort(1).toInt,</div><div class="line">                                            soTimeout = 10000, bufferSize = 64 * 1024, clientId = &quot;leaderLookup&quot;))</div><div class="line">                      val req : TopicMetadataRequest = new TopicMetadataRequest(topics.asJava)</div><div class="line">                      val resp = consumer.get.send(req)</div><div class="line"></div><div class="line">                      metaData = Some(resp.topicsMetadata.get(0))</div><div class="line">                      if (metaData.get.errorCode == ErrorMapping.NoError) break()</div><div class="line">                  &#125;</div><div class="line">              &#125;</div><div class="line">            &#125; catch &#123;</div><div class="line">              case e =&gt; logInfo(s&quot; ###### Error in MTDirectKafkaInputDStream $&#123;e&#125; ######&quot;)</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">        )</div><div class="line">        metaData</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在修改过后的 KafkaUtils 文件中，将所有的 <code>DirectKafkaInputDStream</code> 都替换为 <code>MTDirectKafkaInputDStream</code> 即可</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="分布式系统" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"/>
+    
+      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
+    
+    
+      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
+    
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="auto-adaptive" scheme="http://yoursite.com/tags/auto-adaptive/"/>
+    
+      <category term="partition" scheme="http://yoursite.com/tags/partition/"/>
+    
+      <category term="topic" scheme="http://yoursite.com/tags/topic/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>要多快才能跑完一场马拉松</title>
+    <link href="http://yoursite.com/2016/10/26/e8-a6-81-e5-a4-9a-e5-bf-ab-e6-89-8d-e8-83-bd-e8-b7-91-e5-ae-8c-e4-b8-80-e5-9c-ba-e9-a9-ac-e6-8b-89-e6-9d-be/"/>
+    <id>http://yoursite.com/2016/10/26/e8-a6-81-e5-a4-9a-e5-bf-ab-e6-89-8d-e8-83-bd-e8-b7-91-e5-ae-8c-e4-b8-80-e5-9c-ba-e9-a9-ac-e6-8b-89-e6-9d-be/</id>
+    <published>2016-10-26T11:43:18.000Z</published>
+    <updated>2017-06-03T03:41:23.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="完成一场马拉松的最慢速度"><a href="#完成一场马拉松的最慢速度" class="headerlink" title="完成一场马拉松的最慢速度"></a>完成一场马拉松的最慢速度</h2><p>工作后身边跑马拉松的人突然就多起来了，或许你也蠢蠢欲动，但是一看到半程马拉松有 21 公理，全称马拉松 42 公理，就提前打退堂鼓了。那么你有没有想过</p>
+<pre><code>到底要多快我们才能跑完一场 半程/全程 马拉松？
+</code></pre><a id="more"></a>
+<p>我们来算一算到底需要多快才能才可以跑完一场马拉松，鉴于体力原因，假设我们开始想完成一场半程马拉松，那么我们需要在 3 小时内跑完 21 公理，也就是说每小时需要跑完 7 公理，这样算还是不够直观，我们换一种方式，我们计算每公里平均最长耗时 M</p>
+<pre><code>M * 21 公里 = 3 小时
+</code></pre><p>这样，我们得到 M 的值为 3 * 60 / 21 约等于  8.57 分钟，即 8 分钟 34 秒。这个值告诉我们平均 8 分钟 34 秒跑完一公里  – 也就是快走的速度 – 以这个速度就能跑完一场半程马拉松比赛。</p>
+<h2 id="最慢速度的作用"><a href="#最慢速度的作用" class="headerlink" title="最慢速度的作用"></a>最慢速度的作用</h2><p>我们知道了跑完一场半程马拉松，最慢平均速度是 8 分 34 秒。</p>
+<pre><code>那么我们知道这个速度有什么用呢？
+</code></pre><p>让我们从心底知道我们能完成这件事，这并不是一件只有少数人才能做的事情，并不需要你在体育方面有超过常人能力，只要你身体健康就行。卡耐基在《人性的优点》里面介绍一个应对恐惧的方法也是类似的：</p>
+<pre><code>把你恐惧的事情会导致的所有最坏可能性都一一罗列出来，然后一一检查它们。
+</code></pre><p>这个方法的好处是让你知道，就算最坏情况也就这样，让你从无边的恐惧中解放出来。</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>如果你自己能够一个人跑完十公里，那么你的体力就能跑完半程马拉松。</p>
+<p>跑马拉松是一项群体运动，你会被大家带着跑，但是大家需要找到适合自己的节奏，根据自己的实际情况来确定你能跑完全程的速度。</p>
+<p>如果在比赛过程中有任何不适，要量力而行，千万不要硬撑。</p>
+<p>最后不建议在雾霾天跑马拉松。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;完成一场马拉松的最慢速度&quot;&gt;&lt;a href=&quot;#完成一场马拉松的最慢速度&quot; class=&quot;headerlink&quot; title=&quot;完成一场马拉松的最慢速度&quot;&gt;&lt;/a&gt;完成一场马拉松的最慢速度&lt;/h2&gt;&lt;p&gt;工作后身边跑马拉松的人突然就多起来了，或许你也蠢蠢欲动，但是一看到半程马拉松有 21 公理，全称马拉松 42 公理，就提前打退堂鼓了。那么你有没有想过&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;到底要多快我们才能跑完一场 半程/全程 马拉松？
+&lt;/code&gt;&lt;/pre&gt;
+    
+    </summary>
+    
+      <category term="想清楚" scheme="http://yoursite.com/categories/%E6%83%B3%E6%B8%85%E6%A5%9A/"/>
+    
+    
+      <category term="最坏情况" scheme="http://yoursite.com/tags/%E6%9C%80%E5%9D%8F%E6%83%85%E5%86%B5/"/>
+    
+      <category term="最慢速度" scheme="http://yoursite.com/tags/%E6%9C%80%E6%85%A2%E9%80%9F%E5%BA%A6/"/>
+    
+      <category term="马拉松" scheme="http://yoursite.com/tags/%E9%A9%AC%E6%8B%89%E6%9D%BE/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Storm 的可靠性保证测试</title>
+    <link href="http://yoursite.com/2016/10/22/storm-e7-9a-84-e5-8f-af-e9-9d-a0-e6-80-a7-e4-bf-9d-e8-af-81-e6-b5-8b-e8-af-95/"/>
+    <id>http://yoursite.com/2016/10/22/storm-e7-9a-84-e5-8f-af-e9-9d-a0-e6-80-a7-e4-bf-9d-e8-af-81-e6-b5-8b-e8-af-95/</id>
+    <published>2016-10-22T01:21:42.000Z</published>
+    <updated>2017-05-29T09:22:53.000Z</updated>
+    
+    <content type="html"><![CDATA[<p><span style="color: #ff0000;">文章首发于 <a href="http://tech.meituan.com/test-of-storms-reliability.html" target="_blank" rel="external">美团点评技术博客</a></span></p>
+<p><a href="http://storm.apache.org/" target="_blank" rel="external">Storm</a> 是一个分布式的实时计算框架，可以很方便地对流式数据进行实时处理和分析，能运用在实时分析、在线数据挖掘、持续计算以及分布式 RPC 等场景下。Storm 的实时性可以使得数据从收集到处理展示在秒级别内完成，从而为业务方决策提供实时的数据支持。</p>
+<p>在美团点评公司内部，实时计算主要应用场景包括实时日志解析、用户行为分析、实时消息推送、消费趋势展示、实时新客判断、实时活跃用户数统计等。这些数据提供给各事业群，并作为他们实时决策的有力依据，弥补了离线计算“T+1”的不足。</p>
+<p>在实时计算中，用户不仅仅关心时效性的问题，同时也关心消息处理的成功率。本文将通过实验验证 Storm 的消息可靠性保证机制，文章分为消息保证机制、测试目的、测试环境、测试场景以及总结等五节。</p>
+<h2 id="Storm-的消息保证机制"><a href="#Storm-的消息保证机制" class="headerlink" title="Storm 的消息保证机制"></a>Storm 的消息保证机制</h2><p>Storm 提供了三种不同层次的消息保证机制，分别是 At Most Once、At Least Once 以及 Exactly Once。消息保证机制依赖于消息是否被完全处理。</p>
+<h3 id="消息完全处理"><a href="#消息完全处理" class="headerlink" title="消息完全处理"></a>消息完全处理</h3><p>每个从 Spout（Storm 中数据源节点）发出的 Tuple（Storm 中的最小消息单元）可能会生成成千上万个新的 Tuple，形成一棵 Tuple 树，当整棵 Tuple 树的节点都被成功处理了，我们就说从 Spout 发出的 Tuple 被完全处理了。 我们可以通过下面的例子来更好地诠释消息被完全处理这个概念：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">TopologyBuilder builder = new TopologyBuilder();</div><div class="line">builder.setSpout(&quot;sentences&quot;, new KafkaSpout(spoutConfig), spoutNum);</div><div class="line">builder.setBolt(&quot;split&quot;, new SplitSentence(), 10)</div><div class="line">    .shuffleGrouping(&quot;sentences&quot;);</div><div class="line">builder.setBolt(&quot;count&quot;, new WordCount(), 20)</div><div class="line">    .fieldsGrouping(&quot;split&quot;, new Fields(&quot;word&quot;));</div></pre></td></tr></table></figure>
+<p>这个 Topology 从 Kafka（一个开源的分布式消息队列）读取信息发往下游，下游的 Bolt 将收到的句子分割成单独的单词，并进行计数。每一个从 Spout 发送出来的 Tuple 会衍生出多个新的 Tuple，从 Spout 发送出来的 Tuple 以及后续衍生出来的 Tuple 形成一棵 Tuple 树，下图是一棵 Tuple 树示例：</p>
+<p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/tuple_tree.png" alt="Tuple 树示例图"></p>
+<p>上图中所有的 Tuple 都被成功处理了，我们才认为 Spout 发出的 Tuple 被完全处理。如果在一个固定的时间内（这个时间可以配置，默认为 30 秒），有至少一个 Tuple 处理失败或超时，则认为整棵 Tuple 树处理失败，即从 Spout 发出的 Tuple 处理失败。</p>
+<h3 id="如何实现不同层次的消息保证机制"><a href="#如何实现不同层次的消息保证机制" class="headerlink" title="如何实现不同层次的消息保证机制"></a>如何实现不同层次的消息保证机制</h3><p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/spout_bolt_acker.png" alt="spout_bolt_acker"></p>
+<p>Tuple 的完全处理需要 Spout、Bolt 以及 Acker（Storm 中用来记录某棵 Tuple 树是否被完全处理的节点）协同完成，如上图所示。从 Spout 发送 Tuple 到下游，并把相应信息通知给 Acker，整棵 Tuple 树中某个 Tuple 被成功处理了都会通知 Acker，待整棵 Tuple 树都被处理完成之后，Acker 将成功处理信息返回给 Spout；如果某个 Tuple 处理失败，或者超时，Acker 将会给 Spout 发送一个处理失败的消息，Spout 根据 Acker 的返回信息以及用户对消息保证机制的选择判断是否需要进行消息重传。</p>
+<p>Storm 提供的三种不同消息保证机制中。利用 Spout、Bolt 以及 Acker 的组合我们可以实现 At Most Once 以及 At Least Once 语义，Storm 在 At Least Once 的基础上进行了一次封装（Trident），从而实现 Exactly Once 语义。</p>
+<p>Storm 的消息保证机制中，如果需要实现 At Most Once 语义，只需要满足下面任何一条即可：</p>
+<ul>
+<li>关闭 ACK 机制，即 Acker 数目设置为 0</li>
+<li><p>Spout 不实现可靠性传输</p>
+</li>
+<li><p>Spout 发送消息是使用不带 message ID 的 API</p>
+</li>
+<li>不实现 fail 函数</li>
+<li>Bolt 不把处理成功或失败的消息发送给 Acker</li>
+</ul>
+<p>如果需要实现 At Least Once 语义，则需要同时保证如下几条：</p>
+<ul>
+<li>开启 ACK 机制，即 Acker 数目大于 0</li>
+<li>Spout 实现可靠性传输保证</li>
+<li>Spout 发送消息时附带 message 的 ID</li>
+<li>如果收到 Acker 的处理失败反馈，需要进行消息重传，即实现 fail 函数</li>
+<li>Bolt 在处理成功或失败后需要调用相应的方法通知 Acker<br>实现 Exactly Once 语义，则需要在 At Least Once 的基础上进行状态的存储，用来防止重复发送的数据被重复处理，在 Storm 中使用 Trident API 实现。</li>
+</ul>
+<p>下图中，每种消息保证机制中左边的字母表示上游发送的消息，右边的字母表示下游接收到的消息。从图中可以知道，At Most Once 中，消息可能会丢失（上游发送了两个 A，下游只收到一个 A）；At Least Once 中，消息不会丢失，可能重复（上游只发送了一个 B ，下游收到两个 B）；Exactly Once 中，消息不丢失、不重复，因此需要在 At Least Once 的基础上保存相应的状态，表示上游的哪些消息已经成功发送到下游，防止同一条消息发送多次给下游的情况。</p>
+<p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/3_compare.png" alt="三种消息保证机制比较图"></p>
+<h2 id="测试目的"><a href="#测试目的" class="headerlink" title="测试目的"></a>测试目的</h2><p>Storm 官方提供 At Most Once、At Least Once 以及 Exactly Once 三种不同层次的消息保证机制，我们希望通过相关测试，达到如下目的：</p>
+<ul>
+<li>三种消息保证机制的表现，是否与官方的描述相符；</li>
+<li>At Most Once 语义下，消息的丢失率和什么有关系、关系如何；</li>
+<li>At Least Once 语义下，消息的重复率和什么有关系、关系如何。</li>
+</ul>
+<h2 id="测试环境"><a href="#测试环境" class="headerlink" title="测试环境"></a>测试环境</h2><p>本文的测试环境如下: 每个 worker（worker 为一个 物理 JVM 进程，用于运行实际的 Storm 作业）分配 1 CPU 以及 1.6G 内存。Spout、Bolt、Acker 分别跑在单独的 worker 上。并通过在程序中控制抛出异常以及人工 Kill Spout/Bolt/Acker 的方式来模拟实际情况中的异常情况。</p>
+<p>三种消息保证机制的测试均由 Spout 从 Kafka 读取测试数据，经由相应 Bolt 进行处理，然后发送到 Kafka，并将 Kafka 上的数据同步到 MySQL 方便最终结果的统计，如下图所示：</p>
+<p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/test-flow.png" alt="测试流程示意图"></p>
+<p>测试数据为 Kafka 上顺序保存的一系列纯数字，数据量分别有十万、五十万、一百万等，每个数字在每个测试样例中出现且仅出现一次。</p>
+<h2 id="测试场景"><a href="#测试场景" class="headerlink" title="测试场景"></a>测试场景</h2><p>对于三种不同的消息保证机制，我们分别设置了不同的测试场景，来进行充分的测试。其中为了保证 Spout/Bolt/Acker 发生异常的情况下不影响其他节点，在下面的测试中，所有的节点单独运行在独立的 Worker 上。</p>
+<h3 id="At-Most-Once"><a href="#At-Most-Once" class="headerlink" title="At Most Once"></a>At Most Once</h3><p>从背景中可以得知，如果希望实现 At Most Once 语义，将 Acker 的数目设置为 0 即可，本文的测试过程中通过把设置 Acker 为 0 来进行 At Most Once 的测试。</p>
+<h4 id="输入数据"><a href="#输入数据" class="headerlink" title="输入数据"></a>输入数据</h4><p>保存在 Kafka 上的一系列纯数字，数据量从十万到五百万不等，每个测试样例中，同一个数字在 Kafka 中出现且仅出现一次。</p>
+<h4 id="测试结果"><a href="#测试结果" class="headerlink" title="测试结果"></a>测试结果</h4><table><br><thead><br><tr><br><th>异常次数</th><br><th>测试数据总量</th><br><th>结果集中不同 Tuple 的总量</th><br><th>丢失的 Tuple 数据量</th><br><th>Tuple 的丢失百分比</th><br><th>Tuple 的重复量</th><br></tr><br></thead><br><tbody><br><tr><br><td>0</td><br><td>500000</td><br><td>500000</td><br><td>0</td><br><td>0%</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>1000000</td><br><td>1000000</td><br><td>0</td><br><td>0%</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>2000000</td><br><td>2000000</td><br><td>0</td><br><td>0%</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>3000000</td><br><td>3000000</td><br><td>0</td><br><td>0%</td><br><td>0</td><br></tr><br></tbody><br></table><br><table><br><thead><br><tr><br><th>异常次数</th><br><th>测试数据总量</th><br><th>结果集中不同 Tuple 的总量</th><br><th>丢失的 Tuple 数据量</th><br><th>Tuple 的丢失百分比</th><br><th>Tuple 的重复量</th><br></tr><br></thead><br><tbody><br><tr><br><td>1</td><br><td>3000000</td><br><td>2774940</td><br><td>225060</td><br><td>7.50%</td><br><td>0</td><br></tr><br><tr><br><td>2</td><br><td>3000000</td><br><td>2307087</td><br><td>692913</td><br><td>23.09%</td><br><td>0</td><br></tr><br><tr><br><td>3</td><br><td>3000000</td><br><td>2082823</td><br><td>917177</td><br><td>30.57%</td><br><td>0</td><br></tr><br><tr><br><td>4</td><br><td>3000000</td><br><td>1420725</td><br><td>1579275</td><br><td>52.64%</td><br><td>0</td><br></tr><br></tbody><br></table>
+
+<h4 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h4><p>不发生异常的情况下，消息能够不丢不重；Bolt 发生异常的情况下，消息会丢失，不会重复，其中消息的<strong>丢失数目</strong>与<strong>异常次数正相关</strong>。与官方文档描述相符，符合预期。</p>
+<h3 id="At-Least-Once"><a href="#At-Least-Once" class="headerlink" title="At Least Once"></a>At Least Once</h3><p>为了实现 At Least Once 语义，需要 Spout、Bolt、Acker 进行配合。我们使用 Kafka-Spout 并通过自己管理 offset 的方式来实现可靠的 Spout；Bolt 通过继承 BaseBasicBolt，自动帮我们建立 Tuple 树以及消息处理之后通知 Acker；将 Acker 的数目设置为 1，即打开 ACK 机制，这样整个 Topology 即可提供 At Least Once 的语义。</p>
+<h4 id="测试数据"><a href="#测试数据" class="headerlink" title="测试数据"></a>测试数据</h4><p>Kafka 上保存的十万到五十万不等的纯数字，其中每个测试样例中，每个数字在 Kafka 中出现且仅出现一次。</p>
+<h4 id="测试结果-1"><a href="#测试结果-1" class="headerlink" title="测试结果"></a>测试结果</h4><p>Acker 发生异常的情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常的次数</th><br>    <th>测试数据总量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数（&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    <th>最大积压量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>0</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    <td>2000（默认值）</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>200000</td><br>    <td>200000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>300000</td><br>    <td>300000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>400000</td><br>    <td>400000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    </tbody><br>    </table><br>    <table><br>    <thead><br>    <tr><br>    <th>异常的次数</th><br>    <th>测试数据总量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数（&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    <th>最大积压量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>2000</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>4001</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>3</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>6000</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>4</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>8000</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    </tbody><br>    </table><br>    Spout 发生异常的情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常的次数</th><br>    <th>测试数据总量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数（&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>0</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>200000</td><br>    <td>200000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>300000</td><br>    <td>300000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>400000</td><br>    <td>400000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>    <table><br>    <thead><br>    <tr><br>    <th>异常的次数</th><br>    <th>测试数据总量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数（&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>2052</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>4414</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>4</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>9008</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>6</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>9690</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td></td><br>    <td></td><br>    <td></td><br>    <td>3</td><br>    <td>1675</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>Bolt 发生异常的情况</p>
+<p>调用 emit 函数之前发生异常<br>    <table><br>    <thead><br>    <tr><br>    <th>异常次数</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数 (&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>0</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>200000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>300000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>400000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>    <table><br>    <thead><br>    <tr><br>    <th>异常次数</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数 (&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>4</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>8</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>10</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>    调用 emit 函数之后发生异常<br>    <table><br>    <thead><br>    <tr><br>    <th>异常次数</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数(&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>0</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>200000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>300000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>400000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>    <table><br>    <thead><br>    <tr><br>    <th>异常次数</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数(&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>2</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>3</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>4</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>5</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>8</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>9</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>10</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>11</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table></p>
+<h4 id="结论-1"><a href="#结论-1" class="headerlink" title="结论"></a>结论</h4><p>从上面的表格中可以得到，消息不会丢失，可能发生重复，重复的数目与异常的情况相关。</p>
+<ul>
+<li>不发生任何异常的情况下，消息不会重复不会丢失。</li>
+<li>Spout 发生异常的情况下，消息的重复数目约等于 spout.max.pending(Spout 的配置项，每次可以发送的最多消息条数） * NumberOfException（异常次数）。</li>
+<li>Acker 发生异常的情况下，消息重复的数目等于 spout.max.pending * NumberOfException。</li>
+<li>Bolt 发生异常的情况：</li>
+<li>emit 之前发生异常，消息不会重复。</li>
+<li>emit 之后发生异常，消息重复的次数等于异常的次数。<br>结论与官方文档所述相符，每条消息至少发送一次，保证数据不会丢失，但可能重复，符合预期。</li>
+</ul>
+<h3 id="Exactly-Once"><a href="#Exactly-Once" class="headerlink" title="Exactly Once"></a>Exactly Once</h3><p>对于 Exactly Once 的语义，利用 Storm 中的 Trident 来实现。</p>
+<h4 id="测试数据-1"><a href="#测试数据-1" class="headerlink" title="测试数据"></a>测试数据</h4><p>Kafka 上保存的一万到一百万不等的数字，每个数字在每次测试样例中出现且仅出现一次。</p>
+<h4 id="测试结果-2"><a href="#测试结果-2" class="headerlink" title="测试结果"></a>测试结果</h4><p>Spout 发生异常情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常数</th><br>    <th>测试数据量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>结果集中所有 Tuple 的总和</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>3</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    </tbody><br>    </table><br>    Acker 发生异常的情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常数</th><br>    <th>测试数据量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>结果集中所有 Tuple 的总和</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>3</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    </tbody><br>    </table><br>    Bolt 发生异常的情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常数</th><br>    <th>测试数据量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>结果集中所有 Tuple 的总和</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>3</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    </tbody><br>    </table></p>
+<h4 id="结论-2"><a href="#结论-2" class="headerlink" title="结论"></a>结论</h4><p>在所有情况下，最终结果集中的消息不会丢失，不会重复，与官方文档中的描述相符，符合预期。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>对 Storm 提供的三种不同消息保证机制，用户可以根据自己的需求选择不同的消息保证机制。</p>
+<h3 id="不同消息可靠性保证的使用场景"><a href="#不同消息可靠性保证的使用场景" class="headerlink" title="不同消息可靠性保证的使用场景"></a>不同消息可靠性保证的使用场景</h3><p>对于 Storm 提供的三种消息可靠性保证，优缺点以及使用场景如下所示：</p>
+<table><br><thead><br><tr><br><th>可靠性保证层次</th><br><th>优点</th><br><th>缺点</th><br><th>使用场景</th><br></tr><br></thead><br>    <tbody><br>    <tr><br>    <td>At most once</td><br>    <td>处理速度快</td><br>    <td>数据可能丢失</td><br>    <td>都处理速度要求高，且对数据丢失容忍度高的场景</td><br>    </tr><br>    <tr><br>    <td>At least once</td><br>    <td>数据不会丢失</td><br>    <td>数据可能重复</td><br>    <td>不能容忍数据丢失，可以容忍数据重复的场景</td><br>    </tr><br>    <tr><br>    <td>Exactly once</td><br>    <td>数据不会丢失，不会重复</td><br>    <td>处理速度慢</td><br>    <td>对数据不丢不重性质要求非常高，且处理速度要求没那么高，比如支付金额</td><br>    </tr><br>    </tbody><br>    </table>
+
+<h3 id="如何实现不同层次的消息可靠性保证"><a href="#如何实现不同层次的消息可靠性保证" class="headerlink" title="如何实现不同层次的消息可靠性保证"></a>如何实现不同层次的消息可靠性保证</h3><p>对于 At Least Once 的保证需要做如下几步：</p>
+<ol>
+<li>需要开启 ACK 机制，即 Topology 中的 Acker 数量大于零；</li>
+<li>Spout 是可靠的。即 Spout 发送消息的时候需要附带 msgId，并且实现失败消息重传功能（fail 函数 ，可以参考下面的 Spout 代码）；</li>
+<li>Bolt 在发送消息时，需要调用 emit（inputTuple, outputTuple）进行建立 anchor 树（参考下面建立 anchor 树的代码），并且在成功处理之后调用 ack ，处理失败时调用 fail 函数，通知 Acker。</li>
+</ol>
+<p>不满足以上三条中任意一条的都只提供 At Most Once 的消息可靠性保证，如果希望得到 Exactly Once 的消息可靠性保证，可以使用 Trident 进行实现。</p>
+<h3 id="不同层次的可靠性保证如何实现"><a href="#不同层次的可靠性保证如何实现" class="headerlink" title="不同层次的可靠性保证如何实现"></a>不同层次的可靠性保证如何实现</h3><h4 id="如何实现可靠的-Spout"><a href="#如何实现可靠的-Spout" class="headerlink" title="如何实现可靠的 Spout"></a>如何实现可靠的 Spout</h4><p>实现可靠的 Spout 需要在 nextTuple 函数中发送消息时，调用带 msgID 的 emit 方法，然后实现失败消息的重传（fail 函数），参考如下示例:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">         * 想实现可靠的 Spout，需要实现如下两点</div><div class="line">         * 1\. 在 nextTuple 函数中调用 emit 函数时需要带一个     msgId，用来表示当前的消息（如果消息发送失败会用 msgId 作为参数回调 fail 函数）</div><div class="line">         * 2\. 自己实现 fail 函数，进行重发（注意，在 storm 中没有 msgId 和消息的对应关系，需要自己进行维护）</div><div class="line">         */</div><div class="line">    public void nextTuple() &#123;</div><div class="line">        //设置 msgId 和 Value 一样，方便 fail 之后重发</div><div class="line">        collector.emit(new Values(curNum + &quot;&quot;, round +     &quot;&quot;), curNum + &quot;:&quot; + round);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void fail(Object msgId) &#123;//消息发送失败时的回调函数</div><div class="line">    String tmp = (String)msgId;   //上面我们设置了 msgId 和消息相同，这里通过 msgId 解析出具体的消息</div><div class="line">    String[] args = tmp.split(&quot;:&quot;);</div><div class="line"></div><div class="line">    //消息进行重发</div><div class="line">    collector.emit(new Values(args[0], args[1]), msgId);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<h4 id="如何实现可靠的-Bolt"><a href="#如何实现可靠的-Bolt" class="headerlink" title="如何实现可靠的 Bolt"></a>如何实现可靠的 Bolt</h4><p>Storm 提供两种不同类型的 Bolt，分别是 BaseRichBolt 和 BaseBasicBolt，都可以实现可靠性消息传递，不过 BaseRichBolt 需要自己做很多周边的事情（建立 anchor 树，以及手动 ACK/FAIL 通知 Acker），使用场景更广泛，而 BaseBasicBolt 则由 Storm 帮忙实现了很多周边的事情，实现起来方便简单，但是使用场景单一。如何用这两个 Bolt 实现（不）可靠的消息传递如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div></pre></td><td class="code"><pre><div class="line">//BaseRichBolt 实现不可靠消息传递</div><div class="line">    public class SplitSentence extends BaseRichBolt &#123;//不建立 anchor 树的例子</div><div class="line">        OutputCollector _collector;</div><div class="line"></div><div class="line">        public void prepare(Map conf, TopologyContext context, OutputCollector collector) &#123;</div><div class="line">            _collector = collector;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void execute(Tuple tuple) &#123;</div><div class="line">            String sentence = tuple.getString(0);</div><div class="line">            for(String word: sentence.split(&quot; &quot;)) &#123;</div><div class="line">                _collector.emit(new Values(word));  // 不建立 anchor 树</div><div class="line">            &#125;</div><div class="line">            _collector.ack(tuple);          //手动 ack，如果不建立 anchor 树，是否 ack 是没有区别的，这句可以进行注释</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void declareOutputFields(OutputFieldsDeclarer declarer) &#123;</div><div class="line">            declarer.declare(new Fields(&quot;word&quot;));</div><div class="line">        &#125;      </div><div class="line">    &#125;</div><div class="line"></div><div class="line">    //BaseRichBolt 实现可靠的 Bolt</div><div class="line">    public class SplitSentence extends BaseRichBolt &#123;//建立 anchor 树以及手动 ack 的例子</div><div class="line">        OutputCollector _collector;</div><div class="line"></div><div class="line">        public void prepare(Map conf, TopologyContext context, OutputCollector collector) &#123;</div><div class="line">            _collector = collector;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void execute(Tuple tuple) &#123;</div><div class="line">            String sentence = tuple.getString(0);</div><div class="line">            for(String word: sentence.split(&quot; &quot;)) &#123;</div><div class="line">                _collector.emit(tuple, new Values(word));  // 建立 anchor 树</div><div class="line">            &#125;</div><div class="line">            _collector.ack(tuple);          //手动 ack，如果想让 Spout 重发该 Tuple，则调用 _collector.fail(tuple);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void declareOutputFields(OutputFieldsDeclarer declarer) &#123;</div><div class="line">            declarer.declare(new Fields(&quot;word&quot;));</div><div class="line">        &#125;      </div><div class="line">    &#125;</div><div class="line"></div><div class="line">    下面的示例会可以建立 Multi-anchoring</div><div class="line">    List&lt;Tuple&gt; anchors = new ArrayList&amp;lt;Tuple&amp;gt;();</div><div class="line">    anchors.add(tuple1);</div><div class="line">    anchors.add(tuple2);</div><div class="line">    _collector.emit(anchors, new Values(1, 2, 3));</div><div class="line"></div><div class="line">    //BaseBasicBolt 是吸纳可靠的消息传递</div><div class="line">    public class SplitSentence extends BaseBasicBolt &#123;//自动建立 anchor，自动 ack</div><div class="line">        public void execute(Tuple tuple, BasicOutputCollector collector) &#123;</div><div class="line">            String sentence = tuple.getString(0);</div><div class="line">            for(String word: sentence.split(&quot; &quot;)) &#123;</div><div class="line">                collector.emit(new Values(word));</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void declareOutputFields(OutputFieldsDeclarer declarer) &#123;</div><div class="line">            declarer.declare(new Fields(&quot;word&quot;));</div><div class="line">        &#125;      </div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<h4 id="Trident"><a href="#Trident" class="headerlink" title="Trident"></a>Trident</h4><p>在 Trident 中，Spout 和 State 分别有三种状态，如下图所示：</p>
+<p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/spout-vs-state.png" alt="Trident Spout 和 State 的状态图"></p>
+<p>其中表格中的 Yes 表示相应的 Spout 和 State 组合可以实现 Exactly Once 语义，No 表示相应的 Spout 和 State 组合不保证 Exactly Once 语义。下面的代码是一个 Trident 示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">OpaqueTridentKafkaSpout spout = new OpaqueTridentKafkaSpout(spoutConf);   //Opaque Spout</div><div class="line">//TransactionalTridentKafkaSpout spout = new TransactionalTridentKafkaSpout(spoutConf);   //Transaction Spout</div><div class="line"></div><div class="line">TridentTopology topology = new TridentTopology();</div><div class="line">String spoutTxid = Utils.kafkaSpoutGroupIdBuilder(topologyConfig.kafkaSrcTopic, topologyConfig.topologyName);</div><div class="line">Stream stream = topology.newStream(spoutTxid, spout)</div><div class="line">        .name(&quot;new stream&quot;)</div><div class="line">        .parallelismHint(1);</div><div class="line"></div><div class="line">// kafka config</div><div class="line">KafkaProducerConfig kafkaProducerConfig = new KafkaProducerConfig();      //KafkaProducerConfig 仅对 kafka 相关配置进行了封装，具体可以参考 TridentKafkaStateFactory2(Map&lt;String, String&gt; config)</div><div class="line">Map&lt;String, String&gt; kafkaConfigs = kafkaProducerConfig.loadFromConfig(topologyConfig);</div><div class="line">TridentToKafkaMapper tridentToKafkaMapper = new TridentToKafkaMapper();  //TridentToKafkaMapper 继承自 TridentTupleToKafkaMapper&lt;String, String&gt;，实现 getMessageFromTuple 接口，该接口中返回 tridentTuple.getString(0);</div><div class="line"></div><div class="line">String  dstTopic = &quot;test__topic_for_all&quot;;</div><div class="line"></div><div class="line">TridentKafkaStateFactory2 stateFactory = new TridentKafkaStateFactory2(kafkaConfigs);</div><div class="line">stateFactory.withTridentTupleToKafkaMapper(tridentToKafkaMapper);</div><div class="line">stateFactory.withKafkaTopicSelector(new DefaultTopicSelector(dstTopic));</div><div class="line"></div><div class="line">stream.each(new Fields(&quot;bytes&quot;), new AddMarkFunction(), new Fields(&quot;word&quot;)) //从spout 出来数据是一个 bytes 类型的数据，第二个是参数是自己的处理函数，第三个参数是处理函数的输出字段</div><div class="line">        .name(&quot;write2kafka&quot;)</div><div class="line">        .partitionPersist(stateFactory         //将数据写入到 Kafka 中，可以保证写入到 Kafka 的数据是 exactly once 的</div><div class="line">                , new Fields(&quot;word&quot;)</div><div class="line">                , new TridentKafkaUpdater())</div><div class="line">        .parallelismHint(1);</div></pre></td></tr></table></figure></p>
+<p><strong>关注我们的官方微信公众号“美团点评技术团队”。现在就拿出手机，扫一扫：</strong></p>
+<p><img src="http://tech.meituan.com/img/qrcode_for_gh.jpg" alt="公众号二维码"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;span style=&quot;color: #ff0000;&quot;&gt;文章首发于 &lt;a href=&quot;http://tech.meituan.com/test-of-storms-reliability.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;美团点评
+    
+    </summary>
+    
+      <category term="分布式系统" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"/>
+    
+    
+      <category term="storm" scheme="http://yoursite.com/tags/storm/"/>
+    
+      <category term="at-least-once" scheme="http://yoursite.com/tags/at-least-once/"/>
+    
+      <category term="exactly-once" scheme="http://yoursite.com/tags/exactly-once/"/>
+    
+      <category term="at-most-once" scheme="http://yoursite.com/tags/at-most-once/"/>
+    
+      <category term="reliability" scheme="http://yoursite.com/tags/reliability/"/>
+    
+      <category term="test" scheme="http://yoursite.com/tags/test/"/>
+    
+      <category term="trident" scheme="http://yoursite.com/tags/trident/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>一种可行的英语阅读学习方法</title>
+    <link href="http://yoursite.com/2016/09/26/e4-b8-80-e7-a7-8d-e5-8f-af-e8-a1-8c-e7-9a-84-e8-8b-b1-e8-af-ad-e9-98-85-e8-af-bb-e5-ad-a6-e4-b9-a0-e6-96-b9-e6-b3-95/"/>
+    <id>http://yoursite.com/2016/09/26/e4-b8-80-e7-a7-8d-e5-8f-af-e8-a1-8c-e7-9a-84-e8-8b-b1-e8-af-ad-e9-98-85-e8-af-bb-e5-ad-a6-e4-b9-a0-e6-96-b9-e6-b3-95/</id>
+    <published>2016-09-26T14:38:56.000Z</published>
+    <updated>2017-05-29T09:22:53.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>介绍自己从抵触看英语文章，到现在能够自如的阅读英语文章的方法，以及可能遇到的问题。方法基于 <a href="https://book.douban.com/subject/1880983/" target="_blank" rel="external">今日就读百万英语</a>。这种方法只是我实验过，且可行的，当然还有其他很多方法。</p>
+<h2 id="为什么要看英语文章"><a href="#为什么要看英语文章" class="headerlink" title="为什么要看英语文章"></a>为什么要看英语文章</h2><p>我看英语文章的理由很简单，因为在 IT 行业，前沿的技术，论文和好的书籍都是英文的，从英文翻译到中文的时间往往很长很长，而且大部分翻译的质量达不到我的要求。还有就是看到别人看美剧可以不看字幕很羡慕。</p>
+<h2 id="我之前的英语基础"><a href="#我之前的英语基础" class="headerlink" title="我之前的英语基础"></a>我之前的英语基础</h2><p>英语水平四级 450，六级未过。单词量 5000 左右。</p>
+<h2 id="具体做法"><a href="#具体做法" class="headerlink" title="具体做法"></a>具体做法</h2><p>严格按照按照下面三点来</p>
+<ul>
+<li>不要查辞典，不要翻成母语；</li>
+<li>阅读不查辞典也能完全理解的图书，个别不懂的地方就跳过去；</li>
+<li>越读越没趣的书就暂时停下去，先往后放一放。</li>
+</ul>
+<p>第一点会要求你从看得懂的书开始，形成阅读英文原文的习惯。如果不这么做，我们会习惯的去看一些别人推荐的书籍或文章，这些书籍的难度可能是已经超过了我们的范围的。这样就会给自己造成很大的压力，慢慢的可能就不想继续阅读英语原文了。我最开始阅读的书籍包括《高级彩绘英文童书》，就是那种插画书，每一页可能就几句话，大部分是插图。如果你基本没有阅读过英文原本书籍的话，建议不要跳过这些插图书。</p>
+<p>第二点是需要你从整体上理解一篇文章，一开始你只要能读懂整篇文章的 70% 左右就行了，其他的没读懂的部分可以通过这 70% 进行推测。等慢慢熟练了，再将注意力放在具体的词句上。</p>
+<p>第三点是和前面的结合起来用的，每个人的喜好是不一样的，所以每个人有兴趣的书籍也是不一样的。读你感兴趣的书籍，那么你都下去的概率会大大增加。我看过一本英文的侦探小说，真是停不下来。</p>
+<p>没读完一本书，就下面的表格进行记录（具体可根据自己的情况调整），下面是我最早的两条记录（不要担心 YL 值太小，单词书太少，慢慢来）</p>
+<table>
+<thead>
+<tr>
+<th>No</th>
+<th>日期</th>
+<th>系列</th>
+<th>书名</th>
+<th>YL 值</th>
+<th>单词字数</th>
+<th>累计阅读量</th>
+<th>时间</th>
+<th>速度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>20130726</td>
+<td>ORT</td>
+<td>look at me</td>
+<td>0.1</td>
+<td>35</td>
+<td>35</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td>20130727</td>
+<td>ORT</td>
+<td>floppy floppy</td>
+<td>0.1</td>
+<td>10</td>
+<td>45</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="我遇到过的问题"><a href="#我遇到过的问题" class="headerlink" title="我遇到过的问题"></a>我遇到过的问题</h2><ol>
+<li><p>一开始阅读的书籍会很简单，读完一本想继续读第二本，真想一开始读七，八，十本才好。</p>
+<blockquote>
+<p>有句话叫做，每天走三十公里。前期觉得简单要保持体力，后期觉得艰难要咬牙做完。一开始用力过猛，可能会让自己中途突然停掉。</p>
+</blockquote>
+</li>
+<li><p>看的书太简单，简直就是幼儿园小朋友看的。</p>
+<blockquote>
+<p>我们没有看足够多书籍之前，在英语阅读方面和幼儿园小朋友差不多。另外，我们在私底下看这些书就好，又不给别人看，其他人不会知道我在看这些书</p>
+</blockquote>
+</li>
+<li><p>每天看的单词数量好少。</p>
+<blockquote>
+<p>这和第一点中的一样，前期不要贪多求快。先走稳了，再走快。</p>
+</blockquote>
+</li>
+<li><p>没有任何征兆，突然就看不下去了</p>
+<blockquote>
+<p>我选择一周只看六天，留一天用来休息。另外看不下去了我就看一些 YL 值小的书籍（保证每天一本书，不管单词书多少）</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="有关书籍"><a href="#有关书籍" class="headerlink" title="有关书籍"></a>有关书籍</h2><p>我读过的书籍系列包括 oxford reading tree，Curious George，PGR(Penguim_Readers) 0，PGR 1，PGR 2，Frog and Toad，彩绘英文图书，牛津书虫。</p>
+<h3 id="书籍在哪找"><a href="#书籍在哪找" class="headerlink" title="书籍在哪找"></a>书籍在哪找</h3><p>如果经济能力允许的话建议在 Amazon 等商城购买，其他的可以自行 Google，百度网盘之类的应该也不少。</p>
+<h2 id="有关-YL-值"><a href="#有关-YL-值" class="headerlink" title="有关 YL 值"></a>有关 YL 值</h2><p>YL 值可以理解为书籍的阅读难度登记，阅读越容易。</p>
+<p>下面几个网址可以查询书籍的 YL 值和字数，方便统计时使用。<br><a href="http://www2.odn.ne.jp/ims/bookdata/list_all.html" target="_blank" rel="external">http://www2.odn.ne.jp/ims/bookdata/list_all.html</a><br><a href="http://www.seg.co.jp/sss_review/jsp/frm_a_130.jsp" target="_blank" rel="external">http://www.seg.co.jp/sss_review/jsp/frm_a_130.jsp</a></p>
+<blockquote>
+<p>PS: 在豆瓣有一个 <a href="https://site.douban.com/195274/" target="_blank" rel="external">小组</a>，是 恶魔的奶爸 建立的，也可以参考。<br>有问题的留言交流。</p>
+</blockquote>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;介绍自己从抵触看英语文章，到现在能够自如的阅读英语文章的方法，以及可能遇到的问题。方法基于 &lt;a href=&quot;https://book.douban.com/subject/1880983/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;今日就读百万英语&lt;
+    
+    </summary>
+    
+      <category term="成长" scheme="http://yoursite.com/categories/%E6%88%90%E9%95%BF/"/>
+    
+    
+      <category term="read" scheme="http://yoursite.com/tags/read/"/>
+    
+      <category term="english" scheme="http://yoursite.com/tags/english/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark Streaming 从 Kafka 读取 binlog 转换成 Json</title>
+    <link href="http://yoursite.com/2016/08/27/spark-streaming-kafka-read-binlog-to-json/"/>
+    <id>http://yoursite.com/2016/08/27/spark-streaming-kafka-read-binlog-to-json/</id>
+    <published>2016-08-27T02:12:36.000Z</published>
+    <updated>2017-05-29T09:22:53.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>在开发 Spark Streaming 的公共组件过程中，需要将 binlog 的数据(Array[Byte])转换为 Json 格式，供用户使用，本文提供一种转换的思路。另外我们会用到几个辅助类，为了行文流畅，我们将辅助类的定义放在文章的最后面。如果</p>
+<p>如果本文有讲述不详细，或者错误指出，肯请指出，谢谢</p>
+<p>对于 binlog 数据，每一次操作(INSERT/UPDATE/DELETE 等）都会作为一条记录写入 binlog 文件，但是同一条记录可能包含数据库中的几行数据（这里比较绕，可以看一个具体的例子）</p>
+<p>在数据库中，有 id, name，age 三个字段，其中 id 为主键，name 随意, age 随意。有两行数据如下</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>age</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>john</td>
+<td>30</td>
+</tr>
+<tr>
+<td>2</td>
+<td>john</td>
+<td>40</td>
+</tr>
+</tbody>
+</table>
+<p>那么你进行操作</p>
+<p><pre class="lang:tsql decode:true  ">update table set age = 50 where name = “john”</pre><br>的时候，就会将两行的数据都进行更改，这两行更改的数据会在同一个 binlog 记录中，这一点会在后面的实现中有体现。</p>
+<p>下面，我们给出具体的代码，然后对代码进行分析</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">def desirializeByte(b: (String, Array[Byte])) : (String, String) = &#123; </div><div class="line">  val binlogEntry = BinlogEntryUtil.serializeToBean(b._2)   //将 Array[Byte] 数据转换成 com.meituan.data.binlog.BinlogEntry 类，相关类定义参考附录</div><div class="line"></div><div class="line">  val pkeys = binlogEntry.getPrimaryKeys.asScala   //获取主键，这里的 asScala 将 Java 的 List 转换为 Scala 的 List</div><div class="line">  val rowDatas : List[BinlogRow] = binlogEntry.getRowDatas.asScala.toList  //获取具体的信息</div><div class="line">  val strRowDatas = rowDatas.map(a =&gt; &#123;            //将获取到的具体信息进行转换，这里主要是将没一条信息的内容，转换 [(K1:V1,K2:V2...Kn:Vn)] 的形式，方面后面进行 Json 化</div><div class="line">    val b = a.getBeforeColumns.asScala    //获取 beforColumns</div><div class="line">    val c = a.getAfterColumns.asScala     //获取 afterColumns</div><div class="line">    val mb = b.map(d =&gt; (d._1, d._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值</div><div class="line">    val mc = c.map(c =&gt; (c._1, c._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值</div><div class="line">    (mb, mc) //返回转换后的 beforeColumns 和 afterColumns</div><div class="line">  &#125;)</div><div class="line">  //下面利用 json4s 进行 Json 化</div><div class="line">  (binlogEntry.getEventType, compact(&quot;rowdata&quot; -&gt; strRowDatas.map&#123;</div><div class="line">    w =&gt; List(&quot;row_data&quot; -&amp;gt; (&quot;before&quot; -&amp;gt; w._1.toMap) ~ (&quot;after&quot; -&amp;gt; w._2.toMap))  //这里的两个 toMap 是必要的，不然里层会变成 List，这个地方比较疑惑的是，</div><div class="line">                                                                                 //w._1 按理是 Map类型，为什么还需要强制转换成 Map</div><div class="line">                                                                              //而且用 strRowDatas.foreach(x =&gt; println(s&quot;$&#123;x._1&#125;  $&#123;x._2&#125;&quot;)打印的结果表名是 Map</div><div class="line">  &#125;))&lt;/pre&gt;</div><div class="line">desirializeByte 函数传入 topic 中的一条记录，返回参数自己确定，我这里为了测试，返回一个 (String, String) 的 Tuple，第一个字段表示该条记录的 EventType（Insert/Update/Delete 等），第二个字段为 Json 化后的数据。</div><div class="line"></div><div class="line">BinlogEntryUtil.serilizeToBean 是一个辅助类，将 binlog 数据转化为一个 Java bean 类。</div><div class="line"></div><div class="line">第 4 行，我们得到表对应的主键，第 5 行获得具体的数据</div><div class="line"></div><div class="line">第 6 行到第 12 行是 Json 化之前的辅助工作，将所有不需要的东西给剔除掉，只留下字段，以及字段对应的值。</div><div class="line"></div><div class="line">第 14， 15 行就是具体的 Json 工作了（使用了 json4s 包进行 Json 化）</div><div class="line"></div><div class="line">这个过程中有一点需要注意的是，在 Json 化的时候，记得为 w._1 和 w._2 加 toMap 操作，不然会变成 List（很奇怪，我将 w._1 和 w._2 打印出来看，都是 Map 类型）或者你可以在第 7，8 行的末尾加上 .toMap 操作。这个我查了 API，进行了实验，暂时怀疑是在和 json4s 组合的时候，出现了问题，有待验证。</div><div class="line"></div><div class="line">利用上述代码，我们可以得到下面这样 Json 化之后的字符串(我进行了排版，程序返回的 Json 串是不换行的）</div><div class="line">&lt;pre class=&quot;font-size:8 lang:default decode:true&quot;&gt;&#123;&quot;rowdata&quot;:</div><div class="line">   [&#123;&quot;row_data&quot;:</div><div class="line">       &#123;&quot;before&quot;:&#123;&quot;param_name&quot;:&quot;creator&quot;,&quot;param_value&quot;:&quot;chenqiang05&quot;,&quot;horigindb_etl_id&quot;:&quot;2532&quot;,&quot;utime&quot;:&quot;2016-07-26 15:07:16&quot;,&quot;id&quot;:&quot;15122&quot;,&quot;status&quot;:&quot;0&quot;,&quot;ctime&quot;:&quot;2016-07-25 17:06:01&quot;&#125;,</div><div class="line">        &quot;after&quot;:&#123;&quot;param_name&quot;:&quot;creator&quot;,&quot;param_value&quot;:&quot;chendayao&quot;,&quot;horigindb_etl_id&quot;:&quot;2532&quot;,&quot;utime&quot;:&quot;2016-08-01 10:32:01&quot;,&quot;id&quot;:&quot;15122&quot;,&quot;status&quot;:&quot;0&quot;,&quot;ctime&quot;:&quot;2016-07-25 17:06:01&quot;&#125;</div><div class="line">       &#125;</div><div class="line">    &#125;]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>到这里，基本就完成了一种将 binlog 数据 Json 化的代码。</p>
+<p>附录代码，由于这些代码是从其他工程里面抠出来的，可能读起来会不顺畅，还请见谅。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div></pre></td><td class="code"><pre><div class="line">public static BinlogEntry serializeToBean(byte[] input) &#123;</div><div class="line">      BinlogEntry binlogEntry = null;</div><div class="line">      Entry entry = deserializeFromProtoBuf(input);//从 protobuf 反序列化</div><div class="line">      if(entry != null) &#123;</div><div class="line">         binlogEntry = serializeToBean(entry);</div><div class="line">      &#125;</div><div class="line">      return binlogEntry;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public static Entry deserializeFromProtoBuf(byte[] input) &#123;</div><div class="line">        Entry entry = null;</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            entry = Entry.parseFrom(input);</div><div class="line">//com.alibaba.otter.canal.protocol.CanalEntry#Entry 类的方法，由 protobuf 生成</div><div class="line">        &#125; catch (InvalidProtocolBufferException var3) &#123;</div><div class="line">            logger.error(&quot;Exception:&quot; + var3);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return entry;</div><div class="line">    &#125;</div><div class="line">//将 Entry 解析为一个 bean 类</div><div class="line">public static BinlogEntry serializeToBean(Entry entry) &#123;</div><div class="line">        RowChange rowChange = null;</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            rowChange = RowChange.parseFrom(entry.getStoreValue());</div><div class="line">        &#125; catch (Exception var8) &#123;</div><div class="line">            throw new RuntimeException(&quot;parse event has an error , data:&quot; + entry.toString(), var8);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        BinlogEntry binlogEntry = new BinlogEntry();</div><div class="line">        String[] logFileNames = entry.getHeader().getLogfileName().split(&quot;\\.&quot;);</div><div class="line">        String logFileNo = &quot;000000&quot;;</div><div class="line">        if(logFileNames.length &gt; 1) &#123;</div><div class="line">            logFileNo = logFileNames[1];</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        binlogEntry.setBinlogFileName(logFileNo);</div><div class="line">        binlogEntry.setBinlogOffset(entry.getHeader().getLogfileOffset());</div><div class="line">        binlogEntry.setExecuteTime(entry.getHeader().getExecuteTime());</div><div class="line">        binlogEntry.setTableName(entry.getHeader().getTableName());</div><div class="line">        binlogEntry.setEventType(entry.getHeader().getEventType().toString());</div><div class="line">        Iterator primaryKeysList = rowChange.getRowDatasList().iterator();</div><div class="line"></div><div class="line">        while(primaryKeysList.hasNext()) &#123;</div><div class="line">            RowData rowData = (RowData)primaryKeysList.next();</div><div class="line">            BinlogRow row = new BinlogRow(binlogEntry.getEventType());</div><div class="line">            row.setBeforeColumns(getColumnInfo(rowData.getBeforeColumnsList()));</div><div class="line">            row.setAfterColumns(getColumnInfo(rowData.getAfterColumnsList()));</div><div class="line">            binlogEntry.addRowData(row);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if(binlogEntry.getRowDatas().size() &gt;= 1) &#123;</div><div class="line">            BinlogRow primaryKeysList1 = (BinlogRow)binlogEntry.getRowDatas().get(0);</div><div class="line">            binlogEntry.setPrimaryKeys(getPrimaryKeys(primaryKeysList1));</div><div class="line">        &#125; else &#123;</div><div class="line">            ArrayList primaryKeysList2 = new ArrayList();</div><div class="line">            binlogEntry.setPrimaryKeys(primaryKeysList2);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return binlogEntry;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public class BinlogEntry implements Serializable &#123;</div><div class="line">    private String binlogFileName;</div><div class="line">    private long binlogOffset;</div><div class="line">    private long executeTime;</div><div class="line">    private String tableName;</div><div class="line">    private String eventType;</div><div class="line">    private List&lt;String&gt; primaryKeys;</div><div class="line">    private List&lt;BinlogRow&gt; rowDatas = new ArrayList();</div><div class="line">&#125;</div><div class="line">public class BinlogRow implements Serializable &#123;</div><div class="line">    public static final String EVENT_TYPE_INSERT = &quot;INSERT&quot;;</div><div class="line">    public static final String EVENT_TYPE_UPDATE = &quot;UPDATE&quot;;</div><div class="line">    public static final String EVENT_TYPE_DELETE = &quot;DELETE&quot;;</div><div class="line">    private String eventType;</div><div class="line">    private Map&lt;String, BinlogColumn&gt; beforeColumns;</div><div class="line">    private Map&lt;String, BinlogColumn&gt; afterColumns;</div><div class="line">&#125;</div><div class="line">public class BinlogColumn implements Serializable &#123;</div><div class="line">    private int index;</div><div class="line">    private String mysqlType;</div><div class="line">    private String name;</div><div class="line">    private boolean isKey;</div><div class="line">    private boolean updated;</div><div class="line">    private boolean isNull;</div><div class="line">    private String value;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&nbsp;</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在开发 Spark Streaming 的公共组件过程中，需要将 binlog 的数据(Array[Byte])转换为 Json 格式，供用户使用，本文提供一种转换的思路。另外我们会用到几个辅助类，为了行文流畅，我们将辅助类的定义放在文章的最后面。如果&lt;/p&gt;
+&lt;p&gt;如果本
+    
+    </summary>
+    
+      <category term="分布式系统" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"/>
+    
+      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
+    
+    
+      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
+    
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="binlog" scheme="http://yoursite.com/tags/binlog/"/>
+    
+      <category term="json" scheme="http://yoursite.com/tags/json/"/>
+    
+      <category term="protobuf" scheme="http://yoursite.com/tags/protobuf/"/>
+    
+      <category term="scala" scheme="http://yoursite.com/tags/scala/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark Streaming 中使用 zookeeper 保存 offset 并重用（二）</title>
+    <link href="http://yoursite.com/2016/07/15/spark-streaming-saving-offset-in-zookeeper-2/"/>
+    <id>http://yoursite.com/2016/07/15/spark-streaming-saving-offset-in-zookeeper-2/</id>
+    <published>2016-07-15T12:58:04.000Z</published>
+    <updated>2017-05-29T09:22:53.000Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="http://www.klion26.com/spark-streaming-save-offset-to-zookeeper.html" target="_blank" rel="external">上一篇文章</a>中，我们讲了如何在将 offset 保存在 zk 中，以及进行重用，但是程序中有个小问题“如果程序停了很长很长一段后再启动，zk 中保存的 offset 已经过期了，那会怎样呢？”本文将解决这个问题</p>
+<p>如果 kafka 上的 offset 已经过期，那么就会报 OffsetOutOfRange 的异常，因为之前保存在 zk 的 offset 已经 topic 中找不到了。所以我们需要在 从 zk 找到 offset 的这种情况下增加一个判断条件，如果 zk 中保存的 offset 小于当前 kafka topic 中最小的 offset，则设置为 kafka topic 中最小的 offset。假设我们上次保存在 zk 中的 offset 值为 123（某一个 partition），然后程序停了一周，现在 kafka topic 的最小 offset 变成了 200，那么用前文的代码，就会得到 OffsetOutOfRange 的异常，因为 123 对应的数据已经找不到了。下面我们给出，如何获取 <topic, parition=""> 的最小 offset，这样我们就可以进行对比了</topic,></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">val partitionOffset = zkClient.readData[String](s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;i&#125;&quot;)</div><div class="line">val tp = TopicAndPartition(topic, i)</div><div class="line"></div><div class="line">val requestMin = OffsetRequest(Map(tp -&gt; PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))</div><div class="line">val consumerMin = new SimpleConsumer(&quot;broker_host&quot;, 9092, 10000, 10000, &quot;getMinOffset&quot;)  //注意这里的 broker_host，因为这里会导致查询不到，解决方法在下面</div><div class="line">val curOffsets = consumerMin.getOffsetsBefore(requestMin).partitionErrorAndOffsets(tp).offsets</div><div class="line">var nextOffset = partitionOffset.toLong</div><div class="line">if (curOffsets.length &gt; 0 &amp;amp; nextOffset &lt; curOffsets.head) &#123;  // 通过比较从 kafka 上该 partition 的最小 offset 和 zk 上保存的 offset，进行选择</div><div class="line">  nextOffset = curOffsets.head</div><div class="line">&#125;</div><div class="line">fromOffsets += (tp -&gt; nextOffset) //设置正确的 offset，这里将 nextOffset 设置为 0（0 只是一个特殊值），可以观察到 offset 过期的现象&lt;/pre&gt;</div></pre></td></tr></table></figure>
+<p>但是上面的代码有一定的问题，因为我们从 kafka 上获取 offset 的时候，需要寻找对应的 leader，从 leader 来获取 offset，而不是 broker，不然可能得到的 curOffsets 会是空的（表示获取不到）。下面的代码就是获取不同 partition 的 leader 相关代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">val topic_name = &quot;topic_name&quot;     //topic_name 表示我们希望获取的 topic 名字</div><div class="line">val topic2 = List(topic_name)       </div><div class="line">val req = new TopicMetadataRequest(topic2, 0)</div><div class="line">val getLeaderConsumer = new SimpleConsumer(&quot;broker_host&quot;, 9092, 10000, 10000, &quot;OffsetLookup&quot;)  // 第一个参数是 kafka broker 的host，第二个是 port</div><div class="line">val res = getLeaderConsumer.send(req)</div><div class="line">val topicMetaOption = res.topicsMetadata.headOption</div><div class="line">val partitions = topicMetaOption match &#123;</div><div class="line">  case Some(tm) =&gt;</div><div class="line">    tm.partitionsMetadata.map(pm =&gt; (pm.partitionId, pm.leader.get.host)).toMap[Int, String]  // 将结果转化为 partition -&amp;gt; leader 的映射关系</div><div class="line">  case None =&gt;</div><div class="line">    Map[Int, String]()</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的代码能够得到所有 partition 的 leader 地址，然后将 leader 地址替换掉上面第一份代码中的 broker_list 即可。</p>
+<p>到此，在 spark streaming 中将 kafka 的 offset 保存到 zk，并重用的大部分情况都覆盖到了</p>
+<p><br><br><br>&nbsp;</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;a href=&quot;http://www.klion26.com/spark-streaming-save-offset-to-zookeeper.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;上一篇文章&lt;/a&gt;中，我们讲了如何在将 offset 
+    
+    </summary>
+    
+      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
+    
+    
+      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
+    
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="at-least-once" scheme="http://yoursite.com/tags/at-least-once/"/>
+    
+      <category term="exactly-once" scheme="http://yoursite.com/tags/exactly-once/"/>
+    
+      <category term="zookeeper" scheme="http://yoursite.com/tags/zookeeper/"/>
+    
+      <category term="offset" scheme="http://yoursite.com/tags/offset/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark Streaming 中使用 zookeeper 保存 offset 并重用</title>
+    <link href="http://yoursite.com/2016/07/14/spark-streaming-save-offset-to-zookeeper/"/>
+    <id>http://yoursite.com/2016/07/14/spark-streaming-save-offset-to-zookeeper/</id>
+    <published>2016-07-14T11:36:23.000Z</published>
+    <updated>2017-05-29T09:22:53.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>在 Spark Streaming 中消费 Kafka 数据的时候，有两种方式分别是 1）基于 Receiver-based 的 createStream 方法和 2）Direct Approach (No Receivers) 方式的 createDirectStream 方法，详细的可以参考 <a href="http://spark.apache.org/docs/latest/streaming-kafka-integration.html" target="_blank" rel="external">Spark Streaming + Kafka Integration Guide</a>，但是第二种使用方式中  kafka 的 offset 是保存在 checkpoint 中的，如果程序重启的话，会丢失一部分数据，可以参考  <a href="http://aseigneurin.github.io/2016/05/07/spark-kafka-achieving-zero-data-loss.html" target="_blank" rel="external">Spark  Kafka - Achieving zero data-loss</a>。</p>
+<p>本文主要讲在使用第二种消费方式（Direct Approach）的情况下，如何将 kafka 中的 offset 保存到 zookeeper 中，以及如何从 zookeeper 中读取已存在的 offset。</p>
+<p>大致思想就是，在初始化 kafka stream 的时候，查看 zookeeper 中是否保存有 offset，有就从该 offset 进行读取，没有就从最新/旧进行读取。在消费 kafka 数据的同时，将每个 partition 的 offset 保存到 zookeeper 中进行备份，具体实现参考下面代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">val topic : String = &quot;topic_name&quot;   //消费的 topic 名字</div><div class="line">   val topics : Set[String] = Set(topic)                    //创建 stream 时使用的 topic 名字集合</div><div class="line"></div><div class="line">   val topicDirs = new ZKGroupTopicDirs(&quot;test_spark_streaming_group&quot;, topic)  //创建一个 ZKGroupTopicDirs 对象，对保存</div><div class="line">   val zkTopicPath = s&quot;$&#123;topicDirs.consumerOffsetDir&#125;&quot;          获取 zookeeper 中的路径，这里会变成 /consumers/test_spark_streaming_group/offsets/topic_name</div><div class="line"></div><div class="line">   val zkClient = new ZkClient(&quot;10.4.232.77:2181&quot;)          //zookeeper 的host 和 ip，创建一个 client</div><div class="line">   val children = zkClient.countChildren(s&quot;$&#123;topicDirs.consumerOffsetDir&#125;&quot;)     //查询该路径下是否字节点（默认有字节点为我们自己保存不同 partition 时生成的）</div><div class="line"></div><div class="line">   var kafkaStream : InputDStream[(String, String)] = null   </div><div class="line">   var fromOffsets: Map[TopicAndPartition, Long] = Map()   //如果 zookeeper 中有保存 offset，我们会利用这个 offset 作为 kafkaStream 的起始位置</div><div class="line"></div><div class="line">   if (children &gt; 0) &#123;   //如果保存过 offset，这里更好的做法，还应该和  kafka 上最小的 offset 做对比，不然会报 OutOfRange 的错误</div><div class="line">       for (i &lt;- 0 until children) &#123;</div><div class="line">         val partitionOffset = zkClient.readData[String](s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;i&#125;&quot;)</div><div class="line">         val tp = TopicAndPartition(topic, i)</div><div class="line">         fromOffsets += (tp -&gt; partitionOffset.toLong)  //将不同 partition 对应的 offset 增加到 fromOffsets 中</div><div class="line">         logInfo(&quot;@@@@@@ topic[&quot; + topic + &quot;] partition[&quot; + i + &quot;] offset[&quot; + partitionOffset + &quot;] @@@@@@&quot;)</div><div class="line">       &#125;</div><div class="line"></div><div class="line">       val messageHandler = (mmd : MessageAndMetadata[String, String]) =&gt; (mmd.topic, mmd.message())  //这个会将 kafka 的消息进行 transform，最终 kafak 的数据都会变成 (topic_name, message) 这样的 tuple</div><div class="line">       kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParam, fromOffsets, messageHandler)</div><div class="line">   &#125;</div><div class="line">   else &#123;</div><div class="line">       kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParam, topics) //如果未保存，根据 kafkaParam 的配置使用最新或者最旧的 offset</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   var offsetRanges = Array[OffsetRange]()</div><div class="line">   kafkaStream.transform&#123; rdd =&gt;</div><div class="line">     offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges //得到该 rdd 对应 kafka 的消息的 offset</div><div class="line">     rdd</div><div class="line">   &#125;.map(msg =&gt; msg._2).foreachRDD &#123; rdd =&amp;gt;     </div><div class="line">     for (o &lt;- offsetRanges) &#123;</div><div class="line">       val zkPath = s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;o.partition&#125;&quot;</div><div class="line">       ZkUtils.updatePersistentPath(zkClient, zkPath, o.fromOffset.toString)  //将该 partition 的 offset 保存到 zookeeper</div><div class="line">       logInfo(s&quot;@@@@@@ topic  $&#123;o.topic&#125;  partition $&#123;o.partition&#125;  fromoffset $&#123;o.fromOffset&#125;  untiloffset $&#123;o.untilOffset&#125; #######&quot;)</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     rdd.foreachPartition(</div><div class="line">       message =&gt; &#123;</div><div class="line">         while(message.hasNext) &#123;</div><div class="line">           logInfo(s&quot;@^_^@   [&quot; + message.next() + &quot;] @^_^@&quot;)</div><div class="line">         &#125;</div><div class="line">       &#125;</div><div class="line">     )</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>使用上面的代码，我们可以做到 Spark Streaming 程序从 Kafka 中读取数据是不丢失</p>
+<p>欢迎阅读<a href="http://www.klion26.com/spark-streaming-saving-offset-in-zookeeper-2.html" target="_blank" rel="external">第二篇文章</a>，解决 offset out of range 的问题</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在 Spark Streaming 中消费 Kafka 数据的时候，有两种方式分别是 1）基于 Receiver-based 的 createStream 方法和 2）Direct Approach (No Receivers) 方式的 createDirectStream
+    
+    </summary>
+    
+      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
+    
+    
+      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
+    
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="at-least-once" scheme="http://yoursite.com/tags/at-least-once/"/>
+    
+      <category term="exactly-once" scheme="http://yoursite.com/tags/exactly-once/"/>
+    
+      <category term="zookeeper" scheme="http://yoursite.com/tags/zookeeper/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Asking The Right Questions</title>
+    <link href="http://yoursite.com/2016/06/11/asking-the-right-questions/"/>
+    <id>http://yoursite.com/2016/06/11/asking-the-right-questions/</id>
+    <published>2016-06-11T03:30:27.000Z</published>
+    <updated>2017-05-29T09:22:53.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>这是一本讲 Critical Thinking 的书籍，本文为一份读书笔记，有兴趣的建议自己读最新的原版。我读的是中文第 7 版，豆瓣地址<a href="https://book.douban.com/subject/1504957/" target="_blank" rel="external">https://book.douban.com/subject/1504957/</a></p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2016/06/Screen-Shot-2016-06-11-at-09.50.49.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2016/06/Screen-Shot-2016-06-11-at-09.50.49.png" alt="Screen Shot 2016-06-11 at 09.50.49"></a></p>
+<p><strong><span style="color: #0000ff;">批判性思维是耗时的，我们需要明确，“谁关心这个问题”，并不是所有的问题都需要使用批判性思维</span></strong></p>
+<p>批判性思维包括提出一系列相关的批判性问题的意识，以及在适当的时机提出并回答问题的能力和意愿。本书主要包括如下三方面：</p>
+<ul>
+<li>意识到一些彼此相关的批判性问题</li>
+<li>能够在适当的时机提出和回答批判性问题</li>
+<li>愿意主动运用批判性问题<br>我们所做的每个决定都受自己的个人印记—经历、价值观、训练和文化的习惯所影响，因此需要尽量减少情感成为你接受或拒绝一个观点的主要原因的情况出现。</li>
+</ul>
+<p><span style="color: #0000ff;">身体力行通常比旁观更有趣，做好比只是简单的做更有趣。这也是批判性思维的乐趣所在。使用批判性思维，你能够感觉到一种满足感，知道为什么某种观点只是一堆废话所产生的满足感。</span></p>
+<p>通过细分，可以将批判性思维的阶段分为如下阶段</p>
+<ol>
+<li>什么是论题？什么是结论？结论是其他观点支持的观点，没有其他观点支持的观点，不算结论</li>
+<li>理由是什么</li>
+<li>哪些词句有歧义</li>
+<li>什么是价值观冲突？什么是价值观假设？</li>
+<li>什么是描述性假设？</li>
+<li>推理中存在谬误吗？</li>
+<li>这些证据的可信度有多大？</li>
+<li>你发现干扰性原因了吗？</li>
+<li>统计数据是否具有欺骗性</li>
+<li>哪些重要信息被遗漏了</li>
+<li>什么结论可能是合理的<br>通过一项一项的学习，以及对应的训练，能够更好的学习批判性思维</li>
+</ol>
+<h2 id="1-论题是什么"><a href="#1-论题是什么" class="headerlink" title="1 论题是什么"></a><span style="color: #0000ff;"><strong>1 论题是什么</strong></span></h2><div>有两种明显的论题种类：</div>
+
+<ol>
+<li><p>描述类：针对有关过去、现在、未来的描述是否正确提出的问题，比如</p>
+<ul>
+<li>引起高血压的原因<em><strong>是什么</strong></em>？</li>
+<li>提高销售税的决定是<em><strong>谁</strong></em>做出的？</li>
+<li>到 2010 年，大学学费将是<em><strong>多少</strong></em>？</li>
+</ul>
+</li>
+<li><p>说明类：针对我们应当怎样做及对于错、好与坏提出的问题，比如</p>
+<ul>
+<li>死刑<em><strong>应该</strong></em>被废除吗？</li>
+<li>对于失业我们<em><strong>应该</strong></em>做些什么</li>
+<li>我们<em><strong>必须</strong></em>禁止 SUV（大型轿车）吗？我们必须面对哮喘病的蔓延吗？</li>
+</ul>
+</li>
+</ol>
+<h2 id="2-结论是什么"><a href="#2-结论是什么" class="headerlink" title="2 结论是什么"></a><span style="color: #0000ff;">2 结论是什么</span></h2><div><br><div><span style="color: #0000ff;">结论是作者或者演讲者希望你进行选择的目标</span>。你需要继续注意的问题是：<strong>根据这些证据，我是否应该接受这个结论</strong>？</div><br><div></div><br></div><br><div><strong>怎么找出结论</strong>，几点线索</div>
+
+<ol>
+<li><strong>寻找论题</strong>。因为结论往往是论题的答案，如果你知道论题是什么，将有助于你找出结论。看文章的题目，文章的首段等。</li>
+<li><p><strong>提示语</strong>。但并不是所有作者都使用提示语，常用提示语：</p>
+<ul>
+<li>所以。。。 这说明。。。 因此。。。 为此。。。 我们可以推理。。。 接下来。。。 由此得出结论。。。 那样。。。 我努力说明的一点是。。。 简言之。。。 最明显的解释是。。。 事实证明。。。 事件的真相是。。。</li>
+</ul>
+</li>
+<li><p><strong>看可能出现结论的特殊位置</strong>。文章的开头，结尾等</p>
+</li>
+<li><p><strong>记住哪些不是结论</strong>。下面这些类型的陈述不是结论：</p>
+<ul>
+<li>例子</li>
+<li>统计数据</li>
+<li>定义</li>
+<li>背景信息</li>
+<li>证据</li>
+</ul>
+</li>
+<li><p><strong>检查上下文及作者背景</strong>。作者的背景和资料可能带有的倾向（偏见）</p>
+</li>
+<li><strong>问问这个问题：“因此呢？”。</strong></li>
+</ol>
+<h2 id="3-理由是什么"><a href="#3-理由是什么" class="headerlink" title="3 理由是什么"></a><span style="color: #0000ff;">3 理由是什么</span></h2><p><span style="color: #0000ff;">理由的质量决定了论证的说服力，只有当你接受了相应的理由之后，才能接受对应的结</span>。</p>
+<p>在确定理由之前，你不能对一个结论的价值做出判断。理由是提供给人们并使之接受某个结论的基础内容。确定理由是批判性思维的重要步骤，要确定理由，就必须以<strong>开放和宽容</strong>的态度来看待那些<strong>与自己的看法不同</strong>的观点。</p>
+<p>确定理由的第一步是以质疑的态度来看待一个论证，就是要问“为什么”，如果你能够用自己的话描述回答这个“为什么”，那就发现了作者的理由。</p>
+<div>如果自己演讲或写作的时候，应该公开地呈现你的理由和结论，给受众一个机会来清楚地了解你打算做什么</div><br><div><br><div></div><br><div>有些推理会很长，且没有很好的组织结构，有些理由只支持一个结论，并且这个结论又充当另外一个结论的理由。可以通过下面的辅助手段来帮助自己确认和组织推理线索</div>
+
+<ul>
+<li>圈出提示语</li>
+<li>用不同颜色的笔分别在理由和结论下方划线，或者在结论的上方划线，在理由的下方划线</li>
+<li>在说明理由和结论的空白处作出标注</li>
+<li>读完长段落之后，在文章最后把理由罗列出来。</li>
+<li>对于特别复杂的推理，可以把推理结构做成图标，使用数字标注出每个理由和结论，并用箭头指示它们之间发生的关系：首先在段落旁边的空白处改写所有的理由和结论：然后进行数字编号。有时这种技术非常清晰、有效。</li>
+</ul>
+<h2 id="4-关键词句是否有歧义"><a href="#4-关键词句是否有歧义" class="headerlink" title="4 关键词句是否有歧义"></a><span style="color: #0000ff;">4 关键词句是否有歧义</span></h2><p><span style="color: #0000ff;">在结论和理由中，不能被去掉的词被称为关键词</span>，对关键词含义的理解会影响我们整个推理的过程。在决定是否赞同某个观点的根本一步就是要确定关键词或关键句的含义。</p>
+<p>为什么需要弄清楚关键词的含义——&gt;作者用这些词句来支撑 TA 的论证</p>
+<p><span style="color: #0000ff;">往往一个词越抽象，就越可能有多种解释，因此也需要做出更清晰的定义</span>。抽象的定义“一个词语与特定的事例联系越少，其抽象程度就越高”。例如和“在人生的必经道路上拥有平等的捷径”，“对一件事情直接负责”“关于男女生殖器官的图片”“故意对其他人的身体进行伤害”这些短语相比，“平等”，“责任”，“淫秽书籍”，“侵犯”这几个词更抽象</p>
+<p>我们可以通过变换不同的立场（同意和反对作者等），查看关键词是否有不同的释义。一直问作者这样说是什么意思，要避免从一开始就和作者出现“心灵感应”</p>
+<p><span style="color: #0000ff;">除了歧义词句，还有带感情色彩的语言，一般政治性语言常常附带有感情色彩，并有歧义</span>。例如，当政府帮助那些我们不喜欢的人时，我们用福利这个词；当政府帮助那些我们喜欢的人是，我们称之为资助或激励。</p>
+<div><span style="color: #0000ff;">确认关键词的理解和作者想表达的意思一致，否则你的赞同或否认都没有意义。</span></div><br><div></div><br></div>
+
+<h2 id="5-价值观冲突和价值观假设"><a href="#5-价值观冲突和价值观假设" class="headerlink" title="5 价值观冲突和价值观假设"></a><span style="color: #0000ff;">5 价值观冲突和价值观假设</span></h2><div><br><div><span style="color: #0000ff;">假设指的是那些<em><strong>想当然地被作为论证基本组成部分的观点</strong></em></span></div><br><div></div><br><div>在所有的论证中，都存在一些作者所认同的思想，而这类思想的典型特征就是作者没有对它们进行清晰的陈述。在推理结构中，这些思想是隐形的重要环节，是将全部论证整合在一起的黏合剂。如果你不能发掘出隐藏的环节，就常常会发现自己相信了一些不应该相信的东西，一旦经过更深入的思考，就绝不会接受这些东西。这就是假设的存在，假设包括<strong><em>价值观假设</em></strong>和<strong><em>描述性假设。</em></strong></div><br></div><br><div></div>
+
+<h3 id="5-1-价值观假设"><a href="#5-1-价值观假设" class="headerlink" title="5.1 价值观假设"></a>5.1 价值观假设</h3><div><span style="color: #0000ff;">价值观：人们认为值得为之努力的观念</span></div><br><div><span style="color: #0000ff;">价值观假设是选择理由的基础，应当把确定价值观假设变成一种习惯。价值观假设暗含价值观偏向</span>。</div><br><div>同一个价值观对不同的人来说，强烈程度是不同的。在回答一个说明性问题时，价值观的这种相对强度就会导致你得出与别人不同的答案。</div><br><div>通过作者的背景，以及论证的结果，变换立场，可以确定价值观假设的线索。通过确定价值观假设，可以知道作者放弃的是什么，获得的是什么。</div><br><div></div><br><div><span style="color: #0000ff;">描述性假设：关于世界是什么样子的观念，或将来是什么样子的未阐明的观念</span></div><br><div><br><br>### 5.2  如何寻找假设<br><br><div><span style="color: #0000ff;"><strong>坚持思考原因和结论之间的差距</strong></span>。先要问问自己“是否有依据确信原因可能是不真实的？”再问“假设这些原因是真实的，然而，得出结论的方法是否可能是错误的？”</div><br><div></div>
+
+<h2 id="6-推理中是否有谬误"><a href="#6-推理中是否有谬误" class="headerlink" title="6 推理中是否有谬误"></a><span style="color: #0000ff;">6 推理中是否有谬误</span></h2><div><br><div><span style="color: #0000ff;">缪误：作者为了说服你接受一个结论而可能使用的一种推理“骗术”</span></div><br><div>下面三个通常的缪误：</div>
+
+<ol>
+<li>提供了<em>错误或不正确</em>假设的推理</li>
+<li>通过使信息看起来与结论相关而实际上不相关来<em>转移我们的视线</em></li>
+<li>需要使用已经被证实为真的结论来为结论提供支撑<div>下面是一些<span style="color: #0000ff;">常见的缪误</span>，可以帮助我们定位和沟通</div>
+</li>
+</ol>
+<ul>
+<li>人身攻击：不直接阐明原因而对一个人进行攻击或侮辱</li>
+<li>滑坡缪误：将推理中的可能性说成必然性</li>
+<li>妄求完美：错误的假定，如果使用一种方法不能使该问题得到彻底解决，就不采用这种方法</li>
+<li>移花接木：一个关键词在一个论据中被使用两个或两个以上的意义，一旦意义被确定转变了，这一论证就没有意义了。</li>
+<li>诉诸权威：通过引入在一个问题上缺少第一手专业知识的权威来支持结论</li>
+<li>诉诸公众：试图通过偏爱多数人一致赞成的观点使某个观点合理化，错误地认为多数人支持的就是合理的</li>
+<li>稻草人：歪曲对方的观点，使之易于攻击，因而，我们攻击的是一种事实上并不存在的观点</li>
+<li>虚假的两难困境：当可能存在不止两个选择时，就假定仅存在两个选择</li>
+<li>一厢情愿：做出错误的假设，即因为我们希望 X 是真实的或错误的，那么 X 就是真实的或错误的（比如：今天不可能是星期四，我还没有完成论文呢）</li>
+<li>命名解释：错误地假定因为你已经给某个事件或行为提供了一个名称，就认为你已经充分地解释了此事</li>
+<li>晕轮效应：使用模糊、情绪化的美德词汇来迫使我们没有仔细考察原因就支持某种观点</li>
+<li>偷梁换柱：提出一个不相关的主题使读者的注意离开原来的论题，读者的注意离开当前的论证而转移到另一个论题上有助于“赢得”辩论。这个错误的过程如下：1) A 是正在讨论的主题 ；2）主题 B 被引入进讨论中，尽管它与主题 A 相关，但不是要讨论的；3）主题 A 被放弃</li>
+<li>窃取论点：在论证中，结论在推理中是一个假设</li>
+<li>错误类比：进行类比的两个事物存在重要的、与论题有关联的差异</li>
+<li>因果单一化：根据一些不够充分的因素来解释某事件，过分强调某一个或某几个因素对事件的作用</li>
+<li>混淆原因和结果：将原因和结果混淆在一起或没有认识到两件事可能是相互影响的</li>
+<li>对共同原因的疏忽：没有认识到两件事可能由于另一个共同因素的影响而相互联系</li>
+<li>在此之后、由此引起的错误：仅仅因为 B 事件在时间上晚于 A 事件发生，就认为 B 事件是由 A 事件引起的。两件事 A 和 B 同时发生了，可能是 A 导致 B，可能是 B 导致 A，可能是 C 导致 A 和 B，也可能是巧合。<br></li></ul></div><br></div>
+
+<h2 id="7-证据的可信度有多少"><a href="#7-证据的可信度有多少" class="headerlink" title=" 7 证据的可信度有多少"></a><span style="color: #0000ff;"> 7 证据的可信度有多少</span></h2><div><span style="color: #0000ff;">对于一个结论，我们为什么要相信它&lt;— 需要理由/证据 &lt;— 理由的可靠性如何</span></div><br><div></div><br><div>证据是什么，证据在哪里，为什么相信它，如何知道它是真实的，肯定它是真实的吗，能证明它吗</div><br><div><br><div></div><br><div>下面三种事实性声明我们认为是可信赖的</div>
+
+<ol>
+<li>声明是众人一致认同的常识。如“举重能练出肌肉”</li>
+<li>声明是某一个有充分理由支持的论证</li>
+<li>传达信息的人为其声明提供了可靠性证据，或我们知道的其他证据能支持该声明<br></li></ol></div><div>证据的主要类型包括：</div>
+
+
+<ul>
+<li>直觉。依靠的是“常识”，“内在感觉”或预感，由于直觉是个人性的，其他人无法判断其可信度，这是把直觉作为证据的主要问题</li>
+<li>个人的经验。容易形成 <strong>以偏概全</strong> 的缪误：即仅仅根据群体中少数几个人的经历就得出关于整个群体的结论</li>
+<li>他人的证词。除非我们对提供证词的人的专业技术水平、兴趣、价值观、偏见等有更多了解，否则就不必在意这种证词。因为人们的经验千差万别，每个人的兴趣、立场不同，信息不充分，人为加工等原因。</li>
+<li>权威的意见。权威的意见并不都是可信的，术业有专攻，权威人士可能并不是你们讨论问题方的专业人士</li>
+<li>个人的观察。个人观察是一种有价值的证据，但是也有不足的地方，因为人们倾向于看到或听到合乎自己意愿的东西，倾向于选择并记住某一事件中与自己的经历和背景最一致的部分。但是观察者不会为我们提供“原模原样”的观察资料，会带自己的偏见</li>
+<li>案例。案例是否典型，能不能找出有力的反面事例，该案例在表述上有没有偏差</li>
+<li><p>科学研究。科学研究由于其｛可重复性、控制变量、语言精确｝等特性，更具可靠性，但也需要记住如下几点：</p>
+<ul>
+<li>研究<em>质量</em>有天壤之别，不是所有的研究结果都值得信任</li>
+<li>研究结果是否是可重复的，有没有其他人可以重复该研究</li>
+<li>研究结果并不能证明结论，最多只能算支持结论</li>
+<li>研究结果由于研究者的期望、态度、价值观和需要等可能存在偏差</li>
+<li>演讲者或作者可能简化或歪曲研究结论</li>
+<li>研究得到的“事实”会随时间发生变化，尤其是关于人类行为的研究</li>
+<li>研究者在经济收益、地位、安全及其他方面的需要会影响其研究结果</li>
+<li>取样的数量、广度和随机性如何</li>
+<li>调查问卷是否存在偏差，是否有误导性（人们可能给出他们人为恰当的回复，而不是自己实际的回复），太长的问卷，后面的答案可能就不靠谱</li>
+</ul>
+</li>
+<li><p>类比。类比既能激发我们的灵感，也能蒙骗我们（可能我们两者类似的性质，不是当前所讨论的），可以考虑从下面两个方面评价类比的好坏：</p>
+<ol>
+<li>从多个方面比较两种事物的相似之处与不同之处</li>
+<li>相似性与差异性之间的<em>关联</em></li>
+</ol>
+</li>
+</ul>
+<h2 id="8-是否有干扰性原因"><a href="#8-是否有干扰性原因" class="headerlink" title="8 是否有干扰性原因"></a><span style="color: #0000ff;">8 是否有干扰性原因</span></h2><p><span style="color: #0000ff;">干扰性原因是一个<em>看似合理</em>，与作者的解释不同，但能说明一个已知的结果如何发生的解释</span>。</p>
+<h3 id="8-1-什么时候需要寻找干扰性原因："><a href="#8-1-什么时候需要寻找干扰性原因：" class="headerlink" title="8.1 什么时候需要寻找干扰性原因："></a>8.1 什么时候需要寻找干扰性原因：</h3><p>当你有充足的理由相信作者或演说者对某件事的因果解释的证据时，你就需要寻找干扰性原因</p>
+<h3 id="8-2-如何寻找干扰性原因："><a href="#8-2-如何寻找干扰性原因：" class="headerlink" title="8.2 如何寻找干扰性原因："></a>8.2 如何寻找干扰性原因：</h3><ul>
+<li>我能想出其他方法来解释这个证据吗</li>
+<li>还有什么其他的可能原因会导致这个行为或这些结果吗</li>
+<li>如果我换一个角度来看，我回找到什么重要的原因呢</li>
+<li>如果现有的解释是错误的，何种解释才是正确的呢</li>
+</ul>
+<h2 id="9-统计数据是否有欺骗性"><a href="#9-统计数据是否有欺骗性" class="headerlink" title="9 统计数据是否有欺骗性"></a><span style="color: #0000ff;">9 统计数据是否有欺骗性</span></h2><div>平均数不靠谱：<span style="color: #0000ff;">平均数包括｛算术平均数、中数、众数｝</span>，首先我们需要知道作者用的是哪一种。还有<span style="color: #0000ff;">每个数的频率也同样重要（分布如何）。</span></div><br><div></div><br><div>用作者给的数据，然后看从这些数据可以推导出什么结论，最终再将这些结论和作者给出的结论进行比较。</div><br><div></div><br><div>由于统计数据的不完善，我们常常被它欺骗。在你判断出统计数据的影响之前，你还需要哪些进一步的信息。</div><br><div></div><br><div>遇到统计数字，需要想想“有没有什么相关信息被忽略了？”</div><br><div></div><br><div>当遇到使用统计数据的论证时，一定要想想，如果使用<span style="color: #0000ff;">绝对值</span>会出现什么不同（死亡率从 1 提升到 3 可以说增加了 200 %，从 1000 提升到 1500 却只增加了 50%），数据给人的印象是否也不及先前那样深刻。</div><br><div></div>
+
+<h2 id="10-哪些重要信息被遗漏了"><a href="#10-哪些重要信息被遗漏了" class="headerlink" title="10 哪些重要信息被遗漏了"></a><span style="color: #0000ff;">10 哪些重要信息被遗漏了</span></h2><div><br><div><span style="color: #0000ff;">“被遗漏的重要信息”指那些决定你是否被演讲者或作者的论证影响的信息，也就是那些<em>形成推理</em>的信息</span></div><br><div></div>
+
+<h3 id="10-1-为什么重要信息会被遗漏："><a href="#10-1-为什么重要信息会被遗漏：" class="headerlink" title="10.1 为什么重要信息会被遗漏："></a>10.1 为什么重要信息会被遗漏：</h3><ol>
+<li>时间和空间上的局限性</li>
+<li>有限的注意范围</li>
+<li>人们所具备的知识有限</li>
+<li>为了达到欺骗的目的</li>
+<li><p>每个人的视角不同</p>
+<div></div><br><div>对作者提问“哪些重要的信息被遗漏”（尽管作者很可能没有答案）的好处：</div>
+</li>
+<li><p>可能作者遗漏的信息是你已经掌握的</p>
+</li>
+<li>在具有说服力的文章里寻找被遗漏的信息能使你得到良好锻炼，当你面对面地与教师或其他试图说服你的人交谈时，你就能更好地找出他所遗漏的信息</li>
+<li>寻找被遗漏的信息能防止你妄下结论<div></div>
+
+</li>
+</ol>
+<h3 id="10-2-如何寻找常见的重要信息的线索"><a href="#10-2-如何寻找常见的重要信息的线索" class="headerlink" title="10.2 如何寻找常见的重要信息的线索"></a>10.2 如何寻找常见的重要信息的线索</h3><ol>
+<li><p>常见的反对意见</p>
+<ol>
+<li>反对者提出什么样的理由</li>
+<li>是否有实验研究与作者提供的研究相矛盾</li>
+<li>是否有支持相反观点的示例、证明或类似的推导被遗漏</li>
+</ol>
+</li>
+<li><p>缺失定义</p>
+<ol>
+<li>加入采用不同的方式来定义关键词，得出的观点会发生多大的变化呢</li>
+</ol>
+</li>
+<li><p>缺失价值取向或价值观</p>
+<ol>
+<li>其他什么价值观也可以解释这个问题</li>
+<li>如果以不同的价值观来看待这个论题，会得出什么样的观点呢</li>
+</ol>
+</li>
+<li><p>论证里间接提到的“事实”的根源</p>
+<ol>
+<li>这些“事实”是从哪里得来的</li>
+<li>这些所谓的事实是否来自于有效的研究或可靠的信息来源</li>
+</ol>
+</li>
+<li><p>搜集事实的详细程序</p>
+<ol>
+<li>填写调查问卷的人有多少</li>
+<li>调查的问题是如何措辞的</li>
+</ol>
+</li>
+<li><p>搜集或组织证据的其他技术</p>
+<ol>
+<li>访谈发与问卷发所得到的结果会有什么不同</li>
+</ol>
+</li>
+<li><p>缺失或不完整的数字、图标、表格或数据</p>
+<ol>
+<li>如果加入来自早起研究或后续研究的证据，数字是否会有所变化</li>
+<li>作者有没有为了扩大差异而故意“扩展”数字</li>
+</ol>
+</li>
+<li><p>被遗漏的信息作用既有积极作用也有消息作用，既有短期效应也有长期效应，既包括人们提倡的观点，也有人们反对的内容</p>
+<ol>
+<li>作者的论证是否只考虑了某一种行为的积极结果或消极结果，而没有同时考虑两方面的结果</li>
+<li>我们是否有必要知道该行为在政治、社会、经济、生物、精神、健康或环境等所有领域中所引起的影响</li>
+</ol>
+</li>
+<li><p>文章中的引证及证明</p>
+<ol>
+<li>作者是否除去了上下文的引证或证明</li>
+</ol>
+</li>
+<li><p>作者通过使他人相信自己的建议而获得的好处</p>
+<ol>
+<li>假如我们采用了作者所建议的策略，是否会给作者带来经济上的收益？</li>
+</ol>
+</li>
+</ol>
+<h3 id="10-3-是否有消极作用（即不好的一面），消极作用有哪些？"><a href="#10-3-是否有消极作用（即不好的一面），消极作用有哪些？" class="headerlink" title="10.3 是否有消极作用（即不好的一面），消极作用有哪些？"></a><span style="color: #0000ff;">10.3 是否有消极作用（即不好的一面），消极作用有哪些</span>？</h3><ul>
+<li>社会的哪些方面不能从作者所提议的行为中获利？受到的损失是哪些人？这些人对该行为有什么看法？</li>
+<li>这个行为如何影响权利的分配</li>
+<li>该行为是否影响社会的民主程度</li>
+<li>某种特殊行为如何影响我们的世界观，即如何影响我们思考的内容、思考的方式以及我们了解的事物和将来能了解的事物？</li>
+<li>该行为对我们的健康有什么影响</li>
+<li>该行为如何影响人与人之间的关系、人与环境之间的关系？</li>
+<li>该行为是否有一个缓慢的、累积的作用<div></div><br><div><span style="color: #0000ff;">可能找不到上面这些问题的答案，但是没关系，你做了应该做的事，你寻找你所需要的信息来形成自己的思想，推理往往是不完整的，你需要在你掌握的信息基础上做决定。</span></div><br><div></div>
+
+</li>
+</ul>
+<h2 id="11-什么结论可能是合理的"><a href="#11-什么结论可能是合理的" class="headerlink" title="11 什么结论可能是合理的"></a><span style="color: #0000ff;">11 什么结论可能是合理的</span></h2><div>我们很少遇见只能得到一个唯一结论的情形。因此，你必须确保，你最终采纳的是最合理的、与你的价值观偏好<span style="color: #0000ff;">最一致（并不是完全一致）</span>的结论。</div><br><div></div><br><div><span style="color: #0000ff;">注意二元思维</span>，几乎没有一个重要的问题可用简单的“是”或绝对的“否”来回答。二元思维限制了你作决策和选择的范围，同时也将复杂事情过度简单化了</div><br><div></div><br><div>在寻找结论的过程中，可以通过认真研究理由而不要看结论，并根据那些理由找出尽可能多的结论。你可以经常使用“何时”，“何地”，“为什么”这些问题来帮助你产生多个结论。</div><br></div>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;这是一本讲 Critical Thinking 的书籍，本文为一份读书笔记，有兴趣的建议自己读最新的原版。我读的是中文第 7 版，豆瓣地址&lt;a href=&quot;https://book.douban.com/subject/1504957/&quot; target=&quot;_blank&quot; r
+    
+    </summary>
+    
+      <category term="成长" scheme="http://yoursite.com/categories/%E6%88%90%E9%95%BF/"/>
+    
+    
+      <category term="thinking" scheme="http://yoursite.com/tags/thinking/"/>
+    
+      <category term="critical" scheme="http://yoursite.com/tags/critical/"/>
+    
+      <category term="question" scheme="http://yoursite.com/tags/question/"/>
+    
+      <category term="read" scheme="http://yoursite.com/tags/read/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>我心目中的老师</title>
+    <link href="http://yoursite.com/2016/05/03/e6-88-91-e5-bf-83-e7-9b-ae-e4-b8-ad-e7-9a-84-e8-80-81-e5-b8-88/"/>
+    <id>http://yoursite.com/2016/05/03/e6-88-91-e5-bf-83-e7-9b-ae-e4-b8-ad-e7-9a-84-e8-80-81-e5-b8-88/</id>
+    <published>2016-05-03T15:20:11.000Z</published>
+    <updated>2017-05-29T09:22:53.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>师者，所以传道，授业，解惑也<br>我心目中，教师和老师是两个完全不同的词，教师是一个职业，和工人，农民，医生等一样，而老师是一个尊称。</p>
+</blockquote>
+<p>最近看了《<a href="https://movie.douban.com/subject/26259677/" target="_blank" rel="external">垫底辣妹</a>》，电影里面的补习班教师算得上是真正的老师，为每一个学生指定不一样的学习计划，不管在人前还是人后，都从心底觉得学生有无限的可能。电影里面老师对女主说的一句话，大致意思是“你要相信自己有可能做到，然后你就会努力的去做到”，而且用一个很形象的例子来诠释了这句话。很多时候，确实是因为我们不相信自己可能做到，从而导致自己一开始就放弃了，从某种角度上来说，又是因为我们一次次的放弃，导致我们不相信自己可以做成事情。就像自信一样，如果你做一件事成功了，再做一件事，又成功了，再做一件事又成功了，等成功的次数多了，我们从心底就相信自己能够做成事，这就是自信。长大后，如果有人对你说，你不会吃饭，你一定觉得  TA 是傻子，但是别人质疑你做不成某件事的时候，你可能就会相信  TA  的说法，因为你已经成功的吃饭几十年了。</p>
+<p>由于各种原因，老师毕竟是少数的，能遇到是幸运。硕士第三年，每天最开心的时候是吃饭时一起吐槽导师，有幸在 15 年初遇到刘江老师，刘江老师在的一个月，是硕士第三年中我过得最愉快的一个月，每天早上六点多起床，然后爬山一小时，然后去实验室做事。刘江老师看我们，也总是看到我们的优点，给我们指出各种可能性。刘江老师现在已经以千人计划回国内发展，他的研究团队正在招人，相关职位信息见<a href="http://hr.nimte.ac.cn/jobview.asp?id=506&amp;from=singlemessage&amp;isappinstalled=0" target="_blank" rel="external">http://hr.nimte.ac.cn/jobview.asp?id=506from=singlemessage&amp;isappinstalled=0</a>。</p>
+<p>我的目标是有一天能成为一个老师，可以指导后来者，为了这个目标，加油。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;师者，所以传道，授业，解惑也&lt;br&gt;我心目中，教师和老师是两个完全不同的词，教师是一个职业，和工人，农民，医生等一样，而老师是一个尊称。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;最近看了《&lt;a href=&quot;https://movie.douban
+    
+    </summary>
+    
+      <category term="我的生活" scheme="http://yoursite.com/categories/%E6%88%91%E7%9A%84%E7%94%9F%E6%B4%BB/"/>
+    
+    
+      <category term="可能性" scheme="http://yoursite.com/tags/%E5%8F%AF%E8%83%BD%E6%80%A7/"/>
+    
+      <category term="教师" scheme="http://yoursite.com/tags/%E6%95%99%E5%B8%88/"/>
+    
+      <category term="老师" scheme="http://yoursite.com/tags/%E8%80%81%E5%B8%88/"/>
+    
+  </entry>
+  
+</feed>
