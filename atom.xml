@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-06-20T14:08:38.000Z</updated>
+  <updated>2017-06-20T14:57:02.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,12 +20,13 @@
     <link href="http://yoursite.com/2017/06/20/%E9%A3%8E%E9%99%A9%E4%B8%8D%E4%BB%85%E4%BB%85%E6%98%AF%E4%BA%8B%E4%BB%B6%E5%8F%91%E7%94%9F%E7%9A%84%E6%A6%82%E7%8E%87/"/>
     <id>http://yoursite.com/2017/06/20/风险不仅仅是事件发生的概率/</id>
     <published>2017-06-20T14:05:59.000Z</published>
-    <updated>2017-06-20T14:08:38.000Z</updated>
+    <updated>2017-06-20T14:57:02.000Z</updated>
     
     <content type="html"><![CDATA[<h1 id="风险不仅仅是事件发生的概率"><a href="#风险不仅仅是事件发生的概率" class="headerlink" title="风险不仅仅是事件发生的概率"></a>风险不仅仅是事件发生的概率</h1><blockquote>
 <p>风险可以定义为 = 事件结果对你的影响 * 事件发生的概率</p>
 </blockquote>
 <p>风险在生活中处处存在，可能我们会想冒个险没啥关系，反正发生的概率小，而且在某些时候会有高收益/回报伴随这风险，这个时候就更有诱惑力了，总有人希望通过冒险得到高回报，但这恰恰是不可取的，是非常危险的。</p>
+<a id="more"></a>
 <h2 id="到底能不能闯红灯"><a href="#到底能不能闯红灯" class="headerlink" title="到底能不能闯红灯"></a>到底能不能闯红灯</h2><blockquote>
 <p>如果 遇到/见到过一次严重的交通事故，产生过后怕的感觉，那么就再也不会在这件事上冒险了</p>
 </blockquote>
@@ -57,7 +58,9 @@
     <summary type="html">
     
       &lt;h1 id=&quot;风险不仅仅是事件发生的概率&quot;&gt;&lt;a href=&quot;#风险不仅仅是事件发生的概率&quot; class=&quot;headerlink&quot; title=&quot;风险不仅仅是事件发生的概率&quot;&gt;&lt;/a&gt;风险不仅仅是事件发生的概率&lt;/h1&gt;&lt;blockquote&gt;
-&lt;p&gt;风险可以定义为 = 事件结
+&lt;p&gt;风险可以定义为 = 事件结果对你的影响 * 事件发生的概率&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;风险在生活中处处存在，可能我们会想冒个险没啥关系，反正发生的概率小，而且在某些时候会有高收益/回报伴随这风险，这个时候就更有诱惑力了，总有人希望通过冒险得到高回报，但这恰恰是不可取的，是非常危险的。&lt;/p&gt;
     
     </summary>
     
