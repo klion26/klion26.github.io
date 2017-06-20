@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>第 9 页 | klion26</title>
+  <title>Page 9 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,57 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-10-17 </div>
+			<div class="article-title"><a href="/2012/10/17/structure-and-interpretation-of-computer-programs-1-2/" >Structure and Interpretation of Computer Programs 1.2</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>1.2 <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#%_sec_1.2.6" target="_blank" rel="external"> Procedures and the Processes They Generate</a></p>
+<p>一开始用阶乘讲解了Linear Recursion和Iteration，Linear Recursion实现阶乘的时候如下所示:<br>(factorial 6)<br>(<em> 6 (factorial 5))<br>(</em> 6 (<em> 5 (factorial 4)))<br>(</em> 6 (<em> 5 (</em> 4 (factorial 3))))<br>(<em> 6 (</em> 5 (<em> 4 (</em> 3 (factorial 2)))))<br>(<em> 6 (</em> 5 (<em> 4 (</em> 3 (<em> 2 (factoral 1))))))<br>(</em> 6 (<em> 5 (</em> 4 (<em> 3 (</em> 2 1)))))<br>(<em> 6 (</em> 5 (<em> 4 (</em> 3 2))))<br>(<em> 6 (</em> 5 (<em> 4 6)))<br>(</em> 6 (<em> 5 24))<br>(</em> 6 120)<br>720<br>但是Iteration的方式是下面这样的<br>(factorial 6)<br>(fact-iter 1 1 6)<br>(fact-iter 1 2 6)<br>(fact-iter 2 3 6)<br>(fact-iter 6 4 6)<br>(fact-iter 24 5 6)<br>(fact-iter 120 6 6)<br>(fact-iter 720 7 6)<br>720<br>这里可以看出后面一种基本不要什么多余的空间消耗，但是第一种是要消耗多余的空间的，第二种貌似就是尾递归。</p>
+<p>1.2.2讲述了树递归，用的是fibonacci数列的例子。首先给出一张图，直观的看到算fib[5]的时候需要算哪些值，而且很多都重复的算了很多次。然后给出fibonacci数列的每一项都近似于Φ^n/sqrt(5).其中<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-14.gif" alt="">，然后还把fibonacci数列的求值改了方式，变成了O(n)的。</p>
+<p>接下来讲了一个分钱的例子。给你100块，然后你手上有50,25,10,5,1块的足够多，问你用这些面值的钱可以由多少种方式来换这100块。这个你可以选中1中钱币，然后看是否需要，如果需要，就看到底要多少个，不用的话，就只剩下其他的其中钱币了。这样就可以解决这个问题</p>
+<p>1.2.3大致讲了函数的增长趋势，也就是传说中是算法复杂度。这个讲的比较简略，具体参看算法书籍</p>
+<p>1.2.4讲了快速幂的想法，就是通过二进制一直求，这样得到复杂度是log_2(n)的其中n是指数。</p>
+<p>1.25 求最大公约数，用欧几里得算法</p>
+<p>1.26 找一个数的最小因子，费马小定理判定一个数是否是素数<br>习题如下:</p>
+<p>1.9 给出a+b的两种不同实现，然后让你写具体的执行步骤，这个一步一步写就行了，最后你得到的第一种就Linear Recursion，第二种是Iteration。</p>
+<p>1.10 给出Ackermann’s function的procedure，然后让你算几个Ackermann 值，当然你可以直接执行就可以了，也可以自己手动算，然后又几个定义：<br>(define (f n) (A 0 n))                (1)<br>(define (g n) (A 1 n))               (2)<br>(define (h n) (A 2 n))              (3)<br>(define (k n) (<em> 5 n n))           (4)   其中procedure A就是Ackermann’s function<br>这里你可以看到(1)==&gt;2n    (2)===&gt;2^n           (3)===&gt;2^2^….^2(n次)             (4)===&gt;5</em>n^2</p>
+<p>1.11给一个函数定义<em>f</em>(<em>n</em>) = <em>n</em> if <em>n</em>&lt;3 and <em>f</em>(<em>n</em>) = <em>f</em>(<em>n</em> - 1) + 2<em>f</em>(<em>n</em> - 2) + 3<em>f</em>(<em>n</em> - 3)让你写一个procedure，这个可以仿照fibonacci就行</p>
+<p>1.12写一个求<em>Pascal’s triangle </em>的第i行第j列的procedure。只要照着C[n,m]=C[n-1,m-1]+C[n-1,m]就行了，另外注意下边界</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span><span style="color: #da70d6;">Exercise 1.12</span><br><span style="color: #da70d6;">02 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">pascal</span> <span style="color: #d8bfd8;">r</span> <span style="color: #d8bfd8;">c</span>)<br><span style="color: #da70d6;">03 </span>  (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">04 </span>    ((<span style="color: #b0c4de; font-weight: bold;">&gt; </span><span style="color: #d8bfd8;">c</span> <span style="color: #d8bfd8;">r</span>) <span style="color: #add8e6;">0</span>)<br><span style="color: #f810b0;">05 </span>    ((<span style="color: #b0c4de; font-weight: bold;">&lt; </span><span style="color: #d8bfd8;">c</span> <span style="color: #add8e6;">0</span>) <span style="color: #add8e6;">0</span>)<br><span style="color: #da70d6;">06 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">c</span> <span style="color: #add8e6;">1</span>) <span style="color: #add8e6;">1</span>)<br><span style="color: #da70d6;">07 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">r</span> <span style="color: #d8bfd8;">c</span>) <span style="color: #add8e6;">1</span>)<br><span style="color: #da70d6;">08 </span>    (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #b0c4de; font-weight: bold;">+ </span>(<span style="color: #ffffff;">pascal</span> (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">r</span> <span style="color: #add8e6;">1</span>) <span style="color: #d8bfd8;">c</span>) (<span style="color: #ffffff;">pascal</span> (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">r</span> <span style="color: #add8e6;">1</span>) (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">c</span> <span style="color: #add8e6;">1</span>))))<br><span style="color: #da70d6;">09 </span>    <span style="color: #da70d6;">pascal[r,c] = pascal[r-1,c]+pascal[r-1,c-1]</span><br><span style="color: #f810b0;">10 </span>  )<br><span style="color: #da70d6;">11 </span>)</div><br>1.13 证明<em>F<strong>i</strong>b</em>(<em>n</em>) = (<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-11.gif" alt=""><sup><em>n</em></sup> - <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-12.gif" alt=""><sup><em>n</em></sup>)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5 其中<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-11.gif" alt=""> = (1 + <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/2   <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-12.gif" alt=""> = (1 - <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/2，我们可以计算F[0],F[1],F[2]得到F[0],F[1],F[2]满足条件，然后假设对于所有的k<n都满足上面的式子，由_f__i__b_(_n_) =="" (![](http:="" mitpress.mit.edu="" sicp="" full-text="" book="" book-z-g-d-11.gif)<sup=""><em>n</em> - <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-12.gif" alt=""><sup><em>n</em></sup>)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5可以知道F[i]可以表示成(A+B*<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5 对所有的i都成立，那么我们可以假设F[n-2]=(A+B<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5(其中A,B是常数)，那么我们可以得到F[n-1]=((A+5B)+(A+B)<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5)/2.再根据F[n]=F[n-1]+F[n-2]可以得到F[n]，和用(<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-11.gif" alt=""><sup><em>n</em></sup> - <img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-12.gif" alt=""><sup><em>n</em></sup>)/<img src="http://mitpress.mit.edu/sicp/full-text/book/book-Z-G-D-13.gif" alt="">5计算得到的一样，这样就得证了。也可以看<a href="http://community.schemewiki.org/?sicp-ex-1.13" target="_blank" rel="external">这里</a>和<a href="http://sicp.org.ua/sicp/Exercise1-13" target="_blank" rel="external">这里</a></n都满足上面的式子，由_f__i__b_(_n_)></p>
+<p>1.14要你写出11个cents分解成其他钱币值的具体过程，这个可以看<a href="http://telegraphics.com.au/~toby/sicp/ex1-14.svg" target="_blank" rel="external">这个链接</a>，画的很好</p>
+<p>1.15给出<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-19.gif" alt="">，和相应的procedure，然后让你求sin x的值。问你求sin 12.15的时候，具体的步骤如何，这个一步步慢慢做就行了。另外让你求这个函数的复杂度，可以分析得到是log_3(n)的，可以类似二分那样分析，二分的时候，除以2，所以得到log_2(n)，这里除以3，所以是log_3(n)</p>
+<p>1.16用successive squaring求a^b而且要求复杂度是log级别的。</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">get-expt</span> b n)                     <span style="color: #da70d6;">求最后结果</span><br><span style="color: #da70d6;">02 </span>  (<span style="color: #ffffff;">my-expt</span> <span style="color: #add8e6;">1</span> b n)<br><span style="color: #da70d6;">03 </span> )<br><span style="color: #da70d6;">04 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">my-expt</span> <span style="color: #d8bfd8;">a</span> b n)                   <span style="color: #da70d6;">求b^n 结果保存在a中</span><br><span style="color: #f810b0;">05 </span>  (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">06 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>n <span style="color: #add8e6;">0</span>) <span style="color: #d8bfd8;">a</span>)<br><span style="color: #da70d6;">07 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>n <span style="color: #add8e6;">1</span>) (<span style="color: #ffffff;">my-expt</span> (<span style="color: #b0c4de; font-weight: bold;"><em> </em></span><span style="color: #d8bfd8;">a</span> b) b (<span style="color: #b0c4de; font-weight: bold;">- </span>n <span style="color: #add8e6;">1</span>) ) )<br><span style="color: #da70d6;">08 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>n <span style="color: #add8e6;">2</span>) (<span style="color: #ffffff;">my-expt</span> (<span style="color: #b0c4de; font-weight: bold;"> </span><span style="color: #d8bfd8;">a</span> b b) b (<span style="color: #b0c4de; font-weight: bold;">- </span>n <span style="color: #add8e6;">2</span>))  )<br><span style="color: #da70d6;">09 </span>    ((<span style="color: #b0c4de; font-weight: bold;">even? </span>n) (<span style="color: #ffffff;">my-expt</span> <span style="color: #d8bfd8;">a</span> (<span style="color: #ffffff;">my-expt</span> <span style="color: #add8e6;">1</span> b (<span style="color: #b0c4de; font-weight: bold;">/ </span>n <span style="color: #add8e6;">2</span>)) <span style="color: #add8e6;">2</span>))<br><span style="color: #f810b0;">10 </span>    (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #ffffff;">my-expt</span> (<span style="color: #b0c4de; font-weight: bold;"><em> </em></span><span style="color: #d8bfd8;">a</span> b) b (<span style="color: #b0c4de; font-weight: bold;">- </span>n <span style="color: #add8e6;">1</span>)))<br><span style="color: #da70d6;">11 </span>   )<br><span style="color: #da70d6;">12 </span>)<br><span style="color: #da70d6;">13 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #b0c4de; font-weight: bold;">even? </span>n)                         <span style="color: #da70d6;">判断一个数是否是偶数</span><br><span style="color: #da70d6;">14 </span>  (<span style="color: #b0c4de; font-weight: bold;">if </span>(<span style="color: #b0c4de; font-weight: bold;">= </span>(<span style="color: #b0c4de; font-weight: bold;">remainder </span>n <span style="color: #add8e6;">2</span>) <span style="color: #add8e6;">0</span>)<br><span style="color: #f810b0;">15 </span>      <span style="color: #7fffd4;">#t</span><br><span style="color: #da70d6;">16 </span>      <span style="color: #7fffd4;">#f</span><br><span style="color: #da70d6;">17 </span>   )<br><span style="color: #da70d6;">18 </span> )</div><br>1.17 只用+ ，double， halve写一个procedure实现ab，要求步数是log级别的。</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">fast-multiply</span> <span style="color: #d8bfd8;">a</span> b)                     <span style="color: #da70d6;">快速a*b</span><br><span style="color: #da70d6;">02 </span>  (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">03 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>b <span style="color: #add8e6;">1</span>) <span style="color: #d8bfd8;">a</span>)<br><span style="color: #da70d6;">04 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span>b <span style="color: #add8e6;">0</span>) <span style="color: #add8e6;">0</span>)<br><span style="color: #f810b0;">05 </span>    ((<span style="color: #b0c4de; font-weight: bold;">even? </span>b) (<span style="color: #ffffff;">fast-multiply</span> (<span style="color: #ffffff;">double</span> <span style="color: #d8bfd8;">a</span>) (<span style="color: #ffffff;">halve</span> b)))<br><span style="color: #da70d6;">06 </span>    (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #b0c4de; font-weight: bold;">+ </span><span style="color: #d8bfd8;">a</span> (<span style="color: #ffffff;">fast-multiply</span> <span style="color: #d8bfd8;">a</span> (<span style="color: #b0c4de; font-weight: bold;">- </span>b <span style="color: #add8e6;">1</span>))))<br><span style="color: #da70d6;">07 </span>  )<br><span style="color: #da70d6;">08 </span>)<br><span style="color: #da70d6;">09 </span><br><span style="color: #f810b0;">10 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">halve</span> n)                                <span style="color: #da70d6;">求一个数的一半</span><br><span style="color: #da70d6;">11 </span>  (<span style="color: #b0c4de; font-weight: bold;">/ </span>n <span style="color: #add8e6;">2</span>)<br><span style="color: #da70d6;">12 </span>)</div><br>1.18让你用1.16和1.17的相关知识，写一个procedure，来实现两个数相乘，也是用log级别的步数，我认为代码和1.17类似</p>
+<p>1.19给出fibonacci数列的一种转移，然后让你推一个公式，这个自己认真推导下就行了，我推出的是p’=(+ (<em> q q) (</em> p q))       q’=(+ (<em> 2 q p) (</em> q q))</p>
+<p>1.20用两种(normal-order 和applicative-order)不同的方式，要得到GCD（206,40）的具体步骤，步数有点多，具体请<a href="http://community.schemewiki.org/?sicp-ex-1.20" target="_blank" rel="external">移步这里</a>，只要知道normal-order和applicative-order的区别就行了，具体的问题分析起来还是比较容易的</p>
+<p>1.21用书中给出的smallest-divisor procedure求出199，1999和19999的最小因子，这个直接求就行</p>
+<p>1.22算procedure运行的时间，这个时间我运行的时候是不稳定的，在DrRacket里面没有runtime这个原语。我用的是time和apply-time。然后分别让你求大于100，1000,10000,100000的最小的3个素数，然后看运行时间。这个时间也不是固定的，每次都会变，而且很多时候都是0。另外，实现的时候，我自己2了好久，(+ cnt 2)是不会改变cnt的值的，一般改变一个变量的值用set!。</p>
+<p>1.23 求最小因子的procedure中，如果2不是n的最小因子，那么所有偶数都不可能是n的因子，因此我们可以略掉所有的偶数。这里就是需要你写这样一个procedure。这里只要把每次的(+ test 1)改变成(next test)而next是一个procedure，如果test==2，那么(next test)返回3，其他的返回test+2，小于2则出错(对于这题来说)。</p>
+<p>1.24测试费马小定理测素数所用的时间。用类似1.22中的方法</p>
+<p>1.25我认为会溢出(以前C/C++中这样会溢出，受数据类型的限制)，不过在scheme中却不会溢出，不过是时间用的比较多一点而已。</p>
+<p>1.26 把1.24中的procedure改了，改成(remainder (* (expmod base (/ exp 2) m)                       (expmod base (/ exp 2) m))    m))，也就是会算两次(expmod base (/ exp 2) m),这样的话复杂度就变成了O(n)的了</p>
+<p>1.27 测试Carmichael数，测试所有的a&lt;n a^n % n是否等于n。对于Carmichael数，费马小定理肯定是可以通过的，这样就Fool了费马小定理的测试。然后可以通过改变素数测试的参数，来得到最后的输出，看是否Fool了费马小定理的测试。可以<a href="http://community.schemewiki.org/?sicp-ex-1.27" target="_blank" rel="external">围观这里</a></p>
+<p>1.28素数检测的<em>Miller-Rabin</em>测试,要求写出相应的procedure。看以google相应的<em>Miller-Rabin </em>知识，然后写出procedure。这个测试可以把Carmichael刷选出来。可以<a href="http://sicp.org.ua/sicp/Exercise1-28" target="_blank" rel="external">到这里围观procedure</a></p>
+<p>表示这一节看了好久，继续加油。好好学习，天天向上。</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -610,34 +661,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-03-29 </div>
-			<div class="article-title"><a href="/2012/03/29/game-theory-prove/" >一个博弈题的证明</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>看Game Theory的时候看到的这个题目:</p>
-<p>一共有N堆石子,每堆石子的数目告诉你,然后两个人轮流从中取石子,每次最多从K堆中取,每堆取的石子数任意,每次最少取一颗石子.假设两个人都足够聪明的话,最后没石子可取的人算输,问先手和后手谁输谁赢.</p>
-<p>以前看到这个题目的时候只是按照提示证了一下,知道这个是正确的,但是如果不知道结果的话,可能就不知道怎么想了.后来给别人讲这题的时候,突然想起其实这个题就是两个简单的博弈题的结合:报数问题,和简单的取石子游戏问题.</p>
-<p>首先我们知道报数问题是给一个数N,每个人每次最多报K个数,最少报1个数,先报道N的算赢,问谁会赢.这个大家都会了,就是算N%(K+1)的结果就行了.</p>
-<p>简单的取石子游戏就是上面的取石子游戏中K=1.也就是每次只能从1堆中取石子.这个题目大家也知道了,就是把所有的石子数目抑或起来,看结果是否为0.其实抑或就是先化成2进制,然后看相应的为加起来是否能整除2.</p>
-<p>OK,那么如果我们每次最多取K堆石子的话,也就是说两个人每次都可以改变K+1堆石子(就像报数中两个人每次都可以报K+1个数)这样的话,我们就只要把N堆石子的数目化成2进制之后,然后对每一位都加起来,看是否整除K+1就行了.</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -648,13 +671,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/8/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
+    	<li class="prev"><a href="/page/8/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/10/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/10/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -674,7 +697,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -683,16 +706,16 @@
 		
 			
 	<div class="widget">
-		<h4>分类</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
-		
 			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -722,7 +745,7 @@
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -732,27 +755,27 @@
 		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -766,51 +789,51 @@
 		
 			
 	<div class="widget">
-		<h4>标签云</h4>
+		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/code-interview/">code interview<span>1</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
-			<li><a href="/tags/写作/">写作<span>1</span></a></li>
+			<li><a href="/tags/queue/">queue<span>1</span></a></li>
 		
-			<li><a href="/tags/腾讯/">腾讯<span>1</span></a></li>
+			<li><a href="/tags/my-life/">my life<span>1</span></a></li>
 		
-			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
+			<li><a href="/tags/spark/">spark<span>6</span></a></li>
 		
-			<li><a href="/tags/于娟/">于娟<span>1</span></a></li>
+			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
 		
-			<li><a href="/tags/教师/">教师<span>1</span></a></li>
+			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
 		
-			<li><a href="/tags/hive/">hive<span>1</span></a></li>
+			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
 		
-			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
+			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
 		
-			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+			<li><a href="/tags/knapsack/">knapsack<span>1</span></a></li>
 		
-			<li><a href="/tags/windows/">windows<span>4</span></a></li>
+			<li><a href="/tags/select/">select<span>2</span></a></li>
 		
-			<li><a href="/tags/python/">python<span>2</span></a></li>
+			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
 		
-			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+			<li><a href="/tags/json/">json<span>1</span></a></li>
 		
-			<li><a href="/tags/list/">list<span>1</span></a></li>
+			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
 		
-			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+			<li><a href="/tags/bit/">bit<span>0</span></a></li>
 		
-			<li><a href="/tags/job/">job<span>1</span></a></li>
+			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
 		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
+			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
 		
-			<li><a href="/tags/prim/">prim<span>1</span></a></li>
+			<li><a href="/tags/svm/">svm<span>1</span></a></li>
 		
-			<li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
+			<li><a href="/tags/metric/">metric<span>1</span></a></li>
 		
-			<li><a href="/tags/pair/">pair<span>1</span></a></li>
+			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
 		
-			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>270</span></a></li>
+		   <li><a href="/tags">...<span>272</span></a></li>
 		 
 		</ul>
 	</div>
@@ -819,8 +842,12 @@
 		
 			
 <div class="widget">
-  <h4>最新文章</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
+      </li>
     
       <li>
         <a href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/" ><i class="fa fa-file-o"></i>Streaming 程序调用 Producer.clo...</a>
@@ -838,17 +865,13 @@
         <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
-      <li>
-        <a href="/2017/05/10/Python-代码实践小结/" ><i class="fa fa-file-o"></i>Python 代码实践小结</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>链接</h4>
+	<h4>Links</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

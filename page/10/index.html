@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>第 10 页 | klion26</title>
+  <title>Page 10 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,34 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-03-29 </div>
+			<div class="article-title"><a href="/2012/03/29/game-theory-prove/" >一个博弈题的证明</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>看Game Theory的时候看到的这个题目:</p>
+<p>一共有N堆石子,每堆石子的数目告诉你,然后两个人轮流从中取石子,每次最多从K堆中取,每堆取的石子数任意,每次最少取一颗石子.假设两个人都足够聪明的话,最后没石子可取的人算输,问先手和后手谁输谁赢.</p>
+<p>以前看到这个题目的时候只是按照提示证了一下,知道这个是正确的,但是如果不知道结果的话,可能就不知道怎么想了.后来给别人讲这题的时候,突然想起其实这个题就是两个简单的博弈题的结合:报数问题,和简单的取石子游戏问题.</p>
+<p>首先我们知道报数问题是给一个数N,每个人每次最多报K个数,最少报1个数,先报道N的算赢,问谁会赢.这个大家都会了,就是算N%(K+1)的结果就行了.</p>
+<p>简单的取石子游戏就是上面的取石子游戏中K=1.也就是每次只能从1堆中取石子.这个题目大家也知道了,就是把所有的石子数目抑或起来,看结果是否为0.其实抑或就是先化成2进制,然后看相应的为加起来是否能整除2.</p>
+<p>OK,那么如果我们每次最多取K堆石子的话,也就是说两个人每次都可以改变K+1堆石子(就像报数中两个人每次都可以报K+1个数)这样的话,我们就只要把N堆石子的数目化成2进制之后,然后对每一位都加起来,看是否整除K+1就行了.</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -411,32 +439,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-08-03 </div>
-			<div class="article-title"><a href="/2011/08/03/csu-summer-training-team-1/" >[逆序数对的应用]CSU暑假集训组队赛第一题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>这次题目比较坑爹.因为我们的时间确实比较紧,半天需要找9道题.后来是刘悠然一人在USACO的月赛中找了9题.结果新人大受打击,一片一题.</p>
-<p>第一题的题意是,给你一个1 2 3。。。n的乱序列,让你用最少的交换步数得到下面的样子[其中交换只能在相邻的两个数里面进行]—–所以的i在i+1的左边,然后n在1的左边.当然序列的最后一个数算是第一个数的左边.也就是说如果是1 2 3 4 5的话,那么</p>
-<p>1 2 3 4 5      |    2 3 4 5 1   | 3 4 5 1 2  | 4 5 1 2 3  |  5 1 2 3 4都算符合条件的序列</p>
-<p>这题的解法就用到了逆序数对,因为一个序列如果只能通过相邻的两个交换使之变成1 2 3 4….n这样的序列的话,那么结果和逆序数对是一样的.这个可以证明.然后这题就可以用逆序数对来解决了.首先我们知道对于一个序列循环左移一位就相当于把最小的数加上n,然后又变成了从小到大的一个排列.还有对于一个序列中最小的一个数,如果加上n的话,那么这个序列的逆序数将变为L+(n-p)-(p-1)这里L是原序列的逆序数对,n是数目的个数,p是最小的数字的位置,从1开始.这样我们就可以首先求出变换到1 2 3….n的步数,也就是逆序数对,然后依次把i变换为i+n(i从1开始到n-1).这样这题就变成了n*lgn的了.可以解决之</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -447,13 +449,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/9/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
+    	<li class="prev"><a href="/page/9/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/11/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/11/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -473,7 +475,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -482,16 +484,16 @@
 		
 			
 	<div class="widget">
-		<h4>分类</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
-		
 			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -521,7 +523,7 @@
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -531,27 +533,27 @@
 		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -565,51 +567,51 @@
 		
 			
 	<div class="widget">
-		<h4>标签云</h4>
+		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
+			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
 		
-			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
+			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
 		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
+			<li><a href="/tags/exception/">exception<span>1</span></a></li>
 		
-			<li><a href="/tags/proof/">proof<span>1</span></a></li>
+			<li><a href="/tags/grub/">grub<span>2</span></a></li>
 		
-			<li><a href="/tags/kv/">kv<span>1</span></a></li>
-		
-			<li><a href="/tags/at-most-once/">at-most-once<span>1</span></a></li>
+			<li><a href="/tags/微信/">微信<span>1</span></a></li>
 		
 			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
 		
-			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
+			<li><a href="/tags/prim/">prim<span>1</span></a></li>
 		
-			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
+			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
 		
-			<li><a href="/tags/opengl/">opengl<span>1</span></a></li>
+			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
 		
-			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
 		
-			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
+			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
 		
-			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+			<li><a href="/tags/mapreduce/">mapreduce<span>1</span></a></li>
 		
-			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
+			<li><a href="/tags/成长/">成长<span>1</span></a></li>
 		
-			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
+			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
 		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
+			<li><a href="/tags/english/">english<span>1</span></a></li>
 		
-			<li><a href="/tags/tencent/">tencent<span>1</span></a></li>
+			<li><a href="/tags/queue/">queue<span>1</span></a></li>
 		
-			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+			<li><a href="/tags/dag/">dag<span>1</span></a></li>
 		
-			<li><a href="/tags/problem-solve/">problem_solve<span>2</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li>
 		
-			<li><a href="/tags/office/">office<span>1</span></a></li>
+			<li><a href="/tags/scc/">scc<span>1</span></a></li>
+		
+			<li><a href="/tags/https/">https<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>270</span></a></li>
+		   <li><a href="/tags">...<span>272</span></a></li>
 		 
 		</ul>
 	</div>
@@ -618,8 +620,12 @@
 		
 			
 <div class="widget">
-  <h4>最新文章</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
+      </li>
     
       <li>
         <a href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/" ><i class="fa fa-file-o"></i>Streaming 程序调用 Producer.clo...</a>
@@ -637,17 +643,13 @@
         <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
-      <li>
-        <a href="/2017/05/10/Python-代码实践小结/" ><i class="fa fa-file-o"></i>Python 代码实践小结</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>链接</h4>
+	<h4>Links</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

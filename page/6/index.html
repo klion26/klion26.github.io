@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>第 6 页 | klion26</title>
+  <title>Page 6 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,39 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-11-28 </div>
+			<div class="article-title"><a href="/2013/11/28/use-vundle-to-manage-vim-plugin/" >使用Vundle管理Vim插件</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>在Linux下vim和emacs是两个最常用的编辑器了，基本是必须熟悉一个的节奏。当然随便用了一个之后，都需要配置相应的插件，这里讲的就是如何用Vundle来配置管理vim插件，以及中间遇到的一个问题。</p>
+<p>首先，确认你系统有git，一般的linux发行版都有，windows自行google解决。这里主要以linux下的配置为主。</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;">git clone <a href="https://github.com/gmarik/vundle.git" target="_blank" rel="external">https://github.com/gmarik/vundle.git</a> ~/.vim/bundle/vundle</div><br>在命令行输入这一句之后，就把需要的文件从github上clone下来了。可以用ls ~/.vim/bundle/vundle进行查看。接下来就是编辑vimrc文件，打开终端，输入命令</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;">vim ~/.vimrc</div><br>然后对打开的文件进行编辑，一开始可以输入如下的东西进行一个简单的测试，如果没有出错的话，再继续安装其他的插件，下面是测试用的vimrc文件，如果想保险的话，可以把下面的东西复制到你的vimrc文件中</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">set </span>nocompatible              <span style="color: #7fffd4;">“ be iMproved</span><br><span style="color: #7fffd4;">filetype off                  “</span>required!<span style="color: #b0c4de; font-weight: bold;">set </span>rtp+<span style="color: #f5deb3;">=</span>~/.vim/bundle/vundle/<br>call vundle#rc()<span style="color: #7fffd4;">“ let Vundle manage Vundle</span><br><span style="color: #7fffd4;">“</span> required!<br>Bundle <span style="color: #7fffd4;">‘gmarik/vundle’</span><span style="color: #7fffd4;">“ My bundles here:</span><br><span style="color: #7fffd4;">“</span><br><span style="color: #7fffd4;">“ original repos on GitHub</span><br><span style="color: #7fffd4;">Bundle ‘tpope/vim-fugitive’</span><br><span style="color: #7fffd4;">Bundle ‘Lokaltog/vim-easymotion’</span><br><span style="color: #7fffd4;">Bundle ‘rstacruz/sparkup’, {‘rtp’: ‘vim/‘}</span><br><span style="color: #7fffd4;">Bundle ‘tpope/vim-rails.git’</span><br><span style="color: #7fffd4;">“</span> vim-scripts repos<br>Bundle <span style="color: #7fffd4;">‘L9’</span><br>Bundle <span style="color: #7fffd4;">‘FuzzyFinder’</span><br><span style="color: #7fffd4;">“ non-GitHub repos</span><br><span style="color: #7fffd4;">Bundle ‘git://git.wincent.com/command-t.git’</span><br><span style="color: #7fffd4;">“</span> Git repos on your <span style="color: #b0c4de; font-weight: bold;">local </span>machine (i.e. when working on your own plugin)<br>Bundle <span style="color: #7fffd4;"><span>‘<a href="file:///Users/gmarik/path/to/plugin" target="_blank" rel="external">file:///Users/gmarik/path/to/plugin</a>‘</span></span><br><span style="color: #7fffd4;">“ …</span><span style="color: #7fffd4;">filetype plugin indent on     “</span> required!<br><span style="color: #7fffd4;">“</span><br><span style="color: #7fffd4;">“</span> Brief <span style="color: #b0c4de; font-weight: bold;">help</span><br><span style="color: #7fffd4;">“ :BundleList          - list configured bundles</span><br><span style="color: #7fffd4;">“</span> :BundleInstall(!)    - install (update) bundles<br><span style="color: #7fffd4;">“ :BundleSearch(!) foo - search (or refresh cache first) for foo</span><br><span style="color: #7fffd4;">“</span> :BundleClean(!)      - confirm (or auto-approve) removal of unused bundles<br><span style="color: #7fffd4;">“</span><br><span style="color: #7fffd4;">“</span> see :h vundle <span style="color: #b0c4de; font-weight: bold;">for </span>more details or wiki <span style="color: #b0c4de; font-weight: bold;">for </span>FAQ<br><span style="color: #f5deb3;">“</span> NOTE: comments after Bundle commands are not allowed.</div></p>
+<p><br>这个文件就是github上的<a href="https://github.com/gmarik/vundle" target="_blank" rel="external">样例</a>，然后对文件进行保存退出，再用vim打开这个文件，如果没有报错的话，一般就是没有问题了，然后在Normal模式下输入</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;">:BundelInstall</div><br>就能看到在自动帮你安装插件了，然后其他的可以照着github上的<a href="https://github.com/gmarik/vundle" target="_blank" rel="external">教程</a>做。然后剩下的就只有去找自己喜欢的插件了。</p>
+<p>===========================================性感的分割线======================================</p>
+<p>在上面的过程中遇到一个问题，每次打开vimrc的时候报错”<span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">Not an editor command: BundleInstall”,google之，发现一般是说rtp+=那一句写错了(当然要保证自己不打错字)，然后自己一字一字的对照了很久都没有找到区别，中途都想让别人来确定我是不是敲错了字，只是没有看出来而已&gt;_&lt;。后来看到一个说和alias什么的有关，然后想起会不会是因为vi和vim的alias问题，然后就打算确定一下，我是直接用安装vim的方法来确定的。</span></p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;">sudo yum install vim</div><br>发现可以安装，也就是说<span style="color: #ff0000;">我的系统中其实用的是vi，而不是vim</span>。或许问题就是在这里，装好之后，一打开vimrc文件还是报错，那么就用alias设置下再说。</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">alias </span><span style="color: #d8bfd8;">vi</span><span style="color: #f5deb3;">=</span>vim</div><br>然后再打开，发现可以了。接下来就是安装插件的过程了。啦啦啦，我是买报的小行家～～～～～～～</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -629,31 +662,6 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2013-03-07 </div>
-			<div class="article-title"><a href="/2013/03/07/matlab-2012-libsvm/" >Matlab 2012下安装libsvm</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>由于需要使用svm，自己又不是很熟，然后就用到了libsvm，libsvm是网上别人写好的一个库。</p>
-<p>首先从<a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/#download" target="_blank" rel="external">libsvm官网</a>下载最新版本，现在是3.16，然后解压到某个路径，比如d:\libsvm-3.16,然后把d:\libsvm-3.16\matlab添加到matlab的路径中，具体操作如下<br>在matlab中依次打开File -&gt; Set path -&gt; Add Fold,然后添加就行了，接下来就是编译了，步骤如下<br>在matlab命令窗口输入mex -setup其中mex和后面的中间有一个空格，然后选择一个自己系统上安装好的c++编译器，一般选择visual studio是最方便的。然后再把当前目录改到d:\lbsvm-3.16\matlab,然后输入命令make，如果没有出现错误就算安装好了，然后可以用自带的样例做测试。<br>进入到d:\libsvm-3.16，然后用如下命令进行测试<br>[heart_scale_label,heart_scale_inst]=libsvmread(‘heart_scale’);<br>model = svmtrain(heart_scale_label,heart_scale_inst, ‘-c 1 -g 0.07’);<br>[predict_label, accuracy, dec_values] =svmpredict(heart_scale_label, heart_scale_inst, model); % test the trainingdata<br>如果出现一行Accuracy = 86.6667% (234/270) (classification)就说明成功了。就可以在matlab中使用svm了。<br>参考文献<br>[1] <a href="http://blog.csdn.net/lqhbupt/article/details/8596349" target="_blank" rel="external">http://blog.csdn.net/lqhbupt/article/details/8596349</a><br>[2] <a href="http://www.matlabsky.com/thread-11925-1-1.html" target="_blank" rel="external">http://www.matlabsky.com/thread-11925-1-1.html</a></p>
-<p>要是出现错误的话，有可能是你添加路径的时候没有添加正确，或者工作路径不对，也就是Matlab上面的Current path。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -664,13 +672,13 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/5/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
+    	<li class="prev"><a href="/page/5/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/7/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/7/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -690,7 +698,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -699,16 +707,16 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			
 	<div class="widget">
-		<h4>分类</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
-		
 			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -738,7 +746,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -748,27 +756,27 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -782,51 +790,51 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			
 	<div class="widget">
-		<h4>标签云</h4>
+		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
+			<li><a href="/tags/blog/">blog<span>2</span></a></li>
 		
-			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
+			<li><a href="/tags/command/">command<span>1</span></a></li>
 		
-			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+			<li><a href="/tags/update/">update<span>1</span></a></li>
 		
-			<li><a href="/tags/notes/">notes<span>0</span></a></li>
+			<li><a href="/tags/概率/">概率<span>1</span></a></li>
 		
-			<li><a href="/tags/DP/">DP<span>1</span></a></li>
+			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
 		
-			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
 		
-			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+			<li><a href="/tags/longest-increasing-subsequences/">longest increasing subsequences<span>1</span></a></li>
 		
-			<li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
+			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
 		
-			<li><a href="/tags/concrete-mathematics/">concrete-mathematics<span>2</span></a></li>
+			<li><a href="/tags/方法/">方法<span>1</span></a></li>
 		
-			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
-		
-			<li><a href="/tags/redis/">redis<span>1</span></a></li>
-		
-			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
-		
-			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
-		
-			<li><a href="/tags/java/">java<span>1</span></a></li>
-		
-			<li><a href="/tags/微信/">微信<span>1</span></a></li>
-		
-			<li><a href="/tags/shortest-paths-in-dag/">shortest paths in dag<span>1</span></a></li>
-		
-			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
+			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
 		
 			<li><a href="/tags/receiver/">receiver<span>1</span></a></li>
 		
-			<li><a href="/tags/bit/">bit<span>0</span></a></li>
+			<li><a href="/tags/network/">network<span>1</span></a></li>
 		
-			<li><a href="/tags/kv/">kv<span>1</span></a></li>
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
+		
+			<li><a href="/tags/trident/">trident<span>1</span></a></li>
+		
+			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
+		
+			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
+		
+			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+		
+			<li><a href="/tags/数论/">数论<span>5</span></a></li>
+		
+			<li><a href="/tags/topic/">topic<span>1</span></a></li>
+		
+			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>270</span></a></li>
+		   <li><a href="/tags">...<span>272</span></a></li>
 		 
 		</ul>
 	</div>
@@ -835,8 +843,12 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			
 <div class="widget">
-  <h4>最新文章</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
+      </li>
     
       <li>
         <a href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/" ><i class="fa fa-file-o"></i>Streaming 程序调用 Producer.clo...</a>
@@ -854,17 +866,13 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
         <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
-      <li>
-        <a href="/2017/05/10/Python-代码实践小结/" ><i class="fa fa-file-o"></i>Python 代码实践小结</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>链接</h4>
+	<h4>Links</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

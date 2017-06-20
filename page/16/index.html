@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>第 16 页 | klion26</title>
+  <title>Page 16 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,31 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-03-17 </div>
+			<div class="article-title"><a href="/2011/03/17/poj-1704-game/" >POJ 1704 博弈</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://poj.org/problem?id=1704" target="_blank" rel="external">传送门</a></p>
+<p>这题看懂了就是一个staircase nim,没看懂就比较难做了.对于staircase nim的理解,你可以这样想.把每两个chess的距离算出来,那么移动任何一个chess的话,会同时改变和这个chess相关的两个距离,左边的减少,右边的增加,这样你就可以把右边的看成是低的梯子,左边是高的梯子.然后用staircase nim来解决就OK了,staircase nim只与奇数层的梯子上的石子数有关,这个可以用P-positon和N-position的定义归纳来证明[每一个P-position只能到达N-position和每个N-position都能达到至少一个P-position].具体关系就是把所有的奇数层上的石子单独拿出来,做一般的nim游戏,如果某个点使P-position的话,那么还原之后的这个staircase nim也处于一个P-position的状态上.反之亦然.<br>代码如下:</p>
+<div class="source" style="background-color: #2f4f4f; font-family: 'Courier New','Consolas','Lucida Console'; color: #f5deb3;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">ID:qcx97811</span><br><span style="color: #da70d6;">LANG:C</span><br><span style="color: #da70d6;">TASK:POJ_1704</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><span style="color: #eeee00;">#include <math.h></math.h></span><br><br><span style="color: #98fb98; font-weight: bold;">int</span> n<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">t</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1006</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">nim</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1006</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">idx</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">cmp</span>(<span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span><span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;"></span>b)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #b0c4de; font-weight: bold;">if</span>((<span style="color: #f5deb3;"><em></em></span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">a</span>) <span style="color: #f5deb3;">&gt;</span> (<span style="color: #f5deb3;"><em></em></span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;"></span>)b))<br>        <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">1</span><br>    <span style="color: #b0c4de; font-weight: bold;">if</span>((<span style="color: #f5deb3;"><em></em></span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">a</span>) <span style="color: #f5deb3;">&lt;</span> (<span style="color: #f5deb3;"><em></em></span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;"></span>)b))<br>        <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>    <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span>(<span style="color: #98fb98; font-weight: bold;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">t</span>);<br>    <span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">–</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>n);<br>            <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span>n;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]);</span><br>            <span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span>n<span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>            <span style="color: #f5deb3;">qsort</span>(<span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">,</span>n<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]),</span><span style="color: #f5deb3;">cmp</span>);<br>            <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span>n<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&gt;;</span><span style="color: #add8e6;">0</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">–</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">nim</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">num</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>            <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">j</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">+=</span><span style="color: #add8e6;">2</span>)<br>                <span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">^=</span><span style="color: #f5deb3;">nim</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>            <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">k</span>)<br>                <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“Bob will win</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>            <span style="color: #b0c4de; font-weight: bold;">else</span><br>                <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“Georgia will win</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -339,32 +364,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-02-12 </div>
-			<div class="article-title"><a href="/2011/02/12/usaco-4-2-3-job-processing/" >USACO 4.2.3 Job processing</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://www.nocow.cn/index.php/Translate:USACO/job" target="_blank" rel="external">题意</a></p>
-<p>对于第一问,比较容易想到.直接贪心就可以了,也就是每次都只处理一个任务,每次取当前结束时间最靠前的一个,这样的话,就可以保证总的结束时间一定是最早的.比如说5 2 3 1 1 3 1 4的话,那么一共会循环5次[也就是5个任务],第一次选第一台机器,因为它的结束时间是1,然后它的结束时间就会变成2[这里是指如果这个任务让这台机器来完成,那么完成之后的结束时间],第二次就会选第2台机器,因为第二台机器的结束时间还是1,依次类推,完成A任务的时间就会是1 1 2 2 3也就是一共需要3个单位的时间这是第一问的答案.那么第二问的答案就比这个要稍微难想一点,不过我们知道A B两项任务是没关系的,也就是进水不犯河水,各干各的.而且对于完成每个任务的每种机器也是各干各的,互不干扰.还有一点就是我们可以想象如果把完成A任务的和完成B任务的所需时间一个按从小到大排序,一个从大到小排序,然后对应的相加,也就是说完成A任务最早的放到B那就让它最晚完成,这样总的结束时间就会早一点.但是这里有个问题就是这样可以吗,因为B任务的开始是以A任务的结束为开始的,如果B任务那样一搞,但是A那某个还没完成咋办呢?这样我们来看看一个简单的分析,就那上面的例子来说,那么排序之后会是这样的<br>1 1 2 2 3<br>4 3 3 2 1[单独完成B任务所需的时间]这里还得说一点,就是这个时间是可以”换”的,也就是不一定要特定的任务在特定的机器上完成,反正就是里面的2和3 或者3和4之类的不是指的某个任务在第几个单位时间内完成,而是说最好的安排是有任务在第1个单位完成,有任务在第4个单位完成,这就OK了.<br>那么我们的第二问就是这样排列之后上下两个相加,然后取这些和的最大值.这里是5.但是就会有这样的疑问,也就是说下面那一排是首先不管A的,那么又没有可能是某个时候和下面对应的那个上面的任务还没问成呢?这样不是就不对了么?这里我们可以这样考虑,因为对于B中不同的机器之间是不存在这样的问题的,只有对于同一类机器,可是说同一台机器才会有这样的问题,因为不同机器是互不干扰的,那么我们单独考虑一台机器[B机器]<br>如果我们有如下的情况<br>1 3 6<br>6 4 2[这里是说明这台机器完成一件任务需要2分钟]<br>那么我们得到的结果应该是8[=2+6],那么第1分钟的时候第一件A任务完成了,现在我们可以让B的机器去做它,到了第3分钟刚好完成了,那么我们让它继续做第二件A任务,到了第5分钟的时候完成了,可是现在没有A任务给它,好的,这样更好,因为这样不会有我们认为的那种”忙不过来的”感觉.最终第6分钟来任务了,在第8分钟结束.<br>好了看看下面的一组数据<br>1 4 6<br>9 6 3<br>这里的数据是第1分钟B机器接到任务,然后第4分钟完成了,然后刚好接到第二个任务,继续做,到了第6分钟的时候,还没做完,怎么办?继续做原来的任务,这样就在第7分钟开始做等在那得第三个任务,可是这是不是一个巧合呢?下面就是见证奇迹的时候- -.其实这不是什么巧合,而是事实.你可以这样想,反正B任务得工作9个单位时间,这两个例子里面是不是都工作了9个单位时间呢?对啊,没错啊.可是还是有点糊涂,那么你可以把第一行的后一个减前一个得到一个差,这样就会得到另外一个数列,如下<br>3 2<br>这里要干嘛呢?你可以这样想,如果要是出现前面那种情况,那么后面的和会比较大[8比前面的大,这个原因就是上面的数列决定的]如果要是第二个例子的话,那么后面的结果不会比前面的大,这样只需要知道放在这台机器上工作的A任务的第一个任务的完成时间然后再加上一个几个任务*每个任务的时间久OK了.这样每台机器的搞清楚了,因为不同机器互不干扰,所以这样就是最佳答案了.</p>
-<p>代码如下:</p>
-<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">ID:qcx97811</span><br><span style="color: #da70d6;">LANG:C</span><br><span style="color: #da70d6;">TASK:job</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="font-weight: bold; color: #b0c4de;">typedef</span> <span style="font-weight: bold; color: #b0c4de;">struct</span><br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">end</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">cost</span><br><span style="color: #f5deb3;">}</span><span style="color: #f5deb3;">Node</span><br><br><span style="color: #f5deb3;">Node</span> <span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">36</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">36</span><span style="color: #f5deb3;">];</span><br><span style="font-weight: bold; color: #98fb98;">int</span> N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">A</span><span style="color: #f5deb3;">,</span>B;<br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1006</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">bEnd</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1006</span><span style="color: #f5deb3;">];</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">total</span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">cmp</span>(<span style="font-weight: bold; color: #b0c4de;">const</span> <span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">const</span> <span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #f5deb3;"></span>b)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">Node</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">c</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">Node</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">a</span><br>    <span style="color: #f5deb3;">Node</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">d</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">Node</span> <span style="color: #f5deb3;"></span>)b;<br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">end</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">d</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">end</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">end</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">d</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">end</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">}</span><br><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">work</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">tn</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><br>    <span style="color: #f5deb3;">tn</span> <span style="color: #f5deb3;">=</span> N;<br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">aEnd</span>));<br>    <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #f5deb3;">tn</span>)<br>        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//每次减少一个任务</span><br>            <span style="color: #f5deb3;">qsort</span>(<span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">A</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]),</span><span style="color: #f5deb3;">cmp</span>);<span style="color: #da70d6;">//对结束时间排序</span><br>            <span style="color: #f5deb3;">tn</span><span style="color: #f5deb3;">–</span><br>            <span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">end</span><br>            <span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">end</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">cost</span><span style="color: #da70d6;">//更改当前的结束时间</span><br>            <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#if 0</span><br><span style="color: #da70d6;">    for(i = 0;i &lt; N;i++)</span><br><span style="color: #da70d6;">        printf(“<strong><strong>%d</strong></strong>\n”,aEnd[i]);</span><br><span style="color: #eeee00;">#endif</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">[</span>N<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]);</span><span style="color: #da70d6;">//这个是A Machine工作完所需的时间</span><br>    <span style="color: #f5deb3;">tn</span> <span style="color: #f5deb3;">=</span> N;<br>    <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #f5deb3;">tn</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">qsort</span>(<span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">,</span>B<span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]),</span><span style="color: #f5deb3;">cmp</span>);<br>            <span style="color: #f5deb3;">tn</span><span style="color: #f5deb3;">–</span><br>            <span style="color: #f5deb3;">bEnd</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">end</span><br>            <span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">end</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">cost</span><br>            <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#if 0</span><br><span style="color: #da70d6;">    printf(“\n”);</span><br><span style="color: #da70d6;">    for(i = 0;i &lt; N;i++)</span><br><span style="color: #da70d6;">        printf(“####%d####\n”,bEnd[i]);</span><br><span style="color: #eeee00;">#endif</span><br>    <span style="color: #f5deb3;">tn</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">bEnd</span><span style="color: #f5deb3;">[</span>N<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">];</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> N;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">bEnd</span><span style="color: #f5deb3;">[</span>N<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">tn</span>)<br>                <span style="color: #f5deb3;">tn</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">bEnd</span><span style="color: #f5deb3;">[</span>N<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“ %d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">tn</span>);<br><span style="color: #f5deb3;">}</span><br><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">input</span>(<span style="color: #f5deb3;">Node</span> <span style="color: #f5deb3;">in</span><span style="color: #f5deb3;">[],</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">num</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">num</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">in</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">cost</span>);<br>            <span style="color: #f5deb3;">in</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">end</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">in</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">cost</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">main</span>(<span style="font-weight: bold; color: #98fb98;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“job.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdin</span>);<br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“job.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdout</span>);<br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">A</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span>B);<br>    <span style="color: #f5deb3;">input</span>(<span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">A</span>);<br>    <span style="color: #f5deb3;">input</span>(<span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">,</span>B);<br>    <span style="color: #f5deb3;">work</span>();<br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -375,13 +374,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/15/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
+    	<li class="prev"><a href="/page/15/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/17/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/17/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -401,7 +400,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -410,16 +409,16 @@
 		
 			
 	<div class="widget">
-		<h4>分类</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
-		
 			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -449,7 +448,7 @@
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -459,27 +458,27 @@
 		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -493,51 +492,51 @@
 		
 			
 	<div class="widget">
-		<h4>标签云</h4>
+		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
+			<li><a href="/tags/DP/">DP<span>1</span></a></li>
 		
-			<li><a href="/tags/command/">command<span>1</span></a></li>
+			<li><a href="/tags/jekyll/">jekyll<span>1</span></a></li>
 		
-			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
-		
-			<li><a href="/tags/java/">java<span>1</span></a></li>
-		
-			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
-		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
-		
-			<li><a href="/tags/grub/">grub<span>2</span></a></li>
+			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
 		
 			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
 		
-			<li><a href="/tags/RecurringTimer/">RecurringTimer<span>1</span></a></li>
+			<li><a href="/tags/写作/">写作<span>1</span></a></li>
 		
-			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
+			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
 		
-			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
 		
-			<li><a href="/tags/method/">method<span>1</span></a></li>
+			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
 		
-			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
+			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
 		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
+			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
 		
-			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
 		
-			<li><a href="/tags/go/">go<span>1</span></a></li>
+			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
 		
-			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
+			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
 		
-			<li><a href="/tags/MST/">MST<span>1</span></a></li>
+			<li><a href="/tags/积分/">积分<span>1</span></a></li>
 		
-			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
+			<li><a href="/tags/shortest-paths-in-dag/">shortest paths in dag<span>1</span></a></li>
 		
-			<li><a href="/tags/learning/">learning<span>1</span></a></li>
+			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
+		
+			<li><a href="/tags/递归/">递归<span>1</span></a></li>
+		
+			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
+		
+			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
+		
+			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>270</span></a></li>
+		   <li><a href="/tags">...<span>272</span></a></li>
 		 
 		</ul>
 	</div>
@@ -546,8 +545,12 @@
 		
 			
 <div class="widget">
-  <h4>最新文章</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
+      </li>
     
       <li>
         <a href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/" ><i class="fa fa-file-o"></i>Streaming 程序调用 Producer.clo...</a>
@@ -565,17 +568,13 @@
         <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
-      <li>
-        <a href="/2017/05/10/Python-代码实践小结/" ><i class="fa fa-file-o"></i>Python 代码实践小结</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>链接</h4>
+	<h4>Links</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

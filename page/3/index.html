@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>第 3 页 | klion26</title>
+  <title>Page 3 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,34 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2016-05-03 </div>
+			<div class="article-title"><a href="/2016/05/03/e6-88-91-e5-bf-83-e7-9b-ae-e4-b8-ad-e7-9a-84-e8-80-81-e5-b8-88/" >我心目中的老师</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<blockquote>
+<p>师者，所以传道，授业，解惑也<br>我心目中，教师和老师是两个完全不同的词，教师是一个职业，和工人，农民，医生等一样，而老师是一个尊称。</p>
+</blockquote>
+<p>最近看了《<a href="https://movie.douban.com/subject/26259677/" target="_blank" rel="external">垫底辣妹</a>》，电影里面的补习班教师算得上是真正的老师，为每一个学生指定不一样的学习计划，不管在人前还是人后，都从心底觉得学生有无限的可能。电影里面老师对女主说的一句话，大致意思是“你要相信自己有可能做到，然后你就会努力的去做到”，而且用一个很形象的例子来诠释了这句话。很多时候，确实是因为我们不相信自己可能做到，从而导致自己一开始就放弃了，从某种角度上来说，又是因为我们一次次的放弃，导致我们不相信自己可以做成事情。就像自信一样，如果你做一件事成功了，再做一件事，又成功了，再做一件事又成功了，等成功的次数多了，我们从心底就相信自己能够做成事，这就是自信。长大后，如果有人对你说，你不会吃饭，你一定觉得  TA 是傻子，但是别人质疑你做不成某件事的时候，你可能就会相信  TA  的说法，因为你已经成功的吃饭几十年了。</p>
+<p>由于各种原因，老师毕竟是少数的，能遇到是幸运。硕士第三年，每天最开心的时候是吃饭时一起吐槽导师，有幸在 15 年初遇到刘江老师，刘江老师在的一个月，是硕士第三年中我过得最愉快的一个月，每天早上六点多起床，然后爬山一小时，然后去实验室做事。刘江老师看我们，也总是看到我们的优点，给我们指出各种可能性。刘江老师现在已经以千人计划回国内发展，他的研究团队正在招人，相关职位信息见<a href="http://hr.nimte.ac.cn/jobview.asp?id=506&amp;from=singlemessage&amp;isappinstalled=0" target="_blank" rel="external">http://hr.nimte.ac.cn/jobview.asp?id=506from=singlemessage&amp;isappinstalled=0</a>。</p>
+<p>我的目标是有一天能成为一个老师，可以指导后来者，为了这个目标，加油。</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -630,75 +658,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2015-01-05 </div>
-			<div class="article-title"><a href="/2015/01/05/dynamic-programming/" >Dynamic Programming</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://en.wikipedia.org/wiki/Dynamic_programming" target="_blank" rel="external">Dynamic Programming</a>（动态规划）是一种以<span style="color: #0000ff;">空间换时间</span>的算法，可以用来解决的问题都有一个共性：<span style="color: #0000ff;">重叠子问题</span>。用通俗的话说就是记忆化搜索。也就是说，所有的动态规划都是可以用搜索去写的，但是用简单的搜索写，会发现时间复杂度太高，从而达不到要求，因为在搜索的过程中我们重复计算了很多以前已经计算过的问题（重叠子问题），这里就会浪费大量的时间。</p>
-<p>下面借助一个经典的入门题<a href="http://acm.hdu.edu.cn/showproblem.php?pid=2084" target="_blank" rel="external">数塔</a>来讲解具体的过程：</p>
-<p>数塔的大致意思如下：在一棵二叉树中，每个节点都有一个权值，现在你的任务是需要求从根出发到树的最底层的任何一条路径中（每一次都只能往下走），所经过的节点权值加起来最大（或者最小）的一条路径，并输出这个最大值（最小值）。下图中，9是树的根，需要求的是从9出发，最后到达｛19, 7, 10, 4, 16} 这一层的所有路径中，权值加起来最大的那一条。这里是{9-12-10-18-10}最大值为59.<a href="http://www.klion26.com/wp-content/uploads/2015/01/2084-1.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2015/01/2084-1-300x148.jpg" alt="2084-1"></a>我们在看到这个题目的时候，最开始可能想到的是用搜索直接求解，写一个递归函数解决之。因为每个节点只能往下走，所以每个节点的路径必然是经过左儿子或者右儿子节点，那么最大路径也必然从左儿子或右儿子中间选取。如果我们写一个函数叫做 f(i, j) 用来求每个点到最底层的最大路径和的话，那么这个函数的大致轮廓就可以写成：</p>
-<pre class="lang:c mark:7,8 decode:true ">int f(int i, int j)
-{
-if(i>MAX) //超过层数
- return 0;
-if(j>i) //每一层的边界
- return 0;
-int a = f(i+1, j); //左儿子
-int b = f(i+1, j+1); //右儿子
-if(a>b)
- return a+num[i][j];
-else
- return b+num[i][j];
-}</pre> 
-
-<p>写出这个代码之后，对于层数不多的时候，我们是可以求出最终的答案的，不过当层数比较多的时候，就会发现，求结果所需要的时间太多了。每一条路径可能会计算好几次，路径{18-10}就会被计算3次，分别是{12-10-18-10},{12-6-18-10}和{15-6-18-10},其中有两次是浪费的，因为前面我们计算过一次，如果能够保存下来的话，那么就可以直接查询就行了。那么接下来我们来看是否可以改进上面的代码。</p>
-<p>我们发现对于每个节点，都需要计算它的左儿子和右儿子到底层的最大路径和，这个路径是会重叠的，比如路径{9-12-6-18-10}和路径{9-15-6-18-10}的后面一段{6-18-10}就是重合的，也就是说用上面的代码我们会计算两次这条路径的值。这就造成了资源上的浪费，耗费了很多不必要的时间。那么现在我们用一个二维数组 dp[][] 记录下每个节点到底层的最大路径和，在第一次计算的时候，将这个结果赋值给二维数组 dp[][] 中相应的单元格，在后面需要的时候直接从 二维数组 dp[][] 里面取就行了，于是就有了下面的代码</p>
-<pre class="lang:c++ mark:7,8,9,10 decode:true ">int f(int i, int j)
-{
-if(i>MAX)
-  return 0;
-if(j<0 ||="" j="">i)
-  return 0;
-if(dp[i][j] == -1)//dp[][]数组初始化为-1，因为所有路径和都是正数，所以这里-1表示未计算过
-  dp[i+1][j] = f(i+1, j);
-if(dp[i+1][j+1] == -1)
-  dp[i+1][j+1] = f(i+1, j+1);
-if(dp[i+1][j]>dp[i+1][j+1])
-  return dp[i+1][j]+num[i][j];
-else
-  return dp[i+1][j+1]+num[i][j];
-}</0></pre> 
-
-<p>这段代码和第一段代码的区别就是用二维数组 dp[][] 保存下了每一个状态，这样每一条路径我们就只会计算一次，对于一棵节点很多的树来说，这节省下来的时间是非常多的，可以自己生成一个符合条件的二叉树，用上面两段代码同时计算所需要的结果，最后对比运行时间。<br>到这里差不多动态规划的思想就出来了：<span style="color: #0000ff;">空间换时间。<span style="color: #000000;">从而解决有<span style="color: #0000ff;">重叠子问题</span>的问题。</span><span style="color: #000000;">某些路径我们会计算很多次，那么就把这些结果保存下来，供后面需要的时候查询。当然本文的第二段代码，很多人叫做记忆化搜索，实际上思想是一样的，都是<span style="color: #0000ff;">用空间换时间</span>。当然接下来我们还可以继续把第二段代码写成非递归的，甚至对非递归的写法继续优化，这里就不涉及相应的内容了，这里给出一个优化版的非递归版本：（从底层开始计算，最后计算到树根结束，这样空间只需要 O(n) ），代码如下</span></span></p>
-<pre class="lang:c++ mark:10 decode:true ">int f(int i, int j)
-{
-int dp[MAX];//保存结果
-for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int="" i="MAX-2;">=0; --i)
-{
- for(int j=0; j<=i; ++j)="" {="" dp[j]="max(dp[j]," dp[j+1])="" +="" num[i][j];="" 最大值是由自己的左儿子和右儿子的最大路径和构成="" }="" return="" dp[0];="" }<="" pre=""> 
-
-<p>在动态规划里面，还有两个术语叫做“<span style="color: #0000ff;">状态</span>”和“<span style="color: #0000ff;">转移方程</span>”，通俗的说“状态”就是表示某一情况下的结果，比如本文第二段代码中 dp[i][j] 就表示的是 (i,j)这个节点的状态，而“转移方程”就阐述了如何从一个“状态”变化到“另外一个状态”，比如上面第三段代码中的第10行 dp[j] = max(dp[j], dp[j+1]) + num[i][j]，表示了当前节点怎么从左儿子和右儿子的状态变化而来. 到这里，基本的动态规划问题，应该是能够理解了，当然能够理解不代表就能够解出新的题目，对于<span style="color: #0000ff;">怎么选取状态</span>，<span style="color: #0000ff;">怎么找出转移方程</span>，这些问题都需要通过<span style="color: #0000ff;">不停的训练</span>才能够获得。动态规划里面最难的就是<span style="color: #0000ff;">状态的选取</span>以及<span style="color: #0000ff;">转移方程</span>，当然利用其譬如优先队列等东西优化就属于更高级的东西了，如果能够知道怎么表达状态，以及写出相应的转移方程，那么剩下的就只是苦力活了。</p>
-<p>至于经典的最长公共子序列，最长上升子序列，背包问题等都是可以用上述思路来解</p>
-<p>至于自己想找题目练习的话，我推荐 Topcoder，至于其他的 OJ，可以自行搜索。<a href="http://community.topcoder.com/tc?module=ProblemArchivesr=&amp;er=&amp;sc=&amp;sd=&amp;class=&amp;cat=Dynamic+Programming&amp;div1l=&amp;div2l=&amp;mind1s=&amp;mind2s=&amp;maxd1s=&amp;maxd2s=&amp;wr=" target="_blank" rel="external">这里</a>是 Topcoder 上所有的动态规划题目集合，可以自行选择相应的难度。另外推荐一篇讲动态规划的英文版的<a href="http://www.topcoder.com/tc?d1=tutorials&amp;d2=dynProg&amp;module=Static" target="_blank" rel="external">文章</a>，也来自 Topcoder。网上还有人总结的 <a href="http://www.cppblog.com/doer-xee/archive/2009/12/05/102629.html" target="_blank" rel="external">DP46 题</a>，也可以看看。</p>
-<p>当然如果有什么地方讲解不详细，或者有错误的话，欢迎讨论:)</p>
-</=i;></max;></pre>
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -709,13 +668,13 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/2/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
+    	<li class="prev"><a href="/page/2/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/4/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/4/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -735,7 +694,7 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -744,16 +703,16 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
 		
 			
 	<div class="widget">
-		<h4>分类</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
-		
 			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -783,7 +742,7 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -793,27 +752,27 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
 		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -827,51 +786,51 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
 		
 			
 	<div class="widget">
-		<h4>标签云</h4>
+		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
-		
-			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
-		
-			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
-		
-			<li><a href="/tags/老师/">老师<span>1</span></a></li>
-		
-			<li><a href="/tags/json/">json<span>1</span></a></li>
-		
-			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
-		
-			<li><a href="/tags/how/">how<span>1</span></a></li>
-		
-			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
 		
 			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/pair/">pair<span>1</span></a></li>
-		
-			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
-		
-			<li><a href="/tags/prim/">prim<span>1</span></a></li>
-		
-			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
-		
-			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
+			<li><a href="/tags/spark/">spark<span>6</span></a></li>
 		
 			<li><a href="/tags/exception/">exception<span>1</span></a></li>
 		
-			<li><a href="/tags/alibaba/">alibaba<span>1</span></a></li>
+			<li><a href="/tags/my-life/">my life<span>1</span></a></li>
 		
-			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
+			<li><a href="/tags/概率/">概率<span>1</span></a></li>
 		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
+			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
 		
-			<li><a href="/tags/latex/">latex<span>1</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
-			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
+			<li><a href="/tags/reservior/">reservior<span>1</span></a></li>
 		
-			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
+			<li><a href="/tags/dag/">dag<span>1</span></a></li>
+		
+			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
+		
+			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
+		
+			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
+		
+			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
+		
+			<li><a href="/tags/queue/">queue<span>1</span></a></li>
+		
+			<li><a href="/tags/compter-graphics/">compter graphics<span>1</span></a></li>
+		
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+		
+			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
+		
+			<li><a href="/tags/windows/">windows<span>4</span></a></li>
+		
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
+		
+			<li><a href="/tags/source-code/">source_code<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>270</span></a></li>
+		   <li><a href="/tags">...<span>272</span></a></li>
 		 
 		</ul>
 	</div>
@@ -880,8 +839,12 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
 		
 			
 <div class="widget">
-  <h4>最新文章</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
+      </li>
     
       <li>
         <a href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/" ><i class="fa fa-file-o"></i>Streaming 程序调用 Producer.clo...</a>
@@ -899,17 +862,13 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
         <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
-      <li>
-        <a href="/2017/05/10/Python-代码实践小结/" ><i class="fa fa-file-o"></i>Python 代码实践小结</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>链接</h4>
+	<h4>Links</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>
