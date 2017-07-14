@@ -121,6 +121,58 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2015-01-17 </div>
+			<div class="article-title"><a href="/2015/01/17/recursion/" >Recursion</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://en.wikipedia.org/wiki/Recursion" target="_blank" rel="external">递归</a>（Recursion）是一种不停的调用自身的过程。比如下面这个故事就是一个递归的例子</p>
+<p>从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？「从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？『从前有座山，山里有座庙，庙里有个老和尚，正在给小和尚讲故事呢！故事是什么呢？……』」</p>
+<p>本文说的递归，讲的是递归函数，也就是一个函数不停的调用自己而形成的。</p>
+<p>首先，递归函数都满足两个性质</p>
+<ol>
+<li>有一个 base case。base case 可以理解为可以直接得到结果的一个状态或者说是终止状态。</li>
+<li>每一次函数调用都往 base case 靠拢，否则会形成 infinite loop<br>这里我们用阶乘函数 f(n) = n! 来进行说明。对于阶乘函数我们写出的递归函数大致是下面的样子</li>
+</ol>
+<pre class="lang:c decode:true ">int fac(int n)
+{
+  if(n<0) base="" case="" return="" 0;="" if(n<2)="" 1;="" n*fac(n-1);="" 调用="" fac(n-1)，往="" 靠拢="" }<="" pre=""> 
+
+<p>这个函数中前面两个 if 语句组成了 base case。也就是说如果 n&lt;0,那么 n 的阶乘是0，如果 n 是 0 或者 1，那么阶乘是1。这两种情况就组成了阶乘函数的 base case。剩下的 return 语句就是先计算 (n-1) 的阶乘（调用函数 fac(n-1))，然后再乘上 n [n!= n*(n-1)!]，得到最终的结果 n!。</p>
+<p>对于递归函数，刚开始的时候难就难在栈状态的理解，首先可以不考虑栈，把递归函数看成一个数学上的递归式，比如上面的阶乘，f(n) = f*f(n-1).那么如果我们想要求 f(n)，首先就需要知道 f(n-1).刚好这就是函数 fac()所解决的问题。对于刚开始学习递归的时候，可以手动模拟代码是怎么跑的，在纸上画出来，方便自己理解。假设我们要求 6！，就会变成下面的状态</p>
+<p>1 —&gt; fac(6)</p>
+<p>2 —&gt;  6*fac(5)   //6&gt;=2，所以执行最后一句话</p>
+<p>3 —&gt; 6<em>(5</em>fac(4)) //5&gt;=2 这里在 5*fac(4)这一层加上括号表示调用 fac(5)的时候，6是被屏蔽掉的，可以理解成”看不见”</p>
+<p>4 —&gt; 6<em>(5</em>(4*fac(3))) //4 &gt;=2</p>
+<p>5—&gt; 6<em>(5</em>(4<em>(3</em>fac(2)))) //3&gt;=2</p>
+<p>6 —&gt; 6<em>(5</em>(4<em>(3</em>(2*fac(1))))) //2&gt;=2</p>
+<p>7 —&gt; 6<em>(5</em>(4<em>(3</em>(2*(1)))))      //1 &lt; 2 所以返回1，这里在 1 的外面加上括号表示 1 是一个函数调用过程。</p>
+<p>8 —&gt; 6<em>(5</em>(4<em>(3</em>2)))      //这里的2表示是调用 fac(2)返回的结果，最里面的 3<em>2 是调用 fac(3)时 最后依据 n</em>fac(n-1)的具体化</p>
+<p>9—&gt; 6<em>(5</em>(4<em>6))    //4</em>6 表示的是调用 fac(4) 时执行的最后一句，其中 6 是 fac(4-1) 的结果</p>
+<p>10 —&gt; 6<em>(5</em>24)     // 5*24 表示的是调用 fac(5) 时执行的最后一句，其中 24 是 fac(5-1) 的结果</p>
+<p>11 —&gt; 6<em>120   // 6</em>120 表示的是调用 fac(6) 时执行的组后一句，其中 120 是 fac(6-1) 的结果</p>
+<p>12 —&gt; 720 // 调用 fac(6) 返回的结果</p>
+<p>每一行中，如果有函数就先计算函数的值，如果没有函数，那么就计算最里面一层括号中的值。对于每一次函数调用都会开辟一块新的栈空间，在相应的栈空间上进行操作， 就算同一个函数，两次不同的调用操作，也会在不同的栈空间上进行操作。这里一开始可以把函数看成一个黑盒子，盒子的输入就是 n， 盒子的输出是 n!,不用去考虑具体的栈空间什么的，这样会比较好一点。</p>
+<p>对于阶乘来说，如果传入的参数 n&lt;2 就表示是 base case（&lt;0 的情况是特例需要处理），其它的情况，每次都会调用 fac(n-1)，每次 n 都会减1，这样会往1靠拢，也就是往 base case 靠拢。刚好满足上面两个性质。</p>
+<p>在<a href="http://www.klion26.com/dynamic-programming.html" target="_blank" rel="external">动态规划</a>这篇文章里面，最开始的代码也是用的递归写的，base case 就是前面两个 if 语句判断（base case 一般都是用 if 特判），剩下的就是把其它的状态状态为 base case。比如有名的 <a href="http://en.wikipedia.org/wiki/Tower_of_Hanoi" target="_blank" rel="external">Hanoi 塔</a>问题，就可以用来测试自己是否理解了递归。Fibonacci 数列和 Euclid’s GCD 也可以用递归来写，还有一个<a href="http://www.algorithmist.com/index.php/Coin_Change" target="_blank" rel="external">找零钱</a>问题，也可以用递归来写。很多代码用递归写出来之后会变得很简洁。不过如果递归的层数比较深的话，可能会导致栈溢出的问题。</p>
+<p>熟悉递归之后，就还有尾递归的消除，至于怎么消除尾递归（有些语言里面会自带尾递归的消除），<a href="http://blog.moertel.com/tags/recursion-to-iteration%20series.html" target="_blank" rel="external">这个系列</a>讲的很详细，可以参考参考。</p>
+</0)></pre>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2015-01-05 </div>
 			<div class="article-title"><a href="/2015/01/05/dynamic-programming/" >Dynamic Programming</a></div>						
 		</h3>
@@ -668,47 +720,6 @@ private:
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2014-06-16 </div>
-			<div class="article-title"><a href="/2014/06/16/nginx-advancd-data-struct-1/" >Nginx 高级数据结构 1</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>本文主要描述 Nginx 中的几种高级数据结构，参考《深入理解 Nginx》，结合源码，对这些数据结构进行一些解剖。文章中的代码可以<a href="http://lxr.nginx.org/source/src/" target="_blank" rel="external">在这里</a>找到。</p>
-<p>1.<a href="http://lxr.nginx.org/source/src/core/ngx_queue.h" target="_blank" rel="external"> ngx_queue_t</a> 双向链表</p>
-<p>首先，ngx_queue_t 是不从内存池分配内存的，所以有关双向链表的所有内存都由程序员自己负责。ngx_queue_t 的定义如下（src/core/ngx_queue.h）</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">ngx_queue_s</span> <span style="color: #f5deb3;">ngx_queue_t</span><br><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">ngx_queue_s</span> <span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">ngx_queue_t</span>  <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">prev</span><br><span style="color: #f5deb3;">ngx_queue_t</span>  <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">next</span><br><span style="color: #f5deb3;">}</span></div><br>这里定义的其实是两个指针，一个指向前一个节点，一个指向后一个节点，在需要使用双链表的地方加上一个 ngx_queue_t 变量即可。ngx_queue_t 有关的操作函数如下：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">ngx_queue_int</span>(<span style="color: #f5deb3;">h</span>)           <span style="color: #da70d6;">//h 为链表结构体 ngx_queue_t 的指针。初始化双链表</span><br><span style="color: #f5deb3;">ngx_queue_empty</span>(<span style="color: #f5deb3;">h</span>)      <span style="color: #da70d6;">//h 为链表容器结构体 ngx_queue_t 的指针。 判断链表是否为空</span><br><span style="color: #f5deb3;">ngx_queue_insert_head</span>(<span style="color: #f5deb3;">h</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">x</span>)     <span style="color: #da70d6;">//h 为链表容器结构体 ngx_queue_t 的指针，x 为插入元素结构体中 ngx_queue_t 成员的指针。将 x 插入到链表头部</span><br><span style="color: #f5deb3;">ngx_queue_insert_tail</span>(<span style="color: #f5deb3;">h</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">x</span>)     <span style="color: #da70d6;">//h 为链表容器结构体 ngx_queue_t 的指针,x 为插入元素结构体中 ngx_queue_t 成员的指针。将 x 插入到链表尾部</span><br><span style="color: #f5deb3;">ngx_queue_head</span>(<span style="color: #f5deb3;">h</span>)         <span style="color: #da70d6;">//h 为链表容器结构体 ngx_queue_t 的指针。返回链表容器 h 中的第一个元素的 ngx_queue_t 结构体指针</span><br><span style="color: #f5deb3;">ngx_queue_last</span>(<span style="color: #f5deb3;">h</span>)         <span style="color: #da70d6;">//h 为链表容器结构体 ngx_queue_t 的指针。返回链表容器 h 中的最后一个元素的 ngx_queue_t 结构体指针</span><br><span style="color: #f5deb3;">ngx_queue_sentinel</span>(<span style="color: #f5deb3;">h</span>)     <span style="color: #da70d6;">//h 为链表容器结构体 ngx_queue_t 的指针。返回链表结构体的指针</span><br><span style="color: #f5deb3;">ngx_queue_remove</span>(<span style="color: #f5deb3;">x</span>)     <span style="color: #da70d6;">//x 为链表容器结构体 ngx_queue_t 的指针。从容器中移除 x 元素</span><br><span style="color: #f5deb3;">ngx_queue_split</span>(<span style="color: #f5deb3;">h</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">,</span> n)<span style="color: #da70d6;">//h 为链表容器结构体 ngx_queue_t 的指针。该函数用于拆分链表，h 是链表容器，而 q 是链表 h 中的一个元素。这个方法将链表 h 以元素 q 为界拆分成两个链表 h 和 n</span><br><span style="color: #f5deb3;">ngx_queue_add</span>(<span style="color: #f5deb3;">h</span><span style="color: #f5deb3;">,</span> n)     <span style="color: #da70d6;">//h 为链表容器结构体 ngx_queue_t 的指针， n为另一个链表容器结构体 ngx_queue_t 的指针。合并链表，将 n 链表添加到 h 链表的末尾</span><br><span style="color: #f5deb3;">ngx_queue_middle</span>(<span style="color: #f5deb3;">h</span>)     <span style="color: #da70d6;">//h 为链表容器结构体 ngx_queue_t 的指针。返回链表中心元素，即第 N/2 + 1 个</span><br><span style="color: #f5deb3;">ngx_queue_sort</span>(<span style="color: #f5deb3;">h</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cmpfunc</span>)    <span style="color: #da70d6;">//h 为链表容器结构体 ngx_queue_t 的指针，cmpfunc 是比较回调函数。使用插入排序对链表进行排序</span><br><span style="color: #f5deb3;">ngx_queue_next</span>(<span style="color: #f5deb3;">q</span>)         <span style="color: #da70d6;">//q 为链表中某一个元素结构体的 ngx_queue_t 成员的指针。返回 q 元素的下一个元素。</span><br><span style="color: #f5deb3;">ngx_queue_prev</span>(<span style="color: #f5deb3;">q</span>)         <span style="color: #da70d6;">//q 为链表中某一个元素结构体的 ngx_queue_t 成员的指针。返回 q 元素的上一个元素。</span><br><span style="color: #f5deb3;">ngx_queue_data</span>(<span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">type</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">link</span>)     <span style="color: #da70d6;">//q 为链表中某一个元素结构体的 ngx_queue_t 成员的指针，type 是链表元素的结构体类型名称，link 是上面这个结构体中 ngx_queue_t 类型的成员名字。返回 q 元素所属结构体的地址</span><br><span style="color: #f5deb3;">ngx_queue_insert_after</span>(<span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">x</span>)     <span style="color: #da70d6;">//q 为链表中某一个元素结构体的 ngx_queue_t 成员的指针，x 为插入元素结构体中 ngx_queue_t 成员的指针。 在 nginx 1.2 中 这个函数是 ngx_queue_insert_head 的一个别名</span></div><br>下面这段代码能够大致说明这个数据结构的一些用法：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include “ngx_queue.h”</span><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #b0c4de; font-weight: bold;">struct</span><span style="color: #f5deb3;">{    //这个结构体实际上是我们真正使用的</span><br><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">str</span><br><span style="color: #f5deb3;">ngx_queue_t</span> <span style="color: #f5deb3;">qEle</span>  //这里的 ngx_queue_t 变量是用来连接双向链表的<br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">num</span><br><span style="color: #f5deb3;">}</span><span style="color: #f5deb3;">TestNode</span><span style="color: #f5deb3;">ngx_int_t</span> <span style="color: #ffffff;">comp</span>(<span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #f5deb3;">ngx_queue_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #f5deb3;">ngx_queue_t</span> <span style="color: #f5deb3;"><em></em></span>b)<br><span style="color: #f5deb3;">{//这个是排序用的比较函数</span><br><span style="color: #f5deb3;">TestNode</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">aNode</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_queue_data</span>(<span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">TestNode</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">qEle</span>); //首先得到 a 所在的结构体的指针<br><span style="color: #f5deb3;">TestNode</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">bNode</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_queue_data</span>(b<span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">TestNode</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">qEle</span>);<span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">aNode</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">num</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">bNode</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">num</span>; //比较两个结构体中的 num 的大小<br><span style="color: #f5deb3;">}</span><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span>(<span style="color: #98fb98; font-weight: bold;">void</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">TestNode</span> <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">5</span><span style="color: #f5deb3;">],</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">tmp</span><br><span style="color: #f5deb3;">ngx_queue_t</span> <span style="color: #f5deb3;">queueContainer</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">*</span><span style="color: #f5deb3;">q</span><br><span style="color: #f5deb3;">ngx_queue_init</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">queueContainer</span>);   //初始化双向链表<span style="color: #b0c4de; font-weight: bold;">for</span>(; <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">5</span> <span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">i</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">num</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><br><span style="color: #f5deb3;">}</span></div></p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;">   //乱序插入双向链表<br><span style="color: #f5deb3;">ngx_queue_insert_tail</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">queueContainer</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">qEle</span>);<br><span style="color: #f5deb3;">ngx_queue_insert_head</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">queueContainer</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">qEle</span>);<br><span style="color: #f5deb3;">ngx_queue_insert_tail</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">queueContainer</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">qEle</span>);<br><span style="color: #f5deb3;">ngx_queue_insert_after</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">queueContainer</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">3</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">qEle</span>);<br><span style="color: #f5deb3;">ngx_queue_insert_tail</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">queueContainer</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">4</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">qEle</span>);</div></p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;">   //使用 comp 比较函数 对双向链表进行排序<br><span style="color: #f5deb3;">ngx_queue_sort</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">queueContainer</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">comp</span>);<span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">q</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_queue_head</span>(<span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">queueContainer</span>);<br><span style="color: #f5deb3;">q</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">ngx_queue_sentinel</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">queueContainer</span>);<br><span style="color: #f5deb3;">q</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_queue_next</span>(<span style="color: #f5deb3;">q</span>))<br><span style="color: #f5deb3;">{//遍历整个链表</span><br><span style="color: #f5deb3;">tmp</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_queue_data</span>(<span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">TestNode</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">qEle</span>);<br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%d</span><span style="color: #7fffd4;">\t</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">num</span>);<br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div><br>2. <a href="http://lxr.nginx.org/source/src/core/ngx_array.h" target="_blank" rel="external">ngx_array_t</a> 动态数组，类似于 STL 中的 vector。代码可以<a href="http://lxr.nginx.org/source/src/core/ngx_array.h" target="_blank" rel="external">参考这里</a></p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">{</span><br><span style="color: #da70d6;">//数组首地址</span><br><span style="color: #98fb98; font-weight: bold;">void</span>        <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">elts</span><br><span style="color: #da70d6;">//数组中已经使用的元素个数</span><br><span style="color: #f5deb3;">ngx_uint_t</span>   <span style="color: #f5deb3;">nelts</span><br><span style="color: #da70d6;">//每个数组元素占用的内存大小</span><br><span style="color: #98fb98; font-weight: bold;">size_t</span>       <span style="color: #f5deb3;">size</span><br><span style="color: #da70d6;">//当前数组中能够容纳的元素个数的总大小</span><br><span style="color: #f5deb3;">ngx_uint_t</span>   <span style="color: #f5deb3;">nalloc</span><br><span style="color: #da70d6;">//内存池对象</span><br><span style="color: #f5deb3;">ngx_pool_t</span>  <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">pool</span><br><span style="color: #f5deb3;">}</span> <span style="color: #f5deb3;">ngx_array_t</span></div><br>几个操作函数如下：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">ngx_array_create</span>(<span style="color: #f5deb3;">ngx_pool_t</span> <span style="color: #f5deb3;"><em></em></span>p<span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_uint_t</span> n<span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">size_t</span> <span style="color: #f5deb3;">size</span>); <span style="color: #da70d6;">//创建一个动态数组，并预分配 n 个大小为 size 的内存空间</span><br><span style="color: #f5deb3;">ngx_array_init</span>(<span style="color: #f5deb3;">ngx_array_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_pool_t</span> <span style="color: #f5deb3;"><em></em></span>p<span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_uint_t</span> n<span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">size_t</span> <span style="color: #f5deb3;">size</span>); <span style="color: #da70d6;">//初始化 1 个已经存在的动态数组，并预分配 n 个大小为 size 的内存空间</span><br><span style="color: #f5deb3;">ngx_array_destroy</span>(<span style="color: #f5deb3;">ngx_array_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">a</span>) <span style="color: #da70d6;">//销毁已分配的数组元素空间和 ngx_array_t 动态数组对象</span><br><span style="color: #f5deb3;">ngx_array_push</span>(<span style="color: #f5deb3;">ngx_array_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">a</span>)    <span style="color: #da70d6;">//向当前动态数组中添加 1 个元素，返回的是这个新添元素的地址。如果动态数组已经达到容量上限，会导致自动扩容</span><br><span style="color: #f5deb3;">ngx_array_push_n</span>(<span style="color: #f5deb3;">ngx_array_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_uint_t</span> n) <span style="color: #da70d6;">//向当前动态数组中添加 n 个元素，返回的是新添加的这批元素中第一个元素的地址。如果动态数组已经达到容量上限，会导致自动扩容</span></div><br>其中有关扩容的情况，如果是添加 1 个元素的话，那么该内存池有空间就直接添加，没空间的话，会导致先扩成原来的2倍。如果是添加 n 个元素的话，如果内存池空间够的话，直接分配 n 个元素的内存，如果不够的话，分配 2X 的空间，其中 X = (n&gt;=a-&gt;nalloc)?n:a-&gt;nalloc. 也就是 n 和动态数组中已分配空间的较大值</p>
-<p>3. <a href="http://lxr.nginx.org/source/src/core/ngx_list.h" target="_blank" rel="external">ngx_list_t</a> 链表，定义如下：</p>
-<div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;">
-
-<p><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">ngx_list_part_s</span>  <span style="color: #f5deb3;">ngx_list_part_t</span></p>
-<p><span style="color: #da70d6;">//链表中每个元素的结构</span><br><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">ngx_list_part_s</span> <span style="color: #f5deb3;">{</span><br><span style="color: #da70d6;">//指向数组的起始地址    </span><br><span style="color: #98fb98; font-weight: bold;">void</span>             <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">elts</span><br><span style="color: #da70d6;">//表示数组中已经使用了多少个元素。必须小于 链表中的 nalloc</span><br><span style="color: #f5deb3;">ngx_uint_t</span>        <span style="color: #f5deb3;">nelts</span><br><span style="color: #da70d6;">//下一个元素的 ngx_list_pars_s 地址</span><br><span style="color: #f5deb3;">ngx_list_part_t</span>  <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">next</span><br><span style="color: #f5deb3;">};</span></p>
-<p><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">{</span><br><span style="color: #da70d6;">//最后一个已使用元素的地址</span><br><span style="color: #f5deb3;">ngx_list_part_t</span>  <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">last</span><br><span style="color: #da70d6;">//第一个元素</span><br><span style="color: #f5deb3;">ngx_list_part_t</span>   <span style="color: #f5deb3;">part</span><br><span style="color: #da70d6;">//每个元素的数组中存储的每个值的字节数不能超过 size</span><br><span style="color: #98fb98; font-weight: bold;">size_t</span>            <span style="color: #f5deb3;">size</span><br><span style="color: #da70d6;">//每个 ngx_list_part_s 数组的容量，即最多可存储多少个数据</span><br><span style="color: #f5deb3;">ngx_uint_t</span>        <span style="color: #f5deb3;">nalloc</span><br><span style="color: #da70d6;">//内存池对象    </span><br><span style="color: #f5deb3;">ngx_pool_t</span>       <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">pool</span><br><span style="color: #f5deb3;">}</span> <span style="color: #f5deb3;">ngx_list_t</span></p>
-<p></p></div><br>针对 ngx_list_t 的几个操作函数为 <a href="http://lxr.nginx.org/ident?_i=ngx_list_init" target="_blank" rel="external">ngx_list_init</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">(</span><a href="http://lxr.nginx.org/ident?_i=ngx_list_t" target="_blank" rel="external">ngx_list_t</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;"> <em></em></span><a href="http://lxr.nginx.org/ident?_i=list" target="_blank" rel="external">list</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">, </span><a href="http://lxr.nginx.org/ident?_i=ngx_pool_t" target="_blank" rel="external">ngx_pool_t</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;"> </span><a href="http://lxr.nginx.org/ident?_i=pool" target="_blank" rel="external">pool</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">, </span><a href="http://lxr.nginx.org/ident?_i=ngx_uint_t" target="_blank" rel="external">ngx_uint_t</a><a href="http://lxr.nginx.org/ident?_i=n" target="_blank" rel="external">n</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">, size_t </span><a href="http://lxr.nginx.org/ident?_i=size" target="_blank" rel="external">size</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">),这个函数会对 list 对应的链表进行初始化。</span><p></p>
-<p>创建链表函数 <a href="http://lxr.nginx.org/ident?_i=ngx_list_create" target="_blank" rel="external">ngx_list_create</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">(</span><a href="http://lxr.nginx.org/ident?_i=ngx_pool_t" target="_blank" rel="external">ngx_pool_t</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;"> *</span><a href="http://lxr.nginx.org/ident?_i=pool" target="_blank" rel="external">pool</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">, </span><a href="http://lxr.nginx.org/ident?_i=ngx_uint_t" target="_blank" rel="external">ngx_uint_t</a><a href="http://lxr.nginx.org/ident?_i=n" target="_blank" rel="external">n</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">, size_t </span><a href="http://lxr.nginx.org/ident?_i=size" target="_blank" rel="external">size</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">) 这个函数首先创建一个 ngx_list_t 的对象 list，然后调用 ngx_list_init 进行初始化</span></p>
-<p><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">往链表中添加元素的函数 </span><a href="http://lxr.nginx.org/ident?_i=ngx_list_push" target="_blank" rel="external">ngx_list_push</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">(</span><a href="http://lxr.nginx.org/ident?_i=ngx_list_t" target="_blank" rel="external">ngx_list_t</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;"> *</span><a href="http://lxr.nginx.org/ident?_i=l" target="_blank" rel="external">l</a><span style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 18px;">) 这个函数会添加一个新元素，返回的是新元素的首地址。如果失败，返回 NULL。首先检测链表的最后一个数组是否已满，没满就直接返回，已满的话就分配新的数组，添加到链表中，然后返回相应的地址。</span></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -801,11 +812,11 @@ private:
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -815,11 +826,11 @@ private:
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
-		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
@@ -840,48 +851,48 @@ private:
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
 		
-			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
+			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
 		
-			<li><a href="/tags/linux/">linux<span>24</span></a></li>
+			<li><a href="/tags/question/">question<span>1</span></a></li>
 		
-			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
+			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
 		
-			<li><a href="/tags/top排序/">top排序<span>2</span></a></li>
+			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
 		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
+			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
 		
-			<li><a href="/tags/prim/">prim<span>1</span></a></li>
+			<li><a href="/tags/教师/">教师<span>1</span></a></li>
 		
-			<li><a href="/tags/DP/">DP<span>1</span></a></li>
-		
-			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
-		
-			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
-		
-			<li><a href="/tags/概率/">概率<span>1</span></a></li>
-		
-			<li><a href="/tags/job/">job<span>1</span></a></li>
-		
-			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
-		
-			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
-		
-			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
-		
-			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
-		
-			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
-		
-			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
-		
-			<li><a href="/tags/go/">go<span>1</span></a></li>
+			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
 		
 			<li><a href="/tags/google-adsense/">google-adsense<span>1</span></a></li>
 		
+			<li><a href="/tags/metric-core/">metric-core<span>1</span></a></li>
 		
-		   <li><a href="/tags">...<span>272</span></a></li>
+			<li><a href="/tags/递归/">递归<span>1</span></a></li>
+		
+			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
+		
+			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
+		
+			<li><a href="/tags/mit/">mit<span>2</span></a></li>
+		
+			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
+		
+			<li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li>
+		
+			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
+		
+			<li><a href="/tags/gdb/">gdb<span>2</span></a></li>
+		
+			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
+		
+			<li><a href="/tags/git/">git<span>4</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>273</span></a></li>
 		 
 		</ul>
 	</div>
@@ -892,6 +903,10 @@ private:
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
+      </li>
     
       <li>
         <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
@@ -907,10 +922,6 @@ private:
     
       <li>
         <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
   </ul>

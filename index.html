@@ -471,9 +471,57 @@
 		
             
 		
+            
+		
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2017-07-14 </div>
+			<div class="article-title"><a href="/2017/07/14/tmux-简单使用指南/" >tmux 简单使用指南</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<h1 id="Tmux-的简单使用说明"><a href="#Tmux-的简单使用说明" class="headerlink" title="Tmux 的简单使用说明"></a>Tmux 的简单使用说明</h1><blockquote>
+<p>工欲善其事，必先利其器</p>
+</blockquote>
+<p>Tmux 是一个多窗口管理程序。可以让用户在一个地方管理多个终端。而不需要在不同的终端间来回切换。</p>
+<h2 id="在-Mac-下如何安装"><a href="#在-Mac-下如何安装" class="headerlink" title="在 Mac 下如何安装"></a>在 Mac 下如何安装</h2><p>直接使用 <code>brew install tmux</code> 就可以了，如果没有 brew，则需要先安装 brew，然后再执行上述命令。</p>
+<h2 id="简单使用流程"><a href="#简单使用流程" class="headerlink" title="简单使用流程"></a>简单使用流程</h2><p>首先，需要了解 tmux 中的几个概念。session，window 以及 pane。这几者的关系如下，tmux 中可以起多个 session，每个 session 可以启动多个 window，然后每个 window 可以启动多个 pane。</p>
+<p>这里给一个基本的流程</p>
+<ol>
+<li><p>启动 tmux（默认会启动一个 session）<br>使用 <code>tmux</code> 启动 tmux，使用 <code>exit</code> 退出 tmux，session 的命名默认是从 0 开始，一直往上加</p>
+</li>
+<li><p>在 session 中启动一个 window<br><code>PREFIX c</code> 会在当前 session 中创建一个 window, 其中 <code>PREFIX</code> 表示 tmux 中的命令前缀符（该条命令表示，先按下 PREFIX，然后按下 c)，</p>
+</li>
+<li><p>在启动的 window 中创建一个 pane<br><code>PREFIX %</code> 竖直方向切分一个 window，<code>PREFIX &quot;</code> 横向切分一个 window。这样就能够在 window 中创建 pane 了。基本的这些就够了。</p>
+</li>
+<li><p>如何在 session，window，pane 中进行移动<br>能够创建 session，window，pane 了，接下来就是如何在 session，window，pane 间进行移动了。<br><code>PREFIX s</code> 会列出所有 session，然后进行具体的选择（可以上下移动光标，然后按 ENTRER 确定）<br><code>PREFIX w</code> 可以列出所有的 window，然后进行具体的筛选<br><code>PREFIX n</code> 可以切换到下一个 window<br><code>PREFIX p</code> 可以切换到上一个 window<br><code>PREFIX &amp;</code> 可以关闭当前 window<br><code>PREFIX o</code> 可以在 pane 之间进行跳转<br><code>tmux ls</code> 会列出当前所有的 session（在非 tmux 环境下）</p>
+</li>
+</ol>
+<h2 id="自定义-tmux"><a href="#自定义-tmux" class="headerlink" title="自定义 tmux"></a>自定义 tmux</h2><p>tmux 的配置文件可以保存在两个地方</p>
+<ol>
+<li>/etc/tmux.conf</li>
+<li>~/.tmux.conf</li>
+</ol>
+<p>其中 2 的优先级会更高，1 的影响面更广</p>
+<h2 id="接下来做什么"><a href="#接下来做什么" class="headerlink" title="接下来做什么"></a>接下来做什么</h2><p>上面的仅仅是一个入门文档，也就是最少基本知识，接下来就是多实践。推荐一本小书《tmux productive mouse-free development》</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -714,30 +762,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2016-12-16 </div>
-			<div class="article-title"><a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" >Spark Streaming Ran out of messages before reaching ending offset 异常</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>Spark Streaming 处理数据过程中遇到 <code>Ran out of messages before reaching ending offset</code> 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）</p>
-		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/#more" class="btn btn-default more">Read More</a>
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -830,11 +854,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -844,11 +868,11 @@
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
-		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
@@ -869,48 +893,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
-		
-			<li><a href="/tags/hash/">hash<span>1</span></a></li>
-		
-			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
-		
-			<li><a href="/tags/半平面交/">半平面交<span>1</span></a></li>
-		
-			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
-		
-			<li><a href="/tags/concrete-mathematics/">concrete-mathematics<span>2</span></a></li>
-		
-			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
-		
-			<li><a href="/tags/插件/">插件<span>1</span></a></li>
-		
-			<li><a href="/tags/receiver/">receiver<span>1</span></a></li>
-		
-			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
-		
-			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
-		
-			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
-		
-			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
-		
-			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
-		
-			<li><a href="/tags/probability/">probability<span>1</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li>
 		
 			<li><a href="/tags/c/">c++<span>1</span></a></li>
 		
-			<li><a href="/tags/alibaba/">alibaba<span>1</span></a></li>
+			<li><a href="/tags/google-adsense/">google-adsense<span>1</span></a></li>
 		
-			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
+			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
 		
-			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+			<li><a href="/tags/question/">question<span>1</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
+		
+			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
+		
+			<li><a href="/tags/vundle/">vundle<span>1</span></a></li>
+		
+			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
+		
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
+		
+			<li><a href="/tags/rm/">rm<span>1</span></a></li>
+		
+			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+		
+			<li><a href="/tags/job/">job<span>1</span></a></li>
+		
+			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
+		
+			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
+		
+			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
+		
+			<li><a href="/tags/写作/">写作<span>1</span></a></li>
+		
+			<li><a href="/tags/reservior/">reservior<span>1</span></a></li>
+		
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
+		
+			<li><a href="/tags/prim/">prim<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>272</span></a></li>
+		   <li><a href="/tags">...<span>273</span></a></li>
 		 
 		</ul>
 	</div>
@@ -921,6 +945,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
+      </li>
     
       <li>
         <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
@@ -936,10 +964,6 @@
     
       <li>
         <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
   </ul>

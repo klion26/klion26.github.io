@@ -121,6 +121,63 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2012-12-03 </div>
+			<div class="article-title"><a href="/2012/12/03/first-linux-module-lvm/" >第一个Linux可装载模块</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>照着《Professional Linux Programming》上的来写的。然后过程中遇到一系列问题，在这里记录下来。</p>
+<p>我的系统是VMware下装的Fedora 16。</p>
+<p>代码如下</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span>#include <linux module.h="">   </linux></span></span></li>
+<li><span>#include <linux init.h="">   </linux></span></li>
+<li><span>  </span></li>
+<li><span class="keyword">int</span><span> __int hello_init(</span><span class="keyword">void</span><span>)   </span></li>
+<li><span>{   </span></li>
+<li><span>    printk(</span><span class="string">“plp: hello reader!\n”</span><span>);   </span></li>
+<li><span>    </span><span class="keyword">return</span><span> </span><span class="number">0</span><span>   </span></li>
+<li><span>}   </span></li>
+<li><span>  </span></li>
+<li><span class="keyword">void</span><span> __exit hello_exit(</span><span class="keyword">void</span><span>)   </span></li>
+<li><span>{   </span></li>
+<li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
+<li><span>}   </span></li>
+<li><span>  </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#108;&#116;&#x6f;&#x3a;&#106;&#x63;&#109;&#x40;&#x6a;&#111;&#110;&#x6d;&#x61;&#115;&#116;&#101;&#x72;&#115;&#x2e;&#111;&#x72;&#x67;">&#106;&#x63;&#109;&#x40;&#x6a;&#111;&#110;&#x6d;&#x61;&#115;&#116;&#101;&#x72;&#115;&#x2e;&#111;&#x72;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
+<li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
+<li><span>  </span></li>
+<li><span>module_init(hello_init);   </span></li>
+<li><span>module_exit(hello_exit);  </span><br></li></ol></div><br>然后你可以用 make -C /usr/src/linux-3.6.8 modules M=$PWD来编译这个可装载模块，在当前文件夹下需要一个Makefile文件，里面写上obj-m  := plp.o
+
+<p>解释下这条语句。-C 后面的参数 是你当前系统的代码所在的位置，貌似需要先编译下系统，可以下载最新版的内核来编译。 modules 应该是告诉make这是要编译啥 然后M=$PWD是参数 表示当前可装载模块在哪。当然你可以把这些放到一个Makefile文件里面。效果是一样的。如果你看到有CC [M] …..这样的那应该就是好了。</p>
+<p>然后编译好了之后你就可以用/sbin/modinfo plp.ko来查看这个可装载模块的相关信息了。这里面可以看到是什么版本的内核。也就是前面你所指定的内核目录相对应的内核版本。</p>
+<p>最后你可以用/sbin/insmod plp.ko和/sbin/rmmod plp来装载这个模块和删除这个模块。</p>
+<p>本来到这里就结束了。不过这里再记录下我所遇到的错误。</p>
+<p>1.make的时候出错。原因是没有写Makefile文件，Makefile文件里面只需要写上obj-m := plp.o就行了。</p>
+<p>2./sbin/insmod plp.ko的时候出现Operation not permitted，这里是因为没有权限，需要用root执行。</p>
+<p>3.用root执行上述命令的时候，出现“Invalid module format”错误。这个是因为内核版本不一致。我编译了3.6.8的内核之后，进入的系统内核版本是3.1的。所以会报错。</p>
+<p>4.printk没有输出。这个是因为输出等级的原因，所以不会输出在控制台。但是你可以用dmesg来查看。一般来说就是最后几条。或者你也可以查看/var/log/messages里面的信息，也是最后几条。貌似可以改输出等级。使得输出在控制台。这个和printk函数有关。printk和printf的用法差不多，不过是用在内核输出，printf用在用户态。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2012-11-27 </div>
 			<div class="article-title"><a href="/2012/11/27/why-can-not-use-weixin-miliao/" >为什么不能用微信或米聊这类的软件</a></div>						
 		</h3>
@@ -420,63 +477,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-10-23 </div>
-			<div class="article-title"><a href="/2012/10/23/structure-and-interpretation-of-computer-programs-1-3/" >Structure and Interpretation of Computer Programs 1.3</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>看了这么久，终于把这本书的第一章看完了，估计第三节看的时间比前两节加起来还长了。不过第三节确实讲了很多东西。这一节主要讲的就是抽象，抽象，抽象，再抽象。。。最后你也变得抽象了。</p>
-<p>1.3.1讲了把procedure作为参数传个另外的procedure[在scheme里面procedure的参数可以使任何你想传的东西，返回值也是任何你想返回的东西]。主要是把类似功能的procedure写成一个模板，然后参数是procedure，这样多个功能的procedure都可以用这个procedure来实现了。简单地说就是一个procedure计算a+b，另外一个procedure计算a*b，第三个procedure计算a-b。那么我们就可以写一个procedure，参数是运算符和相应的两个参数，这样就可以省去了很多重复的操作。</p>
-<p>1.3.2主要介绍了lambda和let。为了后面做准备，lambda就是匿名procedure，define也会用到它。let是作为局部变量用的。</p>
-<p>1.3.3这一小节也是说抽象，主要是用匿名表达式来写代码和let来表示局部变量。这一节里面说到了求一个函数的零点和一个函数的不动点。求f(x)零点的时候就是假设f(a)&gt;0 f(b)&lt;0那么在[a,b]中间至少存在一个零点，可以通过不停的二分来找到这个零点(当然f(x)是连续的，所以不能找到一个很准确的值，只能找一个误差比较小的)。求不动点的时候，就是首先猜测一个值，然后不停的计算当前值的函数值，知道函数值和自变量的差很小为止(关于这个比较的时候，如果自变量很小或者很大都不能直接用(x-f(x))来比较这样是很可能造成死循环，可以用比值来代替简单的减法)，还有就是有些函数，如果你直接用f(x)去替换x的话，也会造成死循环，这样你可以用average(x,f(x))来代替x，当然有些函数你一次average还不行，就必须用到多次average，这个在习题里面有体现。</p>
-<p>1.3.4这一小节看上去很厉害的样子，看了我好久啊，现在我都变得抽象了，有木有啊！！！</p>
-<p>这一节中主要讲的知识是procedure作为procedure的返回值，这个就比较有意思了，这样我们又可以把procedure再一次抽象化 了。这样我们也可以把procedure更加的分离开来，这样所有的procedure之间的耦合度就再次降低了有木有啊。把一个procedure作为返回值的话，需要用到lambda这一匿名过程表达式。比如下面这个</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">average-damp</span> <span style="color: #d8bfd8;">f</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">x</span>) (<span style="color: #ffffff;">average</span> <span style="color: #d8bfd8;">x</span> (<span style="color: #ffffff;">f</span> <span style="color: #d8bfd8;">x</span>))))</div><br>这个procedure的返回值是一个procedure，返回的这个procedure的返回值是average( x,f(x)),这样如果我们需要计算不同函数的average的话，那么我们只需要把相应的procedure作为参数传进去就行了</p>
-<p>然后这一小节讲了Newton’s method，具体看<a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-12.html#%_sec_1.3.4" target="_blank" rel="external">这个链接吧</a>。可以通过不动点就零点，同样可以反过来求，里面用到微分，微分的具体区间得自己取。然后最后面又讲了一种抽象(我表示现在看到神马都是抽象啊！！！)，把average和f函数分开传个相应的procedure。具体见下面这个procedure:</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">fixed-point-of-transform</span> <span style="color: #d8bfd8;">g</span> <span style="color: #d8bfd8;">transform</span> <span style="color: #d8bfd8;">guess</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #ffffff;">fixed-point</span> (<span style="color: #ffffff;">transform</span> <span style="color: #d8bfd8;">g</span>) <span style="color: #d8bfd8;">guess</span>))</div><br>这里(transform g)就是fixed-point中的转移函数，我们这里又可以定义不同的转移方式。scheme最后表示反正你想怎么搞，它都能实现出来，无论你长得多抽象，它都不嫌弃了！！！</p>
-<p>下面是习题的相关分析和解答：</p>
-<p>1.29 计算<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-29.gif" alt="">，其中<em>h</em> = (<em>b</em> - <em>a</em>)/<em>n，<em>y</em><sub><em>k</em></sub> = <em>f</em>(<em>a</em> + <em>k__h</em>)，</em>a和b是这个区间，这个用1.3.1里面的sum函数可以很好的求出结果，分成4块，第一项，最后一项，剩下的按奇数偶数分开就成</p>
-<p>1.30 把1.3.1节中的sum写成iterative的，这个比较简单，都写了好多次了</p>
-<p>1.31要求仿照sum写product的procedure。然后要求计算<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-30.gif" alt="">，product的procedure完全可以照着sum的procedure写就行了。后面的也好写。接着你需要把你当product的procedure改成iterative的(如果你一开始的是recursive的)，反之亦反。</p>
-<p>1.32再次抽象sum和product的procedure，写一个更加抽象的procedure，形如(accumulate combiner null-value term a next b)，其中accumulate是名字，combiner是组合器，null-value是最末尾的值(递归的终止条件下的值) 剩下的和sum中的几个意思一样。这里也可以仿照sum来写，不过把相应的改成抽象就行了。</p>
-<p>1.33把上一题中的procedure再加一个参数，即filter。表示从a到b中满足filter条件的才计算。这个只需要在上面一题的procedure中判断下是否满足条件即可。然后写filter的时候自己仔细写</p>
-<p>1.34给一个procedure：</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">f</span> <span style="color: #d8bfd8;">g</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #ffffff;">g</span> <span style="color: #add8e6;">2</span>))</div><br>然后你求(f f)的值，给出说明。首先结果是会出错。然后说明：(f f)–&gt;(f 2)-&gt;(2 2)然后就出错了。</p>
-<p>1.35用1.3小节中的fixed-point procedure来计算黄金分割率。这个只要写出相应的变换函数就行了，如下</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">y</span>) (<span style="color: #b0c4de; font-weight: bold;">+ </span><span style="color: #add8e6;">1</span> (<span style="color: #b0c4de; font-weight: bold;">/ </span><span style="color: #add8e6;">1</span> <span style="color: #d8bfd8;">y</span>)))</div><br>1.36首先修改fixed-point，从而可以打印出所有的guess数，这个好办，直接display就行了。另外写一个procedure，计算x^x=N,其中N是给定的数，求x，这个也即是求x-&gt;log_x{N}的的一个不动点。函数关系出来之后，procedure就好写了，对于log_x{N}可以用log_e{N}/log_e{x}，刚好scheme里面的log就是log_e的。</p>
-<p>1.37给出连分数的形式，然后写一个procedure来计算k层连分数的值，而且所有的分子分母不一定是一样的，然后接着改成iterative的(如果一开始是recurrence的)，反之亦然。我的代码如下：</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">cont-frac</span> n <span style="color: #d8bfd8;">d</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">02 </span>  (<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">frac</span> <span style="color: #d8bfd8;">i</span>)<br><span style="color: #da70d6;">03 </span>    (<span style="color: #b0c4de; font-weight: bold;">if </span>(<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">i</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">04 </span>        (<span style="color: #b0c4de; font-weight: bold;">/ </span>(n <span style="color: #d8bfd8;">i</span>) (<span style="color: #ffffff;">d</span> <span style="color: #d8bfd8;">i</span>))<br><span style="color: #f810b0;">05 </span>        (<span style="color: #b0c4de; font-weight: bold;">/ </span>(n <span style="color: #d8bfd8;">i</span>) (<span style="color: #b0c4de; font-weight: bold;">+ </span>(<span style="color: #ffffff;">d</span> <span style="color: #d8bfd8;">i</span>) (<span style="color: #ffffff;">frac</span> (<span style="color: #b0c4de; font-weight: bold;">+ </span><span style="color: #d8bfd8;">i</span> <span style="color: #add8e6;">1</span>))))<br><span style="color: #da70d6;">06 </span>     )<br><span style="color: #da70d6;">07 </span>   )<br><span style="color: #da70d6;">08 </span>  (<span style="color: #ffffff;">frac</span> <span style="color: #add8e6;">1</span>)<br><span style="color: #da70d6;">09 </span>)<br><span style="color: #f810b0;">10 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">cont-iter</span> n <span style="color: #d8bfd8;">d</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">11 </span>  (<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">iter</span> <span style="color: #d8bfd8;">ret</span> <span style="color: #d8bfd8;">idx</span>)<br><span style="color: #da70d6;">12 </span>    (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">13 </span>        <span style="color: #da70d6;">((= 1 idx)   ret)</span><br><span style="color: #da70d6;">14 </span>        ((<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">idx</span> <span style="color: #add8e6;">0</span>)   <span style="color: #d8bfd8;">ret</span>)<br><span style="color: #f810b0;">15 </span>        (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #ffffff;">iter</span> (<span style="color: #b0c4de; font-weight: bold;">/ </span>(n <span style="color: #d8bfd8;">idx</span>) (<span style="color: #b0c4de; font-weight: bold;">+ </span>(<span style="color: #ffffff;">d</span> <span style="color: #d8bfd8;">idx</span>) <span style="color: #d8bfd8;">ret</span>)) (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">idx</span> <span style="color: #add8e6;">1</span>) ))<br><span style="color: #da70d6;">16 </span>     )<br><span style="color: #da70d6;">17 </span>  )<br><span style="color: #da70d6;">18 </span>  (<span style="color: #ffffff;">iter</span> <span style="color: #add8e6;">0</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">19 </span>)</div><br>1.38用连分数求出e - 2的值，其中e是自然对数的底。题中给出了连分数相应的分子分母值的函数，具体实现还是比较容易的。</p>
-<p>1.39<img src="http://mitpress.mit.edu/sicp/full-text/book/ch1-Z-G-36.gif" alt="">给出这么个东西，然后需要你写一个procedure，而且由用户确定深度，这个就是连分数的变形，不过相应的分子分母通项需要自己求出来而已。</p>
-<p>1.40写一个cubic的procedure，通过用(newtons-method (cubic a b c) 1)来计算x^3+a<em>x^2+b</em>x+c=0的解。这个只需要写那个procedure容易了。就是传入a，b，c返回x^3+a<em>x^2+b</em>x+c就行了</p>
-<p>1.41定义一个叫做double的procedure。传入一个procedure，返回执行这个procedure两次之后的procedure。这个定义还算好写：</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">double</span> <span style="color: #d8bfd8;">f</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">x</span>)<br><span style="color: #da70d6;">3 </span>    (<span style="color: #ffffff;">f</span> (<span style="color: #ffffff;">f</span> <span style="color: #d8bfd8;">x</span>))<br><span style="color: #da70d6;">4 </span>  )<br><span style="color: #f810b0;">5 </span>)</div><br>接下来的就纠结了。求(((double (double double)) inc) 5)的值，其中inc是把一个数加1的procedure。一开始想着是13(=5+8)，可以运行出来结果是21(=5+16)。想不通啊想不通，调试也没找到什么理由，最后在网上找了答案，<a href="http://wiki.drewhess.com/wiki/SICP_exercise_1.41" target="_blank" rel="external">这里</a>写的很详细，自己照着手动执行一次，就会清楚很多东西，而且遇到类似的也再也不怕了。最后还知道了如果把inc放最里面的话，结果是13.<span style="color: #ff0000;">此题强烈建议手动执行</span></p>
-<p>1.42写一个compose的procedure，传入两个procedure，分别是f和g，然后先执行f，再执行g，这个可以仿照double的写法来上一个。</p>
-<p>1.43写一个名叫repeated的procedure，传入一个procedure，和一个数值n，表示把传入的procedure执行n次，最后让你用写出来的repeated的procedure来计算((repeated square 2) 5)，从而验证。</p>
-<p>提示给出了可以用compose，当然也可以用double了。也就是前两个习题的的procedure。不过也可以不用前两个东西:</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">repeated</span> <span style="color: #d8bfd8;">f</span> n)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">repeat</span> <span style="color: #d8bfd8;">k</span>)<br><span style="color: #da70d6;">3 </span>  (<span style="color: #ffffff;">cond</span><br><span style="color: #da70d6;">4 </span>    ((<span style="color: #b0c4de; font-weight: bold;">= </span><span style="color: #d8bfd8;">k</span> <span style="color: #add8e6;">1</span>)  <span style="color: #d8bfd8;">f</span>)<br><span style="color: #f810b0;">5 </span>    (<span style="color: #b0c4de; font-weight: bold;">else </span>(<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">x</span>) (<span style="color: #ffffff;">f</span> ((<span style="color: #ffffff;">repeat</span> (<span style="color: #b0c4de; font-weight: bold;">- </span><span style="color: #d8bfd8;">k</span> <span style="color: #add8e6;">1</span>)) <span style="color: #d8bfd8;">x</span>))))   <span style="color: #da70d6;">关键是参数x必须先传到最里面的procedure才可以</span><br><span style="color: #da70d6;">6 </span>   )<br><span style="color: #da70d6;">7 </span>  )<br><span style="color: #da70d6;">8 </span>  (<span style="color: #ffffff;">repeat</span> n)<br><span style="color: #da70d6;">9 </span>)</div><br>关于log_2{N}的写法就是不等于1的时候，可以利用double来进行加速，类似快速幂的方法。</p>
-<p>1.44写一个smooth的procedure，参数是一个叫做f的procedure，然后返回(f(x)+f(x-dx)+f(x+dx))/3的一个procedure。然后利用smooth和上一题的repeated来写一个nth-smooth，表示smootn次。写第一个procedure的时候比较简单，一下就出来了，第二个也不难，就写成(repeated smooth n)就变成了nth-smooth了。最后自己再检测下写的是否正确。</p>
-<p>1.45 给出一系列说明，说求sqrt和3次根的时候，average-damp只需要用一次，然后求4次根的时候用2次，让你通过实验得出一个求n次根的抽象procedure。这里首先你必须得知道对于n次根，需要用多少次average-damp。实验4,5,6,7的时候都是2次，但是8的时候是3次，大致可以猜测需要的是floor(log_2{n})次average-damp。算出这个次数之后，程序就变得非常好写了。如下</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">1 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">nth-root</span> n <span style="color: #d8bfd8;">x</span>)<br><span style="color: #da70d6;">2 </span>  (<span style="color: #ffffff;">fixed-point</span> ((<span style="color: #ffffff;">repeated</span> <span style="color: #d8bfd8;">average-damp</span> (<span style="color: #b0c4de; font-weight: bold;">floor </span>(<span style="color: #ffffff;">log2</span> n)))<br><span style="color: #da70d6;">3 </span>                (<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">y</span>) (<span style="color: #b0c4de; font-weight: bold;">/ </span><span style="color: #d8bfd8;">x</span> (<span style="color: #ffffff;">pow</span> <span style="color: #d8bfd8;">y</span> (<span style="color: #b0c4de; font-weight: bold;">- </span>n <span style="color: #add8e6;">1</span>)))))<br><span style="color: #da70d6;">4 </span>               <span style="color: #add8e6;">1.0</span>)<br><span style="color: #f810b0;">5 </span>)</div><br>其中log2是一个自定义的procedure，表示以2为底n的对数，pow也是一个自定义的procedure，计算y的(n-1)次。</p>
-<p>1.46因为前面有很多procedure是传入两个procedure，其中一个是good-enough?，因外一个是improve，现在你需要写一个抽象的procedure，传入这两个procedure，然后传回一个procedure，传回的procedure有一个参数guess。这个过程还是比较绕的，不过在做过前面的几个习题之后，会发现这个习题也是可做的。代码如下：</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">01 </span>(<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">iterative-improve</span> <span style="color: #d8bfd8;">g</span> <span style="color: #d8bfd8;">f</span>)<br><span style="color: #da70d6;">02 </span>    (<span style="color: #b0c4de; font-weight: bold;">lambda </span>(<span style="color: #ffffff;">guess</span>)<br><span style="color: #da70d6;">03 </span>        (<span style="color: #b0c4de; font-weight: bold;">define </span>(<span style="color: #ffffff;">iter</span> <span style="color: #d8bfd8;">guess</span>)<br><span style="color: #da70d6;">04 </span>            (<span style="color: #b0c4de; font-weight: bold;">let </span>((<span style="color: #ffffff;">next</span> (<span style="color: #ffffff;">f</span> <span style="color: #d8bfd8;">guess</span>)))<br><span style="color: #f810b0;">05 </span>                (<span style="color: #b0c4de; font-weight: bold;">if </span>(<span style="color: #ffffff;">g</span> <span style="color: #d8bfd8;">guess</span> <span style="color: #d8bfd8;">next</span>)<br><span style="color: #da70d6;">06 </span>                    <span style="color: #d8bfd8;">next</span><br><span style="color: #da70d6;">07 </span>                    (<span style="color: #ffffff;">iter</span> <span style="color: #d8bfd8;">next</span>))))<br><span style="color: #da70d6;">08 </span>        (<span style="color: #ffffff;">iter</span> <span style="color: #d8bfd8;">guess</span>)<br><span style="color: #da70d6;">09 </span>    )<br><span style="color: #f810b0;">10 </span>)</div><br>这个procedure，看起来很简单,但是写起来不那么简单，不过题目已经给你打好框架了，你只需要填写lambda里面的东西。写了前面的一些题，会发现，差不多都是这样，里面调用一个procedure，然后多次调用这个里面的procedure就完事了。</p>
-<p>终于把第一章看完了，继续加油。好好学习，天天向上。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -569,11 +569,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -583,11 +583,11 @@
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
-		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
@@ -608,48 +608,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
+			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
 		
-			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
+			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
 		
-			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
+			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
 		
-			<li><a href="/tags/git/">git<span>4</span></a></li>
+			<li><a href="/tags/databse/">databse<span>1</span></a></li>
 		
-			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
+			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
 		
-			<li><a href="/tags/MST/">MST<span>1</span></a></li>
+			<li><a href="/tags/vundle/">vundle<span>1</span></a></li>
 		
-			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
+			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
 		
-			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
+			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
 		
-			<li><a href="/tags/proof/">proof<span>1</span></a></li>
+			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
 		
-			<li><a href="/tags/https/">https<span>1</span></a></li>
-		
-			<li><a href="/tags/tree/">tree<span>1</span></a></li>
-		
-			<li><a href="/tags/blog/">blog<span>2</span></a></li>
-		
-			<li><a href="/tags/DFS/">DFS<span>2</span></a></li>
-		
-			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
-		
-			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+			<li><a href="/tags/offset/">offset<span>1</span></a></li>
 		
 			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
 		
-			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
 		
-			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
+			<li><a href="/tags/rm/">rm<span>1</span></a></li>
 		
-			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
+			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
 		
-			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
+			<li><a href="/tags/chinese/">chinese<span>1</span></a></li>
+		
+			<li><a href="/tags/program/">program<span>1</span></a></li>
+		
+			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
+		
+			<li><a href="/tags/rmvb/">rmvb<span>1</span></a></li>
+		
+			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
+		
+			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>272</span></a></li>
+		   <li><a href="/tags">...<span>273</span></a></li>
 		 
 		</ul>
 	</div>
@@ -660,6 +660,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
+      </li>
     
       <li>
         <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
@@ -675,10 +679,6 @@
     
       <li>
         <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
   </ul>

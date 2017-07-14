@@ -3,6 +3,44 @@
   
     
     <entry>
+      <title><![CDATA[tmux 简单使用指南]]></title>
+      <url>/2017/07/14/tmux-%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/</url>
+      <content type="html"><![CDATA[<h1 id="Tmux-的简单使用说明"><a href="#Tmux-的简单使用说明" class="headerlink" title="Tmux 的简单使用说明"></a>Tmux 的简单使用说明</h1><blockquote>
+<p>工欲善其事，必先利其器</p>
+</blockquote>
+<p>Tmux 是一个多窗口管理程序。可以让用户在一个地方管理多个终端。而不需要在不同的终端间来回切换。</p>
+<h2 id="在-Mac-下如何安装"><a href="#在-Mac-下如何安装" class="headerlink" title="在 Mac 下如何安装"></a>在 Mac 下如何安装</h2><p>直接使用 <code>brew install tmux</code> 就可以了，如果没有 brew，则需要先安装 brew，然后再执行上述命令。</p>
+<h2 id="简单使用流程"><a href="#简单使用流程" class="headerlink" title="简单使用流程"></a>简单使用流程</h2><p>首先，需要了解 tmux 中的几个概念。session，window 以及 pane。这几者的关系如下，tmux 中可以起多个 session，每个 session 可以启动多个 window，然后每个 window 可以启动多个 pane。</p>
+<p>这里给一个基本的流程</p>
+<ol>
+<li><p>启动 tmux（默认会启动一个 session）<br>使用 <code>tmux</code> 启动 tmux，使用 <code>exit</code> 退出 tmux，session 的命名默认是从 0 开始，一直往上加</p>
+</li>
+<li><p>在 session 中启动一个 window<br><code>PREFIX c</code> 会在当前 session 中创建一个 window, 其中 <code>PREFIX</code> 表示 tmux 中的命令前缀符（该条命令表示，先按下 PREFIX，然后按下 c)，</p>
+</li>
+<li><p>在启动的 window 中创建一个 pane<br><code>PREFIX %</code> 竖直方向切分一个 window，<code>PREFIX &quot;</code> 横向切分一个 window。这样就能够在 window 中创建 pane 了。基本的这些就够了。</p>
+</li>
+<li><p>如何在 session，window，pane 中进行移动<br>能够创建 session，window，pane 了，接下来就是如何在 session，window，pane 间进行移动了。<br><code>PREFIX s</code> 会列出所有 session，然后进行具体的选择（可以上下移动光标，然后按 ENTRER 确定）<br><code>PREFIX w</code> 可以列出所有的 window，然后进行具体的筛选<br><code>PREFIX n</code> 可以切换到下一个 window<br><code>PREFIX p</code> 可以切换到上一个 window<br><code>PREFIX &amp;</code> 可以关闭当前 window<br><code>PREFIX o</code> 可以在 pane 之间进行跳转<br><code>tmux ls</code> 会列出当前所有的 session（在非 tmux 环境下）</p>
+</li>
+</ol>
+<h2 id="自定义-tmux"><a href="#自定义-tmux" class="headerlink" title="自定义 tmux"></a>自定义 tmux</h2><p>tmux 的配置文件可以保存在两个地方</p>
+<ol>
+<li>/etc/tmux.conf</li>
+<li>~/.tmux.conf</li>
+</ol>
+<p>其中 2 的优先级会更高，1 的影响面更广</p>
+<h2 id="接下来做什么"><a href="#接下来做什么" class="headerlink" title="接下来做什么"></a>接下来做什么</h2><p>上面的仅仅是一个入门文档，也就是最少基本知识，接下来就是多实践。推荐一本小书《tmux productive mouse-free development》</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> tmux, tools </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[风险不仅仅是事件发生的概率]]></title>
       <url>/2017/06/20/%E9%A3%8E%E9%99%A9%E4%B8%8D%E4%BB%85%E4%BB%85%E6%98%AF%E4%BA%8B%E4%BB%B6%E5%8F%91%E7%94%9F%E7%9A%84%E6%A6%82%E7%8E%87/</url>
       <content type="html"><![CDATA[<h1 id="风险不仅仅是事件发生的概率"><a href="#风险不仅仅是事件发生的概率" class="headerlink" title="风险不仅仅是事件发生的概率"></a>风险不仅仅是事件发生的概率</h1><blockquote>
@@ -1413,9 +1451,9 @@
             
             <tag> distributed-system </tag>
             
-            <tag> mit </tag>
-            
             <tag> kv </tag>
+            
+            <tag> mit </tag>
             
             <tag> viewservice </tag>
             
@@ -1467,11 +1505,11 @@
             
             <tag> distributed-system </tag>
             
+            <tag> mit </tag>
+            
             <tag> go </tag>
             
             <tag> mapreduce </tag>
-            
-            <tag> mit </tag>
             
         </tags>
         
@@ -1770,9 +1808,9 @@
         
         <tags>
             
-            <tag> blog </tag>
-            
             <tag> github </tag>
+            
+            <tag> blog </tag>
             
             <tag> math-expression </tag>
             
@@ -2449,9 +2487,9 @@ private:
         
         <tags>
             
-            <tag> filter </tag>
-            
             <tag> nginx </tag>
+            
+            <tag> filter </tag>
             
             <tag> text/plain </tag>
             
@@ -2494,11 +2532,11 @@ private:
         
         <tags>
             
-            <tag> nginx </tag>
-            
             <tag> array </tag>
             
             <tag> list </tag>
+            
+            <tag> nginx </tag>
             
             <tag> queue </tag>
             
@@ -3352,9 +3390,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
         
         <tags>
             
-            <tag> linux </tag>
-            
             <tag> exercise </tag>
+            
+            <tag> linux </tag>
             
             <tag> fedora </tag>
             
@@ -3400,9 +3438,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
         
         <tags>
             
-            <tag> linux </tag>
-            
             <tag> exercise </tag>
+            
+            <tag> linux </tag>
             
             <tag> fedora </tag>
             
@@ -3553,9 +3591,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> fedora </tag>
             
-            <tag> blog </tag>
-            
             <tag> github </tag>
+            
+            <tag> blog </tag>
             
             <tag> free </tag>
             
@@ -3857,7 +3895,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#x61;&#105;&#108;&#116;&#111;&#58;&#106;&#x63;&#x6d;&#x40;&#106;&#111;&#110;&#109;&#97;&#115;&#116;&#101;&#114;&#115;&#x2e;&#x6f;&#114;&#x67;">&#106;&#x63;&#x6d;&#x40;&#106;&#111;&#110;&#109;&#97;&#115;&#116;&#101;&#114;&#115;&#x2e;&#x6f;&#114;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#108;&#116;&#x6f;&#x3a;&#106;&#x63;&#109;&#x40;&#x6a;&#111;&#110;&#x6d;&#x61;&#115;&#116;&#101;&#x72;&#115;&#x2e;&#111;&#x72;&#x67;">&#106;&#x63;&#109;&#x40;&#x6a;&#111;&#110;&#x6d;&#x61;&#115;&#116;&#101;&#x72;&#115;&#x2e;&#111;&#x72;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -4014,13 +4052,13 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
         
         <tags>
             
+            <tag> exercise </tag>
+            
             <tag> APUE </tag>
             
             <tag> linux </tag>
             
             <tag> unix环境高级编程 </tag>
-            
-            <tag> exercise </tag>
             
         </tags>
         

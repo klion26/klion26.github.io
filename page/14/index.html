@@ -121,6 +121,30 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-04-07 </div>
+			<div class="article-title"><a href="/2011/04/07/usaco-5-2-2-electric-fences/" >USACO 5.2.2 Electric Fences</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://www.nocow.cn/index.php/Translate:USACO/fence3" target="_blank" rel="external">中文题意</a><br>这题首先是精读要求不高,只需要输出1位小数,然后范围不大,坐标是0-100.线段条数是150.我一开始想暴力搞,可是死在第7组上.死活过不了.然后去学校的群里问,热心人很多,不过没解决问题.在这里还是要感谢下他们的.然后去各大群里问,最囧的是很多人把线段看成直线,然后说”X和Y分开搞,然后不是显然么”,知道是线段后就说出了各种自己的方法,一开始我问了czw.他说可以模拟退火搞,那个时候我不知道模拟退火的一些细节,就没去试.后来在DIY群里,各大神牛说这数据,模拟退火肯定可搞.就试着去搞了下,发现模拟退火还是比较好写的,不过我总想着它不靠谱,总觉得可能不对,总想着会在中间某一步进入死胡同…..不过看了一些论文之后才有那么一点点感觉,反正是个RP问题[我还是顽固的这么认为],那么就拼拼RP吧.下面是官方的题解.也是模拟退火,不过个人觉得这个还是比较靠谱的.具体的模拟退火还是自己搜吧,大致过程就是不断的在当前最优点的领域节点中找一个最优点</p>
+<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <math.h></math.h></span><br><br><span style="color: #eeee00;">#define FMAX 135</span><br><span style="color: #eeee00;">#define MOVES 50</span><br><span style="color: #eeee00;">#define IMAX 4</span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">numfence</span><br><span style="font-weight: bold; color: #98fb98;">FILE</span> <span style="color: #f5deb3;"><em></em></span><span style="font-weight: bold; color: #98fb98;">int</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">out</span><br><span style="font-weight: bold; color: #b0c4de;">struct</span> <span style="color: #f5deb3;">fence</span><br><span style="font-weight: bold; color: #98fb98;">double</span> <span style="color: #f5deb3;">totaldist</span>(<span style="font-weight: bold; color: #98fb98;">double</span> <span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">double</span>);<br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #f5deb3;">swap</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">&amp;</span>);<br><br><span style="font-weight: bold; color: #b0c4de;">struct</span> <span style="color: #f5deb3;">fence</span><br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">minx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">maxx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">miny</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">maxy</span><br>    <span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">setvals</span>()<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">fscanf</span>(<span style="color: #f5deb3;">in</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“%d%d%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">minx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">miny</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">maxx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">maxy</span>);<br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">minx</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">maxx</span>)<br>                <span style="color: #f5deb3;">swap</span>(<span style="color: #f5deb3;">minx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">maxx</span>);<br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">miny</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">maxy</span>)<br>                <span style="color: #f5deb3;">swap</span>(<span style="color: #f5deb3;">miny</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">maxy</span>);<br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><span style="color: #f5deb3;">feces</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">FMAX</span><span style="color: #f5deb3;">];</span><br><br><span style="font-weight: bold; color: #98fb98;">double</span> <span style="color: #ffffff;">totaldist</span>(<span style="font-weight: bold; color: #98fb98;">double</span> <span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">double</span> <span style="color: #f5deb3;">y</span>)<br><span style="color: #f5deb3;">{</span><br>        <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">a</span><br>        <span style="font-weight: bold; color: #98fb98;">double</span> <span style="color: #f5deb3;">ans</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">xdiff</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">ydiff</span><br>        <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">numfence</span>;<span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">++</span>)<br>            <span style="color: #f5deb3;">{</span><br>                <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">fences</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">minx</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">x</span>)<br>                    <span style="color: #f5deb3;">xdiff</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">fences</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">minx</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">x</span><br>                <span style="font-weight: bold; color: #b0c4de;">else</span><br>                    <span style="color: #f5deb3;">{</span><br>                        <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">fences</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">maxx</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">x</span>)<br>                            <span style="color: #f5deb3;">xdiff</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">fences</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">maxx</span><br>                        <span style="font-weight: bold; color: #b0c4de;">else</span><br>                            <span style="color: #f5deb3;">xdiff</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>                    <span style="color: #f5deb3;">}</span><br>                <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">fences</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">miny</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">y</span>)<br>                    <span style="color: #f5deb3;">ydiff</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">fences</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">miny</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">y</span><br>                <span style="font-weight: bold; color: #b0c4de;">else</span><br>                    <span style="color: #f5deb3;">{</span><br>                        <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">fences</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">maxy</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">y</span>)<br>                            <span style="color: #f5deb3;">ydiff</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">y</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">fences</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">maxy</span><br>                        <span style="font-weight: bold; color: #b0c4de;">else</span><br>                            <span style="color: #f5deb3;">ydiff</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>                    <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">answer</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">sqrt</span>(<span style="color: #f5deb3;">xdiff</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">xdiff</span> <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">ydiff</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">ydiff</span>);<br>            <span style="color: #f5deb3;">}</span><br>        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">answer</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">swap</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">&amp;</span>b)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">a</span><br>    <span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">=</span>b;<br>    b<span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">tmp</span><br><span style="color: #f5deb3;">}</span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">main</span>(<span style="font-weight: bold; color: #98fb98;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">in</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">fopen</span>(<span style="color: #7fffd4;">“fence3.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span>);<br>    <span style="color: #f5deb3;">out</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">fopen</span>(<span style="color: #7fffd4;">“fence3.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span>);<br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span>b<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">best</span><br>    <span style="font-weight: bold; color: #98fb98;">double</span> <span style="color: #f5deb3;">elecx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">elecy</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">xchange</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">ychange</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">tsum</span><br>    <span style="font-weight: bold; color: #98fb98;">double</span> <span style="color: #f5deb3;">bestsum</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">100000.0</span><br>    <span style="font-weight: bold; color: #98fb98;">double</span> <span style="color: #f5deb3;">xinc</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">IMAX</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">yinc</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">IMAx</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">pi</span><br>    <span style="color: #f5deb3;">pi</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">acos</span>(<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1.0</span>);<br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">a</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">IMAX</span>;<span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">xinc</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">cos</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">pi</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">/</span><span style="color: #f5deb3;">IMAX</span>);<br>            <span style="color: #f5deb3;">yinc</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">sin</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">pi</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">/</span><span style="color: #f5deb3;">IMAX</span>);<br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">fscanf</span>(<span style="color: #f5deb3;">in</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">numfence</span>);<br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">numfence</span>;<span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">fences</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">setvals</span>();<br>    <span style="color: #f5deb3;">elecx</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>    <span style="color: #f5deb3;">elecy</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>    <span style="color: #f5deb3;">xchange</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">20</span><br>    <span style="color: #f5deb3;">ychange</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">20</span><br>    <span style="color: #f5deb3;">bestsum</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">totaldist</span>(<span style="color: #f5deb3;">elecx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">elecy</span>);<br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(b<span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span>b<span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">MOVES</span>;b<span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">==</span>b<span style="color: #f5deb3;">%</span><span style="color: #add8e6;">10</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">ychange</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">ychange</span><span style="color: #f5deb3;"><em></em></span><span style="color: #add8e6;">0.1</span><br>                    <span style="color: #f5deb3;">xchange</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">xchange</span><span style="color: #f5deb3;"></span><span style="color: #add8e6;">0.1</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="color: #f5deb3;">best</span><span style="color: #f5deb3;">=-</span><span style="color: #add8e6;">1</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">IMAX</span>;<span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">elecx</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">xchange</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">xinc</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">];</span><br>                    <span style="color: #f5deb3;">elecy</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">xchange</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">yinc</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">];</span><br>                    <span style="color: #f5deb3;">tsum</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">totaldist</span>(<span style="color: #f5deb3;">elecx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">elecy</span>);<br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">tsum</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">bestsum</span>)<br>                        <span style="color: #f5deb3;">{</span><br>                            <span style="color: #f5deb3;">bestsum</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">tsum</span><br>                            <span style="color: #f5deb3;">best</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">c</span><br>                        <span style="color: #f5deb3;">}</span><br>                    <span style="color: #f5deb3;">elecx</span> <span style="color: #f5deb3;">-=</span> <span style="color: #f5deb3;">xchange</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">xinc</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">];</span><br>                    <span style="color: #f5deb3;">elecy</span> <span style="color: #f5deb3;">-=</span> <span style="color: #f5deb3;">ychange</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">yinc</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">];</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">best</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">elecx</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">xchange</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">xinc</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">best</span><span style="color: #f5deb3;">];</span><br>                    <span style="color: #f5deb3;">elecy</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">ychange</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">yinc</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">best</span><span style="color: #f5deb3;">];</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="color: #f5deb3;">bestsum</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">totaldist</span>(<span style="color: #f5deb3;">elecx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">elecy</span>);<br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">fprintf</span>(<span style="color: #f5deb3;">out</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“%.1f %.1f %.1f</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">elecx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">elecy</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">bestsum</span>);<br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-04-06 </div>
 			<div class="article-title"><a href="/2011/04/06/pointers-on-c-link-list/" >C和指针12章 链表</a></div>						
 		</h3>
@@ -442,29 +466,6 @@ return 1;
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-03-28 </div>
-			<div class="article-title"><a href="/2011/03/28/usaco-5-1-3-musical-themes/" >USACO 5.1.3 Musical Themes</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://www.nocow.cn/index.php/Translate:USACO/theme" target="_blank" rel="external">中文题目</a><br>这题我是用dp做的,首先可以把相邻两个数的差算出来,比如说给一个数列1 2 4 7 8 2 3 5 8,那么得到一个新数列:1 2 3 1 -6 1 2 3,这个新数列是上面那个数列相邻两项的差.然后我们的任务就变成了在这个新数列中求一个子序列,至少有4个元素[这里是4=5-1],然后至少重复2次,求这样的子序列的最大长度.我的做法是这样的,下面是伪代码:<br>for i=1 to N<br>     for j=i+1 to N<br>          if(j&lt;=f[i-1][j-1]+i+1)<br>               continue;//保证不重叠<br>          if(num[i]==num[j])//这里是转移的一个条件<br>              f[i][j]=f[i-1][j-1]+1;<br>             if(f[i][j]&gt;max)//更新最大值<br>                    max=f[i][j]<br>if(max&lt;4)//这里是考虑那个最短为5个note的条件<br>       max=-1;<br>max++;<br>printf(max)<br>但是这样之后在本地你可以全部AC,但是一提交你就会得到一个#9的错误,爆内存了.因为这里你必须开5000*5000的内存,可是这已经远远超过了16M了,然后你会发现f[i][j]只与f[i-1]<a href="k&lt;j">k</a>有关,那么我们就可以只开成这样了f[2][5006],转移的时候变成这样就OK了,f[i%2][j]=f[(i-1)%2][j-1]+1,不过这里还有一点就是每次i循环那里必须清空将要算的那一个数组,不然又值残留在那里,会导致错误,由于一开始没有考虑这一点错了一次.这样的话程序就好写了,代码量也不大,不到100行.</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -557,11 +558,11 @@ return 1;
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -571,11 +572,11 @@ return 1;
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
-		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
@@ -596,48 +597,48 @@ return 1;
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/c/">c++<span>1</span></a></li>
-		
-			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
-		
-			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
-		
-			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
-		
-			<li><a href="/tags/metric/">metric<span>1</span></a></li>
-		
-			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
-		
-			<li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li>
-		
 			<li><a href="/tags/yum/">yum<span>1</span></a></li>
 		
-			<li><a href="/tags/poll/">poll<span>1</span></a></li>
-		
-			<li><a href="/tags/博弈/">博弈<span>3</span></a></li>
-		
-			<li><a href="/tags/DFS/">DFS<span>2</span></a></li>
-		
-			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
-		
-			<li><a href="/tags/queue/">queue<span>1</span></a></li>
+			<li><a href="/tags/problem-solve/">problem_solve<span>2</span></a></li>
 		
 			<li><a href="/tags/插件/">插件<span>1</span></a></li>
 		
-			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
+			<li><a href="/tags/spark/">spark<span>6</span></a></li>
 		
-			<li><a href="/tags/java/">java<span>1</span></a></li>
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
 		
-			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
+			<li><a href="/tags/english/">english<span>1</span></a></li>
 		
-			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
+			<li><a href="/tags/google-adsense/">google-adsense<span>1</span></a></li>
 		
-			<li><a href="/tags/logger/">logger<span>1</span></a></li>
+			<li><a href="/tags/my-life/">my life<span>1</span></a></li>
 		
-			<li><a href="/tags/chain-matrix-multiplication/">chain matrix multiplication<span>1</span></a></li>
+			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
+		
+			<li><a href="/tags/风险/">风险<span>1</span></a></li>
+		
+			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
+		
+			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
+		
+			<li><a href="/tags/at-most-once/">at-most-once<span>1</span></a></li>
+		
+			<li><a href="/tags/错误配置/">错误配置<span>1</span></a></li>
+		
+			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
+		
+			<li><a href="/tags/proof/">proof<span>1</span></a></li>
+		
+			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
+		
+			<li><a href="/tags/greedy-algorithm/">greedy algorithm<span>1</span></a></li>
+		
+			<li><a href="/tags/alibaba/">alibaba<span>1</span></a></li>
+		
+			<li><a href="/tags/source-code/">source_code<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>272</span></a></li>
+		   <li><a href="/tags">...<span>273</span></a></li>
 		 
 		</ul>
 	</div>
@@ -648,6 +649,10 @@ return 1;
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
+      </li>
     
       <li>
         <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
@@ -663,10 +668,6 @@ return 1;
     
       <li>
         <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" ><i class="fa fa-file-o"></i>Streaming 中 Receiver 相关源码分析</a>
       </li>
     
   </ul>
