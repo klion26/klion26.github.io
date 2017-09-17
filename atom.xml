@@ -371,9 +371,9 @@
     </summary>
     
     
-      <category term="java" scheme="http://yoursite.com/tags/java/"/>
-    
       <category term="code" scheme="http://yoursite.com/tags/code/"/>
+    
+      <category term="java" scheme="http://yoursite.com/tags/java/"/>
     
       <category term="metric" scheme="http://yoursite.com/tags/metric/"/>
     
@@ -772,11 +772,11 @@
     
       <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
     
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
       <category term="append" scheme="http://yoursite.com/tags/append/"/>
     
       <category term="hdfs" scheme="http://yoursite.com/tags/hdfs/"/>
-    
-      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
     
   </entry>
   
