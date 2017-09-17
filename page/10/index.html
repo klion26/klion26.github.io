@@ -122,6 +122,29 @@
 	<!-- display as entry -->	
 		<h3 class="title">
 			<div class="date"> 2012-03-29 </div>
+			<div class="article-title"><a href="/2012/03/29/github-create-project/" >Github之旅一---创建自己的项目</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>首先在github.com上面创建一个免费的账号[可能需要<a href="http://www.klion26.com/user-chrome-cross-gfw.html" target="_blank" rel="external">翻墙</a>]，上面的账号分为两种，收费和免费，免费的有30M空间貌似。然后来到github的首页，在右侧看到“Your Repositories”，点击这里的New Repositories，然后就会跳到另外一个页面，输入你的项目名字和项目描述，URL那一栏自己取个名字就行了，以后访问你的项目会用到，填写完成之后，就点击”Create repositories”就行，跳到的页面会教你怎么做，都是写基本的git命令，照着做就行了，创建的README文件貌似不能为空，为空的话提交不能成功。上传之后，你可以在相应的URL看到你的项目了。最基本的创建自己的项目就OK了，接下来可以clone别人的项目来看看了</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-03-29 </div>
 			<div class="article-title"><a href="/2012/03/29/github-port-22-error-bad-file-number/" >github连接出现port 22:Bad file number问题</a></div>						
 		</h3>
 	
@@ -431,39 +454,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-08-29 </div>
-			<div class="article-title"><a href="/2011/08/29/usaco-5-4-5-5/" >USACO 5.4&amp;5.5</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>今天终于把第5章搞定了.USACO还剩下3题,早日结束了这3题,任务还很艰巨啊.</p>
-<p>简单写下这两节的题解.这两节搞了好久啊.有些题还是看了题解之后,然后差不多是照着标称打的(- -|).</p>
-<p>ALL Latin:比较变态的一道搜索题,7的时候过不去,然后看的题解,那个循环群什么的不是很懂,用的是另外一种方法,就是首先第一行第一列都放好(最后结果再乘以(n-1)!就行),然后第2行第2列放2,3,4,5的方案是一样多的.貌似比较慢,最慢的0.9+s</p>
-<p>Canada Tour:费用流的方法没弄,用的是DP,类似方格取数的那种多线程DP,只需要看最后是不是有两条独立的路径从起点到终点就OK了,中间不能有重复的点</p>
-<p>Character Recognition:很烦的一道题,借鉴标称的,方法:DP,有一点就是多余的那一行的变化数不算在里面的.然后如果知道了前i行的可以推知i+19,i+20,i+21的情况.</p>
-<p>Betsy’s Tour:正解是连通性DP?czw和我说了下这是最简单的连通性DP,但是那论文看不懂,刚好这题可以搜过,只需要考虑下,如果进入了死胡同就不要搜了,还有如果当前的路径把格子分成了两边就不用搜了.死胡同那个可以考虑做过这个点之后,它的上下左右点是否被走过,一个点必须有进有出才行(不然进死胡同了),除了起点和终点</p>
-<p>TeleCowmunication:拆点,最大流,然后枚举删点.拆点时,每个点拆成2<em>i,2</em>i+1,然后流量是1,原边中有边的则加两条无穷大的边,跑最大流,然后枚举删点.看删掉点之后是不是最大流减少了.是的话就输出这个点,最大流减少,继续枚举</p>
-<p>Picture:很早以前就听说这题是线段树的好题,但是我还是用了朴素的方法(小汗一下),直接把横向边和纵向边分别排序,然后遇到起始边(坐标小的)就+1.否则-1.这样如果由0-&gt;1,那么一定是最终矩形的边,这样枚举完了之后,在USACO还挺快.线段树就是在更新+1,-1的时候用线段树,可以做到区间处理.降低时间复杂度</p>
-<p>Hidden Passwords:刚好czw和我说过最小表示法,然后就直接做了.或许这是这两节我觉得最简单的了- -|.貌似还有很多其他方法,可以看看nocow的分析</p>
-<p>Two Five:就是一个一个算就行了.主要是要好写,而且速度还过得去.对于数变字符串.可以枚举25个位置,如果某个位置放字符ch的数目加上前面算的结果已经超过了给的n,那么就把这个位置放置ch,因为放置ch-1的时候不够,然后接着放下一个位置,直到25个位置全放好为止,字符串变数字的差不多,只不过把上面的操作反过来而已,就是看这个字符之前有多少个.比如求ACD的,那么我们就求ABC,ABD,ACB,的方案数,然后再求ACD后面有多少个,就像求10进制数的大小一样,求521是第几个,可以首先求1<strong>,2</strong>,3<strong>,4</strong>的个数,然后求5<em>_(</em>&lt;2)和52<em>(</em>&lt;1)的个数,最后结果+1就是521的结果了</p>
-<p>接下来还有三题,搞定也算是圆满了USACO,加油吧</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -516,9 +506,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -556,29 +546,29 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -595,48 +585,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/go/">go<span>1</span></a></li>
-		
-			<li><a href="/tags/how/">how<span>1</span></a></li>
-		
-			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
-		
-			<li><a href="/tags/mit/">mit<span>2</span></a></li>
-		
-			<li><a href="/tags/yum/">yum<span>1</span></a></li>
-		
-			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
-		
-			<li><a href="/tags/office/">office<span>1</span></a></li>
-		
-			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
-		
-			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
-		
-			<li><a href="/tags/greedy-algorithm/">greedy algorithm<span>1</span></a></li>
-		
-			<li><a href="/tags/update/">update<span>1</span></a></li>
-		
-			<li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li>
-		
-			<li><a href="/tags/vundle/">vundle<span>1</span></a></li>
-		
-			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
-		
-			<li><a href="/tags/java/">java<span>1</span></a></li>
-		
-			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
-		
-			<li><a href="/tags/concrete-mathematics/">concrete-mathematics<span>2</span></a></li>
-		
-			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
+			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
 		
 			<li><a href="/tags/https/">https<span>1</span></a></li>
 		
-			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
+			<li><a href="/tags/bellman-ford/">bellman-ford<span>1</span></a></li>
+		
+			<li><a href="/tags/tree/">tree<span>1</span></a></li>
+		
+			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
+		
+			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
+		
+			<li><a href="/tags/积分/">积分<span>1</span></a></li>
+		
+			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+		
+			<li><a href="/tags/gdb/">gdb<span>2</span></a></li>
+		
+			<li><a href="/tags/米聊/">米聊<span>1</span></a></li>
+		
+			<li><a href="/tags/partition/">partition<span>1</span></a></li>
+		
+			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+		
+			<li><a href="/tags/chain-matrix-multiplication/">chain matrix multiplication<span>1</span></a></li>
+		
+			<li><a href="/tags/text-plain/">text/plain<span>1</span></a></li>
+		
+			<li><a href="/tags/receiver/">receiver<span>1</span></a></li>
+		
+			<li><a href="/tags/memset/">memset<span>1</span></a></li>
+		
+			<li><a href="/tags/rm/">rm<span>1</span></a></li>
+		
+			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
+		
+			<li><a href="/tags/notes/">notes<span>0</span></a></li>
+		
+			<li><a href="/tags/metric-core/">metric-core<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>273</span></a></li>
+		   <li><a href="/tags">...<span>277</span></a></li>
 		 
 		</ul>
 	</div>
@@ -647,6 +637,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
+      </li>
     
       <li>
         <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
@@ -662,10 +656,6 @@
     
       <li>
         <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
-      </li>
-    
-      <li>
-        <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
       </li>
     
   </ul>

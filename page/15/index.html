@@ -121,6 +121,29 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-03-29 </div>
+			<div class="article-title"><a href="/2011/03/29/pointers-on-c-8-array/" >C和指针 第八章数组</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><span style="color: #008000;">本文系读后感,以防自己以后忘记之用</span><br>1.数组名是一个指针常量,也就是数组的第一个元素的地址,数组名只有两种情况并不用指针常量来表示–就是当数组名作为sizeof操作符或单目操作符的操作数是,sizeof返回整个数组的字节数。<br>2.负值下标,不要感到不可思议,因为下标引用是间接访问表达式,你需要把算出它的地址[由数组名和相关的信息得到],但是这是一个很不好的习惯.<br>3.下标绝不会比指针更有效率,但是指针有可能比下表有效率.[循环时每次步长是一样的时候],但是下标的可读性更好,不要为了效率上的细微差别而牺牲可读性.<br>4.数组的初始化,可以用大括号防止很难阅读的情况,比如说一个三维数组,只有两个数初始化不是0,那么你用{{{},{}},{{},{}}} 这样的更好一些,层次分明,而且可以少些很多0.C的数组是行主序,下面的定义是可以通过编译的,但是不是你想要的结果matrix[4,3],这里不是一个二维数组,二是一个一维数组;下标引用的优先级高于间接访问,所以指向数组的指针写成int (<em>p)[];int </em>p[],是指针数组,数组名作为参数传到函数中去的话,只有第一维的大小可以省略,后面维数的大小不能省,所以原型不能写成func(int <em>*matrix)这样的,这里第二维没有给出大小.<br>下面是两个练习题:<br>1.下面的声明取自某个源文件<br>int a[10];<br>int </em>b=a;<br>但在另一个不同的源文件中,却发现了这样的代码:<br>extern int *a;<br>extern int b[];<br>x=a[3];<br>y=b[3];<br>上面两个赋值都是错误的,解释如下<br><!--easy2hide start--><br>第一个赋值中,编译器认为a是一个指针变量,所以它提取存储在那里的指针指,并加上12(3和整型的长度相乘),然后对这个结果执行间接操作.但a实际上是整形数组的起始位置,所以作为”指针”获得的这个值实际上是数组的第一个整形元素,加上12后,结果解释为一个地址,然后对它进行间接访问.作为结果,它或者将提取一些任意内存位置的内容,或者由于某种地址错误而导致程序失败<br>第二个赋值中,编译器认为b是一个数组名,所以它把12(3的调整结果)加到b的存储地址,然后间接访问操作从那里获得值.事实上,b是个指针变量,所以从内存中提取的后面三个字实际上是从另外的任意变量中取得的.这个问题说明指针和数组虽然存在关联,但绝不是相同的.<br><!--easy2hide end--><br>2.void func(int const a,int const b[]){}中两个const的区别.<br>首先a是一个拷贝值,所以加不加const都不会改变原变量的值,如果b作为一个变量也是不会改变原变量的值,但是b可以通过间接访问改变其他位置的值,所以加上const之后,间接访问到的值也不可以改变</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-03-28 </div>
 			<div class="article-title"><a href="/2011/03/28/usaco-5-1-3-musical-themes/" >USACO 5.1.3 Musical Themes</a></div>						
 		</h3>
@@ -329,30 +352,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-03-18 </div>
-			<div class="article-title"><a href="/2011/03/18/another-ux-strong-password/" >另类UX让你输入强口令</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><span style="color: #0000ff;">本文转自 </span><a href="http://coolshell.cn/articles/3877.html" target="_blank" rel="external"><span style="color: #ff0000;">酷壳<br></span></a>昨天和大家说了一下<a href="http://coolshell.cn/articles/3801.html" title="破解你的口令" target="_blank" rel="external">关于口令破解</a>的一些东西，那篇文章告诉我们需要设置一个比较强的不易破解的口令。今天在网上看到一个强大的jQuery插件，叫<a href="http://www.nakedpassword.com/" title="NakedPassword.com" target="_blank" rel="external">NakedPassword</a>，其通过“<strong>强大的用户体验</strong>”让你输入一个比较强且不易被破解的口令。虽然有点另类，但是我个人相当欣赏这个UX，因为UX实在是太到位了——<strong>只有你输入的口令比较强，图片中的女人才会脱光衣服</strong>。<br>下面是演示：请输入你的口令（输入时出现效果）</p>
-<p><input id="test" type="password"> 这个例子和<a href="http://coolshell.cn/articles/3142.html" title="用户界面和用户体验的差别" target="_blank" rel="external">以前的那个例子</a>一样，告诉你UX设计是重要性。<br><span style="color: #ff0000;">由于是转载,所以效果就没了,想看效果?好吧 你可以去这个插件的主页或者<a href="http://coolshell.cn/articles/3877.html" target="_blank" rel="external">酷壳</a>查看,图片很YD.</span></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -405,9 +404,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -445,29 +444,29 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -484,48 +483,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+			<li><a href="/tags/lzo/">lzo<span>1</span></a></li>
 		
-			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
+			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
 		
-			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
+			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
 		
-			<li><a href="/tags/风险/">风险<span>1</span></a></li>
+			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
 		
-			<li><a href="/tags/ASM/">ASM<span>1</span></a></li>
+			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
 		
-			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
+			<li><a href="/tags/半平面交/">半平面交<span>1</span></a></li>
 		
-			<li><a href="/tags/question/">question<span>1</span></a></li>
+			<li><a href="/tags/my-life/">my life<span>1</span></a></li>
 		
-			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
+			<li><a href="/tags/horn-formulas/">horn formulas<span>1</span></a></li>
 		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+			<li><a href="/tags/array/">array<span>1</span></a></li>
 		
-			<li><a href="/tags/no-recursive/">no-recursive<span>1</span></a></li>
+			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
 		
-			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
-		
-			<li><a href="/tags/append/">append<span>2</span></a></li>
-		
-			<li><a href="/tags/kv/">kv<span>1</span></a></li>
-		
-			<li><a href="/tags/logger/">logger<span>1</span></a></li>
-		
-			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
 		
 			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
 		
-			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
+			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
 		
-			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
+			<li><a href="/tags/递归/">递归<span>1</span></a></li>
 		
-			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
+			<li><a href="/tags/list/">list<span>1</span></a></li>
 		
-			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
+		
+			<li><a href="/tags/longest-increasing-subsequences/">longest increasing subsequences<span>1</span></a></li>
+		
+			<li><a href="/tags/rm/">rm<span>1</span></a></li>
+		
+			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
+		
+			<li><a href="/tags/code-interview/">code interview<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>273</span></a></li>
+		   <li><a href="/tags">...<span>277</span></a></li>
 		 
 		</ul>
 	</div>
@@ -536,6 +535,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
+      </li>
     
       <li>
         <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
@@ -551,10 +554,6 @@
     
       <li>
         <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
-      </li>
-    
-      <li>
-        <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
       </li>
     
   </ul>

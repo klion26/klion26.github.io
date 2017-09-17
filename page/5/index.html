@@ -121,6 +121,58 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2014-06-20 </div>
+			<div class="article-title"><a href="/2014/06/20/nginx-http-filter-module/" >Nginx HTTP Filter 模块</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>本文主要是写一个 Http Filter 模块。 本文不会详细的介绍如何写一个 Http Filter，以及其中的原理，想查看原理的可以自行网上搜索，或者参考书[1].<span style="color: #ff0000;">本文最后有解决书[1]中过滤模块无作用的方法</span>。</p>
+<p>处理 Http Filter 模块，主要是把所有的 Filter 串成一个链表，然后逐个处理，最后返回给用户。本文的 Filter 功能很简单，检测配置文件是否配置相关信息，如果配置了，那么用自己编译的 Filter 函数来处理。本文的全部代码可以从<a href="http://taohui.org.cn/codeexample/v1/chapter6.zip" target="_blank" rel="external">这里进行下载</a></p>
+<p><div style="background: #fdfdfd; color: black;">下面是这个模块的config 文件</div></p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">ngx_addon_name</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">ngx_http_myfilter_module</span><br><span style="color: #f5deb3;">HTTP_FILTER_MODULES</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“$HTTP_FILTER_MODULES ngx_http_myfilter_module”</span><br><span style="color: #f5deb3;">NGX_ADDON_SRCS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_myfilter_module.c”</span></div><br>其中 ngx_http_myfilter_module 是模块名，ngx_http_myfilter_module.c 是模块代码。</p>
+<p>首先我们需要在配置文件中设定一个配置项，来标记是否开启当前的过滤模块，我们使用 ngx_flag_t 变量来存储该变量</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #b0c4de; font-weight: bold;">struct</span><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">ngx_flag_t</span> <span style="color: #f5deb3;">enable</span> <span style="color: #da70d6;">//这个在配置文件里面的配置项，其结果将存储在 enable 中</span><br><span style="color: #f5deb3;">}</span><span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span></div><br>如果需要启用这个过滤模块，可以在配置文件中进行开启.而我们需要使用 ngx_http_myfilter_create_conf 函数和 ngx_http_myfilter_merge_conf 函数来设置 ngx_http_myfilter_conf_t.</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #ffffff;">ngx_http_myfilter_create_conf</span>(<span style="color: #f5deb3;">ngx_conf_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">cf</span>)<br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">// </span><br><span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">mycf</span><span style="color: #f5deb3;">mycf</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">ngx_pcalloc</span>(<span style="color: #f5deb3;">cf</span><span style="color: #f5deb3;">-&gt;;</span><span style="color: #f5deb3;">pool</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span>));<br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #b0c4de; font-weight: bold;">NULL</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">mycf</span>)<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span><br><span style="color: #da70d6;">/<em> ngx_flag_t 类型的变量。如果使用预设函数 ngx_conf_set_flag_slot 解析配置项参数，那么必须初始化为 NGX_CONF_UNSET </em>/</span><br><span style="color: #f5deb3;">mycf</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">enable</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">NGX_CONF_UNSET</span>;<span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">mycf</span>;<br><span style="color: #f5deb3;">}</span><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #ffffff;">ngx_http_myfilter_merge_conf</span>(<span style="color: #f5deb3;">ngx_conf_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">cf</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">parent</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">child</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">prev</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">parent</span><br><span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">conf</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">child</span><br><span style="color: #da70d6;">//这个函数的功能是，如果 conf-&gt;enable 设置了，就直接返回。</span><br><span style="color: #da70d6;">//如果没设置但是 prev-&gt;enable 设置了，那么就把 conf-&gt;enable 设置为 prev-&gt;enable</span><br><span style="color: #da70d6;">//否则设置为0</span><br><span style="color: #f5deb3;">ngx_conf_merge_value</span>(<span style="color: #f5deb3;">conf</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">enable</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">prev</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">enable</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>);<span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">NGX_CONF_OK</span>;<br><span style="color: #f5deb3;">}</span></div></p>
+<p><br>下面定义 ngx_command_t 数组和 ngx_http_module_t 以及 ngx_module_t 从而定义整个过滤模块</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_command_t</span> <span style="color: #f5deb3;">ngx_http_myfilter_commands</span><span style="color: #f5deb3;">[]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">ngx_string</span>(<span style="color: #7fffd4;">“add_prefix”</span><span style="color: #f5deb3;">),</span>    <span style="color: #da70d6;">//add_prefix 是配置文件中的配置项</span><br><span style="color: #f5deb3;">NGX_HTTP_MAIN_CONF</span>|<span style="color: #f5deb3;">NGX_HTTP_SRV_CONF</span>|<span style="color: #f5deb3;">NGX_HTTP_LOC_CONF</span>|<span style="color: #f5deb3;">NGX_HTTP_LMT_CONF</span>|<span style="color: #f5deb3;">NGX_CONF_FLAG</span><span style="color: #f5deb3;">,</span><br><span style="color: #f5deb3;">ngx_conf_set_flag_slot</span><span style="color: #f5deb3;">,</span>   <span style="color: #da70d6;">//我们使用 Nginx 内置的 ngx_conf_set_flag_slot 来设置 enable[根据配置文件中 add_prefix 是否配置]</span><br><span style="color: #f5deb3;">NGX_HTTP_LOC_CONF_OFFSET</span><span style="color: #f5deb3;">,</span> <span style="color: #da70d6;">//解析之后的值存在哪一块</span><br><span style="color: #f5deb3;">offsetof</span>(<span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">enable</span><span style="color: #f5deb3;">),</span><span style="color: #da70d6;">//解析后的值具体存在哪，这里是存在 enable 中</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">},</span><br><span style="color: #f5deb3;">ngx_null_command</span><br><span style="color: #f5deb3;">};</span><br><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_http_module_t</span> <span style="color: #f5deb3;">ngx_http_myfilter_module_ctx</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span>                                    <span style="color: #da70d6;">//preconfiguration</span><br><span style="color: #f5deb3;">ngx_http_myfilter_init</span><span style="color: #f5deb3;">,</span>                  <span style="color: #da70d6;">//postconfiguration 方法，把我们的过滤模块加入到过滤模块链中</span><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><span style="color: #da70d6;">//create main</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><span style="color: #da70d6;">//init main</span><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><span style="color: #da70d6;">//create srv</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><span style="color: #da70d6;">//merge srv</span><span style="color: #f5deb3;">ngx_http_myfilter_create_conf</span><span style="color: #f5deb3;">,</span>     <span style="color: #da70d6;">//create loc</span><br><span style="color: #f5deb3;">ngx_http_myfilter_merge_conf</span>       <span style="color: #da70d6;">//merge loc</span><br><span style="color: #f5deb3;">};</span></div></p>
+<p><span style="color: #f5deb3;">ngx_module_t</span> <span style="color: #f5deb3;">ngx_http_myfilter_module</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">NGX_MODULE_V1</span><span style="color: #f5deb3;">,</span><br><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">ngx_http_myfilter_module_ctx</span><span style="color: #f5deb3;">,</span>   <span style="color: #da70d6;">//模块上下文</span><br><span style="color: #f5deb3;">ngx_http_myfilter_commands</span><span style="color: #f5deb3;">,</span>      <span style="color: #da70d6;">//模块命令</span><br><span style="color: #f5deb3;">NGX_HTTP_MODULE</span><span style="color: #f5deb3;">,</span>                 <span style="color: #da70d6;">//模块类型，过滤模块其实也是 HTTP 模块</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span><br><span style="color: #f5deb3;">NGX_MODULE_V1_PADDING</span><br><span style="color: #f5deb3;">};</span></p>
+<p><br>对于添加到过滤模块链中，Nginx 使用的是改变链表的头指针。以及 static  的局部指针，具体如下所示</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">//利用 static 的局部性，下面的两个变量只能在本文中使用，可以用来链接整个过滤链表</span><br><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_http_output_header_filter_pt</span> <span style="color: #f5deb3;">ngx_http_next_header_filter</span><br><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_http_output_body_filter_pt</span>   <span style="color: #f5deb3;">ngx_http_next_body_filter</span><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_int_t</span> <span style="color: #ffffff;">ngx_http_myfilter_init</span>(<span style="color: #f5deb3;">ngx_conf_t</span> <span style="color: #f5deb3;">*</span><span style="color: #f5deb3;">cf</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #da70d6;">//把当前的头过滤模块添加到整个链表中</span><br><span style="color: #f5deb3;">ngx_http_next_header_filter</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_top_header_filter</span><br><span style="color: #f5deb3;">ngx_http_top_header_filter</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_myfilter_header_filter</span><br><span style="color: #da70d6;">//把当前的 body 过滤模块添加到整个链表中</span><br><span style="color: #f5deb3;">ngx_http_next_body_filter</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_top_body_filter</span><br><span style="color: #f5deb3;">ngx_http_top_body_filter</span>  <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_myfilter_body_filter</span><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">NGX_OK</span>;<br><span style="color: #f5deb3;">}</span></div></p>
+<p><br>利用上面的函数把该过滤模块添加到整个链表中后，我们需要的就是写具体的 header_filter 和 body_filter。具体如下</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_int_t</span> <span style="color: #ffffff;">ngx_http_myfilter_header_filter</span>(<span style="color: #f5deb3;">ngx_http_request_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">r</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">ngx_http_myfilter_ctx_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">ctx</span><br><span style="color: #f5deb3;">ngx_http_myfilter_conf_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">conf</span><br><span style="color: #da70d6;">//只对 NGX_HTTP_OK 进行过滤</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">headers_out</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">status</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">NGX_HTTP_OK</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ngx_http_next_header_filter</span>(<span style="color: #f5deb3;">r</span>);<br><span style="color: #f5deb3;">}</span><span style="color: #f5deb3;">ctx</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_get_module_ctx</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_http_myfilter_module</span>);<br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">ctx</span>)<br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">/ 该请求上下文已经存在，说明这个过滤模块已经被调用过 1 次 */</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ngx_http_next_header_filter</span>(<span style="color: #f5deb3;">r</span>);<br><span style="color: #f5deb3;">}</span></div></p>
+<p><span style="color: #f5deb3;">conf</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_get_module_loc_conf</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_http_myfilter_module</span>);</p>
+<p><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">conf</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">enable</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>) <span style="color: #da70d6;">//没有配置，或者配置为 off。直接跳过这个过滤模块</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ngx_http_next_header_filter</span>(<span style="color: #f5deb3;">r</span>);<br><span style="color: #f5deb3;">}</span></p>
+<p><span style="color: #f5deb3;">ctx</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_pcalloc</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">pool</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">ngx_http_myfilter_ctx_t</span>));</p>
+<p><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #b0c4de; font-weight: bold;">NULL</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">ctx</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">NGX_ERROR</span><br><span style="color: #f5deb3;">}</span></p>
+<p><span style="color: #da70d6;">/<em> add_prefix 为 0 表示不加前缀 </em>/</span><br><span style="color: #f5deb3;">ctx</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">add_prefix</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span>;</p>
+<p><span style="color: #da70d6;">/<em> 将构造的上下文设置到当前请求中 </em>/</span><br><span style="color: #f5deb3;">ngx_http_set_ctx</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ctx</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_http_myfilter_module</span>);</p>
+<p><span style="color: #da70d6;">/<em> 这里为什么需要在 sizeof 后面减1呢？这里还没太明白，我觉得是直接用 sizeof 的结果 </em>/</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">headers_out</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">content_type</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">len</span> <span style="color: #f5deb3;">&gt;=</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #7fffd4;">“text/plain”</span>) <span style="color: #f5deb3;">-</span> <span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">ngx_strncasecmp</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">headers_out</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">content_type</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">data</span><span style="color: #f5deb3;">,</span> (<span style="color: #f5deb3;">u_char</span> <span style="color: #f5deb3;"><em></em></span>) <span style="color: #7fffd4;">“text/plain”</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #7fffd4;">“text/plain”</span>) <span style="color: #f5deb3;">-</span> <span style="color: #add8e6;">1</span>) <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #da70d6;">/ 设置为1表示需要在 HTTP 包体前加入前缀 */</span><br><span style="color: #f5deb3;">ctx</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">add_prefix</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span>;</p>
+<p><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">headers_out</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">content_length_n</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">headers_out</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">content_length_n</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">filter_prefix</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">len</span>;<br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ngx_http_next_header_filter</span>(<span style="color: #f5deb3;">r</span>);<br><span style="color: #f5deb3;">}</span><br><span style="color: #da70d6;">//对 body 进行过滤</span><br><span style="color: #b0c4de; font-weight: bold;">static</span> <span style="color: #f5deb3;">ngx_int_t</span> <span style="color: #ffffff;">ngx_http_myfilter_body_filter</span>(<span style="color: #f5deb3;">ngx_http_request_t</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_chain_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">in</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">ngx_http_myfilter_ctx_t</span>     <span style="color: #f5deb3;">*</span><span style="color: #f5deb3;">ctx</span><br><span style="color: #f5deb3;">ctx</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_http_get_module_ctx</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">ngx_http_myfilter_module</span>);</p>
+<p><span style="color: #da70d6;">/<em> 如果获取不到上下文，或者上下文结构体中的 add_prefix 为0 或者2 时，都不会添加前缀，这时直接交给下一个 HTTP 过滤模块处理 </em>/</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">ctx</span> <span style="color: #f5deb3;">==</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span> || <span style="color: #f5deb3;">ctx</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">add_prefix</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">1</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ngx_http_next_body_filter</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">in</span>);<br><span style="color: #f5deb3;">}</span></p>
+<p><span style="color: #da70d6;">/<em> 将 add_prefix 设置为2, 这样即使 ngx_http_myfilter_body_filter 再次回调时，也不会重复添加前缀 </em>/</span><br><span style="color: #f5deb3;">ctx</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">add_prefix</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">2</span>;</p>
+<p><span style="color: #f5deb3;">ngx_buf_t</span> <span style="color: #f5deb3;"><em></em></span>b <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_create_temp_buf</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">pool</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">filter_prefix</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">len</span>);<br><span style="color: #da70d6;">//filter_prefix 是我们定一个的一个 ngx_str_t 变量，存着我们将要添加的数据</span><br>b<span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">start</span> <span style="color: #f5deb3;">=</span> b<span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">pos</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">filter_prefix</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">data</span>;<br>b<span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">last</span> <span style="color: #f5deb3;">=</span> b<span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">pos</span> <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">filter_prefix</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">len</span>;<br><span style="color: #da70d6;">//把我们的添加的数据加入到 ngx_chain_t 中</span><br><span style="color: #f5deb3;">ngx_chain_t</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">cl</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ngx_alloc_chain_link</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">pool</span>);<br><span style="color: #f5deb3;">cl</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">buf</span> <span style="color: #f5deb3;">=</span> b;<br><span style="color: #f5deb3;">cl</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">next</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">in</span>;</p>
+<p><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ngx_http_next_body_filter</span>(<span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">cl</span>);<br><span style="color: #f5deb3;">}</span></p>
+<p><br>到这里我们的过滤模块基本完成了，我们过滤的是<span style="color: #ff0000;"> txt 文档</span>，也就是说我们在 header_filter 中的判断，是否和 <span style="color: #ff0000;">“text/plain”</span> 一样，对于 “text/plain” 我们可以查看 /usr/local/nginx/conf/mime.types, 然后接下来我们可以在 /usr/local/nginx/html 下新建一个文件 123.txt 。然后我们通过请求 “127.0.0.1/123.txt”, 我们可以看到在文件内容的前面加上了相应的前缀。<br>Reference<br>1.《深入理解 Nginx》第6章</p>
+<ol>
+<li><a href="http://blog.csdn.net/zy825316/article/details/24268463" target="_blank" rel="external">nginx：将自己编写HTTP过滤模块融入nginx时遇到的问题</a></li>
+</ol>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2014-06-16 </div>
 			<div class="article-title"><a href="/2014/06/16/nginx-advancd-data-struct-1/" >Nginx 高级数据结构 1</a></div>						
 		</h3>
@@ -426,33 +478,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2013-12-22 </div>
-			<div class="article-title"><a href="/2013/12/22/spiral-matrix/" >Spiral Matrix</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>题目大意：给你一个矩形，然后要你将之螺旋输出。从[0,0]开始。<br>题目链接：<a href="http://oj.leetcode.com/problems/spiral-matrix/" target="_blank" rel="external">Spiral Matrix</a></p>
-<p>看上去是一个挺简单的题目，以前也做过类似的，不过当时做的时候规定是正方形而已。没有好好的想就直接code，然后发现各种bug。慢慢调了好久才最后通过，好久没写算法题了，还是生疏了。</p>
-<p>大致思路如下：首先我们要判断是不是空的矩形，空矩形直接返回一个空的vector即可，如果不是空矩形的话，那么我们可以设多个变量，left，right，top，button分别表示当前矩形还未被输出的部分的最左，最右，最上，最下。然后我们在原始矩阵中进行螺旋访问，输出每一个元素。可以把这个螺旋访问看成是一层一层的剖洋葱，一层一层的来，每一层先处理最上面的一行，然后是最右边的一列，接下来是最下面的一行，最后是最左边的一列。然后在途中不断更新left，right，top和button四个变量值即可。</p>
-<p>到这里已经大致OK了，不过还是有问题，因为不是正方形，可能导致某些元素输出多次，这样的话就不行了，这里可以对输出的元素进行计数，如果已经全部输出完毕，那么就直接退出就行了。</p>
-<p><a href="https://github.com/klion26/LeetCode/blob/master/Spiral-Matrix.cpp" target="_blank" rel="external">代码在这里</a></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -505,9 +530,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -545,29 +570,29 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -584,48 +609,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+			<li><a href="/tags/memset/">memset<span>1</span></a></li>
 		
-			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
+			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
 		
-			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
+			<li><a href="/tags/probability/">probability<span>1</span></a></li>
 		
-			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
+			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
 		
-			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
+			<li><a href="/tags/metric-core/">metric-core<span>1</span></a></li>
 		
-			<li><a href="/tags/critical/">critical<span>1</span></a></li>
+			<li><a href="/tags/latex/">latex<span>1</span></a></li>
 		
-			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
+			<li><a href="/tags/topic/">topic<span>1</span></a></li>
 		
-			<li><a href="/tags/chain-matrix-multiplication/">chain matrix multiplication<span>1</span></a></li>
+			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
 		
-			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
+			<li><a href="/tags/method/">method<span>1</span></a></li>
 		
-			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
+			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
 		
-			<li><a href="/tags/top排序/">top排序<span>2</span></a></li>
+			<li><a href="/tags/链接排序/">链接排序<span>1</span></a></li>
 		
-			<li><a href="/tags/problem-solve/">problem_solve<span>2</span></a></li>
+			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
 		
-			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
+			<li><a href="/tags/offset/">offset<span>1</span></a></li>
 		
-			<li><a href="/tags/写作/">写作<span>1</span></a></li>
+			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
 		
-			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+			<li><a href="/tags/DP/">DP<span>1</span></a></li>
 		
-			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
+			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
 		
-			<li><a href="/tags/book/">book<span>1</span></a></li>
+			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
 		
-			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
+			<li><a href="/tags/shortest-paths-in-dag/">shortest paths in dag<span>1</span></a></li>
 		
-			<li><a href="/tags/receiver/">receiver<span>1</span></a></li>
+			<li><a href="/tags/fork/">fork<span>2</span></a></li>
 		
-			<li><a href="/tags/mapreduce/">mapreduce<span>1</span></a></li>
+			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>273</span></a></li>
+		   <li><a href="/tags">...<span>277</span></a></li>
 		 
 		</ul>
 	</div>
@@ -636,6 +661,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
+      </li>
     
       <li>
         <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
@@ -651,10 +680,6 @@
     
       <li>
         <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
-      </li>
-    
-      <li>
-        <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
       </li>
     
   </ul>

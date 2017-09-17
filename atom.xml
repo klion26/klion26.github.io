@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-07-14T09:37:38.000Z</updated>
+  <updated>2017-09-17T08:19:42.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,112 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>GC 标记-清除算法</title>
+    <link href="http://yoursite.com/2017/09/17/GC-%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95/"/>
+    <id>http://yoursite.com/2017/09/17/GC-标记-清除算法/</id>
+    <published>2017-09-17T00:51:40.000Z</published>
+    <updated>2017-09-17T08:19:42.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>GC 的世界中有三种基本的算法，分别是：</p>
+<ul>
+<li>标记清除</li>
+<li>引用计数</li>
+<li>GC 复制</li>
+</ul>
+<p>其他的 GC 算法都是在这三种算法上进行修改，优化得来。本文将要介绍的是 标记-清除 算法。</p>
+<a id="more"></a>
+<h1 id="标记清除算法介绍"><a href="#标记清除算法介绍" class="headerlink" title="标记清除算法介绍"></a>标记清除算法介绍</h1><p>像字面意思一样，标记-清除算法分为两步：标记和清除。其中标记和清除使用伪代码分别可以写出来如下：</p>
+<p>标记</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">mark_phase() &#123;</div><div class="line">    for (r: $roots)</div><div class="line">       mark(*r)</div><div class="line">&#125;</div><div class="line"></div><div class="line">mark(obj)&#123;</div><div class="line">    if(obj.mark == FALSE)</div><div class="line">        obj.mark == TRUE</div><div class="line">        for(child: children(obj))</div><div class="line">            mark(*child)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>清除</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">sweep_phase() &#123;</div><div class="line">    sweeping = $head_start    //从堆头开始清除</div><div class="line">    while (sweeping &lt; $head_end)</div><div class="line">        if (sweeping.mark == TRUE) //如果当前对象是活跃对象</div><div class="line">            sweeping.mark = FALSE</div><div class="line">        else  //如果当前对象是可清除对象，则将其加入到 free_list 中</div><div class="line">            sweeping.next = $free_list   </div><div class="line">            $free_list = sweep</div><div class="line">        sweeping += sweeping.size</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>对于标记清除算法，最基本的，将某个对象是否已经被标记，以及对象的大小等等这些信息都保存在头部，从上面的代码中，我们可以知道头部至少有三个域：标记位(名为 mark)、对象大小（名为 size）以及下一个对象的头部地址（名为 next）– 有 size 和 next 两个域，是因为下一个对象不一定在物理上是连续的。如下图所示</p>
+<img src="/2017/09/17/GC-标记-清除算法/heap.png" alt="heap.png" title="">
+<p>其中淡蓝色的表示还在使用的空间，白色的表示空闲空间。</p>
+<h2 id="标记算法的选取"><a href="#标记算法的选取" class="headerlink" title="标记算法的选取"></a>标记算法的选取</h2><p>在标记部分，我们从 root 节点触发，然后逐一标记哪个节点不再使用，哪些节点还需要在继续存活。在上述代码中，我们给出的是 DFS 搜素算法，那么对于这一块我们可以比较 DFS 和 BFS 的区别，大致可以用下图表示：</p>
+<img src="/2017/09/17/GC-标记-清除算法/BFS_DFS.jpeg" alt="BFS_DFS.jpeg" title=""> 
+<p>主要区别在于：<strong>DFS 需要保存的内存使用量更低</strong></p>
+<h2 id="分配内存"><a href="#分配内存" class="headerlink" title="分配内存"></a>分配内存</h2><p>所有的标记、清除等都是为了分配内存服务的，如果我们不需要再分配内存的话，那么就可以不进行前面哪些活动了。下面说说如何分配内存的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">new_obj(size) &#123;</div><div class="line">    chunk = pickup_chunk(size, $free_list) // 从上面的空闲列表中找一个合适的内存块</div><div class="line">    if (chunk != NULL)</div><div class="line">        return chunk</div><div class="line">    else</div><div class="line">        allocation_fail() //内存不够</div></pre></td></tr></table></figure>
+<p>上面的代码表示整个分配内存的过程，其中 <code>pickup_chunk</code> 表示从空闲列表中找出一个合适的内存块，返回给申请者。</p>
+<p>对于找出一个 <strong>合适</strong> 的内存块，我们已知的至少有三种方法：</p>
+<ul>
+<li>First-fit 返回最先找到的一个内存块</li>
+<li>Best-fit  找到一个大于需要内存的最小内存块</li>
+<li>Worst-fit 找到一个大于需要内存的最大内存块</li>
+</ul>
+<p>上面三种每一种都有不同的应用场景，也各有优劣。</p>
+<h2 id="合并"><a href="#合并" class="headerlink" title="合并"></a>合并</h2><p>对于清除阶段，我们会遍历堆中所有的内存区域，将不需要的加入到 <code>free_list</code> 中，对于连续出现的两个内存块，我们并没有进行任何操作，那么下一次我们申请内存的时候，可能会由于没有足够大的内存块而失败。比如我们有两个大小分别为 3，4 的内存块，然后，我们需要申请一个内存大小为 5 的内存块，在之前的算法中是会失败的。这就牵涉到清除阶段的合并了，将连续的内存块进行合并形成大的内存块。上面的清除阶段算法改成如下所示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">sweep_phase() &#123;</div><div class="line">    sweeping = $head_start    //从堆头开始清除</div><div class="line">    while (sweeping &lt; $head_end)</div><div class="line">        if (sweeping.mark == TRUE) //如果当前对象是活跃对象</div><div class="line">            sweeping.mark = FALSE</div><div class="line">        else  //如果当前对象是可清除对象，则将其加入到 free_list 中</div><div class="line">            if(sweeping == $free_list + $free_list.size) //邻接块的合并</div><div class="line">                $free_list.size + sweeping.size</div><div class="line">            else</div><div class="line">                sweeping.next = $free_list</div><div class="line">                $free_list = sweep</div><div class="line">        sweeping += sweeping.size</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h1><p>基本算法基本描述完成，接下来可以看看这种算法的优缺点分别是什么，以及是否有办法进行优化</p>
+<p>优点：</p>
+<ol>
+<li>实现简单。算法简单，能够明显知道是否有问题，而且更容易和其他算法进行结合</li>
+<li>与保守式 GC 算法兼容。在 保守式 GC 算法中，对象是不能被移动的，刚好 GC 标记-清除算法不需要移动对象。</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>碎片化。在标记-清除的过程中，会不断的产生碎片，虽然在清除阶段有合并过程，但还是不够。</li>
+<li>分配速度。由于在 标记-清除 算法 中分块不是连续的，因此每次分配都需要遍历空闲列表，找到足够大的分块，最坏的情况需要每次都遍历整个空闲列表。</li>
+<li>与写时复制技术不兼容。标记-清除算法中的标记阶段，会修改对象的头部，因此和写时复制技术不兼容，可能导致很多不必要的复制。</li>
+</ol>
+<h1 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h1><p>既然我们了解到了该算法的优缺点，那么在此基础上如何进行改进呢？</p>
+<p>针对上面的缺点分别有如下几点改进</p>
+<h2 id="多个空闲链表"><a href="#多个空闲链表" class="headerlink" title="多个空闲链表"></a>多个空闲链表</h2><p>简单的说，就是将原来一个空闲链表变成现在的多个空闲链表，加快分配的速度。<br>我们之前分配内存的时候，需要查询整个空闲链表来寻找一个合适的内存块，现在我们将不同大小的内存块挂在不同的链表下面，这样我们就能够直接去合适的链表中查找了。如下图所示</p>
+<img src="/2017/09/17/GC-标记-清除算法/multilink.jpeg" alt="multilink.jpeg" title="">
+<p>我们有用于 2 个字的空闲链表，有用于 3 个字的空闲链表。这样当需要分配 3 个字的空间时，我们直接去对应的链表查找即可。</p>
+<p>这里有一个注意的点，需要保持多少个链表呢？一般来说，根据经验，一般会将小于某个阈值的分别生成一个链表，大于该阈值的所有内存块放到一个链表中。比如所有小于 100 字的都有一个单独的链表，而所有大于等于 100 字的内存块都挂在 100 字这个链表下。</p>
+<h2 id="BiBOP-法"><a href="#BiBOP-法" class="headerlink" title="BiBOP 法"></a>BiBOP 法</h2><p>另外一种优化方法，就是将大小相近的内存块放到一起，如下图所示</p>
+<img src="/2017/09/17/GC-标记-清除算法/bibop.jpeg" alt="bibop.jpeg" title="">
+<p>这样的形式，我们也知道去哪个地方查找需要的内存块，但是这个方法有一点不好，就是会形成很多内存碎片，比如我们分配的很多大小为 2 个字的空间，但是所有的申请中最小的都是 3 个字，这个时候这些 2 个字的空间都是浪费的</p>
+<h2 id="位图标记"><a href="#位图标记" class="headerlink" title="位图标记"></a>位图标记</h2><p>位图标记法主要改善的是“和 copy-on-write 技术不兼容”，将标记位从头部抽离出来了。如下图所示</p>
+<img src="/2017/09/17/GC-标记-清除算法/bitmap.jpeg" alt="bitmap.jpeg" title="">
+<p>这样标记的时候就不会修改头部位置了。伪代码大致如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">mark(obj) &#123;</div><div class="line">    obj_num = (obj - $heap_start) / WORD_LENGTH</div><div class="line">    index = obj_num / WORD_LENGTH</div><div class="line">    offset = obj_num % WORD_LENGTH</div><div class="line">    </div><div class="line">    if (($bitmap_tbl[index] &amp; (1 &lt;&lt; offset)) == 0) // 未被标记</div><div class="line">        $bitmap_tbl[index] |= (1 &lt;&lt; offset)</div><div class="line">        for (child: children(obj))</div><div class="line">            mark(*child)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>在参考条目[1] 中有描述这个算法的第二个优势：清除操作更高效。描述如下：以往的清除操作都必须遍历整个堆，把非活动对象连接到空闲链表，同时取消活动对象的标志位。</p>
+</blockquote>
+<p>我的理解现在还是需要遍历整个堆，而且需要取消标志位，只是现在标志位变成了连续的，这样处理起来会高效一点。</p>
+<p>另外，如果有多个堆的情况下，就需要多个 bitmap 了</p>
+<h2 id="延迟清除法"><a href="#延迟清除法" class="headerlink" title="延迟清除法"></a>延迟清除法</h2><p>在清除操作中，我们需要遍历整个堆，也就是处理时间和堆的大小成正比。在清除阶段，内存空间不能访问，这就牵涉到最大暂停时间。而延迟清除法（lazy sweep）则可以缩短清除操作导致的最大暂停时间。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">new_obj(size) &#123;</div><div class="line">    chunk = lazy_sweep(size) //先通过延迟清除法，查找是否以满足条件的内存块</div><div class="line">    if (chunk != NULL)</div><div class="line">        return chunk</div><div class="line"></div><div class="line">    mark_phase() //标记阶段</div><div class="line">    </div><div class="line">    chunk = lazy_sweep(size) //再次通过延迟清除法，寻找一个满足条件的内存块</div><div class="line">    if (chunk != NULL)</div><div class="line">        return chunk</div><div class="line">    </div><div class="line">    allocation_fail()</div></pre></td></tr></table></figure>
+<p>至于 <code>lazy_sweep</code> 函数如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">lazy_sweep(size) &#123;</div><div class="line">    while($sweeping &lt; $headp_end)</div><div class="line">        if ($sweeping.mark == TRUE) //TRUE 表示活动对象</div><div class="line">            $sweeping.mark = FALSE</div><div class="line">        else if ($sweeping.size &gt;= size)</div><div class="line">            chunk = $sweeping</div><div class="line">            $sweeping += $sweeping.size</div><div class="line">            return chunk</div><div class="line">        $sweeping += $sweeping.size</div><div class="line">    $sweeping = $head_start</div><div class="line">    return NULL</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注意，其中的 <code>sweeping</code> 时候全局变量，因此遍历的起始位置是上次结束的地方。</p>
+<p>延迟清除法有一个缺点就是。如果空闲内存块和活动对象块基本分成两个大的部分的话（如下图所示），那么对于某次清除活动对象周围的空间时，就会增加暂停时间。</p>
+<img src="/2017/09/17/GC-标记-清除算法/lazy-sweep.png" alt="lazy-sweep.png" title="">
+<p>上图中淡蓝色的表示活动对象，白色的表示空闲对象，当清除到活动对象附近的时候，就会增加本次的最大暂停时间。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ol>
+<li>《垃圾回收的算法与实现》第二章</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;GC 的世界中有三种基本的算法，分别是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;标记清除&lt;/li&gt;
+&lt;li&gt;引用计数&lt;/li&gt;
+&lt;li&gt;GC 复制&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;其他的 GC 算法都是在这三种算法上进行修改，优化得来。本文将要介绍的是 标记-清除 算法。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="GC" scheme="http://yoursite.com/tags/GC/"/>
+    
+      <category term="java" scheme="http://yoursite.com/tags/java/"/>
+    
+      <category term="标记-清除" scheme="http://yoursite.com/tags/%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4/"/>
+    
+      <category term="算法" scheme="http://yoursite.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+      <category term="总结" scheme="http://yoursite.com/tags/%E6%80%BB%E7%BB%93/"/>
+    
+  </entry>
   
   <entry>
     <title>tmux 简单使用指南</title>
@@ -265,6 +371,8 @@
     </summary>
     
     
+      <category term="java" scheme="http://yoursite.com/tags/java/"/>
+    
       <category term="code" scheme="http://yoursite.com/tags/code/"/>
     
       <category term="metric" scheme="http://yoursite.com/tags/metric/"/>
@@ -272,8 +380,6 @@
       <category term="reservior" scheme="http://yoursite.com/tags/reservior/"/>
     
       <category term="metric-core" scheme="http://yoursite.com/tags/metric-core/"/>
-    
-      <category term="java" scheme="http://yoursite.com/tags/java/"/>
     
   </entry>
   
@@ -666,11 +772,11 @@
     
       <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
     
-      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
-    
       <category term="append" scheme="http://yoursite.com/tags/append/"/>
     
       <category term="hdfs" scheme="http://yoursite.com/tags/hdfs/"/>
+    
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
     
   </entry>
   
@@ -1101,42 +1207,6 @@
       <category term="zookeeper" scheme="http://yoursite.com/tags/zookeeper/"/>
     
       <category term="offset" scheme="http://yoursite.com/tags/offset/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spark Streaming 中使用 zookeeper 保存 offset 并重用</title>
-    <link href="http://yoursite.com/2016/07/14/spark-streaming-save-offset-to-zookeeper/"/>
-    <id>http://yoursite.com/2016/07/14/spark-streaming-save-offset-to-zookeeper/</id>
-    <published>2016-07-14T11:36:23.000Z</published>
-    <updated>2017-05-29T09:22:53.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>在 Spark Streaming 中消费 Kafka 数据的时候，有两种方式分别是 1）基于 Receiver-based 的 createStream 方法和 2）Direct Approach (No Receivers) 方式的 createDirectStream 方法，详细的可以参考 <a href="http://spark.apache.org/docs/latest/streaming-kafka-integration.html" target="_blank" rel="external">Spark Streaming + Kafka Integration Guide</a>，但是第二种使用方式中  kafka 的 offset 是保存在 checkpoint 中的，如果程序重启的话，会丢失一部分数据，可以参考  <a href="http://aseigneurin.github.io/2016/05/07/spark-kafka-achieving-zero-data-loss.html" target="_blank" rel="external">Spark  Kafka - Achieving zero data-loss</a>。</p>
-<p>本文主要讲在使用第二种消费方式（Direct Approach）的情况下，如何将 kafka 中的 offset 保存到 zookeeper 中，以及如何从 zookeeper 中读取已存在的 offset。</p>
-<p>大致思想就是，在初始化 kafka stream 的时候，查看 zookeeper 中是否保存有 offset，有就从该 offset 进行读取，没有就从最新/旧进行读取。在消费 kafka 数据的同时，将每个 partition 的 offset 保存到 zookeeper 中进行备份，具体实现参考下面代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">val topic : String = &quot;topic_name&quot;   //消费的 topic 名字</div><div class="line">   val topics : Set[String] = Set(topic)                    //创建 stream 时使用的 topic 名字集合</div><div class="line"></div><div class="line">   val topicDirs = new ZKGroupTopicDirs(&quot;test_spark_streaming_group&quot;, topic)  //创建一个 ZKGroupTopicDirs 对象，对保存</div><div class="line">   val zkTopicPath = s&quot;$&#123;topicDirs.consumerOffsetDir&#125;&quot;          获取 zookeeper 中的路径，这里会变成 /consumers/test_spark_streaming_group/offsets/topic_name</div><div class="line"></div><div class="line">   val zkClient = new ZkClient(&quot;10.4.232.77:2181&quot;)          //zookeeper 的host 和 ip，创建一个 client</div><div class="line">   val children = zkClient.countChildren(s&quot;$&#123;topicDirs.consumerOffsetDir&#125;&quot;)     //查询该路径下是否字节点（默认有字节点为我们自己保存不同 partition 时生成的）</div><div class="line"></div><div class="line">   var kafkaStream : InputDStream[(String, String)] = null   </div><div class="line">   var fromOffsets: Map[TopicAndPartition, Long] = Map()   //如果 zookeeper 中有保存 offset，我们会利用这个 offset 作为 kafkaStream 的起始位置</div><div class="line"></div><div class="line">   if (children &gt; 0) &#123;   //如果保存过 offset，这里更好的做法，还应该和  kafka 上最小的 offset 做对比，不然会报 OutOfRange 的错误</div><div class="line">       for (i &lt;- 0 until children) &#123;</div><div class="line">         val partitionOffset = zkClient.readData[String](s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;i&#125;&quot;)</div><div class="line">         val tp = TopicAndPartition(topic, i)</div><div class="line">         fromOffsets += (tp -&gt; partitionOffset.toLong)  //将不同 partition 对应的 offset 增加到 fromOffsets 中</div><div class="line">         logInfo(&quot;@@@@@@ topic[&quot; + topic + &quot;] partition[&quot; + i + &quot;] offset[&quot; + partitionOffset + &quot;] @@@@@@&quot;)</div><div class="line">       &#125;</div><div class="line"></div><div class="line">       val messageHandler = (mmd : MessageAndMetadata[String, String]) =&gt; (mmd.topic, mmd.message())  //这个会将 kafka 的消息进行 transform，最终 kafak 的数据都会变成 (topic_name, message) 这样的 tuple</div><div class="line">       kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParam, fromOffsets, messageHandler)</div><div class="line">   &#125;</div><div class="line">   else &#123;</div><div class="line">       kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParam, topics) //如果未保存，根据 kafkaParam 的配置使用最新或者最旧的 offset</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   var offsetRanges = Array[OffsetRange]()</div><div class="line">   kafkaStream.transform&#123; rdd =&gt;</div><div class="line">     offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges //得到该 rdd 对应 kafka 的消息的 offset</div><div class="line">     rdd</div><div class="line">   &#125;.map(msg =&gt; msg._2).foreachRDD &#123; rdd =&amp;gt;     </div><div class="line">     for (o &lt;- offsetRanges) &#123;</div><div class="line">       val zkPath = s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;o.partition&#125;&quot;</div><div class="line">       ZkUtils.updatePersistentPath(zkClient, zkPath, o.fromOffset.toString)  //将该 partition 的 offset 保存到 zookeeper</div><div class="line">       logInfo(s&quot;@@@@@@ topic  $&#123;o.topic&#125;  partition $&#123;o.partition&#125;  fromoffset $&#123;o.fromOffset&#125;  untiloffset $&#123;o.untilOffset&#125; #######&quot;)</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     rdd.foreachPartition(</div><div class="line">       message =&gt; &#123;</div><div class="line">         while(message.hasNext) &#123;</div><div class="line">           logInfo(s&quot;@^_^@   [&quot; + message.next() + &quot;] @^_^@&quot;)</div><div class="line">         &#125;</div><div class="line">       &#125;</div><div class="line">     )</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<p>使用上面的代码，我们可以做到 Spark Streaming 程序从 Kafka 中读取数据是不丢失</p>
-<p>欢迎阅读<a href="http://www.klion26.com/spark-streaming-saving-offset-in-zookeeper-2.html" target="_blank" rel="external">第二篇文章</a>，解决 offset out of range 的问题</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;在 Spark Streaming 中消费 Kafka 数据的时候，有两种方式分别是 1）基于 Receiver-based 的 createStream 方法和 2）Direct Approach (No Receivers) 方式的 createDirectStream
-    
-    </summary>
-    
-      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
-    
-    
-      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
-    
-      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
-    
-      <category term="at-least-once" scheme="http://yoursite.com/tags/at-least-once/"/>
-    
-      <category term="exactly-once" scheme="http://yoursite.com/tags/exactly-once/"/>
-    
-      <category term="zookeeper" scheme="http://yoursite.com/tags/zookeeper/"/>
     
   </entry>
   

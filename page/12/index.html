@@ -121,6 +121,47 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-05-18 </div>
+			<div class="article-title"><a href="/2011/05/18/number-theory-hdu-2879/" >[数论]HDU_2879</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://acm.hdu.edu.cn/showproblem.php?pid=2879" target="_blank" rel="external">传送门</a></p>
+<p>首先给出,He函数是一个积性函数,然后He[p^n]=2,其中p是素数.那么He[n]就是2^k,k是不同素数的个数.那么HeHe[n]函数就是计算所有的n/p,p是素数.那么这题就变成了证明He[n]是素数函数.下面给出一个简单证明,如有错误还请指出:</p>
+<p>首先He[p]=2.p是素数.      x^2=x(mod p)—-&gt;p|x(x-1).因为x&lt;p所以p不整除x也不整除x-1.所以成立的情况下是x=1或者x=0.</p>
+<p>He[p^k]=2,证明类似上面的</p>
+<p>对于不同的两个素数p和q,He[p<em>q]=4=He[p]</em>He[q];</p>
+<p>首先x=0和x=1是肯定成立的,</p>
+<p>现在由x^2=x(mod p*q)</p>
+<pre><code>   ---&gt;p*q|x(x-1)
+
+ 假设x=k*p[k&lt;q]
+
+ ------&gt;p*q|k*p(k*p-1)
+
+-------&gt;q|k(k*p-1)
+</code></pre><p>   ——-&gt;q|(k*p-1)  因为k&lt;q  q是素数 所以gcd(k,q)=1</p>
+<p>  ——-&gt;k<em>p+t</em>q=1</p>
+<p> 这里就变成了这个方程的解,由扩展欧几里得知,这个方程有解,但是k在[0,q-1]之内的解就一个,所以这里多一个解,同理设x=k<em>p又有一个解,所以x^2=x(mod p</em>q)有4个解(x=0 ,x=1 ,x=k<em>p, x=k</em>q)</p>
+<p>—-&gt;He[p<em>q]=4=He[p]</em>He[q];</p>
+<p>那么He[p1^r1<em>p2^r2</em>……*pk^rk]=2^k然后可以进一步算出HeHe只需要算n以内每个素数的倍数的个数.</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-05-16 </div>
 			<div class="article-title"><a href="/2011/05/16/sg-function-hdu-2873/" >[博弈]HDU_2873</a></div>						
 		</h3>
@@ -347,31 +388,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-04-23 </div>
-			<div class="article-title"><a href="/2011/04/23/5th-csu-acm-competition/" >第五届中南大学校赛-klion26</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<pre><code>这次校赛应该是最后一次以参赛队员参加了,明年就算弄也应该不是参赛队员了.可是还是有很多不如意之处啊.虽然拿了个较好的成绩,但是比赛实在是……,可以用惨不忍睹来形容.首先这套题出的还算可以的,当然除了几个陈题,难度应该是A-E,I水体,然后K是一个巨难但是可以直接水的题.F,G,H,J都还是比较难的.可是最后我们是已5题结束比赛,I是我最后画错图了,然后一直在分N(非常非常大)中情况讨论.其实不画错图的话,一转化就变成了4中情况.然后这题我们还一直没看sample - -||.表示这次我们队配合的也不是挺好,至少没有达到那种1+1+1&gt;=3,甚至是2都没有.[不过后面我们队换了个人,希望配好要好,我理想中的配合是1+1+1至少要&amp;gt;=2.5]我们是2小时的时候过了5题,然后后面3小时一直浪费了,然后三个人一人一个题,可是三个题都没出- -|.如果三个人一起攻一个题的话,应该还是有希望过题的,可是这就是后话了.我觉得我们这次这么惨的原因有:配合不好,基本是单兵作战,除了I基本讨论很少;不够冷静,前面被水体卡了,然后就有点慌了;最后的时间分配上有点问题,这个和配合有一定关系;题目没有多人读[赛前我们都讨论过要多人读题- -|],由于这个被C卡了,后来在100分钟的时候看懂题意,然后20分钟过掉.当时那个汗啊- -|.最最不爽的是后面三小时浪费了.
-
-  现在我们队的三个人[&quot;这怎么好意思&quot;大婶,czw加我.]还没一起做过题.等五一的时候一起做做题,应该锻炼锻炼配合,不然不行啊.吃饭的时候&quot;这怎么好意思&quot;大婶说了个很欠扁的队名&quot;这怎么好意思&quot;.[我邪恶的认为如果有实力的话还是可以这么取名的- -|],那么接下来就看我们三个的实力能达到什么水平了,其实我一直认为小小概率事件也是有发生的可能的.加油吧.最后希望实训可以代替实习吧.
-</code></pre>
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -424,9 +440,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -464,29 +480,29 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -503,48 +519,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/longest-increasing-subsequences/">longest increasing subsequences<span>1</span></a></li>
+			<li><a href="/tags/shortest-paths-in-dag/">shortest paths in dag<span>1</span></a></li>
 		
-			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
 		
-			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
+			<li><a href="/tags/java/">java<span>2</span></a></li>
 		
-			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
+			<li><a href="/tags/network/">network<span>1</span></a></li>
 		
-			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
+			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
 		
-			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
+			<li><a href="/tags/老师/">老师<span>1</span></a></li>
 		
-			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
+			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
 		
-			<li><a href="/tags/windows/">windows<span>4</span></a></li>
+			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
 		
-			<li><a href="/tags/free/">free<span>1</span></a></li>
+			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
 		
-			<li><a href="/tags/how/">how<span>1</span></a></li>
+			<li><a href="/tags/source-code/">source_code<span>1</span></a></li>
 		
-			<li><a href="/tags/horn-formulas/">horn formulas<span>1</span></a></li>
+			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
+			<li><a href="/tags/tencent/">tencent<span>1</span></a></li>
 		
-			<li><a href="/tags/filter/">filter<span>1</span></a></li>
+			<li><a href="/tags/job/">job<span>1</span></a></li>
 		
-			<li><a href="/tags/book/">book<span>1</span></a></li>
+			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
 		
-			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+			<li><a href="/tags/zookeeper/">zookeeper<span>3</span></a></li>
 		
-			<li><a href="/tags/ASM/">ASM<span>1</span></a></li>
+			<li><a href="/tags/probability/">probability<span>1</span></a></li>
 		
-			<li><a href="/tags/vi/">vi<span>2</span></a></li>
+			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
 		
-			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
+			<li><a href="/tags/递归/">递归<span>1</span></a></li>
 		
-			<li><a href="/tags/火柴棍式程序题/">火柴棍式程序题<span>1</span></a></li>
+			<li><a href="/tags/exercise/">exercise<span>8</span></a></li>
 		
-			<li><a href="/tags/gdb/">gdb<span>2</span></a></li>
+			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>273</span></a></li>
+		   <li><a href="/tags">...<span>277</span></a></li>
 		 
 		</ul>
 	</div>
@@ -555,6 +571,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
+      </li>
     
       <li>
         <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
@@ -570,10 +590,6 @@
     
       <li>
         <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
-      </li>
-    
-      <li>
-        <a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" ><i class="fa fa-file-o"></i>从源码级别分析 metric-core 的抽样算法</a>
       </li>
     
   </ul>
