@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-17T12:29:56.000Z</updated>
+  <updated>2017-09-17T12:36:25.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/09/17/GC-%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95/"/>
     <id>http://yoursite.com/2017/09/17/GC-标记-清除算法/</id>
     <published>2017-09-17T00:51:40.000Z</published>
-    <updated>2017-09-17T12:29:56.000Z</updated>
+    <updated>2017-09-17T12:36:25.000Z</updated>
     
     <content type="html"><![CDATA[<p>GC 的世界中有三种基本的算法，分别是：</p>
 <ul>
@@ -42,7 +42,7 @@
 <img src="/2017/09/17/GC-标记-清除算法/BFS_DFS.jpeg" alt="BFS_DFS.jpeg" title=""> 
 <p>主要区别在于：<strong>DFS 需要保存的内存使用量更低</strong></p>
 <h2 id="分配内存"><a href="#分配内存" class="headerlink" title="分配内存"></a>分配内存</h2><p>所有的标记、清除等都是为了分配内存服务的，如果我们不需要再分配内存的话，那么就可以不进行前面哪些活动了。下面说说如何分配内存的：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">new_obj(size) &#123;</div><div class="line">    chunk = pickup_chunk(size, $free_list) // 从上面的空闲列表中找一个合适的内存块</div><div class="line">    if (chunk != NULL)</div><div class="line">        return chunk</div><div class="line">    else</div><div class="line">        allocation_fail() //内存不够</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">new_obj(size) &#123;</div><div class="line">    chunk = pickup_chunk(size, $free_list) // 从上面的空闲列表中找一个合适的内存块</div><div class="line">    if (chunk != NULL)</div><div class="line">        return chunk</div><div class="line">    else</div><div class="line">        allocation_fail() //内存不够</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>上面的代码表示整个分配内存的过程，其中 <code>pickup_chunk</code> 表示从空闲列表中找出一个合适的内存块，返回给申请者。</p>
 <p>对于找出一个 <strong>合适</strong> 的内存块，我们已知的至少有三种方法：</p>
 <ul>
@@ -84,7 +84,7 @@
 <p>我的理解现在还是需要遍历整个堆，而且需要取消标志位，只是现在标志位变成了连续的，这样处理起来会高效一点。</p>
 <p>另外，如果有多个堆的情况下，就需要多个 bitmap 了</p>
 <h2 id="延迟清除法"><a href="#延迟清除法" class="headerlink" title="延迟清除法"></a>延迟清除法</h2><p>在清除操作中，我们需要遍历整个堆，也就是处理时间和堆的大小成正比。在清除阶段，内存空间不能访问，这就牵涉到最大暂停时间。而延迟清除法（lazy sweep）则可以缩短清除操作导致的最大暂停时间。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">new_obj(size) &#123;</div><div class="line">    chunk = lazy_sweep(size) //先通过延迟清除法，查找是否以满足条件的内存块</div><div class="line">    if (chunk != NULL)</div><div class="line">        return chunk</div><div class="line"></div><div class="line">    mark_phase() //标记阶段</div><div class="line">    </div><div class="line">    chunk = lazy_sweep(size) //再次通过延迟清除法，寻找一个满足条件的内存块</div><div class="line">    if (chunk != NULL)</div><div class="line">        return chunk</div><div class="line">    </div><div class="line">    allocation_fail()</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">new_obj(size) &#123;</div><div class="line">    chunk = lazy_sweep(size) //先通过延迟清除法，查找是否以满足条件的内存块</div><div class="line">    if (chunk != NULL)</div><div class="line">        return chunk</div><div class="line"></div><div class="line">    mark_phase() //标记阶段</div><div class="line">    </div><div class="line">    chunk = lazy_sweep(size) //再次通过延迟清除法，寻找一个满足条件的内存块</div><div class="line">    if (chunk != NULL)</div><div class="line">        return chunk</div><div class="line">    </div><div class="line">    allocation_fail()</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>至于 <code>lazy_sweep</code> 函数如下所示：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">lazy_sweep(size) &#123;</div><div class="line">    while($sweeping &lt; $headp_end)</div><div class="line">        if ($sweeping.mark == TRUE) //TRUE 表示活动对象</div><div class="line">            $sweeping.mark = FALSE</div><div class="line">        else if ($sweeping.size &gt;= size)</div><div class="line">            chunk = $sweeping</div><div class="line">            $sweeping += $sweeping.size</div><div class="line">            return chunk</div><div class="line">        $sweeping += $sweeping.size</div><div class="line">    $sweeping = $head_start</div><div class="line">    return NULL</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>注意，其中的 <code>sweeping</code> 时候全局变量，因此遍历的起始位置是上次结束的地方。</p>
