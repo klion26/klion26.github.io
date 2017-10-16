@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 8 | klion26</title>
+  <title>第 8 頁 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -121,6 +121,82 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2012-12-26 </div>
+			<div class="article-title"><a href="/2012/12/26/fedora-13-update-to-fedora-15/" >Fedora13 升级到Fedora 15</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>在开学的时候装了Fedora 13,然后一直用着，感觉也还可以，虽然现在Fedora都出18了。前两天不知道那根神经一短路然后就想着升级Fedora，一开始想升级到16的（担心17,18还不那么稳定，到时出了问题找不到解决方案）。然后就用下面的命令执行呗 。</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">sudo yum install preupgrade<br>preupgrade</div><br>执行preupgrade需要输入root命令，照着做就行了，然后就可以选择你想升级到的版本，有14,15,16,17，当然你还可以列出那些unstable版本。选择之后，就一直下一步就行了，然后等着下载所需要的软件包吧（时间根据你的网速不同而不同，我大概用了20分钟左右）。我一开始选择的版本是16,然后下完之后，提醒需要reboot来完成升级，好，那就reboot呗。</p>
+<p>reboot之后，你会发现屏幕一直是一个光标在那跳动，啥也不可以做，这个时候你只需要等待就行了，应该是在配置些啥东西吧。别重启了，实在没事干就出喝杯咖啡吧，等好了之后，结果发现提示说Fedora 16只能通过14,15升级而来，也就是不能跨太多的版本升级。好吧。那就重启升级到15再说吧。然后照着做之后，发现尼妈居然又是自动升级到16,然后一顿折腾之后，我把/var/cache/yum/下面所有和preupgrade有关的文件夹全都删掉了（其实应该做个备份更好，万一删错了还可以还原）。然后继续升级到Fedora 15.然后就可以了，没出现啥问题，刚好装Fedora 15的时候老师叫开会，然后开会回来之后发现已经装好了。而且还不错。</p>
+<p>现在你已经装好了Fedora 15了，当然还是可以访问Fedora 13的。然后说说接下来你需要做的事情吧。或许你可以在网上搜一篇叫做《Fedora 15安装之后需要做的×件事》，不过很多你可能不需要，我这里大致写下我做的一些事情吧</p>
+<p>1.安装gnome-tweak-tool，因为现在你的桌面是没有任何东西的，而且右击也没用，装这个东西就是解决这些事的，装好之后，用命令gnome-tweak-tool执行出来一个配置界面，选中File Manager。把右边的“Have file manager handle the desktop该陈ON就行了，现在你的桌面有东西了，而且可以右击了。</p>
+<p>2.在上一步中的Tweak tool中打开选中左边的Shell栏目，然后把右边的Arrangement of buttons on the titlebar选项改为All，这样尼会看到你的cmd窗口上面有最小化，最大化和关闭按钮了，默认的是只有关闭按钮的。</p>
+<p>3.解决按下Del不能删除文件的事情，首先用命令</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gsettings <span style="color: #b0c4de; font-weight: bold;">set </span>org.gnome.desktop.interface can-change-accels <span style="color: #b0c4de; font-weight: bold;">true</span></div><br>设置可以改变相应的快捷方式映射</p>
+<p>然后打开一个文件夹，选中随便一个文件然后点击菜单Edit，把鼠标放到“Move to Trash”上，然后按<span style="color: #ff0000;">两次<span style="color: #000000;">Del键就行了，接下来你可以用命令</span></span></p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gsettings <span style="color: #b0c4de; font-weight: bold;">set </span>org.gnome.desktop.interface can-change-accels <span style="color: #b0c4de; font-weight: bold;">false</span></div><br>来关闭快捷方式的映射。</p>
+<p>4.中文输入法的问题，由于我是由Fedora 13升级来的，系统没有自动安装ibus输入法，还是保留了我在13上安装的fcitx，可是奇怪的事情发生了，fcitx输入法只能在浏览器下使用，其他任何地方都不能使用。这个也太坑爹了。然后google，百度结果没有发现什么解决办法，又说是gnome3的问题，又说是配置的问题， 有说直接换ibus的。可是换了ibus结果还是用不了，不知为何（应该不是和fcitx冲突的问题，我在装ibus之前卸载了fcitx）。然后最后发现有个帖子的配置和其他人的配置有个小小的区别，那就是试试吧，结果就TM可以了。我一开始的配置是（下面语句放在～/.bashrc文件中）</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">XMODIFIERS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“@im=fcitx”</span><br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">QT_IM_MODULE</span><span style="color: #f5deb3;">=</span>xim<br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">GTK_IM_MODULE</span><span style="color: #f5deb3;">=</span>xim</div><br>然后另外那个人的配置是把两个xim改成了fcitx也就是</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">XMODIFIERS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“@im=fcitx”</span><br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">QT_IM_MODULE</span><span style="color: #f5deb3;">=</span>fcitx<br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">GTK_IM_MODULE</span><span style="color: #f5deb3;">=</span>fcitx</div><br>然后奇迹发生了，重登录之后结果就可以了，这中间我各种重装，反正都不知道是为什么，<span style="color: #ff0000;">如果你也遇到了这样的问题，但是上面的方案没有帮到你的话，我只能说声遗憾了，因为我也不知道是为什么了。</span></p>
+<p>最后再吐嘈下Fedora 15的界面，感觉用起来总是没有13那么爽，gnome3或许炫一点，但是现在打开软件的方式有点不爽，也没有下面的任务栏了，而且最上面的panel也没了，现在变成了“Your favorites”，反正就是现在暂时还不适应这种界面，接下来慢慢适应吧。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-12-12 </div>
+			<div class="article-title"><a href="/2012/12/12/fedora-13-texlive2012-install-chinese-configure/" >Fedora 13 TexLive2012安装+中文配置</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><span style="color: #ff0000;">注：我博客里面所有类似风格的代码高亮都是由<span style="color: #0000ff;"><a href="http://fayaa.com/code" target="_blank" rel="external">代码发芽网</a></span>的代码高亮提供，特此说明</span></p>
+<p>由于各种原因，想在Fedora下装LaTeX软件，于是就有了这篇文章，这篇文章从安装到配置中文环境，中间遇到了各种蛋疼的问题。在这里记录下来，做个备份，也给后来人一份参考。</p>
+<p>首先，你可以去厦门大学的开源镜像下载TexLive2012 地址：<a href="http://mirrors.xmu.edu.cn/CTAN/systems/texlive/Images/" target="_blank" rel="external">http://mirrors.xmu.edu.cn/CTAN/systems/texlive/Images/</a><br>速度很给力的，一般都能在1M左右。</p>
+<p>下好之后，你需要安装，以下命令都是以root身份操作（如果你不知道命令到底需不需要root身份，那么就都用root身份吧）。</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">cd</span> ~/Downloads<br>mount -t iso9660 -o loop texlive2012-20120701.iso /mnt/<br><span style="color: #b0c4de; font-weight: bold;">cd</span> /mnt<br>./install-tl</div><br>其中Downloads是你ISO下载的地方。这样，你已经安装好了TeXLive2012了，你也可以用来排版英文的文献了。因为中文暂时还不支持。好下面我们就来说这蛋疼的中文了。</p>
+<p>网上主要有两种说法：</p>
+<p>第一种。从windows下copy一些字体，然后改一些配置文件，网上也有很多人说已经成功，不过由于本人用这种方法没有成功就不写了，这里给个<span style="color: #ff0000;"><a href="http://asc.2dark.org/node/129" target="_blank" rel="external"><span style="color: #ff0000;">链接</span></a></span>，也可以自己上网搜中文支持。</p>
+<p>第二种方法如下：</p>
+<p>首先你下载YueWang-zhfonts-final_1.01.tar.bz2包，地址在这里<a href="http://bj.soulinfo.com/%7Ehugang/tex/tex2007/YueWang-zhfonts-final_1.01.tar.bz2。" target="_blank" rel="external">http://bj.soulinfo.com/%7Ehugang/tex/tex2007/YueWang-zhfonts-final_1.01.tar.bz2。</a></p>
+<p>如果你RP够好的话，那么就能够在Linux下把这个动下下下来。好我们假定所有人的RP都想最近我的RP一样挫，那么你总是下到78%就下不下来了（也不知道为什么每次到这个点就下不动了，有人知道的话还请告知，在下不胜感激），而且每次在78%之前速度都是1000kb/s左右，然后一到78%，好见证你RP的时刻到了。不过就算RP再挫，我们也可以在windows下用迅雷把这个文件下下来，在这里我表示压力很大。</p>
+<p>到这里你应该已经把上面的压缩文件下下来了，如果还没有那请自行解决（就不说你RP为什么挫到这个地步了）。那么你来到下载的目录，然后解压缩这个文件，是不是解压缩完了之后，却没有发现它，ls也没有，图形化界面也没有？恩，你没有看错，是没有。因为作者把这个文件夹作成了隐藏文件，也就是文件夹名最前名有个点。然后你只要把texlive2007中的texmf-var文件夹copy到/usr/local/texlive下然后进行一系列操作就完成了。命令如下，都在root权限下进行的。</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">cp -rf texmf-var /usr/local/texlive<br><span style="color: #b0c4de; font-weight: bold;">cd</span> /usr/local/texlive<br>mv texmf-local texmf-local.backup<br>mv texmf-var texmf-local<br>texhash</div><br>上面的命令首先是把texmf-var文件夹copy到/usr/local/texlive下，然后对已有的texmf-local文件进行一个备份（对你不了解的文件进行操作时，你都应该这样做）。然后再把texmf-var改名为texmf-local。然后texhash是创建ls-R数据库，不懂就先照着做吧。好了，看也看累了，操作也操作烦了，那么下面就让我们来看看到底行不行了吧。</p>
+<p>用下面的tex文件进行测试下呗</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">\documentclass</span><span style="color: #ffffff;">[4pt]</span><span style="color: #b0c4de; font-weight: bold;">{</span>article<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\usepackage</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJKutf8<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\title</span><span style="color: #b0c4de; font-weight: bold;">{</span>Fuck-Chinese<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\author</span><span style="color: #b0c4de; font-weight: bold;">{</span>klion26<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\maketitle</span><br><span style="color: #b0c4de; font-weight: bold;">\begin</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJK<span style="color: #b0c4de; font-weight: bold;">}{</span>UTF8<span style="color: #b0c4de; font-weight: bold;">}{</span>kai<span style="color: #b0c4de; font-weight: bold;">}</span><br><del>~~Hello, 你好World</del>~~~<br>你好 Fuck Chinese<br><span style="color: #b0c4de; font-weight: bold;">\end</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJK<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\end</span><span style="color: #b0c4de; font-weight: bold;">{</span>document<span style="color: #b0c4de; font-weight: bold;">}</span></div><br>1.tex是上面这个tex文件的文件名</p>
+<p>然后用如下命令生成PDF或者PS格式的文件</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">latex 1.tex<br>dvipdfm 1.dvi</div><br>生成PDF文件</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">dvips 1.dvi</div><br>生成PS格式的。不过我系统上PS格式的文件乱码了。<br>另外要说的就是pdflatex不能用，貌似是说找不到字体，这个我暂时还不能解决，然后其他的应该都没啥问题了。</p>
+<p>到这里，你终于舒了一口气，TM的终于搞定了。恩，接下来你可以用tex来排版中文文献了。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2012-12-10 </div>
 			<div class="article-title"><a href="/2012/12/10/implicit-declaration-of-function-class-device-create/" >Implicit declaration of function class_device_create</a></div>						
 		</h3>
@@ -177,7 +253,7 @@
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#105;&#108;&#116;&#111;&#58;&#x6a;&#99;&#x6d;&#64;&#106;&#111;&#x6e;&#x6d;&#97;&#115;&#x74;&#101;&#114;&#x73;&#x2e;&#x6f;&#x72;&#x67;">&#x6a;&#99;&#x6d;&#64;&#106;&#111;&#x6e;&#x6d;&#97;&#115;&#x74;&#101;&#114;&#x73;&#x2e;&#x6f;&#x72;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x6a;&#99;&#x6d;&#64;&#x6a;&#111;&#x6e;&#x6d;&#97;&#x73;&#116;&#101;&#x72;&#x73;&#x2e;&#111;&#x72;&#103;">&#x6a;&#99;&#x6d;&#64;&#x6a;&#111;&#x6e;&#x6d;&#97;&#x73;&#116;&#101;&#x72;&#x73;&#x2e;&#111;&#x72;&#103;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -428,57 +504,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-11-06 </div>
-			<div class="article-title"><a href="/2012/11/06/chrome-https-connection/" >Chrome强制https连接某些网站</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>最近一段时间google貌似非常的不稳定,不知道是不是那个什么”多少大”马上就要开的原因。有时上google首页也许要翻墙，而且有时https连接下也打不开。今早看到<a href="http://www.williamlong.info/archives/3270.html" target="_blank" rel="external">月光博客</a>上说，https在某些情况下是用http打开的，所以就会时不时断网了。下面是教你怎么用chrome强制https连接。</p>
-<p>你需要的就是chrome浏览器，然后有可能需要翻墙[我在自己电脑上实验的时候，有时不翻墙不行]，翻墙可以参照<span style="color: #ff0000;"><a href="http://www.klion26.com/user-chrome-cross-gfw.html" target="_blank" rel="external"><span style="color: #ff0000;">这里</span></a></span>。然后接下来你只需要在chrome的新建标签页里面输入”chrome://net-internals/“会出来如下界面:</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2012/11/hsts.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/11/hsts-300x165.jpg" alt="" title="hsts"></a>看到上图的倒数第二个HSTS没，点开这个，然后Add domain下填写www.google.com，如果你需要google的子域名也用https的话，就勾上下面的Include subdomains选项框。不过勾上这个的话貌似translate就不能用了，反正我这translate不管怎样都不能用https访问，翻墙也不行，translate.google.com都不行，直接跳到traslate.google.cn去了。</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-11-05 </div>
-			<div class="article-title"><a href="/2012/11/05/display-views-count-without-plugin/" >wordpress文章浏览量-非插件实现</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>刚开始弄我wordpress的时候，想加个浏览量的插件来着，同学推荐了一个叫WP-PostViews 的插件，装了一段时间之后就给卸载了，因为文章的浏览量会无辜增加好多，你刷新一下就可能发现文章的浏览量增加了几十甚至上百。这样就没什么意思了。最近实验室的同学也在弄wordpress,然后添加了一个浏览量的插件，然后突然想不用插件来实现这个，因为插件一多速度就不行了 。然后同学给了一个链接，可是加的代码一直出错，没办法，最后搜索出错信息的时候，发现了<a href="http://bacsoftwareconsulting.com/blog/index.php/wordpress-cat/how-to-track-and-display-post-views-count-in-wordpress-without-a-plugin/" target="_blank" rel="external">这篇文章</a>，刚好是不用插件实现这个功能的。然后就自己添加，而且这篇文章写的非常好，英文也很简单，我这里再简单说以下我添加的过程。首先我把上面那篇文章中的code-1的代码添加到functions.php的最后面，最好是先copy到本地的编辑器，然后确定没有全角符之类的，再复制到functions.php里面。然后再在single.php里面添加上文所说的CODE-2。至于所说的The-Loop其实就是那段处理每篇文章的代码，也就是说这段代码没篇文章都会用到，简单点就是你可以搜索文章作者，或者文章时间，然后查到相应的位置，接下来你在刚在搜索到地方加入CODE-2，就行了。</p>
-<p><span style="color: red;">——————————-追加——————–</span></p>
-<p><span style="color: red;">保存的PHP文件不能是UTF-8的，不然会出错，可以选择自己手动输入代码(别copy-paste)，或者下载下来，改完之后再传上去。</span></p>
-<p><span style="color: red;"><br><span style="color: #0000ff;">PS. 不同的主题可能会在不同的位置改这些东西，不过大致思路相同</span><br><span style="color: #0000ff;"> PSS. 不要再主页添加那段添加到single.php的代码，那样的话，你刷新主页也会把每一篇文章的浏览量加1，这一点可以自己参考CODE-1。你每次刷新文章界面也会增加浏览量</span><br><span style="color: #0000ff;"> PSSS.浏览量是从你添加代码才开始计算了，所以你很早以前的文章也会显示浏览量为0</span><br></span></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -489,13 +514,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/7/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+    	<li class="prev"><a href="/page/7/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一頁</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/9/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/9/" class="alignright next">下一頁<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -515,7 +540,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜尋" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -524,7 +549,7 @@
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>分類</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -557,13 +582,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -571,11 +596,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -587,13 +612,13 @@
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -607,51 +632,51 @@
 		
 			
 	<div class="widget">
-		<h4>Tag Cloud</h4>
+		<h4>標籤雲</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
 		
-			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
+			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
 		
-			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
+			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
 		
-			<li><a href="/tags/knapsack/">knapsack<span>1</span></a></li>
+			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
 		
-			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
+			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
 		
-			<li><a href="/tags/yum/">yum<span>1</span></a></li>
+			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
 		
-			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
+			<li><a href="/tags/office/">office<span>1</span></a></li>
 		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
+			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
 		
-			<li><a href="/tags/shortest-paths-in-dag/">shortest paths in dag<span>1</span></a></li>
+			<li><a href="/tags/poll/">poll<span>1</span></a></li>
 		
-			<li><a href="/tags/redis/">redis<span>1</span></a></li>
+			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
 		
-			<li><a href="/tags/trident/">trident<span>1</span></a></li>
+			<li><a href="/tags/proof/">proof<span>1</span></a></li>
 		
-			<li><a href="/tags/metric/">metric<span>1</span></a></li>
+			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
 		
-			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
 		
-			<li><a href="/tags/vim/">vim<span>2</span></a></li>
+			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
 		
 			<li><a href="/tags/append/">append<span>2</span></a></li>
 		
-			<li><a href="/tags/opengl/">opengl<span>1</span></a></li>
+			<li><a href="/tags/概率/">概率<span>1</span></a></li>
 		
-			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
+			<li><a href="/tags/thinking/">thinking<span>2</span></a></li>
 		
-			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
 		
-			<li><a href="/tags/github/">github<span>5</span></a></li>
+			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
 		
-			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
+			<li><a href="/tags/notes/">notes<span>0</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>277</span></a></li>
+		   <li><a href="/tags">...<span>278</span></a></li>
 		 
 		</ul>
 	</div>
@@ -660,8 +685,16 @@
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>最新文章</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
+      </li>
+    
+      <li>
+        <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
+      </li>
     
       <li>
         <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
@@ -675,21 +708,13 @@
         <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
       </li>
     
-      <li>
-        <a href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/" ><i class="fa fa-file-o"></i>Streaming 程序调用 Producer.clo...</a>
-      </li>
-    
-      <li>
-        <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>Links</h4>
+	<h4>鏈接</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

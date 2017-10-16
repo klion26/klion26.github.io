@@ -475,9 +475,80 @@
 		
             
 		
+            
+		
+            
+		
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2017-10-16 </div>
+			<div class="article-title"><a href="/2017/10/16/spark-dagscheduler/" >spark_dagscheduler</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<blockquote>
+<p>基于 spark 1.6</p>
+</blockquote>
+<p>面向 Stage 的调度器，负责计算每个 job 的 DAG，并将 DAG 图划分为不同的 stage，对哪些 RDD 以及相应输出进行记录，寻找一个运行相应 job 所需要的最小 stage。然后将 <code>stage</code> 以 <code>TaskSet</code> 的形式提交到下层的 <code>TaskScheduler</code> 进行具体的 task 调度。每个 <code>TaskSet</code> 包含整个可以独立运行的 task，这些 task 能够利用集群上已有的数据立即运行起来，如果集群上已有的数据已经不存在了，那么当前 task 就会失败。</p>
+<p>Spark 的 stage 以 RDD 的 shuffle 为界进行划分。窄依赖的 RDD 操作会被穿起来放到一个 task 中，比如 <code>map()</code>, <code>filter()</code> 这样的操作。但是需要使用到 shuffle 依赖的操作，需要多个 stage（至少一个将中间文件写到特定的地方，另外一个从特定的地方进行读取）。每个 Stage，只会对其他 Stage 有 shuffle 依赖，在同一个 stage 中会进行很多计算。实际的将计算串起来的操作在 RDD.compute 中完成。</p>
+<p><code>DAGScheduler</code> 同样会基于缓存状态决定 task 希望运行在那（preferred location），如果 shuffle 输出文件丢失造成的 Stage 失败，会重新被提交。在 <strong>Stage 内部</strong> 的不是由 shuffle 文件丢失造成的失败，由 <code>TaskScheduler</code> 来完成，<code>TaskScheduler</code> 会在取消整个 stage 前进行小部分重试。<br>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2017/10/16/spark-dagscheduler/#more" class="btn btn-default more">閱讀本文</a>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2017-09-22 </div>
+			<div class="article-title"><a href="/2017/09/22/GC-引用计数法/" >GC 引用计数法</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>本文将将介绍 GC 算法中最基本的三种算法的第二种：引用计数法。</p>
+<h1 id="GC-引用计数法"><a href="#GC-引用计数法" class="headerlink" title="GC 引用计数法"></a>GC 引用计数法</h1><p>GC 本来是一种“释放已经没有被引用的对象的机制”，人们自然就想到，通过记录所有对象的引用次数来进行，这就是 GC 引用计数法。</p>
+<p>引用计数法，一句话来说就是，记录每个对象被引用的多少次，如果引用次数为零，就编程“垃圾”了，可以被回收。</p>
+<p>下面给出引用计数法的基本代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">//分配对象</div><div class="line">new_object(size) &#123;</div><div class="line">    obj = pickup_chunk(size, $free_list) //从 free_list 中查找一个符合大小的块</div><div class="line">    </div><div class="line">    if (obj == NULL) //分配失败</div><div class="line">        allocation_fail()</div><div class="line">    else //分配成功</div><div class="line">        obj.ref_cnt = 1 //更新引用计数</div><div class="line">        return ojb</div><div class="line">&#125;</div><div class="line"></div><div class="line">//更新指针</div><div class="line">update_ptr(ptr, obj) &#123;</div><div class="line">    inc_ref_cnt(obj)  // 更新 obj 的引用</div><div class="line">    dec_ref_cnt(*ptr) // 更新 *ptr 的引用，注意这两句话的顺序，思考是否可以调换顺序</div><div class="line">    *ptr = obj</div><div class="line">&#125;</div><div class="line"></div><div class="line">inc_ref_cnt(obj) &#123;</div><div class="line">    obj.ref_cnt++</div><div class="line">&#125;</div><div class="line"></div><div class="line">dec_ref_cnt(obj) &#123;</div><div class="line">    obj.ref_cnt-- // 更新引用计数</div><div class="line">    if(obj.ref_cnt == 0) //如果该对象变成了 “垃圾”，进行回收</div><div class="line">        for (child: children(obj)) //更新所有子节点的引用</div><div class="line">            dec_ref_cnt(*child)</div><div class="line">        reclaim(obj)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>GC 引用计数法的大致流程如上所述，其中 update_ptr 可以用下图描述</p>
+<h1 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h1><p>对于引用计数法，我们可以来看看它到底有哪些优缺点呢？</p>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ol>
+<li><p>可即刻回收垃圾。</p>
+<p> 在引用计数法中，每个对象都知道自己的被引用数，一旦计数变为 0，就会被链接到空闲链表中。换句话说，所有对象在被标记为垃圾的同时就会被回收。</p>
+</li>
+<li><p>最大暂停时间短</p>
+<p> 只有更新指针的时候才会执行垃圾回收，</p>
+</li>
+<li></li>
+</ol>
+<h1 id="优化方案"><a href="#优化方案" class="headerlink" title="优化方案"></a>优化方案</h1>
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -501,7 +572,7 @@
 </ul>
 <p>其他的 GC 算法都是在这三种算法上进行修改，优化得来。本文将要介绍的是 标记-清除 算法。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/09/17/GC-标记-清除算法/#more" class="btn btn-default more">Read More</a>
+		<a type="button" href="/2017/09/17/GC-标记-清除算法/#more" class="btn btn-default more">閱讀本文</a>
 	
 	</div>
 </div>
@@ -575,7 +646,7 @@
 </blockquote>
 <p>风险在生活中处处存在，可能我们会想冒个险没啥关系，反正发生的概率小，而且在某些时候会有高收益/回报伴随这风险，这个时候就更有诱惑力了，总有人希望通过冒险得到高回报，但这恰恰是不可取的，是非常危险的。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/06/20/风险不仅仅是事件发生的概率/#more" class="btn btn-default more">Read More</a>
+		<a type="button" href="/2017/06/20/风险不仅仅是事件发生的概率/#more" class="btn btn-default more">閱讀本文</a>
 	
 	</div>
 </div>
@@ -599,7 +670,7 @@
 	
 		<p>本文作为一个问题追查过程的复盘记录，主要希望找出自己在解决问题中可以优化改进的地方。以后遇到问题，能够快速的进行定位，解决。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/#more" class="btn btn-default more">Read More</a>
+		<a type="button" href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/#more" class="btn btn-default more">閱讀本文</a>
 	
 	</div>
 </div>
@@ -626,7 +697,7 @@
 </blockquote>
 <p>在 Spark Streaming 作业中，每个作业会消费一个或多个 topic，但是这些 topic 需要在作业启动之前确定好，在作业运行中不能进行调整，之前<a href="https://klion26.github.io/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/" target="_blank" rel="external">修改了源码</a>做到了自适应 topic partition 扩容的情况，但是无法动态调整消费的 topic。现在需要在不重启作业的情况下，动态调整消费的 topic。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/#more" class="btn btn-default more">Read More</a>
+		<a type="button" href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/#more" class="btn btn-default more">閱讀本文</a>
 	
 	</div>
 </div>
@@ -650,7 +721,7 @@
 	
 		<p><a href="http://metrics.dropwizard.io" target="_blank" rel="external">metric-core</a> 是一个 java metric 库，用于统计 JVM 层面以及 服务级别 的各种 metric 信息。其中 metric-core 是其核心模块，代码量不多，总共 44 个文件，5700 行左右代码（包括注释）。算是一个很小的开源项目了。由于 metric 在所有项目中都非常重要，因此选择通读该项目，本文分析 metrci-core 中的抽样算法。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/#more" class="btn btn-default more">Read More</a>
+		<a type="button" href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/#more" class="btn btn-default more">閱讀本文</a>
 	
 	</div>
 </div>
@@ -674,7 +745,7 @@
 	
 		<p>本文基于 spark 1.6.2<br>本次的源码全来自 <code>org.apache.spark.streaming.receiver</code> 这个 package 下，包括 <code>BlockGenerator.scala</code>, <code>RateLimiter</code>, <code>ReceiverdBlock.scala</code>, <code>ReceivedBlockHandler.scala</code>, <code>Receiver.scala</code>, <code>ReceiverSupervisor.scala</code>, <code>ReceiverSupervisorImpl.scala</code></p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/05/19/Streaming-中-Receiver-相关源码分析/#more" class="btn btn-default more">Read More</a>
+		<a type="button" href="/2017/05/19/Streaming-中-Receiver-相关源码分析/#more" class="btn btn-default more">閱讀本文</a>
 	
 	</div>
 </div>
@@ -710,61 +781,7 @@
 </ol>
 <p>上述总结肯定有片面的地方，也有不全的地方，欢迎指出</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/05/10/Python-代码实践小结/#more" class="btn btn-default more">Read More</a>
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2017-04-15 </div>
-			<div class="article-title"><a href="/2017/04/15/从现在开始写作/" >从现在开始写作</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>这里的写作不特指写长篇大论的文章</p>
-<h2 id="为什么要写作"><a href="#为什么要写作" class="headerlink" title="为什么要写作"></a>为什么要写作</h2><blockquote>
-<p>写作是了帮助自己更好的思考，提高自己的效率。</p>
-</blockquote>
-<p>首先，每个人同一时刻能记住的东西有限，而做一件事情可能需要考虑的条件往往会比较多，将所有的情况写到一张纸上，就能在需要的时候看到自己需要的条件。相信每个人都有这样的体验：做数学题的时候，将所有的已知条件，或者自己推导出来的结论写到草稿纸上，往往能更快的解出这道题目。这也是写作帮助自己思考的一个直接。</p>
-<p>其次，我遇到过这种情况，自己想着是这么回事，可是写下来的时候，发现无从下笔，根本写不出来，写出来之后，也很难向别人清楚、准确的表达自己的意思。这归根结底还是没有思考清楚导致的，而写作可以帮助我整理自己的思路。</p>
-<p>然后，当过客服的人肯定有一个体会，客服非常耗时间，而这些客服的问题大部分是差不多的，一对一的客服是非常低效的，就算在群组里面进行客服，其实很多后来遇到同样问题的人也是不看群历史记录（或者不知道以前有人遇到过类似的问题）的。这种情况下，虽然文档不是最优解，但能够省出自己足够多的时间，实际上这是一件杠杆率非常高（产出投入比高）的事件。</p>
-		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/04/15/从现在开始写作/#more" class="btn btn-default more">Read More</a>
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2017-02-16 </div>
-			<div class="article-title"><a href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/" >Spark Streaming 统一在每分钟的 00 秒消费 Kafka 数据的问题解决</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据</p>
-		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/#more" class="btn btn-default more">Read More</a>
+		<a type="button" href="/2017/05/10/Python-代码实践小结/#more" class="btn btn-default more">閱讀本文</a>
 	
 	</div>
 </div>
@@ -781,13 +798,13 @@
 <ul class="pagination">
 	 
 		
-          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>上一頁</a></li>
         
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/2/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/2/" class="alignright next">下一頁<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -807,7 +824,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜尋" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -816,7 +833,7 @@
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>分類</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -849,13 +866,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -863,11 +880,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -879,13 +896,13 @@
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -899,51 +916,51 @@
 		
 			
 	<div class="widget">
-		<h4>Tag Cloud</h4>
+		<h4>標籤雲</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
+			<li><a href="/tags/github/">github<span>5</span></a></li>
 		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
-			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
+			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
 		
-			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
+			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
 		
-			<li><a href="/tags/memset/">memset<span>1</span></a></li>
+			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
 		
-			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
+			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
 		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
+			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
 		
-			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
+			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
 		
-			<li><a href="/tags/成长/">成长<span>1</span></a></li>
+			<li><a href="/tags/ASM/">ASM<span>1</span></a></li>
 		
-			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
+			<li><a href="/tags/windows/">windows<span>4</span></a></li>
 		
-			<li><a href="/tags/queue/">queue<span>1</span></a></li>
+			<li><a href="/tags/learning/">learning<span>1</span></a></li>
 		
-			<li><a href="/tags/dag/">dag<span>1</span></a></li>
+			<li><a href="/tags/积分/">积分<span>1</span></a></li>
 		
-			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
+			<li><a href="/tags/DP/">DP<span>1</span></a></li>
 		
-			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
-		
-			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
-		
-			<li><a href="/tags/MST/">MST<span>1</span></a></li>
-		
-			<li><a href="/tags/6-824/">6.824<span>2</span></a></li>
+			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
 		
 			<li><a href="/tags/critical/">critical<span>1</span></a></li>
 		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
+			<li><a href="/tags/how/">how<span>1</span></a></li>
 		
-			<li><a href="/tags/git/">git<span>4</span></a></li>
+			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
+		
+			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
+		
+			<li><a href="/tags/bellman-ford/">bellman-ford<span>1</span></a></li>
+		
+			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>277</span></a></li>
+		   <li><a href="/tags">...<span>278</span></a></li>
 		 
 		</ul>
 	</div>
@@ -952,8 +969,16 @@
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>最新文章</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
+      </li>
+    
+      <li>
+        <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
+      </li>
     
       <li>
         <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
@@ -967,21 +992,13 @@
         <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
       </li>
     
-      <li>
-        <a href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/" ><i class="fa fa-file-o"></i>Streaming 程序调用 Producer.clo...</a>
-      </li>
-    
-      <li>
-        <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>Links</h4>
+	<h4>鏈接</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

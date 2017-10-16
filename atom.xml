@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-17T12:36:25.000Z</updated>
+  <updated>2017-10-16T13:39:24.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,149 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>spark_dagscheduler</title>
+    <link href="http://yoursite.com/2017/10/16/spark-dagscheduler/"/>
+    <id>http://yoursite.com/2017/10/16/spark-dagscheduler/</id>
+    <published>2017-10-16T12:01:20.000Z</published>
+    <updated>2017-10-16T13:39:24.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>基于 spark 1.6</p>
+</blockquote>
+<p>面向 Stage 的调度器，负责计算每个 job 的 DAG，并将 DAG 图划分为不同的 stage，对哪些 RDD 以及相应输出进行记录，寻找一个运行相应 job 所需要的最小 stage。然后将 <code>stage</code> 以 <code>TaskSet</code> 的形式提交到下层的 <code>TaskScheduler</code> 进行具体的 task 调度。每个 <code>TaskSet</code> 包含整个可以独立运行的 task，这些 task 能够利用集群上已有的数据立即运行起来，如果集群上已有的数据已经不存在了，那么当前 task 就会失败。</p>
+<p>Spark 的 stage 以 RDD 的 shuffle 为界进行划分。窄依赖的 RDD 操作会被穿起来放到一个 task 中，比如 <code>map()</code>, <code>filter()</code> 这样的操作。但是需要使用到 shuffle 依赖的操作，需要多个 stage（至少一个将中间文件写到特定的地方，另外一个从特定的地方进行读取）。每个 Stage，只会对其他 Stage 有 shuffle 依赖，在同一个 stage 中会进行很多计算。实际的将计算串起来的操作在 RDD.compute 中完成。</p>
+<p><code>DAGScheduler</code> 同样会基于缓存状态决定 task 希望运行在那（preferred location），如果 shuffle 输出文件丢失造成的 Stage 失败，会重新被提交。在 <strong>Stage 内部</strong> 的不是由 shuffle 文件丢失造成的失败，由 <code>TaskScheduler</code> 来完成，<code>TaskScheduler</code> 会在取消整个 stage 前进行小部分重试。<br><a id="more"></a><br>下面的几个核心概念：</p>
+<ul>
+<li>Jobs (通过 <code>ActiveJob</code> 来表示）是提交给调度器中最上次工作单元。比如，用户触发一次 action，比如 <code>count()</code>，的时候，就会提交一个 Job。每个 Job 可能会包含多个 stage</li>
+<li>Stages 是 Job 中产生中间结果的一系列 Task 的集合，同一个 Stage 的每个 Task 运行着同样的逻辑，只是处理同一个 RDD 的不同分区。Stage 以 Shuffle 为界（后面的 Stage 必须等前面的 Stage 运行完才能继续往下进行）。现在有两种 Stage：<code>ResultStage</code>，Job 的最终执行 action 的 Stage，<code>ShuffleMapState</code> 产生中间文件的 shuffle。如果多 Job 公用同一个 RDD 的话，Stage 可能会在多个 Job 间共享。</li>
+<li>Tasks 是组小的独立工作单元，每个 Task 会被独立的分发到具体的机器上运行</li>
+<li>Cache tracking: <code>DAGScheduler</code> 会记录哪些 RDD 以及被缓存过，从而避免重复计算，也会记录哪些 Stage 已经生成过输出文件从而避免重复操作</li>
+<li>Preferred locations: <code>DAGScheduler</code> 会根据计算所依赖的 RDD 数据、缓存的地址以及 shuffle 输出结果对 Task 进行调度</li>
+<li>Cleanup: 如果上游依赖的 Job 处理完成后，下游的数据会被清理掉，防止长驻服务的内存泄漏</li>
+</ul>
+<p>为了能够从错误中进行恢复，同一个 Stage 可能会被运行多次，每一次就是一个 “attempts”。如果 <code>TaskScheduler</code> 汇报某个 task 失败的原因是因为依赖的前一个 Stage 的输出文件已经不见了，那么 <code>DAGScheduler</code> 会对前一个 Stage 重新进行提交。这通过 <code>CompletionEveent</code> 以及 <code>FetchFailed</code> 或者 <code>ExecutorLost</code> 事件来完成。<code>DAGScheduler</code> 会等待一小段时间来判断是否还有其他 task 需要重试，然后将所有失败的 task 进行重试。在这一过程中，我们需要重新对之前清理过的 Stage 进行计算。由于之前的 “attempt” 可能还在运行，所以需要特别注意</p>
+<img src="/2017/10/16/spark-dagscheduler/procesure.jpg" alt="procesure.jpg" title="">
+<p>上面的图是 DAGScheduler.scala 的主题脉络，当然还包括其他诸如 <code>taskStarted</code>, <code>taskGettingResult</code>, <code>taskEnded</code>, <code>executorZHeatbeatReceived</code>, <code>executorLost</code>, <code>executorAdded</code>, <code>taskSetFailed</code>, 等函数</p>
+<blockquote>
+<p>其中带箭头的虚线为消息调用；带箭头的实线为直接调用，无箭头的实线表示方法申明和内部的主要实现（比如 <code>getShuffleMapStage</code> 中包括了 <code>getAncestorShuffleDependencies</code> 和 <code>newOrUsedShuffleStage</code>)</p>
+</blockquote>
+<h4 id="上面是注释，下面是代码解释"><a href="#上面是注释，下面是代码解释" class="headerlink" title="上面是注释，下面是代码解释"></a>上面是注释，下面是代码解释</h4><p>入口在 <code>runJob</code>，<code>runJob</code> 会调用 <code>submitJob(rdd, func, partitions, callSite, resultHandler, properties)</code> 返回一个 waiter，等待处理完成</p>
+<p><code>submitJob</code> 核心代码如下，主要生成一个 waiter 对象，然后发送一个 <code>JobSubmitted</code> 信号</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">val func2 = func.asInstanceOf[(TaskContext, Iterator[_]) =&gt; _]</div><div class="line">val waiter = new JobWaiter(this, jobId, partitions.size, resultHandler)</div><div class="line">eventProcessLoop.post(JobSubmitted(jobId, rdd, func2, partitions.toArray, callSite, waiter, SerializationUtils.clone(properties)))</div></pre></td></tr></table></figure>
+<p><code>JobSubmitted</code> 方法会将整个 DAG 图进行 Stage 的划分，然后提交 finalStage（也就是 action 所在的 Stage），其中 <code>newResultStage</code> 会进行具体的 Stage 划分，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">try &#123;</div><div class="line">	// New stage creation may throw an exception if, for example, jobs are run on a</div><div class="line">	// HadoopRDD whose underlying HDFS files have been deleted.</div><div class="line">	finalStage = newResultStage(finalRDD, func, partitions, jobId, callSite)</div><div class="line">&#125; catch &#123;</div><div class="line">	case e: Exception =&gt;</div><div class="line">		logWarning(&quot;Creating new stage failed due to exception - job: &quot; + jobId, e)</div><div class="line">		listener.jobFailed(e)</div><div class="line">		return</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>submitJob</code> 返回的 <code>JobWaiter</code>，JobWaiter 用于控制 Job，以及 Job 结束后进行相应的状态更新</p>
+<p><code>newResultStage</code> 会将所有的 Stage 划分出来（通过 <code>getParentStagesAndId</code> 函数，<code>getParentStages</code> 进行具体的 Stage 划分），其中 <code>getParentStages</code> 进行 BFS 进行查找（这个地方 BFS 和 DFS 有什么区别？）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">private def getParentStages(rdd: RDD[_], firstJobId: Int): List[Stage] = &#123;</div><div class="line">	val parents = new HashSet[Stage]</div><div class="line">	val visited = new HashSet[RDD[_]]</div><div class="line">	// We are manually maintaining a stack here to prevent StackOverflowError</div><div class="line">	// caused by recursively visiting</div><div class="line">	val waitingForVisit = new Stack[RDD[_]]</div><div class="line">	def visit(r: RDD[_]) &#123;</div><div class="line">		if (!visited(r)) &#123;</div><div class="line">			visited += r</div><div class="line">			// Kind of ugly: need to register RDDs with the cache here since</div><div class="line">			// we can&apos;t do it in its constructor because # of partitions is unknown</div><div class="line">			for (dep &lt;- r.dependencies) &#123;</div><div class="line">				dep match &#123;</div><div class="line">					case shufDep: ShuffleDependency[_, _, _] =&gt;</div><div class="line">						parents += getShuffleMapStage(shufDep, firstJobId)</div><div class="line">					case _ =&gt;</div><div class="line">						waitingForVisit.push(dep.rdd)</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	waitingForVisit.push(rdd)</div><div class="line">	while (waitingForVisit.nonEmpty) &#123;</div><div class="line">		visit(waitingForVisit.pop())</div><div class="line">	&#125;</div><div class="line">	parents.toList</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>getParentStages 返回某个 RDD 的所有依赖的 stage（直接和间接的），stage 以 getShuffleMapStage() 返回为准</p>
+<p><code>getShuffleMapStage</code> 首先从 shuffleToMapStage(shuffleid 到 stage 的 map 结构）中查找，没有找到就以 shuffleDep.rdd 为起始点建立一个依赖关系，并且将整条依赖链上的东西都建立起来</p>
+<p><code>getAncestorShuffleDependencies</code> 会以一个 RDD 为起点，找到 RDD 直接&amp;间接 依赖的所有 shuffleDependency</p>
+<p><code>getAncestorShuffleDependencies</code> 和  <code>getParentStages</code> 类似但又不一样，前者在搜索的时候，每次都需要把 rdd.dep 入队，而后者只需要将 narrowdependency 的入队。还有为什么两个函数一个结果保存为 Set，一个是 Stack？</p>
+<p><code>newShuffleMapStage</code> 中会更新 job 和 stage，以及 stage 和 job 的关系，每个 stage 属于哪些 job，每个 job 包含哪些 stage</p>
+<p>整个类中有一个变量 <code>mapOutputTracker :MapOutputTracker</code> 用于记录 shuffle 的结果以及位置</p>
+<p><code>MapOutputTracker</code> 记录 shuffleMapStage 的 output location  ，为啥要两个 status map（一个 MapStatus，一个 CachedSerializedStatus，后者是前者的序列化之后的结果）,这些 Map 都是带 ttl 的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">/* org.apache.spark.MapOutputTracker.scala</div><div class="line">* Class that keeps track of the location of the map output of</div><div class="line">* a stage. This is abstract because different versions of MapOutputTracker</div><div class="line">* (driver and executor) use different HashMap to store its metadata.</div></pre></td></tr></table></figure>
+<p>Driver 使用 MapOutputTrackerMaster 跟踪 output location，只有所有 partition 的 output location 都就绪了，整个被依赖的 RDD 才是就绪的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">* MapOutputTracker for the driver. This uses TimeStampedHashMap to keep track of map</div><div class="line">* output information, which allows old output information based on a TTL.</div></pre></td></tr></table></figure>
+<p>Executor 则使用 <code>MapOutputTrackerWorker</code> 从 Driver 获取 map output 的相应信息</p>
+<p><code>newOrUsedShuffleStage</code> 函数中首先查找该 shuffleMapStage 是否注册过 MapOutputTracker，如果注册过就直接获取，如果没有注册过就进行注册。<br>MapOutputTracker 有两个 Map 结构，一个是原始的 partition location，一个是序列化之后的（用于加速？），这两个 map 包含过期清理策略，用于节省空间</p>
+<p>定期清理的 Meta 信息包括如下几种：</p>
+<ul>
+<li>MAP_OUTPUT_TRACKER, </li>
+<li>SPARK_CONTEXT, </li>
+<li>HTTP_BROADCAST, </li>
+<li>BLOCK_MANAGER,</li>
+<li>SHUFFLE_BLOCK_MANAGER, </li>
+<li>BROADCAST_VARS</li>
+</ul>
+<h3 id="上面是一条链路上的相关函数，下面包括一些其他的处理"><a href="#上面是一条链路上的相关函数，下面包括一些其他的处理" class="headerlink" title="上面是一条链路上的相关函数，下面包括一些其他的处理"></a>上面是一条链路上的相关函数，下面包括一些其他的处理</h3><h4 id="handleTaskCompletion-处理-Task-comple-的信息（不分成功和失败）"><a href="#handleTaskCompletion-处理-Task-comple-的信息（不分成功和失败）" class="headerlink" title="handleTaskCompletion 处理 Task comple 的信息（不分成功和失败）"></a><code>handleTaskCompletion</code> 处理 Task comple 的信息（不分成功和失败）</h4><p>task complete 会分几种信息：</p>
+<ul>
+<li><p>Success：<br>首先将 task 从 pendingTask 中去掉<br>  task 分为两种：</p>
+<ul>
+<li>ResultTask：<br>将 job 对应的当前 task 标记为 true（如果没有标记过的话），如果整个 job 都处理完成，就将 stage 标记为完成</li>
+<li><p>ShuffleMapTask：<br>更新 outputLocation （当前 shuffleMapTask 的输出）<br>如果 ShuffleMapTask 的所有 partition 都处理完成，就将当前的 stage 标记为完成<br>这里为了防止是重复进行计算（之前失败过），需要重新进行 outputLocation 的注册（主要是增加 epoch）<br>如果当前当前的 Stage.isAvailable 为 true 就通知所有依赖该 stage 的 stage 可以继续工作了。否则重新提交失败的 task（注意这里available 和上面的 finish 不一样，available 是以 output 是否能够获取到为准）</p>
+</li>
+<li><p>Resubmitted：<br>将 task 加到 pendingTask 中即可，等待后续的调度</p>
+</li>
+<li><p>FetchFailed：<br>首先判断失败 task 的 attemp 是否是当前的 attemp，不是就忽略，然后判断当前 stage 是否正在运行，如果不是，忽略。<br>否则将当前的 stage 标记为 finish，然后将进行 mapStage.removeOutputLoc 以及 mapOutputTracker.unregisterMapOutput。<br>如果同一个 executor 上的 fetchFailed 很多（这个有调用方判断），则将所在的 executor 标记为 Failed</p>
+</li>
+<li><p>其他信息，直接忽略</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="ExecutorLost"><a href="#ExecutorLost" class="headerlink" title="ExecutorLost"></a>ExecutorLost</h4><p>如果上报的 executor 之前没有上报过（会有一个 Map 记录所有上报过的 executor），或者之前上报的该 executor 对应的 epoch 小于 currentepoch， 则需要进行处理</p>
+<p>首先从 blockManagerMaster 中将当前 executor 删除</p>
+<p>如果没有启动 externalShuffleService（开启 <code>DynamicAllocation</code> 后需要开启，不然会出问题），或者 fetchFailed（由调用方设置），则进行下面的操作：</p>
+<p><code>if (!env.blockManager.externalShuffleServiceEnabled || fetchFailed)</code></p>
+<p>所该 executor 上所有的输出都进行标记删除，并且增加 <code>mapOutputTracker</code> 的 epoch</p>
+<h4 id="ExecutorAdded"><a href="#ExecutorAdded" class="headerlink" title="ExecutorAdded"></a>ExecutorAdded</h4><p>  如果当前添加的 executor 是马上需要回收的，那么就从即将回收的 map 中删除，防止回收，否则不需要操作</p>
+<h4 id="StageCancellation"><a href="#StageCancellation" class="headerlink" title="StageCancellation"></a>StageCancellation</h4><p>  如果有正在运行的 job 依赖当前 stage，则将所有的 job 标记为 cancel</p>
+<h4 id="JobCancellation"><a href="#JobCancellation" class="headerlink" title="JobCancellation"></a>JobCancellation</h4><p>  将该 job 以及只由该 job 依赖的 stage 都标记为 failed</p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>  <code>spark.stage.maxConsecutiveAttempts</code> 表示一个 stage 尝试多少次之后会被标记为失败</p>
+<p>  SparkContext 中会根据模式生成和注册相应的 backend 以及 taskscheduler</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><ol>
+<li>如果一个 Stage 有多个 RDD，那么这些 RDD 是在同一个 TaskSet 中吗</li>
+<li>如何模拟 <code>r2 = r0.reduceByKey; r3 = r1.reduceByKey; r4 = r2.map(xx); r5 = r4.union(r3); r6 = r5.map r7 = r6.reduceByKey</code> 的 Stage 划分和生成（会有多少个 Stage，以及每个 Stage 包含多少个 RDD（按照定义，一个 Stage 只包含一个 RDD？），以及整个 DAG 怎么整合起来的）</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;基于 spark 1.6&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;面向 Stage 的调度器，负责计算每个 job 的 DAG，并将 DAG 图划分为不同的 stage，对哪些 RDD 以及相应输出进行记录，寻找一个运行相应 job 所需要的最小 stage。然后将 &lt;code&gt;stage&lt;/code&gt; 以 &lt;code&gt;TaskSet&lt;/code&gt; 的形式提交到下层的 &lt;code&gt;TaskScheduler&lt;/code&gt; 进行具体的 task 调度。每个 &lt;code&gt;TaskSet&lt;/code&gt; 包含整个可以独立运行的 task，这些 task 能够利用集群上已有的数据立即运行起来，如果集群上已有的数据已经不存在了，那么当前 task 就会失败。&lt;/p&gt;
+&lt;p&gt;Spark 的 stage 以 RDD 的 shuffle 为界进行划分。窄依赖的 RDD 操作会被穿起来放到一个 task 中，比如 &lt;code&gt;map()&lt;/code&gt;, &lt;code&gt;filter()&lt;/code&gt; 这样的操作。但是需要使用到 shuffle 依赖的操作，需要多个 stage（至少一个将中间文件写到特定的地方，另外一个从特定的地方进行读取）。每个 Stage，只会对其他 Stage 有 shuffle 依赖，在同一个 stage 中会进行很多计算。实际的将计算串起来的操作在 RDD.compute 中完成。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;DAGScheduler&lt;/code&gt; 同样会基于缓存状态决定 task 希望运行在那（preferred location），如果 shuffle 输出文件丢失造成的 Stage 失败，会重新被提交。在 &lt;strong&gt;Stage 内部&lt;/strong&gt; 的不是由 shuffle 文件丢失造成的失败，由 &lt;code&gt;TaskScheduler&lt;/code&gt; 来完成，&lt;code&gt;TaskScheduler&lt;/code&gt; 会在取消整个 stage 前进行小部分重试。&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
+    
+      <category term="source_code" scheme="http://yoursite.com/tags/source-code/"/>
+    
+      <category term="dagscheduler" scheme="http://yoursite.com/tags/dagscheduler/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>GC 引用计数法</title>
+    <link href="http://yoursite.com/2017/09/22/GC-%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95/"/>
+    <id>http://yoursite.com/2017/09/22/GC-引用计数法/</id>
+    <published>2017-09-22T12:48:06.000Z</published>
+    <updated>2017-10-16T12:19:17.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文将将介绍 GC 算法中最基本的三种算法的第二种：引用计数法。</p>
+<h1 id="GC-引用计数法"><a href="#GC-引用计数法" class="headerlink" title="GC 引用计数法"></a>GC 引用计数法</h1><p>GC 本来是一种“释放已经没有被引用的对象的机制”，人们自然就想到，通过记录所有对象的引用次数来进行，这就是 GC 引用计数法。</p>
+<p>引用计数法，一句话来说就是，记录每个对象被引用的多少次，如果引用次数为零，就编程“垃圾”了，可以被回收。</p>
+<p>下面给出引用计数法的基本代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">//分配对象</div><div class="line">new_object(size) &#123;</div><div class="line">    obj = pickup_chunk(size, $free_list) //从 free_list 中查找一个符合大小的块</div><div class="line">    </div><div class="line">    if (obj == NULL) //分配失败</div><div class="line">        allocation_fail()</div><div class="line">    else //分配成功</div><div class="line">        obj.ref_cnt = 1 //更新引用计数</div><div class="line">        return ojb</div><div class="line">&#125;</div><div class="line"></div><div class="line">//更新指针</div><div class="line">update_ptr(ptr, obj) &#123;</div><div class="line">    inc_ref_cnt(obj)  // 更新 obj 的引用</div><div class="line">    dec_ref_cnt(*ptr) // 更新 *ptr 的引用，注意这两句话的顺序，思考是否可以调换顺序</div><div class="line">    *ptr = obj</div><div class="line">&#125;</div><div class="line"></div><div class="line">inc_ref_cnt(obj) &#123;</div><div class="line">    obj.ref_cnt++</div><div class="line">&#125;</div><div class="line"></div><div class="line">dec_ref_cnt(obj) &#123;</div><div class="line">    obj.ref_cnt-- // 更新引用计数</div><div class="line">    if(obj.ref_cnt == 0) //如果该对象变成了 “垃圾”，进行回收</div><div class="line">        for (child: children(obj)) //更新所有子节点的引用</div><div class="line">            dec_ref_cnt(*child)</div><div class="line">        reclaim(obj)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>GC 引用计数法的大致流程如上所述，其中 update_ptr 可以用下图描述</p>
+<h1 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h1><p>对于引用计数法，我们可以来看看它到底有哪些优缺点呢？</p>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ol>
+<li><p>可即刻回收垃圾。</p>
+<p> 在引用计数法中，每个对象都知道自己的被引用数，一旦计数变为 0，就会被链接到空闲链表中。换句话说，所有对象在被标记为垃圾的同时就会被回收。</p>
+</li>
+<li><p>最大暂停时间短</p>
+<p> 只有更新指针的时候才会执行垃圾回收，</p>
+</li>
+<li></li>
+</ol>
+<h1 id="优化方案"><a href="#优化方案" class="headerlink" title="优化方案"></a>优化方案</h1>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文将将介绍 GC 算法中最基本的三种算法的第二种：引用计数法。&lt;/p&gt;
+&lt;h1 id=&quot;GC-引用计数法&quot;&gt;&lt;a href=&quot;#GC-引用计数法&quot; class=&quot;headerlink&quot; title=&quot;GC 引用计数法&quot;&gt;&lt;/a&gt;GC 引用计数法&lt;/h1&gt;&lt;p&gt;GC 本来是
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>GC 标记-清除算法</title>
@@ -371,9 +514,9 @@
     </summary>
     
     
-      <category term="code" scheme="http://yoursite.com/tags/code/"/>
-    
       <category term="java" scheme="http://yoursite.com/tags/java/"/>
+    
+      <category term="code" scheme="http://yoursite.com/tags/code/"/>
     
       <category term="metric" scheme="http://yoursite.com/tags/metric/"/>
     
@@ -772,11 +915,11 @@
     
       <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
     
-      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
-    
       <category term="append" scheme="http://yoursite.com/tags/append/"/>
     
       <category term="hdfs" scheme="http://yoursite.com/tags/hdfs/"/>
+    
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
     
   </entry>
   
@@ -1099,114 +1242,6 @@
       <category term="read" scheme="http://yoursite.com/tags/read/"/>
     
       <category term="english" scheme="http://yoursite.com/tags/english/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spark Streaming 从 Kafka 读取 binlog 转换成 Json</title>
-    <link href="http://yoursite.com/2016/08/27/spark-streaming-kafka-read-binlog-to-json/"/>
-    <id>http://yoursite.com/2016/08/27/spark-streaming-kafka-read-binlog-to-json/</id>
-    <published>2016-08-27T02:12:36.000Z</published>
-    <updated>2017-05-29T09:22:53.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>在开发 Spark Streaming 的公共组件过程中，需要将 binlog 的数据(Array[Byte])转换为 Json 格式，供用户使用，本文提供一种转换的思路。另外我们会用到几个辅助类，为了行文流畅，我们将辅助类的定义放在文章的最后面。如果</p>
-<p>如果本文有讲述不详细，或者错误指出，肯请指出，谢谢</p>
-<p>对于 binlog 数据，每一次操作(INSERT/UPDATE/DELETE 等）都会作为一条记录写入 binlog 文件，但是同一条记录可能包含数据库中的几行数据（这里比较绕，可以看一个具体的例子）</p>
-<p>在数据库中，有 id, name，age 三个字段，其中 id 为主键，name 随意, age 随意。有两行数据如下</p>
-<table>
-<thead>
-<tr>
-<th>id</th>
-<th>name</th>
-<th>age</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>john</td>
-<td>30</td>
-</tr>
-<tr>
-<td>2</td>
-<td>john</td>
-<td>40</td>
-</tr>
-</tbody>
-</table>
-<p>那么你进行操作</p>
-<p><pre class="lang:tsql decode:true  ">update table set age = 50 where name = “john”</pre><br>的时候，就会将两行的数据都进行更改，这两行更改的数据会在同一个 binlog 记录中，这一点会在后面的实现中有体现。</p>
-<p>下面，我们给出具体的代码，然后对代码进行分析</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">def desirializeByte(b: (String, Array[Byte])) : (String, String) = &#123; </div><div class="line">  val binlogEntry = BinlogEntryUtil.serializeToBean(b._2)   //将 Array[Byte] 数据转换成 com.meituan.data.binlog.BinlogEntry 类，相关类定义参考附录</div><div class="line"></div><div class="line">  val pkeys = binlogEntry.getPrimaryKeys.asScala   //获取主键，这里的 asScala 将 Java 的 List 转换为 Scala 的 List</div><div class="line">  val rowDatas : List[BinlogRow] = binlogEntry.getRowDatas.asScala.toList  //获取具体的信息</div><div class="line">  val strRowDatas = rowDatas.map(a =&gt; &#123;            //将获取到的具体信息进行转换，这里主要是将没一条信息的内容，转换 [(K1:V1,K2:V2...Kn:Vn)] 的形式，方面后面进行 Json 化</div><div class="line">    val b = a.getBeforeColumns.asScala    //获取 beforColumns</div><div class="line">    val c = a.getAfterColumns.asScala     //获取 afterColumns</div><div class="line">    val mb = b.map(d =&gt; (d._1, d._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值</div><div class="line">    val mc = c.map(c =&gt; (c._1, c._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值</div><div class="line">    (mb, mc) //返回转换后的 beforeColumns 和 afterColumns</div><div class="line">  &#125;)</div><div class="line">  //下面利用 json4s 进行 Json 化</div><div class="line">  (binlogEntry.getEventType, compact(&quot;rowdata&quot; -&gt; strRowDatas.map&#123;</div><div class="line">    w =&gt; List(&quot;row_data&quot; -&amp;gt; (&quot;before&quot; -&amp;gt; w._1.toMap) ~ (&quot;after&quot; -&amp;gt; w._2.toMap))  //这里的两个 toMap 是必要的，不然里层会变成 List，这个地方比较疑惑的是，</div><div class="line">                                                                                 //w._1 按理是 Map类型，为什么还需要强制转换成 Map</div><div class="line">                                                                              //而且用 strRowDatas.foreach(x =&gt; println(s&quot;$&#123;x._1&#125;  $&#123;x._2&#125;&quot;)打印的结果表名是 Map</div><div class="line">  &#125;))&lt;/pre&gt;</div><div class="line">desirializeByte 函数传入 topic 中的一条记录，返回参数自己确定，我这里为了测试，返回一个 (String, String) 的 Tuple，第一个字段表示该条记录的 EventType（Insert/Update/Delete 等），第二个字段为 Json 化后的数据。</div><div class="line"></div><div class="line">BinlogEntryUtil.serilizeToBean 是一个辅助类，将 binlog 数据转化为一个 Java bean 类。</div><div class="line"></div><div class="line">第 4 行，我们得到表对应的主键，第 5 行获得具体的数据</div><div class="line"></div><div class="line">第 6 行到第 12 行是 Json 化之前的辅助工作，将所有不需要的东西给剔除掉，只留下字段，以及字段对应的值。</div><div class="line"></div><div class="line">第 14， 15 行就是具体的 Json 工作了（使用了 json4s 包进行 Json 化）</div><div class="line"></div><div class="line">这个过程中有一点需要注意的是，在 Json 化的时候，记得为 w._1 和 w._2 加 toMap 操作，不然会变成 List（很奇怪，我将 w._1 和 w._2 打印出来看，都是 Map 类型）或者你可以在第 7，8 行的末尾加上 .toMap 操作。这个我查了 API，进行了实验，暂时怀疑是在和 json4s 组合的时候，出现了问题，有待验证。</div><div class="line"></div><div class="line">利用上述代码，我们可以得到下面这样 Json 化之后的字符串(我进行了排版，程序返回的 Json 串是不换行的）</div><div class="line">&lt;pre class=&quot;font-size:8 lang:default decode:true&quot;&gt;&#123;&quot;rowdata&quot;:</div><div class="line">   [&#123;&quot;row_data&quot;:</div><div class="line">       &#123;&quot;before&quot;:&#123;&quot;param_name&quot;:&quot;creator&quot;,&quot;param_value&quot;:&quot;chenqiang05&quot;,&quot;horigindb_etl_id&quot;:&quot;2532&quot;,&quot;utime&quot;:&quot;2016-07-26 15:07:16&quot;,&quot;id&quot;:&quot;15122&quot;,&quot;status&quot;:&quot;0&quot;,&quot;ctime&quot;:&quot;2016-07-25 17:06:01&quot;&#125;,</div><div class="line">        &quot;after&quot;:&#123;&quot;param_name&quot;:&quot;creator&quot;,&quot;param_value&quot;:&quot;chendayao&quot;,&quot;horigindb_etl_id&quot;:&quot;2532&quot;,&quot;utime&quot;:&quot;2016-08-01 10:32:01&quot;,&quot;id&quot;:&quot;15122&quot;,&quot;status&quot;:&quot;0&quot;,&quot;ctime&quot;:&quot;2016-07-25 17:06:01&quot;&#125;</div><div class="line">       &#125;</div><div class="line">    &#125;]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>到这里，基本就完成了一种将 binlog 数据 Json 化的代码。</p>
-<p>附录代码，由于这些代码是从其他工程里面抠出来的，可能读起来会不顺畅，还请见谅。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div></pre></td><td class="code"><pre><div class="line">public static BinlogEntry serializeToBean(byte[] input) &#123;</div><div class="line">      BinlogEntry binlogEntry = null;</div><div class="line">      Entry entry = deserializeFromProtoBuf(input);//从 protobuf 反序列化</div><div class="line">      if(entry != null) &#123;</div><div class="line">         binlogEntry = serializeToBean(entry);</div><div class="line">      &#125;</div><div class="line">      return binlogEntry;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public static Entry deserializeFromProtoBuf(byte[] input) &#123;</div><div class="line">        Entry entry = null;</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            entry = Entry.parseFrom(input);</div><div class="line">//com.alibaba.otter.canal.protocol.CanalEntry#Entry 类的方法，由 protobuf 生成</div><div class="line">        &#125; catch (InvalidProtocolBufferException var3) &#123;</div><div class="line">            logger.error(&quot;Exception:&quot; + var3);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return entry;</div><div class="line">    &#125;</div><div class="line">//将 Entry 解析为一个 bean 类</div><div class="line">public static BinlogEntry serializeToBean(Entry entry) &#123;</div><div class="line">        RowChange rowChange = null;</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            rowChange = RowChange.parseFrom(entry.getStoreValue());</div><div class="line">        &#125; catch (Exception var8) &#123;</div><div class="line">            throw new RuntimeException(&quot;parse event has an error , data:&quot; + entry.toString(), var8);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        BinlogEntry binlogEntry = new BinlogEntry();</div><div class="line">        String[] logFileNames = entry.getHeader().getLogfileName().split(&quot;\\.&quot;);</div><div class="line">        String logFileNo = &quot;000000&quot;;</div><div class="line">        if(logFileNames.length &gt; 1) &#123;</div><div class="line">            logFileNo = logFileNames[1];</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        binlogEntry.setBinlogFileName(logFileNo);</div><div class="line">        binlogEntry.setBinlogOffset(entry.getHeader().getLogfileOffset());</div><div class="line">        binlogEntry.setExecuteTime(entry.getHeader().getExecuteTime());</div><div class="line">        binlogEntry.setTableName(entry.getHeader().getTableName());</div><div class="line">        binlogEntry.setEventType(entry.getHeader().getEventType().toString());</div><div class="line">        Iterator primaryKeysList = rowChange.getRowDatasList().iterator();</div><div class="line"></div><div class="line">        while(primaryKeysList.hasNext()) &#123;</div><div class="line">            RowData rowData = (RowData)primaryKeysList.next();</div><div class="line">            BinlogRow row = new BinlogRow(binlogEntry.getEventType());</div><div class="line">            row.setBeforeColumns(getColumnInfo(rowData.getBeforeColumnsList()));</div><div class="line">            row.setAfterColumns(getColumnInfo(rowData.getAfterColumnsList()));</div><div class="line">            binlogEntry.addRowData(row);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if(binlogEntry.getRowDatas().size() &gt;= 1) &#123;</div><div class="line">            BinlogRow primaryKeysList1 = (BinlogRow)binlogEntry.getRowDatas().get(0);</div><div class="line">            binlogEntry.setPrimaryKeys(getPrimaryKeys(primaryKeysList1));</div><div class="line">        &#125; else &#123;</div><div class="line">            ArrayList primaryKeysList2 = new ArrayList();</div><div class="line">            binlogEntry.setPrimaryKeys(primaryKeysList2);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return binlogEntry;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public class BinlogEntry implements Serializable &#123;</div><div class="line">    private String binlogFileName;</div><div class="line">    private long binlogOffset;</div><div class="line">    private long executeTime;</div><div class="line">    private String tableName;</div><div class="line">    private String eventType;</div><div class="line">    private List&lt;String&gt; primaryKeys;</div><div class="line">    private List&lt;BinlogRow&gt; rowDatas = new ArrayList();</div><div class="line">&#125;</div><div class="line">public class BinlogRow implements Serializable &#123;</div><div class="line">    public static final String EVENT_TYPE_INSERT = &quot;INSERT&quot;;</div><div class="line">    public static final String EVENT_TYPE_UPDATE = &quot;UPDATE&quot;;</div><div class="line">    public static final String EVENT_TYPE_DELETE = &quot;DELETE&quot;;</div><div class="line">    private String eventType;</div><div class="line">    private Map&lt;String, BinlogColumn&gt; beforeColumns;</div><div class="line">    private Map&lt;String, BinlogColumn&gt; afterColumns;</div><div class="line">&#125;</div><div class="line">public class BinlogColumn implements Serializable &#123;</div><div class="line">    private int index;</div><div class="line">    private String mysqlType;</div><div class="line">    private String name;</div><div class="line">    private boolean isKey;</div><div class="line">    private boolean updated;</div><div class="line">    private boolean isNull;</div><div class="line">    private String value;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>&nbsp;</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;在开发 Spark Streaming 的公共组件过程中，需要将 binlog 的数据(Array[Byte])转换为 Json 格式，供用户使用，本文提供一种转换的思路。另外我们会用到几个辅助类，为了行文流畅，我们将辅助类的定义放在文章的最后面。如果&lt;/p&gt;
-&lt;p&gt;如果本
-    
-    </summary>
-    
-      <category term="分布式系统" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"/>
-    
-      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
-    
-    
-      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
-    
-      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
-    
-      <category term="binlog" scheme="http://yoursite.com/tags/binlog/"/>
-    
-      <category term="json" scheme="http://yoursite.com/tags/json/"/>
-    
-      <category term="protobuf" scheme="http://yoursite.com/tags/protobuf/"/>
-    
-      <category term="scala" scheme="http://yoursite.com/tags/scala/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spark Streaming 中使用 zookeeper 保存 offset 并重用（二）</title>
-    <link href="http://yoursite.com/2016/07/15/spark-streaming-saving-offset-in-zookeeper-2/"/>
-    <id>http://yoursite.com/2016/07/15/spark-streaming-saving-offset-in-zookeeper-2/</id>
-    <published>2016-07-15T12:58:04.000Z</published>
-    <updated>2017-05-29T09:22:53.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><a href="http://www.klion26.com/spark-streaming-save-offset-to-zookeeper.html" target="_blank" rel="external">上一篇文章</a>中，我们讲了如何在将 offset 保存在 zk 中，以及进行重用，但是程序中有个小问题“如果程序停了很长很长一段后再启动，zk 中保存的 offset 已经过期了，那会怎样呢？”本文将解决这个问题</p>
-<p>如果 kafka 上的 offset 已经过期，那么就会报 OffsetOutOfRange 的异常，因为之前保存在 zk 的 offset 已经 topic 中找不到了。所以我们需要在 从 zk 找到 offset 的这种情况下增加一个判断条件，如果 zk 中保存的 offset 小于当前 kafka topic 中最小的 offset，则设置为 kafka topic 中最小的 offset。假设我们上次保存在 zk 中的 offset 值为 123（某一个 partition），然后程序停了一周，现在 kafka topic 的最小 offset 变成了 200，那么用前文的代码，就会得到 OffsetOutOfRange 的异常，因为 123 对应的数据已经找不到了。下面我们给出，如何获取 <topic, parition=""> 的最小 offset，这样我们就可以进行对比了</topic,></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">val partitionOffset = zkClient.readData[String](s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;i&#125;&quot;)</div><div class="line">val tp = TopicAndPartition(topic, i)</div><div class="line"></div><div class="line">val requestMin = OffsetRequest(Map(tp -&gt; PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))</div><div class="line">val consumerMin = new SimpleConsumer(&quot;broker_host&quot;, 9092, 10000, 10000, &quot;getMinOffset&quot;)  //注意这里的 broker_host，因为这里会导致查询不到，解决方法在下面</div><div class="line">val curOffsets = consumerMin.getOffsetsBefore(requestMin).partitionErrorAndOffsets(tp).offsets</div><div class="line">var nextOffset = partitionOffset.toLong</div><div class="line">if (curOffsets.length &gt; 0 &amp;amp; nextOffset &lt; curOffsets.head) &#123;  // 通过比较从 kafka 上该 partition 的最小 offset 和 zk 上保存的 offset，进行选择</div><div class="line">  nextOffset = curOffsets.head</div><div class="line">&#125;</div><div class="line">fromOffsets += (tp -&gt; nextOffset) //设置正确的 offset，这里将 nextOffset 设置为 0（0 只是一个特殊值），可以观察到 offset 过期的现象&lt;/pre&gt;</div></pre></td></tr></table></figure>
-<p>但是上面的代码有一定的问题，因为我们从 kafka 上获取 offset 的时候，需要寻找对应的 leader，从 leader 来获取 offset，而不是 broker，不然可能得到的 curOffsets 会是空的（表示获取不到）。下面的代码就是获取不同 partition 的 leader 相关代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">val topic_name = &quot;topic_name&quot;     //topic_name 表示我们希望获取的 topic 名字</div><div class="line">val topic2 = List(topic_name)       </div><div class="line">val req = new TopicMetadataRequest(topic2, 0)</div><div class="line">val getLeaderConsumer = new SimpleConsumer(&quot;broker_host&quot;, 9092, 10000, 10000, &quot;OffsetLookup&quot;)  // 第一个参数是 kafka broker 的host，第二个是 port</div><div class="line">val res = getLeaderConsumer.send(req)</div><div class="line">val topicMetaOption = res.topicsMetadata.headOption</div><div class="line">val partitions = topicMetaOption match &#123;</div><div class="line">  case Some(tm) =&gt;</div><div class="line">    tm.partitionsMetadata.map(pm =&gt; (pm.partitionId, pm.leader.get.host)).toMap[Int, String]  // 将结果转化为 partition -&amp;gt; leader 的映射关系</div><div class="line">  case None =&gt;</div><div class="line">    Map[Int, String]()</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>上面的代码能够得到所有 partition 的 leader 地址，然后将 leader 地址替换掉上面第一份代码中的 broker_list 即可。</p>
-<p>到此，在 spark streaming 中将 kafka 的 offset 保存到 zk，并重用的大部分情况都覆盖到了</p>
-<p><br><br><br>&nbsp;</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;a href=&quot;http://www.klion26.com/spark-streaming-save-offset-to-zookeeper.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;上一篇文章&lt;/a&gt;中，我们讲了如何在将 offset 
-    
-    </summary>
-    
-      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
-    
-    
-      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
-    
-      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
-    
-      <category term="at-least-once" scheme="http://yoursite.com/tags/at-least-once/"/>
-    
-      <category term="exactly-once" scheme="http://yoursite.com/tags/exactly-once/"/>
-    
-      <category term="zookeeper" scheme="http://yoursite.com/tags/zookeeper/"/>
-    
-      <category term="offset" scheme="http://yoursite.com/tags/offset/"/>
     
   </entry>
   

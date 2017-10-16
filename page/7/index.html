@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 7 | klion26</title>
+  <title>第 7 頁 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,113 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-06-21 </div>
+			<div class="article-title"><a href="/2013/06/21/linux-command-shell-scripts-3/" >Linux命令行和shell脚本编程笔记3</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>接<a href="http://www.klion26.com/linux-command-shell-script-2.html" target="_blank" rel="external">上篇</a>，接下来是讲处理用户输入，显示数据和脚本控制，创建函数以及在脚本中添加颜色，至于后面的sed，正则表达式和awk有时间的话会单独写出来。另外，这本书还是挺不错的，讲的东西不是太简单，也不是太难，同时还有不少的例子可以给你消化。</p>
+<p>处理用户输入</p>
+<p>在shell脚本中，用$0表示程序名称，然后后面可以用$n表示第n个参数，如果n大于9的话需要用大括号把n括起来，比如${10}.不过$0中保存的是程序的完整路径，而不仅仅是程序的名称。如果只想要程序的名称的话，可以用basename命令，比如</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #d8bfd8;">name</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;"><code>&lt;/span&gt;basename &lt;span style=&quot;color: #d8bfd8;&quot;&gt;$0&lt;/span&gt;&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span></div><br>那么name中存的就是程序名称了，而不是完整的路径。</p>
+<p>如果需要在脚本中使用参数的话，最好是先在使用之前对参数的个数进行检查，然后进行提示。</p>
+<p>在shell中如果想使用最后一个参数的话，有两种方法，分别是</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #d8bfd8;">params</span><span style="color: #f5deb3;">=</span><span style="color: #d8bfd8;">$#</span><br><span style="color: #b0c4de; font-weight: bold;">echo </span>The last parameter is <span style="color: #d8bfd8;">$params</span><br><span style="color: #b0c4de; font-weight: bold;">echo </span>The last parameter is <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #f5deb3;">!#</span><span style="color: #b0c4de; font-weight: bold;">}</span></div><br>其中第二种不用能${$#}，这样的话，会产生一个随机数。不过如果没有参数的话，上面两种还是不一样的，第一句会输出0，第二个会输出文件名。</p>
+<p>接下来是$<em>和$@表示所有的参数，但是$</em>把所有的参数看成一个参数，$@把所有参数看成同一个字符串中的多个单词处理。允许对其中的值进行迭代。</p>
+<p>还有就是shift移位操作，shift会把参数往左移一位，会用后面的覆盖前面的参数，而且不可恢复。</p>
+<p>接下来讲的是getopt和getopts的应用，这是两个用来方便处理参数的命令。命令格式如下:</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">getopt options optstring parameters<br><span style="color: #b0c4de; font-weight: bold;">getopts </span>optstring variable</div><br>然后是读入命令read</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">read</span> -t 5 -s -p <span style="color: #7fffd4;">“Please enter your name:”</span> name</div><br>上面的命令表示5s有效(-t 5), 不回显，就像Linux的登录密码一样(-s),其实这里是把前景颜色和背景颜色设成了一样，提示字符串(-p “…”)。另外还有就是-n后面接数字num，表示读入num个字符之后自动结束，这个可以用在读入yes/no的地方，比如</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">read</span> -n1 -p <span style="color: #7fffd4;">“Do you want to continue [Y/N]?”</span> answer</div><br>则会在你输入了一个字符之后自动执行接下来的语句，不用你输入回车表示输入结束。</p>
+<p>可以用cat filename | while read line来进行读取文件</p>
+<p>接下来是显示数据的一章，包括各种文件重定向等。</p>
+<p>首先我们Linux系统讲每个对象当成文件处理，使用文件描述符来标识文件对象，每个进程最多有9个打开文件的描述符，bash shell为特殊需要保留前3个文件描述服(0,1,2)，0表示标准读入，1表示标准输出，2表示标准错误输出[一般也是输出在终端，和1输出的位置一起]。我们可以用重定向符号来把这些文件描述符进行重定向，比如下面的几句</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">cat &lt; file                  表示把标准读入重定向到file文件，即从file中读入<br>ls -l &gt; test2               把标准输出重定向到test2，即输出到test2文件中<br>ls -l fjj fjkd 2&gt; error     把错误信息写到error文件中</div><br>如果用<span style="color: #ff0000;">&gt;&gt;</span>则表示附加，即在原有的文件末尾追加，否则会覆盖现有文件</p>
+<p>关于临时重定向和永久重定向。下面是例子</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“This is an error”</span> &gt;2  <span style="color: #da70d6;">#这事临时重定向</span><br><span style="color: #b0c4de; font-weight: bold;">exec </span>1&gt;textout        <span style="color: #da70d6;">#这事永久重定向，表示把输出重定向到文件textout中</span></div><br>在脚本中重定向还可以通过自己创建文件描述符来完成。自己创建的文件描述符还可以用来保存0，1，2这些系统文件描述符。如下面的例子</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">#!/bin/bash</span><br><span style="color: #b0c4de; font-weight: bold;">exec </span>3&gt;1        <span style="color: #da70d6;">#文件描述符3重定向到标准输出</span><br><span style="color: #b0c4de; font-weight: bold;">exec </span>1&gt;test14out  <span style="color: #da70d6;">#标准输出重定向到test14out文件</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“This should store in the output file”</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“along with this line.”</span><br><span style="color: #b0c4de; font-weight: bold;">exec </span>1&gt;3       <span style="color: #da70d6;">#文件描述符1重定向回标准输出</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“Now things should be back to normal”</span></div><br>可以用”exec 3&lt;&gt; testfile”打开一个读写文件描述符  “exec 3&gt;-“来关闭文件描述符3。可以用mktemp命令来创建临时文件和临时目录，”mktemp testing.XXXXXX”会创建一个临时文件，后面的X会被随机数所替代，当然可以加上-d选项来创建临时目录。</p>
+<p>命令tee会把数据发给两个地方，一个是STDOUT，一个是后面接的文件名。比如”who | tee testfile”会把who的执行结果显示在STDOUT中和文件testfile中。</p>
+<p>可以在脚本中捕获和移除信号，如下代码所示</p>
+<div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">
+
+<p><span style="color: #da70d6;">#!/bin/bash</span></p>
+<p><span style="color: #b0c4de; font-weight: bold;">trap</span> <span style="color: #7fffd4;">“echo byebye”</span> EXIT   <span style="color: #da70d6;">#捕获EXIT信号 如果捕获到了就执行echo byebye</span></p>
+<p><span style="color: #d8bfd8;">count</span><span style="color: #f5deb3;">=</span>1<br><span style="color: #b0c4de; font-weight: bold;">while</span> <span style="color: #f5deb3;">[</span> <span style="color: #d8bfd8;">$count</span> -le 5 <span style="color: #f5deb3;">]</span><br><span style="color: #b0c4de; font-weight: bold;">do</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“Loop #$count”</span><br>sleep 3<br><span style="color: #d8bfd8;">count</span><span style="color: #f5deb3;">=</span><span style="color: #d8bfd8;">$[</span> <span style="color: #d8bfd8;">$count</span> + 1 <span style="color: #f5deb3;">]</span><br><span style="color: #b0c4de; font-weight: bold;">done</span></p>
+<p><span style="color: #b0c4de; font-weight: bold;">trap</span> - EXIT        <span style="color: #da70d6;">#移除EXIT信号的捕获</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“I just removed the trap”</span></p>
+<p></p></div><br>另外书上还大致讲了jobs,nice,at,batch,cron命令的使用，这里就不对这些命令单独说了，<p></p>
+<p>接下来是创建函数。创建函数的格式如下</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">function </span>name <span style="color: #f5deb3;">{</span><br>commands<br><span style="color: #f5deb3;">}</span><br>或者<br>name() <span style="color: #f5deb3;">{</span><br>commands<br><span style="color: #f5deb3;">}</span></div><br>在函数中如果想返回一个数值的话，可以用return命令，不过返回的会被截取到[0,255]之间，而且要完成后尽快提取返回值。</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #da70d6;">#!/bin/bash</span><br><span style="color: #b0c4de; font-weight: bold;">function </span>db1 <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">read</span> -p <span style="color: #7fffd4;">“Enter a value: “</span> value<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“doubling the value”</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #d8bfd8;">$[</span> <span style="color: #d8bfd8;">$value</span> * 2 <span style="color: #f5deb3;">]</span><br><span style="color: #f5deb3;">}</span>db1<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The new value is $?”</span></div></p>
+<p><span style="color: #da70d6;">##下面是另外一种返回值的方式</span><br><span style="color: #b0c4de; font-weight: bold;">function </span>db1 <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">read</span> -p <span style="color: #7fffd4;">“Enter a value: “</span>value<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #d8bfd8;">$[</span> <span style="color: #d8bfd8;">$value</span> * 2 <span style="color: #f5deb3;">]</span>            <span style="color: #da70d6;">#注意这里的写法</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #d8bfd8;">result</span> <span style="color: #f5deb3;">=</span> <span style="color: #7fffd4;"><code>&lt;/span&gt;db1&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>        <span style="color: #da70d6;">#这里是反引号</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The new value is $result”</span></p>
+<p><br>上面的代码中给出了两种返回值的方式，这里可以自己进行选择。</p>
+<p>传递参数和前面讲的参数的使用基本一致，这里就不罗嗦了。接下来就是变量的作用域了，一般来说bash里面的所有变量都是全局的，当然可以用local来限定，不然全部用全局变量的话，会对变量带来一定的麻烦。</p>
+<p>下面的是给函数传函数和返回函数。</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">传数组可以用下面的方法<br><span style="color: #b0c4de; font-weight: bold;">function </span>testit <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">local </span>newarray<br><span style="color: #d8bfd8;">newarray</span><span style="color: #f5deb3;">=(</span><span style="color: #7fffd4;"><code>&lt;/span&gt;&lt;span style=&quot;color: #b0c4de; font-weight: bold;&quot;&gt;echo&lt;/span&gt; &lt;span style=&quot;color: #d8bfd8;&quot;&gt;$@&lt;/span&gt;&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>)<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The new array value is: ${newarray[*]}”</span><br><span style="color: #f5deb3;">}</span></div></p>
+<p><span style="color: #d8bfd8;">myarray</span><span style="color: #f5deb3;">=(</span>1 2 3 4 5)<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The original array is ${myarray[<em>]}”</em></span><br>testit <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #d8bfd8;">myarray</span><span style="color: #f5deb3;">[]</span><span style="color: #b0c4de; font-weight: bold;">}</span><br>下面的脚本会返回一个数组<br><span style="color: #b0c4de; font-weight: bold;">function </span>arraydblr <span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">local </span>origarray<br><span style="color: #b0c4de; font-weight: bold;">local </span>newarray<br><span style="color: #b0c4de; font-weight: bold;">local </span>elements<br><span style="color: #b0c4de; font-weight: bold;">local </span>i<br><span style="color: #d8bfd8;">origarray</span><span style="color: #f5deb3;">=(</span><span style="color: #7fffd4;"><code>&lt;/span&gt;&lt;span style=&quot;color: #b0c4de; font-weight: bold;&quot;&gt;echo&lt;/span&gt; &lt;span style=&quot;color: #7fffd4;&quot;&gt;&quot;$@&quot;&lt;/span&gt;&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>)    <span style="color: #da70d6;">#得到传过来的数组</span><br><span style="color: #d8bfd8;">newarray</span><span style="color: #f5deb3;">=(</span><span style="color: #7fffd4;"><code>&lt;/span&gt;&lt;span style=&quot;color: #b0c4de; font-weight: bold;&quot;&gt;echo&lt;/span&gt; &lt;span style=&quot;color: #7fffd4;&quot;&gt;&quot;$@&quot;&lt;/span&gt;&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>)<br><span style="color: #d8bfd8;">elements</span><span style="color: #f5deb3;">=</span><span style="color: #d8bfd8;">$[</span> <span style="color: #d8bfd8;">$# </span>- 1<span style="color: #f5deb3;">]</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> ((<span style="color: #d8bfd8;">i</span> <span style="color: #f5deb3;">=</span> 0; i&lt;<span style="color: #f5deb3;">=</span><span style="color: #d8bfd8;">$elements</span> i++))<br><span style="color: #f5deb3;">{</span><br>newarray<span style="color: #f5deb3;">[</span><span style="color: #d8bfd8;">$i</span><span style="color: #f5deb3;">]=</span><span style="color: #d8bfd8;">$[</span> <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #d8bfd8;">origarray</span><span style="color: #f5deb3;">[</span><span style="color: #d8bfd8;">$i</span><span style="color: #f5deb3;">]</span><span style="color: #b0c4de; font-weight: bold;">}</span> <em> 2<span style="color: #f5deb3;">]</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #d8bfd8;">newarray</span><span style="color: #f5deb3;">[</span></em>]<span style="color: #b0c4de; font-weight: bold;">}</span>    <span style="color: #da70d6;">#返回一个数组</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #d8bfd8;">myarray</span><span style="color: #f5deb3;">=(</span>1 2 3 4 5)<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The original array is: ${myarray[<em>]}”</em></span><br><span style="color: #d8bfd8;">arg1</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">`</span><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #b0c4de; font-weight: bold;">${</span><span style="color: #d8bfd8;">myarray</span><span style="color: #f5deb3;">[]</span><span style="color: #b0c4de; font-weight: bold;">}</span><span style="color: #7fffd4;"><code>&lt;/span&gt;
+result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <span style="color: #d8bfd8;">$arg1</span><span style="color: #7fffd4;">`</span>)    <span style="color: #da70d6;">#传一个数组给函数，并得到一个函数</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The new array is: ${result[*]}”</span><br>接下来是函数的递归，bash里面可以使用递归，使用的方式没有什么特别的，就和使用一般的函数一样。接下来可以创建函数库，然后通过”. funcname”来引入这个库，其中”.”表示source的意思。接下来就是可以在.bashrc里面创建函数或者导入自己的库函数，这样你就可以在任意的地方使用库函数里面的函数了。</p>
+<p>至于在terminal创建窗口，可以用select命令，dialog命令，KDE下的kdialog和GNOME下的gdialog，zenity。这些的具体用法可以自行搜索。</p>
+<p>到这里基本这本书除了sed，awk，脚本的介绍(zsh等)都讲完了，总体来说这本书还是挺不错的。有时间的话我会单独写sed和awk的一些用法。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-05-25 </div>
+			<div class="article-title"><a href="/2013/05/25/linux-command-shell-script-2/" >Linux命令行和Shell脚本编程2</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>接<a href="http://www.klion26.com/linux-command-shell-script.html" target="_blank" rel="external">上篇</a>，这篇主要写下这本书中有关结构化编程的一些东西。</p>
+<p>首先讲的是if条件判断，基本格式如下:</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">if </span><span style="color: #b0c4de; font-weight: bold;">command  #command表示测试性的语句</span><br><span style="color: #b0c4de; font-weight: bold;">then</span></div></p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">   commands   #需要执行的命令<br><span style="color: #b0c4de; font-weight: bold;">elif </span><span style="color: #b0c4de; font-weight: bold;">command</span><br>commands   #需要执行的命令<br><span style="color: #b0c4de; font-weight: bold;">else</span><br>commands   #需要执行的命令<br><span style="color: #b0c4de; font-weight: bold;">fi</span></div><br>不过我更喜欢的写法是在if command后面加上一个”;”然后把then写在第一行，这样主要是习惯问题</p>
+<p>判断的语句可以用一些命令来判断，如果命令执行成功的话就相当于判断成功，这里用的就是前面讲的命令执行后的退出码[成功的话会返回0，否则是一个1-255的值]。</p>
+<p>然后接下来就是所谓的test命令，test命令格式很简单</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">test </span>condition<br><span style="color: #f5deb3;">[</span> condition <span style="color: #f5deb3;">]</span></div><br>上面的两个都行，不过貌似大部分选的是第二种，但是第二种一定要注意，’[‘这condition之间，condition和’]’之间一定要有空格，不然会报错。</p>
+<p>然后数值比较有</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">n1 -eq n2    n1是否等于n2                     n1 -le n2   n1是否小于或等于n2<br>n1 -ge n2    n1是否大于或等于n2               n1 -lt n2   n1是否小于n2<br>n1 -gt n2    n1是否大于n2                     n1 -ne n2   n1是否不等于n2</div><br>字符串比较有</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #d8bfd8;">str1</span> <span style="color: #f5deb3;">=</span> str2  str1与str2是否相同        str1 &gt; str2  str1是否大于str2<br>str1 !<span style="color: #f5deb3;">=</span> str2 str1与str2是否不同      -n str1      str1的长度是否大于0<br>str1 &lt; str2  str1是否小于str2        -z str1      str1的长度是否为0</div><br>文件判断有</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">-d file  检查file是否存在并且是一个目录             -e file  检查file是否存在<br>-f file  检查file是否存在并且是一个文件             -r file  检查file是否存在并且可读<br>-s file  检查file是否存在并且不为空                 -w file  检查file是否存在并且可写<br>-x file  检查file是否存在并且可以执行               -O file  检查检查file是否存在并且被当前用户拥有<br>-G file  检查file是否存在并且默认组是否为当前用户组 file1-nt file2 检查file1是否比file2新<br>file1 -ot file2 检查file1是否比file2旧</div><br>不过需要注意一点的是，用’&gt;’比较的话，需要用反斜杠转义，不然会被当成重定向符号，比如下面的代码</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">[</span> <span style="color: #d8bfd8;">$var1</span> <span style="color: #7fffd4;">></span> <span style="color: #d8bfd8;">$var2</span> <span style="color: #f5deb3;">]</span>; <span style="color: #b0c4de; font-weight: bold;">then</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“$var1 is greater than $var2”</span><br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“$var1 is less than $var2”</span></div><br>如果在判读的时候不用转义的话，那么就会编程重定向到$var2</p>
+<p>接下来就是符合条件的检查了，也就是 AND和OR，格式如下</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">[</span> condition1 <span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">[</span> condition2 <span style="color: #f5deb3;">]</span><br><span style="color: #f5deb3;">[</span> condition1 <span style="color: #f5deb3;">]</span> || <span style="color: #f5deb3;">[</span> condition2 <span style="color: #f5deb3;">]</span></div><br>另外就是用双圆括号来使用高级数学公式，比如var++等。if (( $var ** 2 &gt; 90 )) 表示var的平方是否大于90。</p>
+<p>接下来就是case命令了，下面是格式</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">case </span>varable in<br>pattern1 | pattern2 ) commands1;  <span style="color: #da70d6;">#表示两个随便一个满足就行</span><br>pattern3) commands;               <span style="color: #da70d6;">#表示满足pattern3</span><br>*) default commands;              <span style="color: #da70d6;">#除了上面的情况之外的所有情况</span><br><span style="color: #b0c4de; font-weight: bold;">esac</span>                                <span style="color: #da70d6;">#一定要加这个结束表示</span></div><br>下面是for的介绍，基本格式为</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">for </span>var in list<br><span style="color: #b0c4de; font-weight: bold;">do</span><br>commands<br><span style="color: #b0c4de; font-weight: bold;">done</span></div><br>如果list中有单引号的话，那么要用转义字符把单引号给转义掉，或者使用双引号来包住整个list，例子如下</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">for </span><span style="color: #b0c4de; font-weight: bold;">test </span>in I don<span style="color: #7fffd4;">\’</span>t know <span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #7fffd4;">“this’ll”</span> work<br><span style="color: #b0c4de; font-weight: bold;">do</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“word:$test”</span><br><span style="color: #b0c4de; font-weight: bold;">done</span></div><br>还有如果list中有空格的话，也许要用双引号包起来。在bash中是把<strong>空格</strong>，<strong>制表符</strong>和<strong>换行符</strong>当成分隔符的<strong>，</strong>不过可以用IFS来设置，比如用”IFS=$’\n’”设置成只有换行符是分隔符，当然还可以使用通配符来生成list，比如”for file in /home/*”.接下来还可以使用和C风格类似的for语句，不过在shell里面写，会觉得很怪</p>
+<p>接下来是while的登场了，基本格式如下</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">while </span><span style="color: #b0c4de; font-weight: bold;">test command</span><br><span style="color: #b0c4de; font-weight: bold;">do</span><br>other commands<br><span style="color: #b0c4de; font-weight: bold;">done</span></div><br>还有就是until了，基本格式为</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">until </span><span style="color: #b0c4de; font-weight: bold;">test </span>commands<br><span style="color: #b0c4de; font-weight: bold;">do</span><br>other commands<br><span style="color: #b0c4de; font-weight: bold;">done</span></div><br>接下来就是循环的嵌套和跳出了，嵌套没啥好讲的，跳出的话还可以比较给力的，主要是可以跳出多层循环，比如break 2就是跳出倒数第二层循环，continue 2会停止当前的循环，继续倒数第二层循环。</p>
+<p>最后可以在所有的结构化语句结束处用一个重定向语句就可以把这个结构里面的所有输出进行重定向。</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -366,82 +473,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-12-26 </div>
-			<div class="article-title"><a href="/2012/12/26/fedora-13-update-to-fedora-15/" >Fedora13 升级到Fedora 15</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>在开学的时候装了Fedora 13,然后一直用着，感觉也还可以，虽然现在Fedora都出18了。前两天不知道那根神经一短路然后就想着升级Fedora，一开始想升级到16的（担心17,18还不那么稳定，到时出了问题找不到解决方案）。然后就用下面的命令执行呗 。</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">sudo yum install preupgrade<br>preupgrade</div><br>执行preupgrade需要输入root命令，照着做就行了，然后就可以选择你想升级到的版本，有14,15,16,17，当然你还可以列出那些unstable版本。选择之后，就一直下一步就行了，然后等着下载所需要的软件包吧（时间根据你的网速不同而不同，我大概用了20分钟左右）。我一开始选择的版本是16,然后下完之后，提醒需要reboot来完成升级，好，那就reboot呗。</p>
-<p>reboot之后，你会发现屏幕一直是一个光标在那跳动，啥也不可以做，这个时候你只需要等待就行了，应该是在配置些啥东西吧。别重启了，实在没事干就出喝杯咖啡吧，等好了之后，结果发现提示说Fedora 16只能通过14,15升级而来，也就是不能跨太多的版本升级。好吧。那就重启升级到15再说吧。然后照着做之后，发现尼妈居然又是自动升级到16,然后一顿折腾之后，我把/var/cache/yum/下面所有和preupgrade有关的文件夹全都删掉了（其实应该做个备份更好，万一删错了还可以还原）。然后继续升级到Fedora 15.然后就可以了，没出现啥问题，刚好装Fedora 15的时候老师叫开会，然后开会回来之后发现已经装好了。而且还不错。</p>
-<p>现在你已经装好了Fedora 15了，当然还是可以访问Fedora 13的。然后说说接下来你需要做的事情吧。或许你可以在网上搜一篇叫做《Fedora 15安装之后需要做的×件事》，不过很多你可能不需要，我这里大致写下我做的一些事情吧</p>
-<p>1.安装gnome-tweak-tool，因为现在你的桌面是没有任何东西的，而且右击也没用，装这个东西就是解决这些事的，装好之后，用命令gnome-tweak-tool执行出来一个配置界面，选中File Manager。把右边的“Have file manager handle the desktop该陈ON就行了，现在你的桌面有东西了，而且可以右击了。</p>
-<p>2.在上一步中的Tweak tool中打开选中左边的Shell栏目，然后把右边的Arrangement of buttons on the titlebar选项改为All，这样尼会看到你的cmd窗口上面有最小化，最大化和关闭按钮了，默认的是只有关闭按钮的。</p>
-<p>3.解决按下Del不能删除文件的事情，首先用命令</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gsettings <span style="color: #b0c4de; font-weight: bold;">set </span>org.gnome.desktop.interface can-change-accels <span style="color: #b0c4de; font-weight: bold;">true</span></div><br>设置可以改变相应的快捷方式映射</p>
-<p>然后打开一个文件夹，选中随便一个文件然后点击菜单Edit，把鼠标放到“Move to Trash”上，然后按<span style="color: #ff0000;">两次<span style="color: #000000;">Del键就行了，接下来你可以用命令</span></span></p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gsettings <span style="color: #b0c4de; font-weight: bold;">set </span>org.gnome.desktop.interface can-change-accels <span style="color: #b0c4de; font-weight: bold;">false</span></div><br>来关闭快捷方式的映射。</p>
-<p>4.中文输入法的问题，由于我是由Fedora 13升级来的，系统没有自动安装ibus输入法，还是保留了我在13上安装的fcitx，可是奇怪的事情发生了，fcitx输入法只能在浏览器下使用，其他任何地方都不能使用。这个也太坑爹了。然后google，百度结果没有发现什么解决办法，又说是gnome3的问题，又说是配置的问题， 有说直接换ibus的。可是换了ibus结果还是用不了，不知为何（应该不是和fcitx冲突的问题，我在装ibus之前卸载了fcitx）。然后最后发现有个帖子的配置和其他人的配置有个小小的区别，那就是试试吧，结果就TM可以了。我一开始的配置是（下面语句放在～/.bashrc文件中）</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">XMODIFIERS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“@im=fcitx”</span><br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">QT_IM_MODULE</span><span style="color: #f5deb3;">=</span>xim<br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">GTK_IM_MODULE</span><span style="color: #f5deb3;">=</span>xim</div><br>然后另外那个人的配置是把两个xim改成了fcitx也就是</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">XMODIFIERS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“@im=fcitx”</span><br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">QT_IM_MODULE</span><span style="color: #f5deb3;">=</span>fcitx<br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">GTK_IM_MODULE</span><span style="color: #f5deb3;">=</span>fcitx</div><br>然后奇迹发生了，重登录之后结果就可以了，这中间我各种重装，反正都不知道是为什么，<span style="color: #ff0000;">如果你也遇到了这样的问题，但是上面的方案没有帮到你的话，我只能说声遗憾了，因为我也不知道是为什么了。</span></p>
-<p>最后再吐嘈下Fedora 15的界面，感觉用起来总是没有13那么爽，gnome3或许炫一点，但是现在打开软件的方式有点不爽，也没有下面的任务栏了，而且最上面的panel也没了，现在变成了“Your favorites”，反正就是现在暂时还不适应这种界面，接下来慢慢适应吧。</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-12-12 </div>
-			<div class="article-title"><a href="/2012/12/12/fedora-13-texlive2012-install-chinese-configure/" >Fedora 13 TexLive2012安装+中文配置</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><span style="color: #ff0000;">注：我博客里面所有类似风格的代码高亮都是由<span style="color: #0000ff;"><a href="http://fayaa.com/code" target="_blank" rel="external">代码发芽网</a></span>的代码高亮提供，特此说明</span></p>
-<p>由于各种原因，想在Fedora下装LaTeX软件，于是就有了这篇文章，这篇文章从安装到配置中文环境，中间遇到了各种蛋疼的问题。在这里记录下来，做个备份，也给后来人一份参考。</p>
-<p>首先，你可以去厦门大学的开源镜像下载TexLive2012 地址：<a href="http://mirrors.xmu.edu.cn/CTAN/systems/texlive/Images/" target="_blank" rel="external">http://mirrors.xmu.edu.cn/CTAN/systems/texlive/Images/</a><br>速度很给力的，一般都能在1M左右。</p>
-<p>下好之后，你需要安装，以下命令都是以root身份操作（如果你不知道命令到底需不需要root身份，那么就都用root身份吧）。</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">cd</span> ~/Downloads<br>mount -t iso9660 -o loop texlive2012-20120701.iso /mnt/<br><span style="color: #b0c4de; font-weight: bold;">cd</span> /mnt<br>./install-tl</div><br>其中Downloads是你ISO下载的地方。这样，你已经安装好了TeXLive2012了，你也可以用来排版英文的文献了。因为中文暂时还不支持。好下面我们就来说这蛋疼的中文了。</p>
-<p>网上主要有两种说法：</p>
-<p>第一种。从windows下copy一些字体，然后改一些配置文件，网上也有很多人说已经成功，不过由于本人用这种方法没有成功就不写了，这里给个<span style="color: #ff0000;"><a href="http://asc.2dark.org/node/129" target="_blank" rel="external"><span style="color: #ff0000;">链接</span></a></span>，也可以自己上网搜中文支持。</p>
-<p>第二种方法如下：</p>
-<p>首先你下载YueWang-zhfonts-final_1.01.tar.bz2包，地址在这里<a href="http://bj.soulinfo.com/%7Ehugang/tex/tex2007/YueWang-zhfonts-final_1.01.tar.bz2。" target="_blank" rel="external">http://bj.soulinfo.com/%7Ehugang/tex/tex2007/YueWang-zhfonts-final_1.01.tar.bz2。</a></p>
-<p>如果你RP够好的话，那么就能够在Linux下把这个动下下下来。好我们假定所有人的RP都想最近我的RP一样挫，那么你总是下到78%就下不下来了（也不知道为什么每次到这个点就下不动了，有人知道的话还请告知，在下不胜感激），而且每次在78%之前速度都是1000kb/s左右，然后一到78%，好见证你RP的时刻到了。不过就算RP再挫，我们也可以在windows下用迅雷把这个文件下下来，在这里我表示压力很大。</p>
-<p>到这里你应该已经把上面的压缩文件下下来了，如果还没有那请自行解决（就不说你RP为什么挫到这个地步了）。那么你来到下载的目录，然后解压缩这个文件，是不是解压缩完了之后，却没有发现它，ls也没有，图形化界面也没有？恩，你没有看错，是没有。因为作者把这个文件夹作成了隐藏文件，也就是文件夹名最前名有个点。然后你只要把texlive2007中的texmf-var文件夹copy到/usr/local/texlive下然后进行一系列操作就完成了。命令如下，都在root权限下进行的。</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">cp -rf texmf-var /usr/local/texlive<br><span style="color: #b0c4de; font-weight: bold;">cd</span> /usr/local/texlive<br>mv texmf-local texmf-local.backup<br>mv texmf-var texmf-local<br>texhash</div><br>上面的命令首先是把texmf-var文件夹copy到/usr/local/texlive下，然后对已有的texmf-local文件进行一个备份（对你不了解的文件进行操作时，你都应该这样做）。然后再把texmf-var改名为texmf-local。然后texhash是创建ls-R数据库，不懂就先照着做吧。好了，看也看累了，操作也操作烦了，那么下面就让我们来看看到底行不行了吧。</p>
-<p>用下面的tex文件进行测试下呗</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">\documentclass</span><span style="color: #ffffff;">[4pt]</span><span style="color: #b0c4de; font-weight: bold;">{</span>article<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\usepackage</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJKutf8<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\title</span><span style="color: #b0c4de; font-weight: bold;">{</span>Fuck-Chinese<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\author</span><span style="color: #b0c4de; font-weight: bold;">{</span>klion26<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\maketitle</span><br><span style="color: #b0c4de; font-weight: bold;">\begin</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJK<span style="color: #b0c4de; font-weight: bold;">}{</span>UTF8<span style="color: #b0c4de; font-weight: bold;">}{</span>kai<span style="color: #b0c4de; font-weight: bold;">}</span><br><del>~~Hello, 你好World</del>~~~<br>你好 Fuck Chinese<br><span style="color: #b0c4de; font-weight: bold;">\end</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJK<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\end</span><span style="color: #b0c4de; font-weight: bold;">{</span>document<span style="color: #b0c4de; font-weight: bold;">}</span></div><br>1.tex是上面这个tex文件的文件名</p>
-<p>然后用如下命令生成PDF或者PS格式的文件</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">latex 1.tex<br>dvipdfm 1.dvi</div><br>生成PDF文件</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">dvips 1.dvi</div><br>生成PS格式的。不过我系统上PS格式的文件乱码了。<br>另外要说的就是pdflatex不能用，貌似是说找不到字体，这个我暂时还不能解决，然后其他的应该都没啥问题了。</p>
-<p>到这里，你终于舒了一口气，TM的终于搞定了。恩，接下来你可以用tex来排版中文文献了。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -452,13 +483,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/6/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+    	<li class="prev"><a href="/page/6/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一頁</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/8/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/8/" class="alignright next">下一頁<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -478,7 +509,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜尋" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -487,7 +518,7 @@
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>分類</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -520,13 +551,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -534,11 +565,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -550,13 +581,13 @@
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -570,51 +601,51 @@
 		
 			
 	<div class="widget">
-		<h4>Tag Cloud</h4>
+		<h4>標籤雲</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/text-plain/">text/plain<span>1</span></a></li>
-		
-			<li><a href="/tags/vi/">vi<span>2</span></a></li>
-		
-			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
-		
-			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
-		
-			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
+			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
 		
 			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
 		
-			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
+			<li><a href="/tags/hash/">hash<span>1</span></a></li>
 		
-			<li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li>
+			<li><a href="/tags/sap/">sap<span>1</span></a></li>
 		
-			<li><a href="/tags/code/">code<span>2</span></a></li>
+			<li><a href="/tags/spark/">spark<span>7</span></a></li>
 		
-			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
+			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
 		
-			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
 		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
+			<li><a href="/tags/knapsack/">knapsack<span>1</span></a></li>
 		
-			<li><a href="/tags/递归/">递归<span>1</span></a></li>
+			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
 		
-			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
+			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
 		
-			<li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li>
+			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
 		
-			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+		
+			<li><a href="/tags/腾讯/">腾讯<span>1</span></a></li>
+		
+			<li><a href="/tags/vim/">vim<span>2</span></a></li>
+		
+			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
+		
+			<li><a href="/tags/problem-solve/">problem_solve<span>2</span></a></li>
+		
+			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
 		
 			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
 		
-			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
+			<li><a href="/tags/question/">question<span>1</span></a></li>
 		
-			<li><a href="/tags/教师/">教师<span>1</span></a></li>
-		
-			<li><a href="/tags/source-code/">source_code<span>1</span></a></li>
+			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>277</span></a></li>
+		   <li><a href="/tags">...<span>278</span></a></li>
 		 
 		</ul>
 	</div>
@@ -623,8 +654,16 @@
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>最新文章</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
+      </li>
+    
+      <li>
+        <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
+      </li>
     
       <li>
         <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
@@ -638,21 +677,13 @@
         <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
       </li>
     
-      <li>
-        <a href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/" ><i class="fa fa-file-o"></i>Streaming 程序调用 Producer.clo...</a>
-      </li>
-    
-      <li>
-        <a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" ><i class="fa fa-file-o"></i>如何在不重启 Spark Streaming 作业的情...</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>Links</h4>
+	<h4>鏈接</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>
