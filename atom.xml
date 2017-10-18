@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-16T13:39:24.000Z</updated>
+  <updated>2017-10-18T03:39:10.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/10/16/spark-dagscheduler/"/>
     <id>http://yoursite.com/2017/10/16/spark-dagscheduler/</id>
     <published>2017-10-16T12:01:20.000Z</published>
-    <updated>2017-10-16T13:39:24.000Z</updated>
+    <updated>2017-10-18T03:39:10.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>基于 spark 1.6</p>
@@ -99,7 +99,7 @@
 <p>  SparkContext 中会根据模式生成和注册相应的 backend 以及 taskscheduler</p>
 <h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><ol>
 <li>如果一个 Stage 有多个 RDD，那么这些 RDD 是在同一个 TaskSet 中吗</li>
-<li>如何模拟 <code>r2 = r0.reduceByKey; r3 = r1.reduceByKey; r4 = r2.map(xx); r5 = r4.union(r3); r6 = r5.map r7 = r6.reduceByKey</code> 的 Stage 划分和生成（会有多少个 Stage，以及每个 Stage 包含多少个 RDD（按照定义，一个 Stage 只包含一个 RDD？），以及整个 DAG 怎么整合起来的）</li>
+<li>如何模拟 <code>r2 = r0.reduceByKey; r3 = r1.reduceByKey; r4 = r2.map(xx); r5 = r4.union(r3); r6 = r5.map; r7 = r6.reduceByKey</code> 的 Stage 划分和生成（会有多少个 Stage，每个 Stage 分别包含哪些 RDD，以及整个 DAG 怎么整合起来的）</li>
 </ol>
 ]]></content>
     
