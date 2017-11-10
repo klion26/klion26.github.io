@@ -121,6 +121,66 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2012-11-08 </div>
+			<div class="article-title"><a href="/2012/11/08/vc-6-clistctr-add-image-and-cant-display/" >VC++ 6 CListCtr添加图片以及不显示文字的问题</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>用CListCtrl的时候添加图片首先把CListCtrl的样式改成热破让他，默认是ICON。<br>然后你需要把下面这段代码添加到InsertItem之前</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span class="comment">//在report样式下得先加列,不然不会显示 </span><span>  </span></span></li>
+<li><span>m_lsCListCtrl.InsertColumn(</span><span class="number">0</span><span>,_T(</span><span class="string">“文件名 “</span><span>),LVCFMT_RIGHT);   </span></li>
+<li><span>m_lsCListCtrl.InsertColumn(</span><span class="number">1</span><span>,_T(</span><span class="string">“仪器类别”</span><span>),LVCFMT_RIGHT);   </span></li>
+<li><span>m_lsCListCtrl.InsertColumn(</span><span class="number">2</span><span>,_T(</span><span class="string">“项目类别”</span><span>),LVCFMT_LEFT);   </span></li>
+<li><span class="comment">//设置列宽 </span><span>  </span></li>
+<li><span class="keyword">for</span><span>(k = </span><span class="number">0</span><span>k&lt;</span><span class="number">3</span><span>;++k)   </span></li>
+<li><span>m_lsCListCtrl.SetColumnWidth(k,</span><span class="number">100</span><span>);   </span></li>
+<li><span>  </span></li>
+<li><span class="comment">//下面是为了添加图片用的 </span><span>  </span></li>
+<li><span class="comment">//其中m_ImageList是可以全局访问的，保证随时都可以访问到 </span><span>  </span></li>
+<li><span>m_ImageList.Create(</span><span class="number">16</span><span>,</span><span class="number">16</span><span>,ILC_COLOR24,</span><span class="number">5</span><span>,</span><span class="number">1</span><span>);   </span></li>
+<li><span>CBitmap bitmap;</span><span class="comment">//创建一个CBitmap对象 </span><span>  </span></li>
+<li><span>bitmap.LoadBitmap(IDB_TIME);</span><span class="comment">//IDB_TIME是一个bitmap资源的ID，可以自己添加 ID自取 </span><span>  </span></li>
+<li><span>m_ImageList.Add(bitmap,RGB(</span><span class="number">0</span><span>,</span><span class="number">128</span><span>,</span><span class="number">128</span><span>));</span><span class="comment">//把bitmap加到m_ImageList中 </span><span>  </span></li>
+<li><span>bitmap.Detach();</span><span class="comment">//释放位图 然后添加IDB_TICK </span><span>  </span></li>
+<li><span>bitmap.LoadBitmap(IDB_TICK);   </span></li>
+<li><span>m_ImageList.Add(bitmap,RGB(</span><span class="number">0</span><span>,</span><span class="number">128</span><span>,</span><span class="number">128</span><span>));   </span></li>
+<li><span class="comment">//设置m_lsCListCtrl的属性 这里m_lsCListCtrl是CListCtrl的control类型的变量 </span><span>  </span></li>
+<li><span>m_lsCListCtrl.SetExtendedStyle(LVS_EX_CHECKBOXES |LVS_EX_GRIDLINES|LVS_EX_FULLROWSELECT | LVS_EX_SUBITEMIMAGES);   </span></li>
+<li><span>m_lsCListCtrl.SetImageList(m_ImageList,LVSIL_SMALL);</span><span class="comment">//把m_ImageList关联给m_lsCListCtrl控件 </span><span>  </span></li>
+<li><span>  </span></li>
+<li><span class="comment">//下面是添加内容 </span><span>  </span></li>
+<li><span class="keyword">int</span><span> ret = m_lsCListCtrl.InsertItem(</span><span class="number">0</span><span>,</span><span class="string">“HELLO”</span><span>);</span><span class="comment">//默认会添加到第一列 </span><span>  </span></li>
+<li><span>m_lsCListCtrl.SetItemText(</span><span class="number">0</span><span>,</span><span class="number">0</span><span>,</span><span class="string">“HELL”</span><span>); </span><span class="comment">//在第一行的第一列修改 </span><span>  </span></li>
+<li><span>m_lsCListCtrl.SetItemText(</span><span class="number">0</span><span>,</span><span class="number">1</span><span>,</span><span class="string">“HPLL”</span><span>); </span><span class="comment">//在第一行的第二列加修 </span><span>  </span></li>
+<li><span class="comment">// m_lsCListCtrl.SetItem(ret,0,LVIF_IMAGE,NULL,0,0,0,0); </span><span>  </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">1</span><span>,</span><span class="string">“HELLO”</span><span>,</span><span class="number">0</span><span>);   </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">2</span><span>,</span><span class="string">“HELLO”</span><span>,</span><span class="number">1</span><span>);   </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">3</span><span>,</span><span class="string">“HELLO”</span><span>,</span><span class="number">0</span><span>);   </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">4</span><span>,</span><span class="string">“HELLO”</span><span>); </span><span class="comment">//没有加图片的某人添加ID为0的图片 相当于第三个参数是0 </span><span>  </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">5</span><span>,</span><span class="string">“HELLO”</span><span>);   </span></li>
+<li><span>m_lsCListCtrl.InsertItem(</span><span class="number">6</span><span>,</span><span class="string">“HELLO”</span><span>);  </span><br></li></ol></div><br>对于新手来说，可能添加图片之后，发现图片不能显示，连文字也不能显示。这其实只是你<span style="color: #ff0000;">没有设置列而已，<span style="color: #000000;">对于report样式的CListCtrl，首先需要设置列头，就是InsertColumn。然后才会显示。</span></span>
+
+<p>好好学习，天天向上。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2012-11-06 </div>
 			<div class="article-title"><a href="/2012/11/06/chrome-https-connection/" >Chrome强制https连接某些网站</a></div>						
 		</h3>
@@ -543,29 +603,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-09-21 </div>
-			<div class="article-title"><a href="/2012/09/21/wordpress-fatal-error/" >Wordpress Fatal Error</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>这博客好久都没更新了，最近登录后台的时候出现了”WordPress Fatal error: Allowed memory size of 33554432 bytes exhausted (tried to allocate 30720 bytes)”错误，怎么都进不了后台，网上一查才知道需要修改一个文件，好使的WP_MEMORY更大一些，具体的操作，就是通过ftp修改/www下的wp_config.php文件，然后在最开始的地方加上一句{define(‘WP_MEMORY_LIMIT’,’64M’);}这里的64M应该就是最大可以达到的内存了吧，如果还不够的话自己继续增加。好久都没更新博客了，这篇就当是除草了。。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -618,9 +655,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
-		
 			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -644,13 +681,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -672,15 +709,15 @@
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -697,48 +734,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/rename/">rename<span>1</span></a></li>
+			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
 		
-			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
-		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
-		
-			<li><a href="/tags/logger/">logger<span>1</span></a></li>
-		
-			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
-		
-			<li><a href="/tags/hive/">hive<span>1</span></a></li>
-		
-			<li><a href="/tags/算法/">算法<span>1</span></a></li>
-		
-			<li><a href="/tags/specify-timestamp/">specify_timestamp<span>1</span></a></li>
-		
-			<li><a href="/tags/成长/">成长<span>1</span></a></li>
-		
-			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
+			<li><a href="/tags/problem-solve/">problem_solve<span>2</span></a></li>
 		
 			<li><a href="/tags/bellman-ford/">bellman-ford<span>1</span></a></li>
 		
-			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
+			<li><a href="/tags/递归/">递归<span>1</span></a></li>
 		
-			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
+			<li><a href="/tags/数学/">数学<span>5</span></a></li>
 		
-			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
+			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
 		
-			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
 		
-			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
 		
-			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
+			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
 		
-			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
+			<li><a href="/tags/trident/">trident<span>1</span></a></li>
 		
-			<li><a href="/tags/概率/">概率<span>1</span></a></li>
+			<li><a href="/tags/dag/">dag<span>1</span></a></li>
+		
+			<li><a href="/tags/queue/">queue<span>1</span></a></li>
+		
+			<li><a href="/tags/list/">list<span>1</span></a></li>
+		
+			<li><a href="/tags/django/">django<span>1</span></a></li>
+		
+			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
 		
 			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
 		
+			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
 		
-		   <li><a href="/tags">...<span>278</span></a></li>
+			<li><a href="/tags/databse/">databse<span>1</span></a></li>
+		
+			<li><a href="/tags/mapreduce/">mapreduce<span>1</span></a></li>
+		
+			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>281</span></a></li>
 		 
 		</ul>
 	</div>
@@ -749,6 +786,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
+      </li>
     
       <li>
         <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
@@ -764,10 +805,6 @@
     
       <li>
         <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
-      </li>
-    
-      <li>
-        <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
       </li>
     
   </ul>

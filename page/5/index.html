@@ -121,6 +121,37 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2014-09-26 </div>
+			<div class="article-title"><a href="/2014/09/26/epoll-and-select/" >epoll 小解以及和select的区别</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>前面写过 <a href="http://www.klion26.com/select-and-poll.html" target="_blank" rel="external">select 和 poll</a> 的文章，在 Linux 下有一种更高效的 I/O 多路机制，那就是 epoll。epoll的高效和它的结构有关系（本文默认读者已经了解 select），首先 epoll 会把 select 的过程分成3个部分， epoll_create(), epoll_ctl() 和 epoll_wait。在 epoll_create 的过程中，会创建一个 eventpoll 结构体，这个结构体的部分定义如下</p>
+<pre class="lang:c decode:true ">struct eventpoll{
+    ...  
+    struct rb_root rbr; //红黑树，存储了所有添加到 epoll 中的事件
+    struct list_head rdllist; // 双向链表保存通过 epoll_wait 返回给用户的满足条件的事件
+    ...
+}</pre> 
+
+<p>这里的红黑树 rbr 存储了所有已经添加到 epoll 中的事件，如果使用 epoll_ctl 进行事件操作的时候，会在红黑树中进行查找，这个效率是很高的（红黑树是一颗自平衡二叉搜索树，查找事件 O(lgn))。双向链表 rdllist 则保存将要返回给用户的满足条件的事件。<br>然后所有添加的事件都会和设备（如网卡）驱动程序建立回调关系，一旦相应事件发生就回调用这里的回调函数，然后回调函数就会把事件添加到上面的双向链表中去。因为最后返回时只需要查看链表是否有数据，这个就比 select 要高效很多<br>然后最后是 epoll_wait.调用这个函数的时候，我们会等待一段时间（这段时间是由自己设置），这段时间过去之后，epoll 会自动返回双向链表中的事件，如果双向链表不为空，就把这里的事件复制到用户态内存中，同时将事件数量返回给用户。<br>epoll 的基本功能差不多就这些，当然还有一个叫做触发模式的，epoll 分为两种触发模式｛水平触发，边缘触发｝，区别就是水平触发的话，如果某一次没有处理，那么下一次还会返回给用户，但是边缘触发的话，只在事件发生时返回给用户一次，如果用户忽略掉了，那么后面就不会再返回给用户了。<br>至于为什么 epoll 会比 select 要好用，大致有如下几个原因<br>1. select 用的是 FD_SET进行操作，而 FD_SET 有上限限制（可以通过自己改源码进行修改），但是 epoll 没有这个限制<br>2. select 会对所有的感兴趣的 fd 一个个去检查是否就绪，这样就行成了一个轮询，这个是比较慢的，而 epoll 则通过设置回调函数，在有事件发生的时候，将事件添加到双向链表中，最后只需要检查双向链表是否为空即可，这个也是很高效的。<br>3. 还有 epoll_ctl 对事件进行操作时，会在红黑树中先查找是否存在，查找的过程也是很高效的。<br>这样 epoll 就可以轻松处理百万级的并发处理了。<br>epoll 的东西大致就这么一些，至于实际应用，这个需要看实际的情况了，这个没有经验，不敢妄谈。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2014-08-25 </div>
 			<div class="article-title"><a href="/2014/08/25/the-hardwaresoftware-interface-csapp-lab2-bomb/" >The Hardware/Software Interface Lab2 bomb</a></div>						
 		</h3>
@@ -497,33 +528,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2014-01-07 </div>
-			<div class="article-title"><a href="/2014/01/07/binary-tree-traversal-without-recursive/" >二叉树的非递归遍历</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>对于二叉树，如果我们需要对它进行遍历的话（不管是前序，中序还是后序，下面如果不特指的话，那么就是对三种遍历的统称）。如果用递归的方法，那么就非常简单了，我们只需要写下类似的代码即可</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">work</span>(<span style="color: #f5deb3;">TreeNode</span> <span style="color: #f5deb3;">*</span><span style="color: #f5deb3;">root</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">   if</span>(<span style="color: #b0c4de; font-weight: bold;">NULL</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">root</span>)<br><span style="color: #b0c4de; font-weight: bold;">       return</span> ;<br><span style="color: #f5deb3;">   work</span>(<span style="color: #f5deb3;">root</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">left</span>);<br><span style="color: #f5deb3;">   work</span>(<span style="color: #f5deb3;">root</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">right</span>);<br><span style="color: #f5deb3;">}</span></div><br>这样我们的三种遍历，只需要在这个函数里面进行一些细微的更改就可以达到了（把当前点的输出位置放在不同的地方）。不过这里主要讲的将是如何用非递归的方法进行二叉树的遍历。</p>
-<p>首先，我们来看树的前序遍历，我们需要先输出当前节点，然后处理左子树，然后再处理右子树。这里我们可以用桟来保存每个节点，但是我们需要处理每个节点的左右子树，如果我们只把每个节点压桟一次的话，那么每次我们不知道如果处理右子树（处理左子树的时候会把当前节点弹出桟）。这里就有问题了，但是我们可以考虑把每个节点压桟两次，也就是说第一次我们弹出的时候处理左子树，第二次弹出的时候，我们处理右子树。那么上面的这个问题就解决了，只不过桟的空间需要会大一点。不过已经可以工作了，至于怎么判断是第一次还是第二次弹出的话，我们可以把弹出的节点和桟里面最上面的节点做比较，相等的话就是第一次弹出，不相等就是第二次弹出。具体代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Binary-Tree-Preorder-Traversal.cpp" target="_blank" rel="external">参考这里</a>。</p>
-<p>然后我们考虑树的中序，可以把上面的代码进行一些细微的更改就好了，大致的框架我们不需要更改，具体的代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Binary-Tree-Inorder-Traversal.cpp" target="_blank" rel="external">参考这里</a>。</p>
-<p>接下来是后序，我们发现上面的算法不行了，因为我们必须在处理完了左右子树之后，才能够输出当前节点，但是按照上面的算法，我们在处理完左右子树之后，已经<span style="color: #ff0000;">找不到当前节点了</span>，这就是问题的所在，或许我们想可以把每个节点压桟3次，这样的话也是可以的，在第一次的时候处理左子树，第二次的时候处理右子树，第三次处理当前节点。不过我们可以看出上面的要不是压桟2次，要不是压桟3次，那么我们可以把压桟的数据更改一下，我们把桟保存的元素变成一个pair<treenode*,int>，这样的话后面的int保存的是这个节点在桟里面的次数，比如说前序遍历中，我们压桟的时候把pair后面的参数改成1（有0和1两种可能）,然后弹出一次就把后面的int值减1。对于后序遍历的话，我们把后面的int值设为2（有0,1和2三种可能），每次出桟的时候，如果int值为2就处理左子树，然后把int值减1再次压桟；如果int值为1的话，就处理右子树，然后把int值设为0,再次压桟；如果int值为0的话，那么就输出当前节点。这样的话我们可以比较好的处理二叉树的后序遍历了。具体的代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Binary-Tree-Postorder-Traversal.cpp" target="_blank" rel="external">参考这里</a>。</treenode*,int></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -576,9 +580,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
-		
 			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -602,13 +606,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -630,15 +634,15 @@
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -655,48 +659,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
-		
-			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
-		
-			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
-		
-			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
-		
 			<li><a href="/tags/插件/">插件<span>1</span></a></li>
 		
-			<li><a href="/tags/shortest-paths-in-dag/">shortest paths in dag<span>1</span></a></li>
+			<li><a href="/tags/read/">read<span>3</span></a></li>
 		
-			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
 		
-			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
+			<li><a href="/tags/top排序/">top排序<span>2</span></a></li>
 		
-			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
+			<li><a href="/tags/list/">list<span>1</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/积分/">积分<span>1</span></a></li>
 		
-			<li><a href="/tags/tree/">tree<span>1</span></a></li>
+			<li><a href="/tags/select/">select<span>2</span></a></li>
 		
-			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
+			<li><a href="/tags/partition/">partition<span>1</span></a></li>
 		
-			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
+			<li><a href="/tags/free/">free<span>1</span></a></li>
 		
-			<li><a href="/tags/风险/">风险<span>1</span></a></li>
+			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
+		
+			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
+		
+			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
+		
+			<li><a href="/tags/dag/">dag<span>1</span></a></li>
+		
+			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+		
+			<li><a href="/tags/json/">json<span>1</span></a></li>
+		
+			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
+		
+			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
 		
 			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
 		
-			<li><a href="/tags/半平面交/">半平面交<span>1</span></a></li>
+			<li><a href="/tags/ln/">ln<span>1</span></a></li>
 		
-			<li><a href="/tags/java/">java<span>2</span></a></li>
-		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
-		
-			<li><a href="/tags/总结/">总结<span>1</span></a></li>
-		
-			<li><a href="/tags/bit/">bit<span>0</span></a></li>
+			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>278</span></a></li>
+		   <li><a href="/tags">...<span>281</span></a></li>
 		 
 		</ul>
 	</div>
@@ -707,6 +711,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
+      </li>
     
       <li>
         <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
@@ -722,10 +730,6 @@
     
       <li>
         <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
-      </li>
-    
-      <li>
-        <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
       </li>
     
   </ul>

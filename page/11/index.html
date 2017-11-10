@@ -121,6 +121,30 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-12-22 </div>
+			<div class="article-title"><a href="/2011/12/22/fuck-csdn/" >CSDN 被黑了 </a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>昨天听闻CSDN被爆了，600W的密码，还明文存储，我勒个去。好歹也是国内一个IT方面比较有影响的网站了，居然明文保存密码。有CSDN账号的，最好改下密码，然后把相关的(账号一样，或者秘密一样，或者邮箱一样的)密码都给改掉。这里奉劝大家一句，密码最好别通用。</p>
+<p>可以在<span style="color: #000000;"><a href="txfile:platformres:MsgMgr\msgmgr.htm#" target="_blank" rel="external">http://0bad.com/csdn.php</a>查询自己的账号是否被干了。</span></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-12-13 </div>
 			<div class="article-title"><a href="/2011/12/13/windows-mpi/" >windows下MPI的环境搭建。</a></div>						
 		</h3>
@@ -411,30 +435,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-06-22 </div>
-			<div class="article-title"><a href="/2011/06/22/xp-fedora-double-os/" >XP和Fedora的双系统之路</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>本来电脑上有XP和Ubuntu了,不过还是不喜欢Ubuntu,总感觉用上去不爽,想试试Fedora（中间试过CentOS,感觉太庞大了- -）,我装的是Fedora 13,一开始想自己刻dvd,然后安装,无赖一直刻不上,不知道是啥原因,刻了两张都说盘被损坏了,我囧啊.然后就只能从硬盘安装了,在网上搜到一个硬盘安装fedora 13和xp<a href="http://www.zhongsisi.com/fedora-13-hard-disk-installation-method/" target="_blank" rel="external">双系统的帖子</a>,照着做就行了,似乎只需要那个grldr文件就可以引导了,然后那文章就讲的很详细了,首先是让你可以进入引导程序,也就是在boot.ini里面加上一句C:\grldr=”Boot Loader”,这样只要grldr文件的位置在c盘根目录下就可以引导了,接下来就是安装fedora了,也就是如下命令</p>
-<table border="0" cellspacing="0" cellpadding="0"><br><tbody><br><tr><br><td><code>root (hd0,0)</code><br><br><code>kernel /isolinux/vmlinuz</code><br><br><code>initrd /isolinux/initrd.img</code><br><br><code>boot</code><br><br>当然hd0,0这是你xp装在了c盘第一个分区,如果不是那就类推吧,然后接下来就是会要求你选择fedora的ISO文件放在哪,那么你放哪将就填哪,哪里也需要填那个盘,自己推一下就行了(如果不对会让你回来继续选择的),选对之后,就会进行安装了,<span style="color: #ff0000;">安装过程中只有一点一定要注意的就是千万别覆盖了你的xp</span>,也就是选择装在哪的时候,空白区和最后一个create custom layout,边上有个缩略图,自己看看.<br>然后就是把修改写到硬盘,也就是安装fedora到硬盘了,接下来就是配置用户名和密码神马的了,其他的就over了.<br><br>======================我是分割线============================<br>这里说下联网,我的是H3C的校园网,由于在Ubuntu下联过网,所以轻松点,首先配置ip和dns gateway等等东西,这些在文件etc/sysconfig/network-scripts/下的ifcfg-eth0,自己加上就行了,然后在命令台敲命令system-config-network(命令可能有误,不过第一个是system,自己tab一下吧)然后选择 静态ip(其实在配置ip dns gateway那可以加上一句BOOTPROTO=static应该就行了),然后安装H3C的客户端,网上一搜一大把(没图形化界面,然后连接是用linux1x的)网上有一个自动配置脚本,不过对于Fedora 自己得改脚本,不然可能会悲剧.我是自己配的(因为不会改脚本- -,太难改了&amp;太懒了)配好之后应该就可以直接连上网了,如果不行,你可以打电话给网络中心(别和我说你们学下的校园网没网络中心,没有那就自己折腾吧)问问是啥原因,因为那边有记录的(我有次就是ip没配好,为了网络中心才配好的)<br><br>==========================邪恶的分割线========================<br><br>一般来说还有一个东西需要安装,那就是中文输入发,我习惯了fcitx,所以就继续用它,(现在有各种云输入法,暂时用用可以,但是云输入法绝非长久之计啊)yum install fcitx之后,就各种无语了,一个不自动启动,而是ctrl+space不能切换输入法,然后网上搜了一大把,基本就是一个各种软件冲突,其实我也不知道到底谁和谁冲突,怎么冲突的- -||.然后我重装了几次之后,居然就可以了,不过中间还是安装网上的做法做的,没做完一次就要重装一次啊.在ubuntu下可以用im-switch来设置的,fedora似乎有个im-chooser,不过不会用,路过的有谁会的就说下呗,那个开机自动启动,可以在系统-首选项-启动应用程序增加一个叫fcitx的启动项就ok了,只要路径对了就没问题,名字那啥都是浮云</td><br></tr><br></tbody><br></table>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -487,9 +487,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
-		
 			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -513,13 +513,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -541,15 +541,15 @@
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -566,48 +566,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/apach/">apach<span>0</span></a></li>
-		
-			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
-		
-			<li><a href="/tags/metric/">metric<span>1</span></a></li>
-		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
-		
-			<li><a href="/tags/于娟/">于娟<span>1</span></a></li>
-		
-			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
-		
-			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
-		
-			<li><a href="/tags/vim/">vim<span>2</span></a></li>
-		
-			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
-		
-			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
-		
-			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
-		
-			<li><a href="/tags/git/">git<span>4</span></a></li>
-		
-			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
-		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+			<li><a href="/tags/dag/">dag<span>1</span></a></li>
 		
 			<li><a href="/tags/storm/">storm<span>3</span></a></li>
 		
-			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
 		
-			<li><a href="/tags/filter/">filter<span>1</span></a></li>
+			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
 		
-			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
 		
-			<li><a href="/tags/metric-core/">metric-core<span>1</span></a></li>
+			<li><a href="/tags/array/">array<span>1</span></a></li>
 		
-			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
+			<li><a href="/tags/github/">github<span>5</span></a></li>
+		
+			<li><a href="/tags/spark/">spark<span>7</span></a></li>
+		
+			<li><a href="/tags/list/">list<span>1</span></a></li>
+		
+			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
+		
+			<li><a href="/tags/fork/">fork<span>2</span></a></li>
+		
+			<li><a href="/tags/django/">django<span>1</span></a></li>
+		
+			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+		
+			<li><a href="/tags/递归/">递归<span>1</span></a></li>
+		
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
+		
+			<li><a href="/tags/hive/">hive<span>1</span></a></li>
+		
+			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+		
+			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+		
+			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
+		
+			<li><a href="/tags/腾讯/">腾讯<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>278</span></a></li>
+		   <li><a href="/tags">...<span>281</span></a></li>
 		 
 		</ul>
 	</div>
@@ -618,6 +618,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
+      </li>
     
       <li>
         <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
@@ -633,10 +637,6 @@
     
       <li>
         <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
-      </li>
-    
-      <li>
-        <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
       </li>
     
   </ul>

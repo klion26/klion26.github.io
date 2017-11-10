@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-18T03:39:10.000Z</updated>
+  <updated>2017-11-10T06:36:03.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,59 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>django-configuration in action</title>
+    <link href="http://yoursite.com/2017/11/09/django-configuration-in-action/"/>
+    <id>http://yoursite.com/2017/11/09/django-configuration-in-action/</id>
+    <published>2017-11-09T14:34:22.000Z</published>
+    <updated>2017-11-10T06:36:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Django-中统一配置的做法"><a href="#Django-中统一配置的做法" class="headerlink" title="Django 中统一配置的做法"></a>Django 中统一配置的做法</h1><blockquote>
+<p>本文主要描述如何在 django 中统一 settings 文件</p>
+</blockquote>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>django 服务会有多个环境，比如 开发环境、测试环境以及线上环境等。现在大部分使用的方案是针对每一种环境使用一个 settings 文件，然后在不同的环境中使用不同的 settings 文件。这样的设计我认为有至少两个问题:</p>
+<ol>
+<li>很多公用的配置不太好公用</li>
+<li>文件数会很多，项目中管理会比较麻烦</li>
+</ol>
+<a id="more"></a>
+<h1 id="新方案"><a href="#新方案" class="headerlink" title="新方案"></a>新方案</h1><p>针对 settings 文件，在 django 项目中可以使用 django-configuration module 进行管理，从而解决上面的两个问题。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><ol>
+<li>使用 <code>pip install django-configurations</code> 安装 django-configuration module </li>
+<li>修改 settings.py manager.py 以及 wsgi.py 三个文件即可</li>
+<li>建立一个配置统一的文件，用于管理不同的配置项</li>
+</ol>
+<h3 id="具体-Demo"><a href="#具体-Demo" class="headerlink" title="具体 Demo"></a>具体 Demo</h3><p>settings.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div></pre></td><td class="code"><pre><div class="line">from configurations import Configuration</div><div class="line"># Build paths inside the project like this: os.path.join(BASE_DIR, ...)</div><div class="line">import os</div><div class="line"></div><div class="line"></div><div class="line">class Common(Configuration):</div><div class="line">    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))</div><div class="line"></div><div class="line">   # Quick-start development settings - unsuitable for production</div><div class="line">    # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/</div><div class="line"></div><div class="line">    # SECURITY WARNING: keep the secret key used in production secret!</div><div class="line">    SECRET_KEY = &apos;secret_key&apos;</div><div class="line"></div><div class="line">    # SECURITY WARNING: don&apos;t run with debug turned on in production!</div><div class="line">    DEBUG = True</div><div class="line"></div><div class="line">    ALLOWED_HOSTS = []</div><div class="line"></div><div class="line">   # Application definition</div><div class="line"></div><div class="line">    INSTALLED_APPS = (</div><div class="line">		&apos;django.contrib.admin&apos;,</div><div class="line">		&apos;django.contrib.auth&apos;,</div><div class="line">		&apos;django.contrib.contenttypes&apos;,</div><div class="line">		&apos;django.contrib.sessions&apos;,</div><div class="line">		&apos;django.contrib.messages&apos;,</div><div class="line">		&apos;django.contrib.staticfiles&apos;,</div><div class="line">																				    )</div><div class="line"></div><div class="line">		MIDDLEWARE_CLASSES = (</div><div class="line">			&apos;django.contrib.sessions.middleware.SessionMiddleware&apos;,</div><div class="line">			&apos;django.middleware.common.CommonMiddleware&apos;,</div><div class="line">			&apos;django.middleware.csrf.CsrfViewMiddleware&apos;,</div><div class="line">			&apos;django.contrib.auth.middleware.AuthenticationMiddleware&apos;,</div><div class="line">			&apos;django.contrib.auth.middleware.SessionAuthenticationMiddleware&apos;,</div><div class="line">			&apos;django.contrib.messages.middleware.MessageMiddleware&apos;,</div><div class="line">			&apos;django.middleware.clickjacking.XFrameOptionsMiddleware&apos;,</div><div class="line">			&apos;django.middleware.security.SecurityMiddleware&apos;,</div><div class="line">			)</div><div class="line"></div><div class="line">		ROOT_URLCONF = &apos;leopard.urls&apos;</div><div class="line"></div><div class="line">		TEMPLATES = [</div><div class="line">			&#123;</div><div class="line">				&apos;BACKEND&apos;: &apos;django.template.backends.django.DjangoTemplates&apos;,</div><div class="line">				&apos;DIRS&apos;: [],</div><div class="line">				&apos;APP_DIRS&apos;: True,</div><div class="line">				&apos;OPTIONS&apos;: &#123;</div><div class="line">					&apos;context_processors&apos;: [</div><div class="line">					&apos;django.template.context_processors.debug&apos;,</div><div class="line">					&apos;django.template.context_processors.request&apos;,</div><div class="line">					&apos;django.contrib.auth.context_processors.auth&apos;,</div><div class="line">					&apos;django.contrib.messages.context_processors.messages&apos;,</div><div class="line">					],</div><div class="line">				&#125;,</div><div class="line">			&#125;,</div><div class="line">		]</div><div class="line"></div><div class="line">		WSGI_APPLICATION = &apos;leopard.wsgi.application&apos;</div><div class="line"></div><div class="line">		# Internationalization</div><div class="line">		# https://docs.djangoproject.com/en/1.8/topics/i18n/</div><div class="line"></div><div class="line">		LANGUAGE_CODE = &apos;en-us&apos;</div><div class="line"></div><div class="line">		TIME_ZONE = &apos;UTC&apos;</div><div class="line"></div><div class="line">		USE_I18N = True</div><div class="line"></div><div class="line">		USE_L10N = True</div><div class="line"></div><div class="line">		USE_TZ = True</div><div class="line"></div><div class="line">		# Static files (CSS, JavaScript, Images)</div><div class="line">		# https://docs.djangoproject.com/en/1.8/howto/static-files/</div><div class="line"></div><div class="line">		STATIC_URL = &apos;/static/&apos;</div><div class="line"></div><div class="line">		STATE_REDIS_DB = 6</div><div class="line"></div><div class="line">		LOGGING = &#123;</div><div class="line">			&apos;version&apos;: 1,</div><div class="line">			&apos;disable_existing_loggers&apos;: False,</div><div class="line">			&apos;formatters&apos;: &#123;</div><div class="line">				&apos;verbose&apos;: &#123;</div><div class="line">					&apos;format&apos;: &apos;%(levelname)s %(asctime)s %(module)s %(funcName)s %(message)s&apos;</div><div class="line">				&#125;,</div><div class="line">			&#125;,</div><div class="line">			&apos;handlers&apos;: &#123;</div><div class="line">				&apos;mail_admins&apos;: &#123;</div><div class="line">					&apos;level&apos;: &apos;ERROR&apos;,</div><div class="line">					&apos;class&apos;: &apos;django.utils.log.AdminEmailHandler&apos;</div><div class="line">				&#125;,</div><div class="line">				&apos;console&apos;: &#123;</div><div class="line">					&apos;level&apos;: &apos;DEBUG&apos;,</div><div class="line">					&apos;class&apos;: &apos;logging.StreamHandler&apos;</div><div class="line">					&#125;,</div><div class="line">				&apos;realtimejob_file&apos;: &#123;</div><div class="line">					&apos;level&apos;: &apos;INFO&apos;,</div><div class="line">					&apos;class&apos;: &apos;logging.handlers.RotatingFileHandler&apos;,</div><div class="line">					&apos;filename&apos;: &apos;filename&apos;,</div><div class="line">					&apos;formatter&apos;: &apos;verbose&apos;</div><div class="line">					&#125;,</div><div class="line">				&#125;,</div><div class="line">			&apos;loggers&apos;: &#123;</div><div class="line">				&apos;django.request&apos;: &#123;</div><div class="line">					&apos;handlers&apos;: [&apos;mail_admins&apos;],</div><div class="line">					&apos;level&apos;: &apos;ERROR&apos;,</div><div class="line">					&apos;propagate&apos;: True,</div><div class="line">				&#125;,</div><div class="line">				&apos;django_crontab.crontab&apos;: &#123;</div><div class="line">					&apos;handlers&apos;: [&apos;console&apos;],</div><div class="line">						&apos;level&apos;: &apos;DEBUG&apos;,</div><div class="line">						&apos;propagate&apos;: True,</div><div class="line">						&#125;,</div><div class="line">					&apos;realtimejob&apos;: &#123;</div><div class="line">						&apos;handlers&apos;: [&apos;realtimejob_file&apos;],</div><div class="line">						&apos;level&apos;: &apos;INFO&apos;,</div><div class="line">						&apos;propagate&apos;: False</div><div class="line">						&#125;,</div><div class="line">			&#125;,</div><div class="line">		&#125;</div><div class="line"></div><div class="line"></div><div class="line">class Dev(Common):</div><div class="line">	  DEBUG = True</div><div class="line">	  DATABASES = &#123;</div><div class="line">		&apos;default&apos;: &#123;</div><div class="line">			&apos;ENGINE&apos;: &apos;django.db.backends.mysql&apos;,</div><div class="line">			&apos;NAME&apos;: &apos;name&apos;,</div><div class="line">			&apos;USER&apos;: &apos;user&apos;,</div><div class="line">			&apos;PASSWORD&apos;: &apos;password&apos;,</div><div class="line">			&apos;HOST&apos;: &apos;host&apos;,</div><div class="line">			&apos;PORT&apos;: &apos;port&apos;,</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">    STATE_REDIS_HOST = &apos;127.0.0.1&apos;</div><div class="line">	STATE_REDIS_PORT = 6379</div><div class="line">	STATE_REDIS_SOCKET_TIMEOUT = 1000</div><div class="line"></div><div class="line"></div><div class="line">class Prod(Common):</div><div class="line">	# Database</div><div class="line">	# https://docs.djangoproject.com/en/1.8/ref/settings/#databases</div><div class="line">	DATABASES = &#123;</div><div class="line">		&apos;default&apos;: &#123;</div><div class="line">			&apos;ENGINE&apos;: &apos;django.db.backends.mysql&apos;,</div><div class="line">			&apos;NAME&apos;: &apos;name&apos;,</div><div class="line">			&apos;USER&apos;: &apos;user&apos;,</div><div class="line">			&apos;PASSWORD&apos;: &apos;password&apos;,</div><div class="line">			&apos;HOST&apos;: &apos;host&apos;,</div><div class="line">			&apos;PORT&apos;: &apos;port&apos;,</div><div class="line">		&#125;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>manager.py<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">if __name__ == &quot;__main__&quot;:</div><div class="line">    os.environ.setdefault(&quot;DJANGO_SETTINGS_MODULE&quot;, &quot;settings&quot;)</div><div class="line">	os.environ.setdefault(&apos;DJANGO_CONFIGURATION&apos;, &apos;Dev&apos;)  #设置默认的环境</div><div class="line"></div><div class="line">	from configurations.management import execute_from_command_line # 引入需要的包</div><div class="line"></div><div class="line">	execute_from_command_line(sys.argv) # 使用 django-configurations 来启动</div></pre></td></tr></table></figure></p>
+<p>wsgi.py 修改同上所示<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">import os</div><div class="line">from configurations.wsgi import get_wsgi_application # 引入相关的包</div><div class="line"></div><div class="line">os.environ.setdefault(&quot;DJANGO_SETTINGS_MODULE&quot;, &quot;settings&quot;)</div><div class="line">os.environ.setdefault(&apos;DJANGO_CONFIGURATION&apos;, &apos;Dev&apos;)</div><div class="line"></div><div class="line">application = get_wsgi_application() # 使用 django-configurations 中的如括进行启动</div></pre></td></tr></table></figure></p>
+<p>对于希望针对不同的环境引入不同的变量值（变量名字一样），可以新建一个 commonsettings.py 文件。demo 如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">import settings</div><div class="line">import os</div><div class="line"></div><div class="line">DJANGO_CONFIGURATION_KEY = &apos;DJANGO_CONFIGURATION&apos;</div><div class="line">STATE_REDIS_HOST = getattr(settings, os.environ.get(DJANGO_CONFIGURATION_KEY, &apos;Dev&apos;)).STATE_REDIS_HOST</div><div class="line">STATE_REDIS_PORT = getattr(settings, os.environ.get(DJANGO_CONFIGURATION_KEY, &apos;Dev&apos;)).STATE_REDIS_PORT</div><div class="line">STATE_REDIS_DB = getattr(settings, os.environ.get(DJANGO_CONFIGURATION_KEY, &apos;Dev&apos;)).STATE_REDIS_DB</div><div class="line">STATE_REDIS_SOCKET_TIMEOUT = getattr(settings, os.environ.get(DJANGO_CONFIGURATION_KEY, &apos;Dev&apos;)).STATE_REDIS_SOCKET_TIMEOUT</div></pre></td></tr></table></figure>
+<p>这样，所有的人从 commonsettings.py 进行引入即可，不需要关心使用的那个环境（commonsettings.py 中没有处理异常，希望对于异常情况提前抛出来）</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;Django-中统一配置的做法&quot;&gt;&lt;a href=&quot;#Django-中统一配置的做法&quot; class=&quot;headerlink&quot; title=&quot;Django 中统一配置的做法&quot;&gt;&lt;/a&gt;Django 中统一配置的做法&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;本文主要描述如何在 django 中统一 settings 文件&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;django 服务会有多个环境，比如 开发环境、测试环境以及线上环境等。现在大部分使用的方案是针对每一种环境使用一个 settings 文件，然后在不同的环境中使用不同的 settings 文件。这样的设计我认为有至少两个问题:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;很多公用的配置不太好公用&lt;/li&gt;
+&lt;li&gt;文件数会很多，项目中管理会比较麻烦&lt;/li&gt;
+&lt;/ol&gt;
+    
+    </summary>
+    
+    
+      <category term="django" scheme="http://yoursite.com/tags/django/"/>
+    
+      <category term="settings" scheme="http://yoursite.com/tags/settings/"/>
+    
+      <category term="code-style" scheme="http://yoursite.com/tags/code-style/"/>
+    
+  </entry>
   
   <entry>
     <title>spark_dagscheduler</title>
@@ -915,11 +968,11 @@
     
       <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
     
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
       <category term="append" scheme="http://yoursite.com/tags/append/"/>
     
       <category term="hdfs" scheme="http://yoursite.com/tags/hdfs/"/>
-    
-      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
     
   </entry>
   
@@ -1138,110 +1191,6 @@
       <category term="test" scheme="http://yoursite.com/tags/test/"/>
     
       <category term="trident" scheme="http://yoursite.com/tags/trident/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>一种可行的英语阅读学习方法</title>
-    <link href="http://yoursite.com/2016/09/26/e4-b8-80-e7-a7-8d-e5-8f-af-e8-a1-8c-e7-9a-84-e8-8b-b1-e8-af-ad-e9-98-85-e8-af-bb-e5-ad-a6-e4-b9-a0-e6-96-b9-e6-b3-95/"/>
-    <id>http://yoursite.com/2016/09/26/e4-b8-80-e7-a7-8d-e5-8f-af-e8-a1-8c-e7-9a-84-e8-8b-b1-e8-af-ad-e9-98-85-e8-af-bb-e5-ad-a6-e4-b9-a0-e6-96-b9-e6-b3-95/</id>
-    <published>2016-09-26T14:38:56.000Z</published>
-    <updated>2017-05-29T09:22:53.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>介绍自己从抵触看英语文章，到现在能够自如的阅读英语文章的方法，以及可能遇到的问题。方法基于 <a href="https://book.douban.com/subject/1880983/" target="_blank" rel="external">今日就读百万英语</a>。这种方法只是我实验过，且可行的，当然还有其他很多方法。</p>
-<h2 id="为什么要看英语文章"><a href="#为什么要看英语文章" class="headerlink" title="为什么要看英语文章"></a>为什么要看英语文章</h2><p>我看英语文章的理由很简单，因为在 IT 行业，前沿的技术，论文和好的书籍都是英文的，从英文翻译到中文的时间往往很长很长，而且大部分翻译的质量达不到我的要求。还有就是看到别人看美剧可以不看字幕很羡慕。</p>
-<h2 id="我之前的英语基础"><a href="#我之前的英语基础" class="headerlink" title="我之前的英语基础"></a>我之前的英语基础</h2><p>英语水平四级 450，六级未过。单词量 5000 左右。</p>
-<h2 id="具体做法"><a href="#具体做法" class="headerlink" title="具体做法"></a>具体做法</h2><p>严格按照按照下面三点来</p>
-<ul>
-<li>不要查辞典，不要翻成母语；</li>
-<li>阅读不查辞典也能完全理解的图书，个别不懂的地方就跳过去；</li>
-<li>越读越没趣的书就暂时停下去，先往后放一放。</li>
-</ul>
-<p>第一点会要求你从看得懂的书开始，形成阅读英文原文的习惯。如果不这么做，我们会习惯的去看一些别人推荐的书籍或文章，这些书籍的难度可能是已经超过了我们的范围的。这样就会给自己造成很大的压力，慢慢的可能就不想继续阅读英语原文了。我最开始阅读的书籍包括《高级彩绘英文童书》，就是那种插画书，每一页可能就几句话，大部分是插图。如果你基本没有阅读过英文原本书籍的话，建议不要跳过这些插图书。</p>
-<p>第二点是需要你从整体上理解一篇文章，一开始你只要能读懂整篇文章的 70% 左右就行了，其他的没读懂的部分可以通过这 70% 进行推测。等慢慢熟练了，再将注意力放在具体的词句上。</p>
-<p>第三点是和前面的结合起来用的，每个人的喜好是不一样的，所以每个人有兴趣的书籍也是不一样的。读你感兴趣的书籍，那么你都下去的概率会大大增加。我看过一本英文的侦探小说，真是停不下来。</p>
-<p>没读完一本书，就下面的表格进行记录（具体可根据自己的情况调整），下面是我最早的两条记录（不要担心 YL 值太小，单词书太少，慢慢来）</p>
-<table>
-<thead>
-<tr>
-<th>No</th>
-<th>日期</th>
-<th>系列</th>
-<th>书名</th>
-<th>YL 值</th>
-<th>单词字数</th>
-<th>累计阅读量</th>
-<th>时间</th>
-<th>速度</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>20130726</td>
-<td>ORT</td>
-<td>look at me</td>
-<td>0.1</td>
-<td>35</td>
-<td>35</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>2</td>
-<td>20130727</td>
-<td>ORT</td>
-<td>floppy floppy</td>
-<td>0.1</td>
-<td>10</td>
-<td>45</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h2 id="我遇到过的问题"><a href="#我遇到过的问题" class="headerlink" title="我遇到过的问题"></a>我遇到过的问题</h2><ol>
-<li><p>一开始阅读的书籍会很简单，读完一本想继续读第二本，真想一开始读七，八，十本才好。</p>
-<blockquote>
-<p>有句话叫做，每天走三十公里。前期觉得简单要保持体力，后期觉得艰难要咬牙做完。一开始用力过猛，可能会让自己中途突然停掉。</p>
-</blockquote>
-</li>
-<li><p>看的书太简单，简直就是幼儿园小朋友看的。</p>
-<blockquote>
-<p>我们没有看足够多书籍之前，在英语阅读方面和幼儿园小朋友差不多。另外，我们在私底下看这些书就好，又不给别人看，其他人不会知道我在看这些书</p>
-</blockquote>
-</li>
-<li><p>每天看的单词数量好少。</p>
-<blockquote>
-<p>这和第一点中的一样，前期不要贪多求快。先走稳了，再走快。</p>
-</blockquote>
-</li>
-<li><p>没有任何征兆，突然就看不下去了</p>
-<blockquote>
-<p>我选择一周只看六天，留一天用来休息。另外看不下去了我就看一些 YL 值小的书籍（保证每天一本书，不管单词书多少）</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="有关书籍"><a href="#有关书籍" class="headerlink" title="有关书籍"></a>有关书籍</h2><p>我读过的书籍系列包括 oxford reading tree，Curious George，PGR(Penguim_Readers) 0，PGR 1，PGR 2，Frog and Toad，彩绘英文图书，牛津书虫。</p>
-<h3 id="书籍在哪找"><a href="#书籍在哪找" class="headerlink" title="书籍在哪找"></a>书籍在哪找</h3><p>如果经济能力允许的话建议在 Amazon 等商城购买，其他的可以自行 Google，百度网盘之类的应该也不少。</p>
-<h2 id="有关-YL-值"><a href="#有关-YL-值" class="headerlink" title="有关 YL 值"></a>有关 YL 值</h2><p>YL 值可以理解为书籍的阅读难度登记，阅读越容易。</p>
-<p>下面几个网址可以查询书籍的 YL 值和字数，方便统计时使用。<br><a href="http://www2.odn.ne.jp/ims/bookdata/list_all.html" target="_blank" rel="external">http://www2.odn.ne.jp/ims/bookdata/list_all.html</a><br><a href="http://www.seg.co.jp/sss_review/jsp/frm_a_130.jsp" target="_blank" rel="external">http://www.seg.co.jp/sss_review/jsp/frm_a_130.jsp</a></p>
-<blockquote>
-<p>PS: 在豆瓣有一个 <a href="https://site.douban.com/195274/" target="_blank" rel="external">小组</a>，是 恶魔的奶爸 建立的，也可以参考。<br>有问题的留言交流。</p>
-</blockquote>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;介绍自己从抵触看英语文章，到现在能够自如的阅读英语文章的方法，以及可能遇到的问题。方法基于 &lt;a href=&quot;https://book.douban.com/subject/1880983/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;今日就读百万英语&lt;
-    
-    </summary>
-    
-      <category term="成长" scheme="http://yoursite.com/categories/%E6%88%90%E9%95%BF/"/>
-    
-    
-      <category term="read" scheme="http://yoursite.com/tags/read/"/>
-    
-      <category term="english" scheme="http://yoursite.com/tags/english/"/>
     
   </entry>
   

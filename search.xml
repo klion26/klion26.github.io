@@ -3,6 +3,46 @@
   
     
     <entry>
+      <title><![CDATA[django-configuration in action]]></title>
+      <url>/2017/11/09/django-configuration-in-action/</url>
+      <content type="html"><![CDATA[<h1 id="Django-中统一配置的做法"><a href="#Django-中统一配置的做法" class="headerlink" title="Django 中统一配置的做法"></a>Django 中统一配置的做法</h1><blockquote>
+<p>本文主要描述如何在 django 中统一 settings 文件</p>
+</blockquote>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>django 服务会有多个环境，比如 开发环境、测试环境以及线上环境等。现在大部分使用的方案是针对每一种环境使用一个 settings 文件，然后在不同的环境中使用不同的 settings 文件。这样的设计我认为有至少两个问题:</p>
+<ol>
+<li>很多公用的配置不太好公用</li>
+<li>文件数会很多，项目中管理会比较麻烦</li>
+</ol>
+<a id="more"></a>
+<h1 id="新方案"><a href="#新方案" class="headerlink" title="新方案"></a>新方案</h1><p>针对 settings 文件，在 django 项目中可以使用 django-configuration module 进行管理，从而解决上面的两个问题。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><ol>
+<li>使用 <code>pip install django-configurations</code> 安装 django-configuration module </li>
+<li>修改 settings.py manager.py 以及 wsgi.py 三个文件即可</li>
+<li>建立一个配置统一的文件，用于管理不同的配置项</li>
+</ol>
+<h3 id="具体-Demo"><a href="#具体-Demo" class="headerlink" title="具体 Demo"></a>具体 Demo</h3><p>settings.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div></pre></td><td class="code"><pre><div class="line">from configurations import Configuration</div><div class="line"># Build paths inside the project like this: os.path.join(BASE_DIR, ...)</div><div class="line">import os</div><div class="line"></div><div class="line"></div><div class="line">class Common(Configuration):</div><div class="line">    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))</div><div class="line"></div><div class="line">   # Quick-start development settings - unsuitable for production</div><div class="line">    # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/</div><div class="line"></div><div class="line">    # SECURITY WARNING: keep the secret key used in production secret!</div><div class="line">    SECRET_KEY = &apos;secret_key&apos;</div><div class="line"></div><div class="line">    # SECURITY WARNING: don&apos;t run with debug turned on in production!</div><div class="line">    DEBUG = True</div><div class="line"></div><div class="line">    ALLOWED_HOSTS = []</div><div class="line"></div><div class="line">   # Application definition</div><div class="line"></div><div class="line">    INSTALLED_APPS = (</div><div class="line">		&apos;django.contrib.admin&apos;,</div><div class="line">		&apos;django.contrib.auth&apos;,</div><div class="line">		&apos;django.contrib.contenttypes&apos;,</div><div class="line">		&apos;django.contrib.sessions&apos;,</div><div class="line">		&apos;django.contrib.messages&apos;,</div><div class="line">		&apos;django.contrib.staticfiles&apos;,</div><div class="line">																				    )</div><div class="line"></div><div class="line">		MIDDLEWARE_CLASSES = (</div><div class="line">			&apos;django.contrib.sessions.middleware.SessionMiddleware&apos;,</div><div class="line">			&apos;django.middleware.common.CommonMiddleware&apos;,</div><div class="line">			&apos;django.middleware.csrf.CsrfViewMiddleware&apos;,</div><div class="line">			&apos;django.contrib.auth.middleware.AuthenticationMiddleware&apos;,</div><div class="line">			&apos;django.contrib.auth.middleware.SessionAuthenticationMiddleware&apos;,</div><div class="line">			&apos;django.contrib.messages.middleware.MessageMiddleware&apos;,</div><div class="line">			&apos;django.middleware.clickjacking.XFrameOptionsMiddleware&apos;,</div><div class="line">			&apos;django.middleware.security.SecurityMiddleware&apos;,</div><div class="line">			)</div><div class="line"></div><div class="line">		ROOT_URLCONF = &apos;leopard.urls&apos;</div><div class="line"></div><div class="line">		TEMPLATES = [</div><div class="line">			&#123;</div><div class="line">				&apos;BACKEND&apos;: &apos;django.template.backends.django.DjangoTemplates&apos;,</div><div class="line">				&apos;DIRS&apos;: [],</div><div class="line">				&apos;APP_DIRS&apos;: True,</div><div class="line">				&apos;OPTIONS&apos;: &#123;</div><div class="line">					&apos;context_processors&apos;: [</div><div class="line">					&apos;django.template.context_processors.debug&apos;,</div><div class="line">					&apos;django.template.context_processors.request&apos;,</div><div class="line">					&apos;django.contrib.auth.context_processors.auth&apos;,</div><div class="line">					&apos;django.contrib.messages.context_processors.messages&apos;,</div><div class="line">					],</div><div class="line">				&#125;,</div><div class="line">			&#125;,</div><div class="line">		]</div><div class="line"></div><div class="line">		WSGI_APPLICATION = &apos;leopard.wsgi.application&apos;</div><div class="line"></div><div class="line">		# Internationalization</div><div class="line">		# https://docs.djangoproject.com/en/1.8/topics/i18n/</div><div class="line"></div><div class="line">		LANGUAGE_CODE = &apos;en-us&apos;</div><div class="line"></div><div class="line">		TIME_ZONE = &apos;UTC&apos;</div><div class="line"></div><div class="line">		USE_I18N = True</div><div class="line"></div><div class="line">		USE_L10N = True</div><div class="line"></div><div class="line">		USE_TZ = True</div><div class="line"></div><div class="line">		# Static files (CSS, JavaScript, Images)</div><div class="line">		# https://docs.djangoproject.com/en/1.8/howto/static-files/</div><div class="line"></div><div class="line">		STATIC_URL = &apos;/static/&apos;</div><div class="line"></div><div class="line">		STATE_REDIS_DB = 6</div><div class="line"></div><div class="line">		LOGGING = &#123;</div><div class="line">			&apos;version&apos;: 1,</div><div class="line">			&apos;disable_existing_loggers&apos;: False,</div><div class="line">			&apos;formatters&apos;: &#123;</div><div class="line">				&apos;verbose&apos;: &#123;</div><div class="line">					&apos;format&apos;: &apos;%(levelname)s %(asctime)s %(module)s %(funcName)s %(message)s&apos;</div><div class="line">				&#125;,</div><div class="line">			&#125;,</div><div class="line">			&apos;handlers&apos;: &#123;</div><div class="line">				&apos;mail_admins&apos;: &#123;</div><div class="line">					&apos;level&apos;: &apos;ERROR&apos;,</div><div class="line">					&apos;class&apos;: &apos;django.utils.log.AdminEmailHandler&apos;</div><div class="line">				&#125;,</div><div class="line">				&apos;console&apos;: &#123;</div><div class="line">					&apos;level&apos;: &apos;DEBUG&apos;,</div><div class="line">					&apos;class&apos;: &apos;logging.StreamHandler&apos;</div><div class="line">					&#125;,</div><div class="line">				&apos;realtimejob_file&apos;: &#123;</div><div class="line">					&apos;level&apos;: &apos;INFO&apos;,</div><div class="line">					&apos;class&apos;: &apos;logging.handlers.RotatingFileHandler&apos;,</div><div class="line">					&apos;filename&apos;: &apos;filename&apos;,</div><div class="line">					&apos;formatter&apos;: &apos;verbose&apos;</div><div class="line">					&#125;,</div><div class="line">				&#125;,</div><div class="line">			&apos;loggers&apos;: &#123;</div><div class="line">				&apos;django.request&apos;: &#123;</div><div class="line">					&apos;handlers&apos;: [&apos;mail_admins&apos;],</div><div class="line">					&apos;level&apos;: &apos;ERROR&apos;,</div><div class="line">					&apos;propagate&apos;: True,</div><div class="line">				&#125;,</div><div class="line">				&apos;django_crontab.crontab&apos;: &#123;</div><div class="line">					&apos;handlers&apos;: [&apos;console&apos;],</div><div class="line">						&apos;level&apos;: &apos;DEBUG&apos;,</div><div class="line">						&apos;propagate&apos;: True,</div><div class="line">						&#125;,</div><div class="line">					&apos;realtimejob&apos;: &#123;</div><div class="line">						&apos;handlers&apos;: [&apos;realtimejob_file&apos;],</div><div class="line">						&apos;level&apos;: &apos;INFO&apos;,</div><div class="line">						&apos;propagate&apos;: False</div><div class="line">						&#125;,</div><div class="line">			&#125;,</div><div class="line">		&#125;</div><div class="line"></div><div class="line"></div><div class="line">class Dev(Common):</div><div class="line">	  DEBUG = True</div><div class="line">	  DATABASES = &#123;</div><div class="line">		&apos;default&apos;: &#123;</div><div class="line">			&apos;ENGINE&apos;: &apos;django.db.backends.mysql&apos;,</div><div class="line">			&apos;NAME&apos;: &apos;name&apos;,</div><div class="line">			&apos;USER&apos;: &apos;user&apos;,</div><div class="line">			&apos;PASSWORD&apos;: &apos;password&apos;,</div><div class="line">			&apos;HOST&apos;: &apos;host&apos;,</div><div class="line">			&apos;PORT&apos;: &apos;port&apos;,</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">    STATE_REDIS_HOST = &apos;127.0.0.1&apos;</div><div class="line">	STATE_REDIS_PORT = 6379</div><div class="line">	STATE_REDIS_SOCKET_TIMEOUT = 1000</div><div class="line"></div><div class="line"></div><div class="line">class Prod(Common):</div><div class="line">	# Database</div><div class="line">	# https://docs.djangoproject.com/en/1.8/ref/settings/#databases</div><div class="line">	DATABASES = &#123;</div><div class="line">		&apos;default&apos;: &#123;</div><div class="line">			&apos;ENGINE&apos;: &apos;django.db.backends.mysql&apos;,</div><div class="line">			&apos;NAME&apos;: &apos;name&apos;,</div><div class="line">			&apos;USER&apos;: &apos;user&apos;,</div><div class="line">			&apos;PASSWORD&apos;: &apos;password&apos;,</div><div class="line">			&apos;HOST&apos;: &apos;host&apos;,</div><div class="line">			&apos;PORT&apos;: &apos;port&apos;,</div><div class="line">		&#125;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>manager.py<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">if __name__ == &quot;__main__&quot;:</div><div class="line">    os.environ.setdefault(&quot;DJANGO_SETTINGS_MODULE&quot;, &quot;settings&quot;)</div><div class="line">	os.environ.setdefault(&apos;DJANGO_CONFIGURATION&apos;, &apos;Dev&apos;)  #设置默认的环境</div><div class="line"></div><div class="line">	from configurations.management import execute_from_command_line # 引入需要的包</div><div class="line"></div><div class="line">	execute_from_command_line(sys.argv) # 使用 django-configurations 来启动</div></pre></td></tr></table></figure></p>
+<p>wsgi.py 修改同上所示<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">import os</div><div class="line">from configurations.wsgi import get_wsgi_application # 引入相关的包</div><div class="line"></div><div class="line">os.environ.setdefault(&quot;DJANGO_SETTINGS_MODULE&quot;, &quot;settings&quot;)</div><div class="line">os.environ.setdefault(&apos;DJANGO_CONFIGURATION&apos;, &apos;Dev&apos;)</div><div class="line"></div><div class="line">application = get_wsgi_application() # 使用 django-configurations 中的如括进行启动</div></pre></td></tr></table></figure></p>
+<p>对于希望针对不同的环境引入不同的变量值（变量名字一样），可以新建一个 commonsettings.py 文件。demo 如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">import settings</div><div class="line">import os</div><div class="line"></div><div class="line">DJANGO_CONFIGURATION_KEY = &apos;DJANGO_CONFIGURATION&apos;</div><div class="line">STATE_REDIS_HOST = getattr(settings, os.environ.get(DJANGO_CONFIGURATION_KEY, &apos;Dev&apos;)).STATE_REDIS_HOST</div><div class="line">STATE_REDIS_PORT = getattr(settings, os.environ.get(DJANGO_CONFIGURATION_KEY, &apos;Dev&apos;)).STATE_REDIS_PORT</div><div class="line">STATE_REDIS_DB = getattr(settings, os.environ.get(DJANGO_CONFIGURATION_KEY, &apos;Dev&apos;)).STATE_REDIS_DB</div><div class="line">STATE_REDIS_SOCKET_TIMEOUT = getattr(settings, os.environ.get(DJANGO_CONFIGURATION_KEY, &apos;Dev&apos;)).STATE_REDIS_SOCKET_TIMEOUT</div></pre></td></tr></table></figure>
+<p>这样，所有的人从 commonsettings.py 进行引入即可，不需要关心使用的那个环境（commonsettings.py 中没有处理异常，希望对于异常情况提前抛出来）</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> django </tag>
+            
+            <tag> settings </tag>
+            
+            <tag> code-style </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[spark_dagscheduler]]></title>
       <url>/2017/10/16/spark-dagscheduler/</url>
       <content type="html"><![CDATA[<blockquote>
@@ -802,11 +842,11 @@
             
             <tag> spark </tag>
             
+            <tag> spark-streaming </tag>
+            
             <tag> append </tag>
             
             <tag> hdfs </tag>
-            
-            <tag> spark-streaming </tag>
             
         </tags>
         
@@ -1667,9 +1707,9 @@
             
             <tag> distributed-system </tag>
             
-            <tag> kv </tag>
-            
             <tag> mit </tag>
+            
+            <tag> kv </tag>
             
             <tag> viewservice </tag>
             
@@ -1721,11 +1761,11 @@
             
             <tag> distributed-system </tag>
             
-            <tag> mit </tag>
-            
             <tag> go </tag>
             
             <tag> mapreduce </tag>
+            
+            <tag> mit </tag>
             
         </tags>
         
@@ -3165,11 +3205,11 @@ private:
             
             <tag> fedora </tag>
             
-            <tag> plugin </tag>
-            
             <tag> vi </tag>
             
             <tag> vim </tag>
+            
+            <tag> plugin </tag>
             
             <tag> vundle </tag>
             
@@ -3922,13 +3962,13 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> fedora </tag>
             
-            <tag> vi </tag>
-            
-            <tag> vim </tag>
-            
             <tag> command </tag>
             
             <tag> tutorial </tag>
+            
+            <tag> vi </tag>
+            
+            <tag> vim </tag>
             
         </tags>
         
@@ -4111,7 +4151,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x6a;&#99;&#x6d;&#64;&#x6a;&#111;&#x6e;&#x6d;&#97;&#x73;&#116;&#101;&#x72;&#x73;&#x2e;&#111;&#x72;&#103;">&#x6a;&#99;&#x6d;&#64;&#x6a;&#111;&#x6e;&#x6d;&#97;&#x73;&#116;&#101;&#x72;&#x73;&#x2e;&#111;&#x72;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#x69;&#108;&#x74;&#111;&#58;&#x6a;&#99;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#97;&#115;&#116;&#101;&#114;&#115;&#x2e;&#x6f;&#x72;&#x67;">&#x6a;&#99;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#97;&#115;&#116;&#101;&#114;&#115;&#x2e;&#x6f;&#x72;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -4334,9 +4374,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> linux </tag>
             
-            <tag> compter graphics </tag>
-            
             <tag> fedora </tag>
+            
+            <tag> compter graphics </tag>
             
             <tag> opengl </tag>
             
@@ -7111,9 +7151,9 @@ return 1;
         
         <tags>
             
-            <tag> grub </tag>
-            
             <tag> Red Hat9 </tag>
+            
+            <tag> grub </tag>
             
         </tags>
         

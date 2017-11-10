@@ -121,6 +121,64 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2010-12-31 </div>
+			<div class="article-title"><a href="/2010/12/31/linux-fork-2/" >Linux-fork(2)</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>由于这篇会比较长,所以就不接在上一篇后面了,在此再开一篇.这里说说和fork有关的两个比较有趣的程序</p>
+<p>第一个是这样的[一组,一共两个程序对比]</p>
+<p><div class="source" style="color: #f5deb3; background-color: #2f4f4f; font-family: 'Courier New', 'Lucida Console', Verdana;"><span style="color: #eeee00;">#include <unistd.h>;</unistd.h></span><br><span style="color: #eeee00;">#include <sys types.h="">;</sys></span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span> ()<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">pid_t</span> <span style="color: #f5deb3;">pid</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">fork</span><span style="color: #f5deb3;">”</span>);<span style="color: #da70d6;">//注意这句和下面的区别</span><br><span style="color: #f5deb3;">pid</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">fork</span>();<br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">error</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">fork</span><span style="color: #f5deb3;">!</span><span style="color: #f5deb3;">”</span>);<br><span style="color: #b0c4de; font-weight: bold;">else</span> <span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">am</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">child</span> <span style="color: #f5deb3;">process</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">my</span> <span style="color: #f5deb3;">process</span> <span style="color: #f5deb3;">id</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">dn</span><span style="color: #f5deb3;">”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">am</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">parent</span> <span style="color: #f5deb3;">process</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">my</span> <span style="color: #f5deb3;">process</span> <span style="color: #f5deb3;">id</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">dn</span><span style="color: #f5deb3;">”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br><span style="color: #f5deb3;">retrun</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#include <unistd.h>;</unistd.h></span><br><span style="color: #eeee00;">#include <sys types.h="">;</sys></span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span> ()<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">pid_t</span> <span style="color: #f5deb3;">pid</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">fork</span><span style="color: #f5deb3;">\</span>n<span style="color: #f5deb3;">”</span>);<span style="color: #da70d6;">//注意这句和下面的区别</span><br><span style="color: #f5deb3;">pid</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">fork</span>();<br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">error</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">fork</span><span style="color: #f5deb3;">!</span><span style="color: #f5deb3;">”</span>);<br><span style="color: #b0c4de; font-weight: bold;">else</span> <span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">pid</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">am</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">child</span> <span style="color: #f5deb3;">process</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">my</span> <span style="color: #f5deb3;">process</span> <span style="color: #f5deb3;">id</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">dn</span><span style="color: #f5deb3;">”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">printf</span>(<span style="color: #f5deb3;">“</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">am</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">parent</span> <span style="color: #f5deb3;">process</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">my</span> <span style="color: #f5deb3;">process</span> <span style="color: #f5deb3;">id</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">dn</span><span style="color: #f5deb3;">”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">getpid</span>());<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div><br>上面的两个会输出什么呢?</p>
+<p>。</p>
+<p>。</p>
+<p>。</p>
+<p>。</p>
+<p>答案是</p>
+<p>第一个输出:</p>
+<p>forki am the child process, my process id is 2955</p>
+<p>forki am the child process, my process id is 2954</p>
+<p>第二个的输出是</p>
+<p>fork</p>
+<p>i am the child process, my process id is 2955</p>
+<p>i am the child process, my process id is 2954</p>
+<p>是不是觉得和我昨天说的不一样呢?怎么第一个中的fork输出两次呢？这里就和printf的缓冲有关了,具体的可以<a href="http://bbs.chinaunix.net/viewthread.php?tid=311067" target="_blank" rel="external"><span style="color: #ff0000;">参考这里</span></a></p>
+<p>下面的是<a href="http://www.cppblog.com/zhangxu/archive/2007/12/02/37640.aspx" target="_blank" rel="external"><span style="color: #ff0000;">转自这里</span></a></p>
+<p>我试验了下,结果和博主的相似.</p>
+<p>.给你两分钟抢答时间</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<p>.</p>
+<p>OK,答案来了.</p>
+<p>对一下答案吧：[这分析和结果是复制过来的.]</p>
+<p>[hardy@localhost fork]$ ./fork<br>father<br>son<br>son<br>son<br>father<br>father<br>son<br>father<br>son<br>son<br>father<br>father<br>son<br>father<br>总共7个son7个father。你答对了么？</p>
+<p>这道题需要在纸上画画才好理解[由于格式会不对,所以我用图片,速度不给力的还请见谅]</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/fork-1.bmp" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/fork-1.bmp" alt="" title="fork-1"></a></p>
+<p>其中每一行分别代表一个进程的运行打印结果。</p>
+<p>当产生子进程的时刻，子进程打印son，当子进程调用fork的生成子子进程，他就提升为father。<br>总结来说，father永远打印father，son在fork之前是son，fork之后就为father，同时生成新的son。<br>这个比喻就像真正的父子，孩子长大了生了小孩，孩子就成了父亲。而父亲永远是父亲。</p>
+<p>我自己试验的时候的结果如下:</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/fork.bmp" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/fork.bmp" alt="" title="fork"></a></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2010-12-30 </div>
 			<div class="article-title"><a href="/2010/12/30/linux-fork-test/" >fork函数小测试</a></div>						
 		</h3>
@@ -360,29 +418,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2010-12-14 </div>
-			<div class="article-title"><a href="/2010/12/14/linux-rename/" >Linux命令 rename</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>首先声明一点:Ubuntu下的rename和Red Hat9下的是不一样的,就连man出来的也是不一样的.具体的可以自己操作看一下. Ubuntu下的似乎还需要了解Perl语法,不然会报语法错误.- -|| 不过Red Hat9下的就好多了,可以man一下,大致能了解是什么意思了. rename 表达式1 表达式2 表达式3 其中表达式1是要改变的字符串,表达式2是你要改为的字符串,表达式3相当于一个判断式一样的,也就是把所有符合表达式3的文件名中表达式1改成表达式2.表达式3可含通配符。比如Red Hat9的例子.把所有的htm文件的文件名改成html,命令如下 rename .htm .html *.htm 上面的意思是把所有的以.htm结尾的文件中htm改成html</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -435,9 +470,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
-		
 			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -461,13 +496,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -489,15 +524,15 @@
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -514,48 +549,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
+			<li><a href="/tags/method/">method<span>1</span></a></li>
 		
-			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
+			<li><a href="/tags/filter/">filter<span>1</span></a></li>
 		
-			<li><a href="/tags/blog/">blog<span>2</span></a></li>
+			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
 		
-			<li><a href="/tags/network/">network<span>1</span></a></li>
+			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
 		
-			<li><a href="/tags/specify-timestamp/">specify_timestamp<span>1</span></a></li>
+			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
 		
-			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
+		
+			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
+		
+			<li><a href="/tags/bellman-ford/">bellman-ford<span>1</span></a></li>
+		
+			<li><a href="/tags/rm/">rm<span>1</span></a></li>
+		
+			<li><a href="/tags/scc/">scc<span>1</span></a></li>
+		
+			<li><a href="/tags/horn-formulas/">horn formulas<span>1</span></a></li>
+		
+			<li><a href="/tags/安全/">安全<span>1</span></a></li>
 		
 			<li><a href="/tags/json/">json<span>1</span></a></li>
 		
-			<li><a href="/tags/timestamp/">timestamp<span>1</span></a></li>
+			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/apach/">apach<span>0</span></a></li>
 		
-			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
+			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
 		
-			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
+			<li><a href="/tags/go/">go<span>1</span></a></li>
 		
-			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
+			<li><a href="/tags/code-style/">code-style<span>1</span></a></li>
 		
-			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
+			<li><a href="/tags/pair/">pair<span>1</span></a></li>
 		
-			<li><a href="/tags/java/">java<span>2</span></a></li>
-		
-			<li><a href="/tags/dagscheduler/">dagscheduler<span>1</span></a></li>
-		
-			<li><a href="/tags/kv/">kv<span>1</span></a></li>
-		
-			<li><a href="/tags/风险/">风险<span>1</span></a></li>
-		
-			<li><a href="/tags/链接排序/">链接排序<span>1</span></a></li>
-		
-			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
-		
-			<li><a href="/tags/hive/">hive<span>1</span></a></li>
+			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>278</span></a></li>
+		   <li><a href="/tags">...<span>281</span></a></li>
 		 
 		</ul>
 	</div>
@@ -566,6 +601,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
+      </li>
     
       <li>
         <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
@@ -581,10 +620,6 @@
     
       <li>
         <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
-      </li>
-    
-      <li>
-        <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
       </li>
     
   </ul>

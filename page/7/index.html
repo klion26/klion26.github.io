@@ -121,6 +121,101 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2013-07-20 </div>
+			<div class="article-title"><a href="/2013/07/20/algorithms-chapter-3-homework-sol/" >Algorithms第3章及少量习题</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>第三章的主要思想就是DFS。讲了图上的DFS操作，然后讲了各种应用。这章默认图都是用邻接矩阵存的。</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span>procedure explore(G, v)   </span></span></li>
+<li><span>Input:        G = (V, E) is a graph;   </span></li>
+<li><span>Output:       visited(u) is set to </span><span class="keyword">true</span><span> </span><span class="keyword">for</span><span> all nodes u reachable from v   </span></li>
+<li><span>  </span></li>
+<li><span>visited(v) = </span><span class="keyword">true</span><span>  </span></li>
+<li><span>previstit(v)   </span></li>
+<li><span class="keyword">for</span><span> each edge(v,u) in E:   </span></li>
+<li><span>    </span><span class="keyword">if</span><span> not visited(u);   explore(u)   </span></li>
+<li><span>postvisit(v)   </span></li>
+<li><span>  </span></li>
+<li><span>procedure dfs(G)   </span></li>
+<li><span class="keyword">for</span><span> all v in V   </span></li>
+<li><span>    visited(v)  = </span><span class="keyword">false</span><span>  </span></li>
+<li><span class="keyword">for</span><span> all v in V   </span></li>
+<li><span>    </span><span class="keyword">if</span><span> not visited(v) explore(v)   </span></li>
+<li><span>  </span></li>
+<li><span>  </span></li>
+<li><span>procedure previsit(v)   </span></li>
+<li><span>pre[v] = clock   </span></li>
+<li><span>clock = clock+</span><span class="number">1</span><span>  </span></li>
+<li><span>  </span></li>
+<li><span>procedure postvisit(v)   </span></li>
+<li><span>post[v] = clock   </span></li>
+<li><span>clock = clock+</span><span class="number">1</span><span>  </span><br></li></ol></div><br>上面的代码就是这章里面所用到的所有代码了，也是DFS的整个代码，首先对于每个点，如果没有被访问过，那么就从这个点开始进行DFS，也就是explore过程，explore过程中，会访问和当前点相连的所有点[即当前点的可达点]，previst和postvisit过程只是记录每个点的pre值和post值，这个值在某些方面还是很有用的，后面会说到。这整个DFS的时间复杂度是O(V+E)的，每个点和每条边都只访问一次。
+
+<p>在有向图中，对边进行了一些其他的定义<br>Tree edges: 指向儿子节点的边<br>Forward edges：从一个点指向非儿子后继节点的边<br>Back edges：  从一个点指向其祖先节点的边<br>Cross edges： 既不指向后继节点也不指向祖先节点的边</p>
+<p>对于不同的边，这些点的pre值和post值的关系如下所示<br>pre/post ordering for(u,v)                                                  Edge type<br>pre[u]           pre[v]               post[v]              post[u]        tree/forward<br>pre[v]           pre[u]               post[u]              post[v]        back<br>pre[v]           post[v]             pre[u]                post[u]        cross</p>
+<p>接下来将的是DAG[directed acyclic graphs]也就是有向无环图。在DAG中，每个点的后继节点的post值都会比当前节点的小，每个DAG至少有一个源点，一个汇点。DAG延伸出来的就是强联通分量了。</p>
+<p>对于有向图，对所有的<u,v>对 in V，都有从u到v的路径，那么就是强联通图，这里&lt;1,2&gt;和&lt;2,1&gt;表示不同的顶点对。如果我们从一个有向图的汇联通分量中的某个点开始进行DFS搜索的话，那么最后会且仅会把整个汇联通分量的点都找出来。这样的话我们如果知道某个汇联通分量里面的一个点，那么就可以知道整个汇联通分量，现在的问题是(I)怎么知道汇联通分量里面的一个点，和(II)求得一个汇联通分量之后要怎么做？</u,v></p>
+<p>我们知道对于汇点[把联通分量缩成一个点]来说，我们没有好的方法可以容易，轻松的求得，但是对于源点我们就有比较简单的方法可以得到。首先我们可以知道，如果一个点的post值最高的话，那么这个点一定是源点，这个可以从两方面来证明，如果C和C’是图的两个联通分量，且有一条从C到C‘的边，那么C中的所有点的post值的最大值一定回比C’中所有点的post值的最大值要大。因为，如果我们的DFS是从C中开始的话，那么开始的那个点的post值比C‘中所有点的post值都要大；如果是从C’中开始搜索的话，那么先搜索完整个C‘联通分量，然后再搜索C联通分量，这样的话，所有在C中的点的post值比在C’中的点的post值都要大。到此得证。知道这个之后，我们就可以解决问题(I)了，我们可以把有向图反向之后，进行一次DFS，这样的话，post值最大的一定是反向之后的源点，也就是原图的汇点了。对于问题(II)那么我们可以先把找出来的联通分量去掉，然后再在剩余的点中找post值最大的，这个点一定是剩下的图中的汇点，上面的证明可以保证这一点。</p>
+<p>所以对于寻找一个图的强联通分量来说，我们只需要对图反向，然后在反向图中进行一次DFS，得到所有点的post值，然后根据post值从大到小的顺序在原图上进行一次DFS，这样就可以得到整个图的所有联通分量了。总时间还是线性的，就相当于2次DFS所用的时间。</p>
+<p>接下来是后面几个习题，这几个习题是在这本书的网站上找的几个习题，并不是书中所有的习题。</p>
+<p>1.给出一个图，要标出每个点的pre/post值。<br>这个只需要细心一点就行来</p>
+<p>2.对于一个给定的图，用线性的方法把图进行反向。<br>这个可以循环所有点v，对<v,u> in E把v加到u的出边就行了，这样我们只需要循环每个点，每条边1次，所以是线性的</v,u></p>
+<p>3.证明，无向图中，所有点的度数和是边数的2倍<br>每条边对两个点共享来度数，总的来说就变成来所有点的度数和是边数的2倍</p>
+<p>4.在无向图中，计算每个点的邻接点的数目<br>这个直接循环所有点就行来，对于边<u,v>那么u点的邻接点和v点的邻接点都+1就行来。</u,v></p>
+<p>5.用非递归的方法实现explore</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span>procedure explore(G, u)   </span></span></li>
+<li><span>  </span></li>
+<li><span>S = (empty stack)   </span></li>
+<li><span>push(S, u)   </span></li>
+<li><span class="keyword">while</span><span> S is not empty:   </span></li>
+<li><span>     v = top(S)   </span></li>
+<li><span>     </span><span class="keyword">if</span><span> not visited[v]:   </span></li>
+<li><span>        visited[v] = </span><span class="keyword">true</span><span>   </span></li>
+<li><span>        previsit(v)   </span></li>
+<li><span>     </span><span class="keyword">if</span><span> there is an edge (v, w) in E with visited[w] = </span><span class="keyword">false</span><span>:   </span></li>
+<li><span>        push(S, w)   </span></li>
+<li><span>     </span><span class="keyword">else</span><span>:    (we’re done with v, the node at the top of the stack)   </span></li>
+<li><span>          pop(S)   </span></li>
+<li><p><span>          postvisited(v)  </span><br></p></li></ol></div><br>6.某学校需要对课表进行安排，某些课必须在另外一些课的前面上。每个学生每学期选多少门课都没关系，问对于给定的所有课之间的关系，同一个人至少需要多少个学期，才能把所有的课修完。<br>首先我们可以用线性时间计算出每个点的入度，并把入度为0 的点加到队列currL中。然后利用如下过程可以处理剩下的问题，下面的过程中in表示每个点的入度，currL表示当前入度为0的点<p></p>
+<div class="dp-highlighter">
+
+<li><p><span><span>time = </span><span class="number">0</span><span>  </span></span></p>
+</li>
+<li><span>repeat until currL is empty:   </span></li>
+<li><span>    time = time + </span><span class="number">1</span><span>  </span></li>
+<li><span>    nextL = empty list   </span></li>
+<li><span>    </span><span class="keyword">for</span><span> all u in currL:   </span></li>
+<li><span>       </span><span class="keyword">for</span><span> all (u, w) in E   </span></li>
+<li><span>          in[w] = in[w] - </span><span class="number">1</span><span>  </span></li>
+<li><span>          </span><span class="keyword">if</span><span>(in[w] is </span><span class="number">0</span><span>)   </span></li>
+<li><span>             add w to nextL   </span></li>
+<li><span>    currL = nextL   </span></li>
+<li><span>output time  </span><br></li></div><br>这样，我们得到的还是线性的时间复杂度。<br>另外还想了一种为经过验证的方法[私以为是正确的]，先对图跑一次DFS，然后把所有点然post值降序排列起来，然后，对排好序的点进行扫描，如果相邻的两个点u,v之间有一条边u-&gt;v的话，那么学期数就需要加1[初始化为1]，这样的话，最后的数目就是所有的学期数了。
+
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2013-06-21 </div>
 			<div class="article-title"><a href="/2013/06/21/linux-command-shell-scripts-3/" >Linux命令行和shell脚本编程笔记3</a></div>						
 		</h3>
@@ -447,32 +542,6 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-12-27 </div>
-			<div class="article-title"><a href="/2012/12/27/too-many-levels-of-symbolic-links/" >Too many levels of symbolic links</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>说是用Linux，可是一直在X-window下用，基本命令很多都不会用，得慢慢学命令啊。Linux下命令才是王道。</p>
-<p>“Too many levels of symbolic links”这个错误是我用ln -s创建了一个软链接时发生的。比如我一开始的命令是</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">ln -s /usr/bin/vuze vuze   <span style="color: #da70d6;">#我在vuze所在的目录下操作这条语句，另外需要root权限</span></div><br>原因是因为我创建链接的时候用的是相对路径，而不是绝对路径造成了，用了绝对路径之后，就解决了。命令如下</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">ln -s /usr/bin/vuze ～/vuze/vuze</div><br>另外，Linux下一直没找到什么好的下载软件，下载速度一直上不去，现在都是用Firfox的Downthemall和chrome的下载功能。感觉文件一大就不给力啊，<span style="color: #ff0000;">要是有什么推荐的话，还请告知，不胜感激啊</span></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -525,9 +594,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
-		
 			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -551,13 +620,13 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -579,15 +648,15 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -604,48 +673,48 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
 		
-			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
+			<li><a href="/tags/pair/">pair<span>1</span></a></li>
 		
-			<li><a href="/tags/append/">append<span>2</span></a></li>
+			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
 		
-			<li><a href="/tags/MST/">MST<span>1</span></a></li>
+			<li><a href="/tags/metric/">metric<span>1</span></a></li>
 		
-			<li><a href="/tags/fork/">fork<span>2</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li>
 		
-			<li><a href="/tags/list/">list<span>1</span></a></li>
+			<li><a href="/tags/go/">go<span>1</span></a></li>
 		
-			<li><a href="/tags/gdb/">gdb<span>2</span></a></li>
+			<li><a href="/tags/windows/">windows<span>4</span></a></li>
 		
-			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
+			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
 		
-			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
+			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
 		
-			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
+			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
 		
-			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
+			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
 		
-			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
+			<li><a href="/tags/topic/">topic<span>1</span></a></li>
 		
-			<li><a href="/tags/GC/">GC<span>1</span></a></li>
+			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
 		
-			<li><a href="/tags/question/">question<span>1</span></a></li>
+			<li><a href="/tags/微信/">微信<span>1</span></a></li>
 		
-			<li><a href="/tags/free/">free<span>1</span></a></li>
+			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
 		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
+			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
 		
-			<li><a href="/tags/databse/">databse<span>1</span></a></li>
+			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
 		
-			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
+			<li><a href="/tags/ASM/">ASM<span>1</span></a></li>
 		
-			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
+			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
 		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
+			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>278</span></a></li>
+		   <li><a href="/tags">...<span>281</span></a></li>
 		 
 		</ul>
 	</div>
@@ -656,6 +725,10 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
+      </li>
     
       <li>
         <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
@@ -671,10 +744,6 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
     
       <li>
         <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
-      </li>
-    
-      <li>
-        <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
       </li>
     
   </ul>

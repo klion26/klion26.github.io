@@ -121,6 +121,33 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2014-01-07 </div>
+			<div class="article-title"><a href="/2014/01/07/binary-tree-traversal-without-recursive/" >二叉树的非递归遍历</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>对于二叉树，如果我们需要对它进行遍历的话（不管是前序，中序还是后序，下面如果不特指的话，那么就是对三种遍历的统称）。如果用递归的方法，那么就非常简单了，我们只需要写下类似的代码即可</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">work</span>(<span style="color: #f5deb3;">TreeNode</span> <span style="color: #f5deb3;">*</span><span style="color: #f5deb3;">root</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">   if</span>(<span style="color: #b0c4de; font-weight: bold;">NULL</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">root</span>)<br><span style="color: #b0c4de; font-weight: bold;">       return</span> ;<br><span style="color: #f5deb3;">   work</span>(<span style="color: #f5deb3;">root</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">left</span>);<br><span style="color: #f5deb3;">   work</span>(<span style="color: #f5deb3;">root</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">right</span>);<br><span style="color: #f5deb3;">}</span></div><br>这样我们的三种遍历，只需要在这个函数里面进行一些细微的更改就可以达到了（把当前点的输出位置放在不同的地方）。不过这里主要讲的将是如何用非递归的方法进行二叉树的遍历。</p>
+<p>首先，我们来看树的前序遍历，我们需要先输出当前节点，然后处理左子树，然后再处理右子树。这里我们可以用桟来保存每个节点，但是我们需要处理每个节点的左右子树，如果我们只把每个节点压桟一次的话，那么每次我们不知道如果处理右子树（处理左子树的时候会把当前节点弹出桟）。这里就有问题了，但是我们可以考虑把每个节点压桟两次，也就是说第一次我们弹出的时候处理左子树，第二次弹出的时候，我们处理右子树。那么上面的这个问题就解决了，只不过桟的空间需要会大一点。不过已经可以工作了，至于怎么判断是第一次还是第二次弹出的话，我们可以把弹出的节点和桟里面最上面的节点做比较，相等的话就是第一次弹出，不相等就是第二次弹出。具体代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Binary-Tree-Preorder-Traversal.cpp" target="_blank" rel="external">参考这里</a>。</p>
+<p>然后我们考虑树的中序，可以把上面的代码进行一些细微的更改就好了，大致的框架我们不需要更改，具体的代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Binary-Tree-Inorder-Traversal.cpp" target="_blank" rel="external">参考这里</a>。</p>
+<p>接下来是后序，我们发现上面的算法不行了，因为我们必须在处理完了左右子树之后，才能够输出当前节点，但是按照上面的算法，我们在处理完左右子树之后，已经<span style="color: #ff0000;">找不到当前节点了</span>，这就是问题的所在，或许我们想可以把每个节点压桟3次，这样的话也是可以的，在第一次的时候处理左子树，第二次的时候处理右子树，第三次处理当前节点。不过我们可以看出上面的要不是压桟2次，要不是压桟3次，那么我们可以把压桟的数据更改一下，我们把桟保存的元素变成一个pair<treenode*,int>，这样的话后面的int保存的是这个节点在桟里面的次数，比如说前序遍历中，我们压桟的时候把pair后面的参数改成1（有0和1两种可能）,然后弹出一次就把后面的int值减1。对于后序遍历的话，我们把后面的int值设为2（有0,1和2三种可能），每次出桟的时候，如果int值为2就处理左子树，然后把int值减1再次压桟；如果int值为1的话，就处理右子树，然后把int值设为0,再次压桟；如果int值为0的话，那么就输出当前节点。这样的话我们可以比较好的处理二叉树的后序遍历了。具体的代码可以<a href="https://github.com/klion26/LeetCode/blob/master/Binary-Tree-Postorder-Traversal.cpp" target="_blank" rel="external">参考这里</a>。</treenode*,int></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2014-01-04 </div>
 			<div class="article-title"><a href="/2014/01/04/reverse-linked-list/" >有关链表逆序</a></div>						
 		</h3>
@@ -500,101 +527,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2013-07-20 </div>
-			<div class="article-title"><a href="/2013/07/20/algorithms-chapter-3-homework-sol/" >Algorithms第3章及少量习题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>第三章的主要思想就是DFS。讲了图上的DFS操作，然后讲了各种应用。这章默认图都是用邻接矩阵存的。</p>
-<div class="dp-highlighter">
-
-<ol>
-<li><span><span>procedure explore(G, v)   </span></span></li>
-<li><span>Input:        G = (V, E) is a graph;   </span></li>
-<li><span>Output:       visited(u) is set to </span><span class="keyword">true</span><span> </span><span class="keyword">for</span><span> all nodes u reachable from v   </span></li>
-<li><span>  </span></li>
-<li><span>visited(v) = </span><span class="keyword">true</span><span>  </span></li>
-<li><span>previstit(v)   </span></li>
-<li><span class="keyword">for</span><span> each edge(v,u) in E:   </span></li>
-<li><span>    </span><span class="keyword">if</span><span> not visited(u);   explore(u)   </span></li>
-<li><span>postvisit(v)   </span></li>
-<li><span>  </span></li>
-<li><span>procedure dfs(G)   </span></li>
-<li><span class="keyword">for</span><span> all v in V   </span></li>
-<li><span>    visited(v)  = </span><span class="keyword">false</span><span>  </span></li>
-<li><span class="keyword">for</span><span> all v in V   </span></li>
-<li><span>    </span><span class="keyword">if</span><span> not visited(v) explore(v)   </span></li>
-<li><span>  </span></li>
-<li><span>  </span></li>
-<li><span>procedure previsit(v)   </span></li>
-<li><span>pre[v] = clock   </span></li>
-<li><span>clock = clock+</span><span class="number">1</span><span>  </span></li>
-<li><span>  </span></li>
-<li><span>procedure postvisit(v)   </span></li>
-<li><span>post[v] = clock   </span></li>
-<li><span>clock = clock+</span><span class="number">1</span><span>  </span><br></li></ol></div><br>上面的代码就是这章里面所用到的所有代码了，也是DFS的整个代码，首先对于每个点，如果没有被访问过，那么就从这个点开始进行DFS，也就是explore过程，explore过程中，会访问和当前点相连的所有点[即当前点的可达点]，previst和postvisit过程只是记录每个点的pre值和post值，这个值在某些方面还是很有用的，后面会说到。这整个DFS的时间复杂度是O(V+E)的，每个点和每条边都只访问一次。
-
-<p>在有向图中，对边进行了一些其他的定义<br>Tree edges: 指向儿子节点的边<br>Forward edges：从一个点指向非儿子后继节点的边<br>Back edges：  从一个点指向其祖先节点的边<br>Cross edges： 既不指向后继节点也不指向祖先节点的边</p>
-<p>对于不同的边，这些点的pre值和post值的关系如下所示<br>pre/post ordering for(u,v)                                                  Edge type<br>pre[u]           pre[v]               post[v]              post[u]        tree/forward<br>pre[v]           pre[u]               post[u]              post[v]        back<br>pre[v]           post[v]             pre[u]                post[u]        cross</p>
-<p>接下来将的是DAG[directed acyclic graphs]也就是有向无环图。在DAG中，每个点的后继节点的post值都会比当前节点的小，每个DAG至少有一个源点，一个汇点。DAG延伸出来的就是强联通分量了。</p>
-<p>对于有向图，对所有的<u,v>对 in V，都有从u到v的路径，那么就是强联通图，这里&lt;1,2&gt;和&lt;2,1&gt;表示不同的顶点对。如果我们从一个有向图的汇联通分量中的某个点开始进行DFS搜索的话，那么最后会且仅会把整个汇联通分量的点都找出来。这样的话我们如果知道某个汇联通分量里面的一个点，那么就可以知道整个汇联通分量，现在的问题是(I)怎么知道汇联通分量里面的一个点，和(II)求得一个汇联通分量之后要怎么做？</u,v></p>
-<p>我们知道对于汇点[把联通分量缩成一个点]来说，我们没有好的方法可以容易，轻松的求得，但是对于源点我们就有比较简单的方法可以得到。首先我们可以知道，如果一个点的post值最高的话，那么这个点一定是源点，这个可以从两方面来证明，如果C和C’是图的两个联通分量，且有一条从C到C‘的边，那么C中的所有点的post值的最大值一定回比C’中所有点的post值的最大值要大。因为，如果我们的DFS是从C中开始的话，那么开始的那个点的post值比C‘中所有点的post值都要大；如果是从C’中开始搜索的话，那么先搜索完整个C‘联通分量，然后再搜索C联通分量，这样的话，所有在C中的点的post值比在C’中的点的post值都要大。到此得证。知道这个之后，我们就可以解决问题(I)了，我们可以把有向图反向之后，进行一次DFS，这样的话，post值最大的一定是反向之后的源点，也就是原图的汇点了。对于问题(II)那么我们可以先把找出来的联通分量去掉，然后再在剩余的点中找post值最大的，这个点一定是剩下的图中的汇点，上面的证明可以保证这一点。</p>
-<p>所以对于寻找一个图的强联通分量来说，我们只需要对图反向，然后在反向图中进行一次DFS，得到所有点的post值，然后根据post值从大到小的顺序在原图上进行一次DFS，这样就可以得到整个图的所有联通分量了。总时间还是线性的，就相当于2次DFS所用的时间。</p>
-<p>接下来是后面几个习题，这几个习题是在这本书的网站上找的几个习题，并不是书中所有的习题。</p>
-<p>1.给出一个图，要标出每个点的pre/post值。<br>这个只需要细心一点就行来</p>
-<p>2.对于一个给定的图，用线性的方法把图进行反向。<br>这个可以循环所有点v，对<v,u> in E把v加到u的出边就行了，这样我们只需要循环每个点，每条边1次，所以是线性的</v,u></p>
-<p>3.证明，无向图中，所有点的度数和是边数的2倍<br>每条边对两个点共享来度数，总的来说就变成来所有点的度数和是边数的2倍</p>
-<p>4.在无向图中，计算每个点的邻接点的数目<br>这个直接循环所有点就行来，对于边<u,v>那么u点的邻接点和v点的邻接点都+1就行来。</u,v></p>
-<p>5.用非递归的方法实现explore</p>
-<div class="dp-highlighter">
-
-<ol>
-<li><span><span>procedure explore(G, u)   </span></span></li>
-<li><span>  </span></li>
-<li><span>S = (empty stack)   </span></li>
-<li><span>push(S, u)   </span></li>
-<li><span class="keyword">while</span><span> S is not empty:   </span></li>
-<li><span>     v = top(S)   </span></li>
-<li><span>     </span><span class="keyword">if</span><span> not visited[v]:   </span></li>
-<li><span>        visited[v] = </span><span class="keyword">true</span><span>   </span></li>
-<li><span>        previsit(v)   </span></li>
-<li><span>     </span><span class="keyword">if</span><span> there is an edge (v, w) in E with visited[w] = </span><span class="keyword">false</span><span>:   </span></li>
-<li><span>        push(S, w)   </span></li>
-<li><span>     </span><span class="keyword">else</span><span>:    (we’re done with v, the node at the top of the stack)   </span></li>
-<li><span>          pop(S)   </span></li>
-<li><p><span>          postvisited(v)  </span><br></p></li></ol></div><br>6.某学校需要对课表进行安排，某些课必须在另外一些课的前面上。每个学生每学期选多少门课都没关系，问对于给定的所有课之间的关系，同一个人至少需要多少个学期，才能把所有的课修完。<br>首先我们可以用线性时间计算出每个点的入度，并把入度为0 的点加到队列currL中。然后利用如下过程可以处理剩下的问题，下面的过程中in表示每个点的入度，currL表示当前入度为0的点<p></p>
-<div class="dp-highlighter">
-
-<li><p><span><span>time = </span><span class="number">0</span><span>  </span></span></p>
-</li>
-<li><span>repeat until currL is empty:   </span></li>
-<li><span>    time = time + </span><span class="number">1</span><span>  </span></li>
-<li><span>    nextL = empty list   </span></li>
-<li><span>    </span><span class="keyword">for</span><span> all u in currL:   </span></li>
-<li><span>       </span><span class="keyword">for</span><span> all (u, w) in E   </span></li>
-<li><span>          in[w] = in[w] - </span><span class="number">1</span><span>  </span></li>
-<li><span>          </span><span class="keyword">if</span><span>(in[w] is </span><span class="number">0</span><span>)   </span></li>
-<li><span>             add w to nextL   </span></li>
-<li><span>    currL = nextL   </span></li>
-<li><span>output time  </span><br></li></div><br>这样，我们得到的还是线性的时间复杂度。<br>另外还想了一种为经过验证的方法[私以为是正确的]，先对图跑一次DFS，然后把所有点然post值降序排列起来，然后，对排好序的点进行扫描，如果相邻的两个点u,v之间有一条边u-&gt;v的话，那么学期数就需要加1[初始化为1]，这样的话，最后的数目就是所有的学期数了。
-
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -647,9 +579,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
-		
 			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -673,13 +605,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -701,15 +633,15 @@
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -726,48 +658,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
+			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
 		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
+			<li><a href="/tags/poll/">poll<span>1</span></a></li>
 		
-			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
+			<li><a href="/tags/code-interview/">code interview<span>1</span></a></li>
 		
-			<li><a href="/tags/python/">python<span>2</span></a></li>
+			<li><a href="/tags/安全/">安全<span>1</span></a></li>
 		
-			<li><a href="/tags/spark/">spark<span>7</span></a></li>
+			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
 		
-			<li><a href="/tags/array/">array<span>1</span></a></li>
+			<li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li>
 		
-			<li><a href="/tags/vundle/">vundle<span>1</span></a></li>
+			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
 		
-			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+			<li><a href="/tags/ASM/">ASM<span>1</span></a></li>
 		
-			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
+			<li><a href="/tags/数学/">数学<span>5</span></a></li>
 		
-			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
+			<li><a href="/tags/链接排序/">链接排序<span>1</span></a></li>
 		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+			<li><a href="/tags/greedy-algorithm/">greedy algorithm<span>1</span></a></li>
 		
-			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
+			<li><a href="/tags/command/">command<span>1</span></a></li>
 		
-			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
+			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
 		
-			<li><a href="/tags/go/">go<span>1</span></a></li>
+			<li><a href="/tags/mit/">mit<span>2</span></a></li>
 		
-			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
+			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
 		
-			<li><a href="/tags/老师/">老师<span>1</span></a></li>
+			<li><a href="/tags/lru/">lru<span>1</span></a></li>
 		
-			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
+			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
 		
-			<li><a href="/tags/于娟/">于娟<span>1</span></a></li>
+			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
 		
-			<li><a href="/tags/how/">how<span>1</span></a></li>
+			<li><a href="/tags/ln/">ln<span>1</span></a></li>
 		
-			<li><a href="/tags/积分/">积分<span>1</span></a></li>
+			<li><a href="/tags/成长/">成长<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>278</span></a></li>
+		   <li><a href="/tags">...<span>281</span></a></li>
 		 
 		</ul>
 	</div>
@@ -778,6 +710,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
+      </li>
     
       <li>
         <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
@@ -793,10 +729,6 @@
     
       <li>
         <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
-      </li>
-    
-      <li>
-        <a href="/2017/06/20/风险不仅仅是事件发生的概率/" ><i class="fa fa-file-o"></i>风险不仅仅是事件发生的概率</a>
       </li>
     
   </ul>
