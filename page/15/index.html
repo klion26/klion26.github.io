@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 15 | klion26</title>
+  <title>Página 15 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,29 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-03-30 </div>
+			<div class="article-title"><a href="/2011/03/30/pointers-on-c-9-string/" >C和指针第9章[字符串 字符 字节]</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>1字符串是一串0个和多个字符,以NUL字符结尾的<br>2.strlen函数的返回值是一个无符号整形,也就是说这个if(strlen(x)-strlen(y)&gt;=0)一定是成立的,因为左边是无符号整形的操作,不可能小于0<br>3.strcpy,strcat会在新字符串后面自动加上一个’\0’结尾符.但是这些函数需要保证有足够的空间.这两个函数的返回值是第一个参数的一份拷贝.<br>4.strcmp,返回不一定是 1 -1 0,标准只是说返回大于0的和小于0的,不一定是1和-1.也不要写成if(strcmp(a,b))这样的,因为当<span style="color: #ff0000;">a和b相等</span>的时候这个<span style="color: #ff0000;">返回的是0</span>,所以有时你会很郁闷<br>5.strncpy(dst,src,len),如果strlen(src)<len的话,那么dst额外的会被nul填充,但是如果strlen(src)>=len的话,那么就<span style="color: #ff0000;">不会</span>以NUL字符结尾,这个切记.<br>6.strncat(dst,src,len)和strncpy不一样,它不管dst的空间够不够,总是会把len个字符连接在dst后面[如果strlen(str)<len就是strlen(strc)个字符],而且每次会在最后面加上一个'\0'.注意一点的是这个函数不管你后面的空间够还是不够,如果不够可能就惨了 7.strchr(char="" const="" *str,int="" ch)查找ch第一次出现的位置,strrchr(char="" ch)查找ch最后一次出现的位置,strpbrk(char="" *str,char="" *group)查找group中随便一个字符在str中第一次出现的最早位置,比如str="Hello there,honey" ;group="aeoiu" 那么结果会是指向e的指针;strstr(char="" *s1,char="" *s2)返回s2在s1中第一次出现的位置="" 8.strspn(char="" *group)="" 返回第一次出现group之外任意字符时group中的字符出现过的总数.比如buffer="25,142,330,Smith,J,239-4123" strspn(buffer,"0123456789")返回的是2也就是在','之前出现过2和5,所以返回2.="" strcspn(char="" *group)和上面的相反,返回第一次出现group中任意字符时,出现过的不属于group的字符总数.="" 9.strtok(char="" *sep)="" 这个不是很懂,待查="" 10其他ctype.h下的单独字符操作函数,有一个要注意的是,在使用ebcdic字符集的机器上判定是否是大些字母不能用if(ch="">= ‘A’ &amp; ch &lt;= ‘Z’)但是可以用if(isupper(ch))<br>11.memcpy(void <em>dst,void cosnt </em>src,size_t len);//dst和src不可重叠<br>memmove(void <em>dst,void const </em>str,size_t len);//dst和src可重叠,速度没上一个快<br>memcmp(void const <em>dst,void const </em>src,size_t len);<br>memchr(void const <em>a,int ch,size_t len)<br>memset(void </em>a,int ch,size_t len);<br>前4个和str开头的功能类似,不过这里不适以NUL结尾,而是len个字节,最后一个是把len字节置为ch.<br>这里有一个区分差别的.<br>memchr(buff,0,SIZE)-buffer<br>strlen(buff)<br>关于这两个的区别.答案如下<br><!--easy2hide start reply to this=true--><br>如果buff以NUL字符结尾,那么没区别,都是得到buff的长度,不过strlen返回的是无符号数,但是减法得到的是有符号的.<br>如果buff不以NUL字符结尾的话,memchr返回一个NULL指针,减去buff将产生一个无意义的结果,strlen则会一直找下去,知道发现一个NUL字符位置.<br>还有一个就是如果你要找的是NUL字符的话,就得用内存操作函数了,因为字符串函数不能找到NUL字节.<br><!--easy2hide end--></len就是strlen(strc)个字符],而且每次会在最后面加上一个'\0'.注意一点的是这个函数不管你后面的空间够还是不够,如果不够可能就惨了></len的话,那么dst额外的会被nul填充,但是如果strlen(src)></p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -331,29 +354,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-03-22 </div>
-			<div class="article-title"><a href="/2011/03/22/c-cow-problem/" >你的C语言很牛吗？来试试这个</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>转自<a href="http://coolshell.cn/articles/3961.html" target="_blank" rel="external">酷壳</a><br>对于下面的程序如果通过修改或增加一个字符,使得程序输出20个’-‘;<br>n=20;<br>for (i=0;i<n;i--) printf("-");="" 想到答案了吗?="" 下面是答案:="" <!--easy2hide="" start{reply_to_this="true}--"><br>1.把i–改成n–<br>2.把i<n改成-i&lt;n 3.把i<n改成i+n<!--easy2hide="" end--=""></n改成-i&lt;n></n;i--)></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -364,13 +364,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/14/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+    	<li class="prev"><a href="/page/14/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/16/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/16/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -390,7 +390,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -399,16 +399,16 @@
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>Categorias</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -436,9 +436,9 @@
 		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
-		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -446,11 +446,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -460,15 +460,15 @@
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -485,48 +485,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/数学/">数学<span>5</span></a></li>
+			<li><a href="/tags/错误配置/">错误配置<span>1</span></a></li>
 		
-			<li><a href="/tags/chinese/">chinese<span>1</span></a></li>
-		
-			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
-		
-			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
-		
-			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
-		
-			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
-		
-			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
-		
-			<li><a href="/tags/kv/">kv<span>1</span></a></li>
-		
-			<li><a href="/tags/no-recursive/">no-recursive<span>1</span></a></li>
-		
-			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
-		
-			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
-		
-			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
-		
-			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
-		
-			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
-		
-			<li><a href="/tags/opengl/">opengl<span>1</span></a></li>
+			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
 		
 			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
 		
-			<li><a href="/tags/风险/">风险<span>1</span></a></li>
+			<li><a href="/tags/pair/">pair<span>1</span></a></li>
 		
-			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
+			<li><a href="/tags/book/">book<span>1</span></a></li>
 		
-			<li><a href="/tags/mit/">mit<span>2</span></a></li>
+			<li><a href="/tags/source-code/">source_code<span>2</span></a></li>
+		
+			<li><a href="/tags/总结/">总结<span>1</span></a></li>
+		
+			<li><a href="/tags/积分/">积分<span>1</span></a></li>
+		
+			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
+		
+			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
+		
+			<li><a href="/tags/ln/">ln<span>1</span></a></li>
+		
+			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
+		
+			<li><a href="/tags/教师/">教师<span>1</span></a></li>
+		
+			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
+		
+			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
+		
+			<li><a href="/tags/安全/">安全<span>1</span></a></li>
+		
+			<li><a href="/tags/json/">json<span>1</span></a></li>
 		
 			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
 		
+			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
 		
-		   <li><a href="/tags">...<span>281</span></a></li>
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>283</span></a></li>
 		 
 		</ul>
 	</div>
@@ -535,8 +535,12 @@
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
+      </li>
     
       <li>
         <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
@@ -552,10 +556,6 @@
     
       <li>
         <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
       </li>
     
   </ul>

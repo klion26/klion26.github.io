@@ -3,6 +3,63 @@
   
     
     <entry>
+      <title><![CDATA[git inside]]></title>
+      <url>/2017/11/20/git-inside/</url>
+      <content type="html"><![CDATA[<blockquote>
+<p><a href="https://git-scm.com/" target="_blank" rel="external">Git</a>是一个分布式的版本控制系统，能够完成你能想到的关于版本相关的所有事情，但是 Git 却不是那么好上手，也就是所谓的入门门槛有点高。</p>
+</blockquote>
+<h1 id="本文会讲什么"><a href="#本文会讲什么" class="headerlink" title="本文会讲什么"></a>本文会讲什么</h1><p>本文会换一个角度讲述 Git 怎么做的，给大家提供一个另外的视角，这个视角主要设计 Git 的存储，这样给大家一个更深的认识，在平时想了解的时候，也能有合适的渠道进行。</p>
+<a id="more"></a>
+<h1 id="Git-是什么"><a href="#Git-是什么" class="headerlink" title="Git 是什么"></a>Git 是什么</h1><p>这个问题看上去想一句废话，因为文章开始就说了，Git 是一个分布式的版本控制系统。那么底层又是如何实现的呢？以及其他人是怎么看待 Git 的呢？</p>
+<blockquote>
+<p>In many ways you can just see git as a filesystem. –Linus </p>
+</blockquote>
+<p>从上面一句话来看，Linus 把 Git 当做一个文件系统来做的，而不是一个传统意义上的版本控制系统，恰好 Git 能够做版本控制的事情。</p>
+<h1 id="Git-文件结构"><a href="#Git-文件结构" class="headerlink" title="Git 文件结构"></a>Git 文件结构</h1><p>每一个 Git 仓库中都有一个隐藏的文件夹，名字叫做 <code>.git</code> 这个文件夹包含了所有的文件内容，以及版本控制相关的信息，大致结构如下：</p>
+<img src="/2017/11/20/git-inside/file_tree.png" alt="file_tree.png" title="">
+<p>说几个大家关注的，有兴趣的可以自己打开文件看看</p>
+<ol>
+<li>HEAD 指向当前分支的最后一个 commit</li>
+<li>config 表示一些本项目的配置（如果没有会使用全局的配置），最明显的是 user.name 和 user.email</li>
+<li>hooks 表示一些钩子函数</li>
+<li>objects, 这里面保存的是所有的数据（也就是实实在在的内容），会是主要的内容</li>
+<li>refs 表示一些引用，包括分支的，远程分支的，tag 的，每一个都具体指向一个 commit</li>
+</ol>
+<h1 id="几个概念"><a href="#几个概念" class="headerlink" title="几个概念"></a>几个概念</h1><ol>
+<li>blob :上面的 objects 中的具体文件内容（保存的是文件内容，如果多个文件的内容一样，则只保存一份）</li>
+<li>tree : tree 包含 tree 或者 blob</li>
+<li>commit : commit 指向 tree 的根节点</li>
+<li>tag : 指向一个具体的 commit</li>
+<li>parent : 表示该 commit 从哪个 commit 演变而来</li>
+<li>branch : 一条 commit 的链</li>
+<li>HEAD : branc 的最新 commit</li>
+</ol>
+<h1 id="一个例子"><a href="#一个例子" class="headerlink" title="一个例子"></a>一个例子</h1><p>假设我们有一个项目，如下图所示：</p>
+<img src="/2017/11/20/git-inside/project.png" alt="project.png" title="">
+<p>那么我们初始化后的 git 示意图应该是这样的</p>
+<img src="/2017/11/20/git-inside/first_version.png" alt="first_version.png" title="">
+<p>接着我们修改 c.txt，那么我们会得到下面的示意图</p>
+<img src="/2017/11/20/git-inside/second_version.png" alt="second_version.png" title="">
+<p>再接着我们修改 a.txt，我们就会得到下面的示意图</p>
+<img src="/2017/11/20/git-inside/third_version.png" alt="third_version.png" title="">
+<p>上面的图中灰色表示非当前版本，亮色表示当前版本，三角形代表 commit，树形表示 tree，六边形表示 blob。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文介绍了 Git 的一些基本概念，以及一个简单的示例，当然这些还远远不够了解 Git 本身的，但是我认为这些是 Git 中最基本，也是最核心的一些东西了，其他的命令大概都能够从这几个命令中得到。</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> git </tag>
+            
+            <tag> file-system </tag>
+            
+            <tag> inside </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[django-configuration in action]]></title>
       <url>/2017/11/09/django-configuration-in-action/</url>
       <content type="html"><![CDATA[<h1 id="Django-中统一配置的做法"><a href="#Django-中统一配置的做法" class="headerlink" title="Django 中统一配置的做法"></a>Django 中统一配置的做法</h1><blockquote>
@@ -475,9 +532,9 @@
         
         <tags>
             
-            <tag> java </tag>
-            
             <tag> code </tag>
+            
+            <tag> java </tag>
             
             <tag> metric </tag>
             
@@ -1259,9 +1316,9 @@
             
             <tag> exactly-once </tag>
             
-            <tag> zookeeper </tag>
-            
             <tag> offset </tag>
+            
+            <tag> zookeeper </tag>
             
         </tags>
         
@@ -1707,9 +1764,9 @@
             
             <tag> distributed-system </tag>
             
-            <tag> mit </tag>
-            
             <tag> kv </tag>
+            
+            <tag> mit </tag>
             
             <tag> viewservice </tag>
             
@@ -1761,11 +1818,11 @@
             
             <tag> distributed-system </tag>
             
+            <tag> mit </tag>
+            
             <tag> go </tag>
             
             <tag> mapreduce </tag>
-            
-            <tag> mit </tag>
             
         </tags>
         
@@ -3205,11 +3262,11 @@ private:
             
             <tag> fedora </tag>
             
+            <tag> plugin </tag>
+            
             <tag> vi </tag>
             
             <tag> vim </tag>
-            
-            <tag> plugin </tag>
             
             <tag> vundle </tag>
             
@@ -3962,13 +4019,13 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> fedora </tag>
             
-            <tag> command </tag>
-            
-            <tag> tutorial </tag>
-            
             <tag> vi </tag>
             
             <tag> vim </tag>
+            
+            <tag> command </tag>
+            
+            <tag> tutorial </tag>
             
         </tags>
         
@@ -4151,7 +4208,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#x69;&#108;&#x74;&#111;&#58;&#x6a;&#99;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#97;&#115;&#116;&#101;&#114;&#115;&#x2e;&#x6f;&#x72;&#x67;">&#x6a;&#99;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#97;&#115;&#116;&#101;&#114;&#115;&#x2e;&#x6f;&#x72;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#x6f;&#58;&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#97;&#x73;&#x74;&#101;&#114;&#x73;&#x2e;&#x6f;&#114;&#103;">&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#97;&#x73;&#x74;&#101;&#114;&#x73;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -7151,9 +7208,9 @@ return 1;
         
         <tags>
             
-            <tag> Red Hat9 </tag>
-            
             <tag> grub </tag>
+            
+            <tag> Red Hat9 </tag>
             
         </tags>
         

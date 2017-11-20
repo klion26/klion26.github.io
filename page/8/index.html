@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 8 | klion26</title>
+  <title>Página 8 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,35 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-12-28 </div>
+			<div class="article-title"><a href="/2012/12/28/vi-basic-command/" >VI的一些基本命令之一</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>在Fedora下虽然写C/C++代码可以用Code::blocks，但是还是用VI来的顺手，尤其是VI用熟了之后，发现真是太好用了，如果想自己好好的学习下有关VI的一些命令的话，那么最好还是从网上下一个Tutorial，英文中文版随便，英文版的也很好懂的。下面记录下我看Tutorial时记下的命令，比如移动光标这样的命令，这里就没有了，所以如果想找一篇入门的文章的话，或许这里不适合你。</p>
+<p>na<em><esc>命令会输入n个</esc></em>,这句命令可以理解为，首先是a*,然后前面的n表示执行n次，然后&lt;ESC&gt;是退到normal模式。<br>s    和x的功能差不多，不过是删除当前字符之后进入到Insert模式，另外c命令和d命令的区别就类似与s和x的区别<br>^    跳到当前行的第一个非空字符<br>fx   从当前字符开始，在当前行查找第一次出现x字符的位置，并跳到x所在的地方，比如你有文本abcdefg。当前光标位置在a处，那么fe，则会把光标跳到e所在的位置，可以在f前面加上数字表示查找第多少个。相同功能的还有F,t,T，其中F是从后往前找，t/T是找到x所在位置前面的一个字符。这样还可以和d，y等命令结合使用<br>CTRL-U/CTRL-D/CTRL-B/CTRL-F   向上滚半屏，向下滚半屏，向上滚一屏，向下滚一屏<br>. 执行最后一次删除或者修改命令操作<br>J     把当前行和接下来的行合并在一起，nJ表示合并n行（包括当前行）n》=2<br>r     表示修改一个字符，nr [表示任意你想换成的字符]，表示替换从当前字符开始的n个字符，并都替换成。<br>～   改变当前字符的大小写 ，当然你也可以在前面加上数字，这条命令，在你不小心按下了Caps键的时候还是很有用的<br>可以用q来录制宏，然后保存在某一个字母所对应的宏区里面，以后可以用。比如你的C 语言头文件有如下一些</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">stdio</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><br><span style="color: #f5deb3;">fcntl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><br><span style="color: #f5deb3;">unistd</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><br><span style="color: #f5deb3;">stdlib</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span></div><br>那么你可以通过如下的命令来快速的完成头文件的录入，首先我们可以把每行都相同的东西不录入（这就是宏的好处，待会可以一次性录入）。然后先录入所有的不同出，也就是先录入如下的几行</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">stdio</span><br><span style="color: #f5deb3;">fcntl</span><br><span style="color: #f5deb3;">unistd</span><br><span style="color: #f5deb3;">stdlib</span></div><br>然后把光标移动到第一行，也就是stdio所在的行，然后退出到Normal模式，接下来就是录制宏了。按下qa，表示把接下来的宏录制在a所对应的宏区。然后依次输入I#include &lt;&lt;ESC&gt;A.h&gt;&lt;ESC&gt;jq,解释下这条命令吧，首先I表示进入Insert模式，而且是从行头开始，然后依次输入#include &lt;这些字符，&lt;ESC&gt;表示退出到Normal模式，然后A表示进入插入模式，不过是从行末开始，然后输入.h&gt;表示头文件的后面几个字符，然后&lt;ESC&gt;表示退出到Normal模式，接下来的j表示移到下一行，q表示宏录制结束。到这里你的宏已经录制在a里面了，接下来就是使用了，把光标移动到fcntl所在的行，然后退出到Normal模式，接下来按下3@a.发现接下来的3行也全部写好了吧，是不是简化了很多工作呢？这里的3表示需要调用3次。</p>
+<p>在VI中如果需要输入一些特殊字符怎么办呢？当然可以解决的啦，可以通过命令(在Normal模式下)输入:digraphs来得到对应的命令，然后在Insert模式下用CTRL-K+刚才得到的两个字符来完成特殊字符的输入</p>
+<p>VI中如果用搜索的话，那么.*[]^%/\?~$这些字符是有特殊意义的，也就是不代表自己本身的，是转意字符，如果想搜这些转意字符，需要在他们前面加上反斜线\来去掉他们的转意性质。另外，搜索模式是有历史记录的，你可以通过在Normal模式输入/进入搜索模式然后通过上下按键来选择历史命令。</p>
+<p>一般搜索到的字符都是高亮的，但是我第二次打开其他的文件也是会高亮上一次搜索的字符，如果我不想高亮怎么办，首先可以通过搜索一个本文件没有的字符或者词来解决，还有就是可以通过命令:set nohlsearch设置不显示高亮，当然:set hlsearch表示显示高亮<br>如果我想在我输入每一个字符的同时，VI自动匹配我已经输入的字符，怎么办，用命令设置:set incsearch.这样VI就会在你输入每一个字符的时候，匹配当前已经输入的字符。<br>ma       在当前位置添加一个名为a的标志<br>`a         跳到名字万为a的mark位置<br>‘a          跳到名字为a的mark的行首<br>:marks         会列出所有的mark 另外mark可以和d，y等命令一起组合使用，另外，每次打开文件的时候，会自动有一些mark。<br>!!command           用command命令的执行结果代替当前行，这个在加入日期什么的还是很方便的<br>set autowrite/noautowrite      设置自动保存和不自动保存的，默认是不自动保存的<br>v/V/CTRL-v        进入Visual模式，v是可以单个字符的，然后V是整行整行的，CTRL-v是矩形形式的。这个对于改变一大片文字什么的也是很有用的<br><span style="color: #ff0000;">由于我这也是记录式的，顺便加上一些自己操作之后的感想，所以很多东西建议读者看Tutorial，那才是王道，下一篇《VI的基本命令之二》会接着这篇写</span></p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -279,7 +308,7 @@
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#x69;&#108;&#x74;&#111;&#58;&#x6a;&#99;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#97;&#115;&#116;&#101;&#114;&#115;&#x2e;&#x6f;&#x72;&#x67;">&#x6a;&#99;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#97;&#115;&#116;&#101;&#114;&#115;&#x2e;&#x6f;&#x72;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#x6f;&#58;&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#97;&#x73;&#x74;&#101;&#114;&#x73;&#x2e;&#x6f;&#114;&#103;">&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#97;&#x73;&#x74;&#101;&#114;&#x73;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -441,35 +470,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-11-13 </div>
-			<div class="article-title"><a href="/2012/11/13/fedora-13-opengl/" >Fedora-13配置 OpenGL</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>本文是在Fedora 13下配OpenGL的一个可行例子。同时还会给出给出我配置大过程中所遇到大错误</p>
-<p>首先你需要安装mesa和freeglut。</p>
-<p>安装mesa的时候，用的命令是“sudo yum install mesa<em>“，注意后面的</em>.在没加大情况下，一直装不好，显示No package mesa available。装好之后你就可以装freeglut了，同样用命令”sudo yum install freeglut*”.然后所有大装好之后，你可以用下面大代码进行测试。</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #eeee00;">#include <gl glut.h=""></gl></span><br><span style="color: #eeee00;">#include <gl gl.h=""></gl></span><br><span style="color: #eeee00;">#include <gl glu.h=""></gl></span><br><span style="color: #eeee00;">#include <math.h></math.h></span><br><span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;">display</span>()<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">glClear</span>(<span style="color: #f5deb3;">GL_COLOR_BUFFER_BIT</span>);</div></p>
-<p><span style="color: #f5deb3;">glBegin</span>(<span style="color: #f5deb3;">GL_POLYGON</span>);<br><span style="color: #f5deb3;">glVertex2f</span>(<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">0.5</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">0.5</span>);<br><span style="color: #f5deb3;">glVertex2f</span>(<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">0.5</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0.5</span>);<br><span style="color: #f5deb3;">glVertex2f</span>(<span style="color: #add8e6;">0.5</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0.5</span>);<br><span style="color: #f5deb3;">glVertex2f</span>(<span style="color: #add8e6;">0.5</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">0.5</span>);<br><span style="color: #f5deb3;">glEnd</span>();</p>
-<p><span style="color: #f5deb3;">glFlush</span>();<br><span style="color: #f5deb3;">}</span></p>
-<p><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">main</span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">argc</span><span style="color: #f5deb3;">,</span><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">**</span><span style="color: #f5deb3;">argv</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">glutInit</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">argc</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">argv</span>);<br><span style="color: #f5deb3;">glutCreateWindow</span>(<span style="color: #7fffd4;">“Hello World!”</span>);<br><span style="color: #f5deb3;">glutDisplayFunc</span>(<span style="color: #f5deb3;">display</span>);<br><span style="color: #f5deb3;">glutMainLoop</span>();<br><span style="color: #f5deb3;">}</span><br>编译的时候用的命令为”g++ test.cpp -o test -lGL -lGLU -lglut -lm”最后一个-lm可以不加是用来链接数学库的。注意头文件中大GL必须大写，不然会出错。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -480,13 +480,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/7/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+    	<li class="prev"><a href="/page/7/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/9/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/9/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -506,7 +506,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -515,16 +515,16 @@
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>Categorias</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -552,9 +552,9 @@
 		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
-		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -562,11 +562,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -576,15 +576,15 @@
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -601,48 +601,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
-		
-			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
-		
-			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
-		
-			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
-		
-			<li><a href="/tags/redis/">redis<span>1</span></a></li>
+			<li><a href="/tags/sap/">sap<span>1</span></a></li>
 		
 			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
 		
-			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
-		
-			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
-		
-			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
-		
-			<li><a href="/tags/grub/">grub<span>2</span></a></li>
-		
-			<li><a href="/tags/code-interview/">code interview<span>1</span></a></li>
-		
-			<li><a href="/tags/链接排序/">链接排序<span>1</span></a></li>
-		
-			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
-		
-			<li><a href="/tags/rm/">rm<span>1</span></a></li>
-		
-			<li><a href="/tags/reservior/">reservior<span>1</span></a></li>
-		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
-		
-			<li><a href="/tags/apach/">apach<span>0</span></a></li>
-		
-			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
+			<li><a href="/tags/积分/">积分<span>1</span></a></li>
 		
 			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
 		
-			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
+			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+		
+			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
+		
+			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+		
+			<li><a href="/tags/compter-graphics/">compter graphics<span>1</span></a></li>
+		
+			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
+		
+			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+		
+			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
+		
+			<li><a href="/tags/链接排序/">链接排序<span>1</span></a></li>
+		
+			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+		
+			<li><a href="/tags/linux/">linux<span>24</span></a></li>
+		
+			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
+		
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
+		
+			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+		
+			<li><a href="/tags/timestamp/">timestamp<span>1</span></a></li>
+		
+			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
+		
+			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>281</span></a></li>
+		   <li><a href="/tags">...<span>283</span></a></li>
 		 
 		</ul>
 	</div>
@@ -651,8 +651,12 @@
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
+      </li>
     
       <li>
         <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
@@ -668,10 +672,6 @@
     
       <li>
         <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
       </li>
     
   </ul>

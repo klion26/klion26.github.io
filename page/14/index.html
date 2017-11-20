@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 14 | klion26</title>
+  <title>Página 14 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,30 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-04-11 </div>
+			<div class="article-title"><a href="/2011/04/11/drab-queue-poj-2823/" >POJ 2823 单调队列+IO优化</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://poj.org/problem?id=2823" target="_blank" rel="external">传送门</a><br>在网上逛的时候,看到一个博主说里下单调队列,然后说这题是单调队列的直接应用.就做了下,发现单调队列其实也很容易嘛.不过这题在WS的POJ上需要加上IO优化,不然就一直TLE.或许是我的程序写措了.不可能吧^-^<br>具体的单调队列介绍还是请看<a href="http://www.felix021.com/blog/read.php?1965" target="_blank" rel="external">这位博主</a>的.单调队列保证队列的首元素是最优的,如果队首元素”已过期”就”出队”,在考虑新元素时,弹出队列中每当前这个元素优的所有元素,然后这个元素入队.一直这样操作,就能保证队首元素一直是最优的.下面给出IO优化的两个函数:</p>
+<div style="background: none repeat scroll 0% 0% #fdfdfd; color: black;">: <a href="http://fayaa.com/code/view/18471/" target="_blank" rel="external"></a></div><br><div class="source" style="font-family: amp;amp; color: #f5deb3; background-color: #2f4f4f;"><br><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">get_int</span>()<br><br><span style="color: #f5deb3;">{</span><br><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br><br><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">c</span><br><br><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">flag</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br><br><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">getchar</span>();<br><br><span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #7fffd4;">‘ ‘</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">c</span> || <span style="color: #7fffd4;">‘\n’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">c</span>)<br><br><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">getchar</span>();<br><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #7fffd4;">‘-‘</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">c</span>)<br><br><span style="color: #f5deb3;">{</span><br><br><span style="color: #f5deb3;">flag</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><br><br><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">getchar</span>();<br><br><span style="color: #f5deb3;">}</span><br><br><span style="color: #b0c4de; font-weight: bold;">while</span>(<span style="color: #f5deb3;">isdigit</span>(<span style="color: #f5deb3;">c</span>))<br><br><span style="color: #f5deb3;">{</span><br><br><span style="color: #f5deb3;">ret</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">*</span><span style="color: #add8e6;">10</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">-</span><span style="color: #7fffd4;">‘0’</span><br><br><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">getchar</span>();<br><br><span style="color: #f5deb3;">}</span><br><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">flag</span>)<br><br><span style="color: #f5deb3;">ret</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">ret</span><br><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ret</span><br><br><span style="color: #f5deb3;">}</span><br><br><span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #ffffff;">put_char</span>(<span style="color: #98fb98; font-weight: bold;">int</span> n)<br><br><span style="color: #f5deb3;">{</span><br><br><span style="color: #b0c4de; font-weight: bold;">if</span>(n<span style="color: #f5deb3;">&gt;=</span><span style="color: #add8e6;">10</span>)<br><br><span style="color: #f5deb3;">put_char</span>(n<span style="color: #f5deb3;">/</span><span style="color: #add8e6;">10</span>);<br><br><span style="color: #f5deb3;">putchar</span>(n<span style="color: #f5deb3;">%</span><span style="color: #add8e6;">10</span> <span style="color: #f5deb3;">+</span> <span style="color: #7fffd4;">‘0’</span>);<br><br><span style="color: #f5deb3;">}</span><br><br></div>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -440,29 +464,6 @@ return 1;
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-03-30 </div>
-			<div class="article-title"><a href="/2011/03/30/pointers-on-c-9-string/" >C和指针第9章[字符串 字符 字节]</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>1字符串是一串0个和多个字符,以NUL字符结尾的<br>2.strlen函数的返回值是一个无符号整形,也就是说这个if(strlen(x)-strlen(y)&gt;=0)一定是成立的,因为左边是无符号整形的操作,不可能小于0<br>3.strcpy,strcat会在新字符串后面自动加上一个’\0’结尾符.但是这些函数需要保证有足够的空间.这两个函数的返回值是第一个参数的一份拷贝.<br>4.strcmp,返回不一定是 1 -1 0,标准只是说返回大于0的和小于0的,不一定是1和-1.也不要写成if(strcmp(a,b))这样的,因为当<span style="color: #ff0000;">a和b相等</span>的时候这个<span style="color: #ff0000;">返回的是0</span>,所以有时你会很郁闷<br>5.strncpy(dst,src,len),如果strlen(src)<len的话,那么dst额外的会被nul填充,但是如果strlen(src)>=len的话,那么就<span style="color: #ff0000;">不会</span>以NUL字符结尾,这个切记.<br>6.strncat(dst,src,len)和strncpy不一样,它不管dst的空间够不够,总是会把len个字符连接在dst后面[如果strlen(str)<len就是strlen(strc)个字符],而且每次会在最后面加上一个'\0'.注意一点的是这个函数不管你后面的空间够还是不够,如果不够可能就惨了 7.strchr(char="" const="" *str,int="" ch)查找ch第一次出现的位置,strrchr(char="" ch)查找ch最后一次出现的位置,strpbrk(char="" *str,char="" *group)查找group中随便一个字符在str中第一次出现的最早位置,比如str="Hello there,honey" ;group="aeoiu" 那么结果会是指向e的指针;strstr(char="" *s1,char="" *s2)返回s2在s1中第一次出现的位置="" 8.strspn(char="" *group)="" 返回第一次出现group之外任意字符时group中的字符出现过的总数.比如buffer="25,142,330,Smith,J,239-4123" strspn(buffer,"0123456789")返回的是2也就是在','之前出现过2和5,所以返回2.="" strcspn(char="" *group)和上面的相反,返回第一次出现group中任意字符时,出现过的不属于group的字符总数.="" 9.strtok(char="" *sep)="" 这个不是很懂,待查="" 10其他ctype.h下的单独字符操作函数,有一个要注意的是,在使用ebcdic字符集的机器上判定是否是大些字母不能用if(ch="">= ‘A’ &amp; ch &lt;= ‘Z’)但是可以用if(isupper(ch))<br>11.memcpy(void <em>dst,void cosnt </em>src,size_t len);//dst和src不可重叠<br>memmove(void <em>dst,void const </em>str,size_t len);//dst和src可重叠,速度没上一个快<br>memcmp(void const <em>dst,void const </em>src,size_t len);<br>memchr(void const <em>a,int ch,size_t len)<br>memset(void </em>a,int ch,size_t len);<br>前4个和str开头的功能类似,不过这里不适以NUL结尾,而是len个字节,最后一个是把len字节置为ch.<br>这里有一个区分差别的.<br>memchr(buff,0,SIZE)-buffer<br>strlen(buff)<br>关于这两个的区别.答案如下<br><!--easy2hide start reply to this=true--><br>如果buff以NUL字符结尾,那么没区别,都是得到buff的长度,不过strlen返回的是无符号数,但是减法得到的是有符号的.<br>如果buff不以NUL字符结尾的话,memchr返回一个NULL指针,减去buff将产生一个无意义的结果,strlen则会一直找下去,知道发现一个NUL字符位置.<br>还有一个就是如果你要找的是NUL字符的话,就得用内存操作函数了,因为字符串函数不能找到NUL字节.<br><!--easy2hide end--></len就是strlen(strc)个字符],而且每次会在最后面加上一个'\0'.注意一点的是这个函数不管你后面的空间够还是不够,如果不够可能就惨了></len的话,那么dst额外的会被nul填充,但是如果strlen(src)></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -473,13 +474,13 @@ return 1;
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/13/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+    	<li class="prev"><a href="/page/13/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/15/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/15/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -499,7 +500,7 @@ return 1;
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -508,16 +509,16 @@ return 1;
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>Categorias</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -545,9 +546,9 @@ return 1;
 		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
-		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -555,11 +556,11 @@ return 1;
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -569,15 +570,15 @@ return 1;
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -594,48 +595,48 @@ return 1;
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
+			<li><a href="/tags/vim/">vim<span>2</span></a></li>
 		
-			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
+			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
 		
-			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
 		
-			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+			<li><a href="/tags/thinking/">thinking<span>2</span></a></li>
+		
+			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
+		
+			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+		
+			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+		
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
+		
+			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
 		
 			<li><a href="/tags/my-life/">my life<span>1</span></a></li>
 		
-			<li><a href="/tags/写作/">写作<span>1</span></a></li>
+			<li><a href="/tags/learning/">learning<span>1</span></a></li>
 		
-			<li><a href="/tags/book/">book<span>1</span></a></li>
+			<li><a href="/tags/scala/">scala<span>1</span></a></li>
 		
-			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
 		
-			<li><a href="/tags/于娟/">于娟<span>1</span></a></li>
+			<li><a href="/tags/算法/">算法<span>1</span></a></li>
 		
-			<li><a href="/tags/git/">git<span>4</span></a></li>
-		
-			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
-		
-			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
-		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
-		
-			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
+			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
 		
 			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
 		
-			<li><a href="/tags/lzo/">lzo<span>1</span></a></li>
+			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
 		
-			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
+			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
 		
-			<li><a href="/tags/alibaba/">alibaba<span>1</span></a></li>
+			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
 		
-			<li><a href="/tags/pair/">pair<span>1</span></a></li>
-		
-			<li><a href="/tags/scc/">scc<span>1</span></a></li>
+			<li><a href="/tags/tencent/">tencent<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>281</span></a></li>
+		   <li><a href="/tags">...<span>283</span></a></li>
 		 
 		</ul>
 	</div>
@@ -644,8 +645,12 @@ return 1;
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
+      </li>
     
       <li>
         <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
@@ -661,10 +666,6 @@ return 1;
     
       <li>
         <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
       </li>
     
   </ul>

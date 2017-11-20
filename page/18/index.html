@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 18 | klion26</title>
+  <title>Página 18 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,33 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-02-10 </div>
+			<div class="article-title"><a href="/2011/02/10/usaco-4-1-2-fence-rails/" >USACO 4-1-2 Fence Rails</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://www.nocow.cn/index.php/Translate:USACO/fence8" target="_blank" rel="external">题目翻译</a></p>
+<p>这题一开始不知如何下手,后来参考了nocow和其他大牛的才写出来的.这里就给出nocow的分析再贴上代码,这题说是dfs-id算法,可是我怎么看都觉得是一般的dfs然后加剪枝.</p>
+<p>nocow分析<a href="http://www.nocow.cn/index.php/USACO/fence8" target="_blank" rel="external">见这里</a></p>
+<p>下面是我的代码:</p>
+<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">  ID:qcx97811</span><br><span style="color: #da70d6;">  LANG:C</span><br><span style="color: #da70d6;">  TASK:fence8</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">board</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">56</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1026</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">rail_sum</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1026</span><span style="color: #f5deb3;">];</span><br><span style="font-weight: bold; color: #98fb98;">int</span> N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">R</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">bsum</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">up</span><br><br><span style="color: #da70d6;">//排序用的模板</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">cmp</span>(<span style="font-weight: bold; color: #b0c4de;">const</span> <span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">const</span> <span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #f5deb3;"></span>b)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;"><em></em></span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">a</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;"><em></em></span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;"></span>)b)<br>        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;"><em></em></span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">a</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;"><em></em></span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;"></span>)b)<br>        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">}</span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">work</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">total</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">rstart</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">bstart</span>)<br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//total是到当前已经浪费掉的木板长度</span><br><span style="color: #da70d6;">//rstart更准确的是rend也就是当前的最大rail下标 因为是从大到小</span><br><span style="color: #da70d6;">//bstart是当前从哪块board开始的</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">t_bstart</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">t_total</span><br>    <span style="color: #f5deb3;">t_total</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">rstart</span>)<span style="color: #da70d6;">//表示搜索已经结束了</span><br>        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> N<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&gt;;=</span> <span style="color: #f5deb3;">bstart</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">–</span>)<br>        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//搜索 从大到小</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">board</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;=</span> <span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rstart</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//如果可以从这个board上切的话</span><br>                    <span style="color: #f5deb3;">board</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">-=</span> <span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rstart</span><span style="color: #f5deb3;">];</span><span style="color: #da70d6;">//更新board</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">board</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">])</span><br>                        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//如果这个board已经不可能再切出其他rail了</span><br>                            <span style="color: #f5deb3;">t_total</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">total</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">board</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><span style="color: #da70d6;">//更新浪费的board总数</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">t_total</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">rail_sum</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">up</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">bsum</span>)<br>                                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//如果已经不可能切出up+1[搜索的是下标]个rail</span><br>                                    <span style="color: #f5deb3;">board</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rstart</span><span style="color: #f5deb3;">];</span><span style="color: #da70d6;">//回溯</span><br>                                    <span style="font-weight: bold; color: #b0c4de;">continue</span><span style="color: #da70d6;">//进行下次个搜索</span><br>                                <span style="color: #f5deb3;">}</span><br>                        <span style="color: #f5deb3;">}</span><br>                    <span style="font-weight: bold; color: #b0c4de;">else</span><br>                        <span style="color: #f5deb3;">t_total</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">total</span><span style="color: #da70d6;">//浪费的board</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">rstart</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">&amp;</span> (<span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rstart</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rstart</span><span style="color: #f5deb3;">]))</span><br>                        <span style="color: #f5deb3;">t_bstart</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><span style="color: #da70d6;">//如果下一块rail和当前的rail相等</span><br>                    <span style="color: #da70d6;">//那么下一块rail所对应的board一定比当前rail所对应的</span><br>                    <span style="color: #da70d6;">//board的下标要大 至少不会小</span><br>                    <span style="font-weight: bold; color: #b0c4de;">else</span><br>                        <span style="color: #f5deb3;">t_bstart</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #da70d6;">//board的最小下标为0 这里不用考虑某块board已经被用 因为每次都会更新board的大小</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">work</span>(<span style="color: #f5deb3;">t_total</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">rstart</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">t_bstart</span>))<br>                        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">1</span><span style="color: #da70d6;">//如果搜索成功的话 就返回成功</span><br>                    <span style="color: #f5deb3;">board</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rstart</span><span style="color: #f5deb3;">];</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">main</span>(<span style="font-weight: bold; color: #98fb98;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“fence8.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdin</span>);<br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“fence8.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdout</span>);<br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>N);<span style="color: #da70d6;">//N是board的数目</span><br>    <span style="color: #f5deb3;">bsum</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #da70d6;">//bsum用来记录所有board的总和 用于一个小剪枝</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> N;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">board</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]);</span><br>            <span style="color: #f5deb3;">bsum</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">board</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">R</span>);<span style="color: #da70d6;">//R是rail的的总数</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">R</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]);</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">qsort</span>(<span style="color: #f5deb3;">board</span><span style="color: #f5deb3;">,</span>N<span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">board</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]),</span><span style="color: #f5deb3;">cmp</span>);<br>    <span style="color: #f5deb3;">qsort</span>(<span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">R</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]),</span><span style="color: #f5deb3;">cmp</span>);<br>    <span style="color: #da70d6;">//对board数组和rail数组进行从小到大的排序</span><br>    <span style="color: #da70d6;">//下面的rail_sum数组表示从rail[0]加到rail[i]的总和 也是用于剪枝    </span><br>    <span style="color: #f5deb3;">rail_sum</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">];</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">R</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">rail_sum</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">rail_sum</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">rail</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">up</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">R</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #da70d6;">//up是有可能的最大下标</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #f5deb3;">rail_sum</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">up</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">bsum</span>)<br>        <span style="color: #f5deb3;">up</span><span style="color: #f5deb3;">–</span><br><span style="color: #eeee00;">#if 0</span><br><span style="color: #da70d6;">    用于调试</span><br><span style="color: #da70d6;">    printf(“%d\n”,up);</span><br><span style="color: #eeee00;">#endif</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">work</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">up</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span>))<span style="color: #da70d6;">//搜索结果</span><br>        <span style="color: #f5deb3;">up</span><span style="color: #f5deb3;">–</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">up</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>);<span style="color: #da70d6;">//由于搜索出来的是下标 所以结果得+1</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -395,29 +422,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2010-12-14 </div>
-			<div class="article-title"><a href="/2010/12/14/red-hat9-command-messy-code/" >Red Hat9命令台乱码</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>我的Red Hat9装在虚拟机上,安装时手痒,选了默认语言为中文,今天实验课的时候,在命令控制台发现ls -l命令居然出现乱码[是total变成了乱码,也就是说英文居然变成了乱码,这下蛋疼了],上网搜了下,没找到,有些人说,是由于内核版本和默认语言的问题决定的.后来再搜一条命令的时候,无意中看到了这个.就记录了下来 vi /etc/sysconfig/i18n 然后把LC_ALL=POSIX加在最后面就行了.退出重新登陆就OK了。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -428,13 +432,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/17/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+    	<li class="prev"><a href="/page/17/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/19/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/19/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -454,7 +458,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -463,16 +467,16 @@
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>Categorias</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -500,9 +504,9 @@
 		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
-		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -510,11 +514,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -524,15 +528,15 @@
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -549,48 +553,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/method/">method<span>1</span></a></li>
+			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
 		
-			<li><a href="/tags/filter/">filter<span>1</span></a></li>
+			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
 		
-			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
+			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
 		
-			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
+			<li><a href="/tags/数学/">数学<span>5</span></a></li>
 		
-			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
+			<li><a href="/tags/read/">read<span>3</span></a></li>
 		
-			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
+			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
 		
-			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
+			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
 		
-			<li><a href="/tags/bellman-ford/">bellman-ford<span>1</span></a></li>
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
 		
-			<li><a href="/tags/rm/">rm<span>1</span></a></li>
+			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
 		
-			<li><a href="/tags/scc/">scc<span>1</span></a></li>
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
 		
-			<li><a href="/tags/horn-formulas/">horn formulas<span>1</span></a></li>
+			<li><a href="/tags/DP/">DP<span>1</span></a></li>
 		
-			<li><a href="/tags/安全/">安全<span>1</span></a></li>
+			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
 		
-			<li><a href="/tags/json/">json<span>1</span></a></li>
+			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
 		
-			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
 		
-			<li><a href="/tags/apach/">apach<span>0</span></a></li>
+			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
 		
-			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
+			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
 		
-			<li><a href="/tags/go/">go<span>1</span></a></li>
+			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
 		
-			<li><a href="/tags/code-style/">code-style<span>1</span></a></li>
+			<li><a href="/tags/proof/">proof<span>1</span></a></li>
 		
-			<li><a href="/tags/pair/">pair<span>1</span></a></li>
+			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
 		
-			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
+			<li><a href="/tags/stack/">stack<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>281</span></a></li>
+		   <li><a href="/tags">...<span>283</span></a></li>
 		 
 		</ul>
 	</div>
@@ -599,8 +603,12 @@
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
+      </li>
     
       <li>
         <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
@@ -616,10 +624,6 @@
     
       <li>
         <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
       </li>
     
   </ul>

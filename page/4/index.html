@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 4 | klion26</title>
+  <title>Página 4 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,57 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-07-26 </div>
+			<div class="article-title"><a href="/2015/07/26/redis-pqsort-c/" >Redis 中快排算法详解(pqsort.c)</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="https://github.com/klion26/redis-1.0-annotation/blob/master/pqsort.c" target="_blank" rel="external">Redis 中的快排</a>中的思想是一篇叫做“<a href="http://cs.fit.edu/~pkc/classes/writing/samples/bentley93engineering.pdf" target="_blank" rel="external">Engineering a Sort Function”</a>里面的思想。做到比标准库里面的快排<span style="color: #ff0000;">更快</span>，<span style="color: #ff0000;">更稳定</span>，（在自己电脑上做测试的时候，基本一样的时间），按照论文来说主要用到下面的优化：</p>
+<ol>
+<li>元素交换的时候更省时间</li>
+<li>在某些情况下使用了冒泡排序，以及插入排序</li>
+<li>选择一个接近中位数的数做 pivot<br>下面从上面三个方面入手分析代码</li>
+</ol>
+<p>对于元素交换方面，代码里面的做法首先会查看待排序的数组是否按机器字节对齐，以及每个元素所占的字节长度是否等于机器字节长度，代码如下：</p>
+<p><pre class="lang:c decode:true ">#define SWAPINIT(a, es) swaptype = ((char <em>)a - (char </em>)0) % sizeof(long) || \<br>    es % sizeof(long) ? 2 : es == sizeof(long)? 0 : 1;</pre><br><span style="color: #ff0000;">注意 || 的优先级比 ?: 的优先级要高</span>，不然这里会理解错误的。这里的 swaptype 就是用来确定交换时的类型的，有如下三种可能：</p>
+<ol>
+<li>数组首地址对齐，且数组元素占的字节数和 sizeof(long) 一样的。swaptype == 0</li>
+<li>数组首地址对齐，数组元素占的字节数是 sizeof(long) 的倍数的。swaptype == 1</li>
+<li>数组首地址不对齐；或者首地址对齐，但是数组元素所占的字节数不能整除 sizeof(long) 的。swaptype == 2<br>针对不能的情况，后面交换数据的时候分别有不同的选择。对于第一种和第二种，直接按照 long 类型来交换，其他的则按照 char 类型来交换。<br><pre class="lang:c decode:true">if (swaptype &lt;= 1)<br>swapcode(long, a, b, n)<br>else<br>swapcode(char, a, b, n)</pre><br>对于交换，本方法由于把数据分为了小于 pivot 的，大于 pivot 的和等于 pivot 的。因此还有数组的交换，将所有等于 pivot 的都换到中间。<br><pre class="lang:c decode:true ">#define vecswap(a, b, n) if ((n) &gt; 0) swapfunc((a), (b), (size_t)(n), swaptype)</pre><br>在进行完一次排序之后，数组内部的分布如下所示：</li>
+</ol>
+<p><span style="color: #ff0000;">|</span> pivot <span style="color: #ff0000;">|</span>  等于 pivot 的所有元素A <span style="color: #ff0000;">|</span>  小于 pivot 的所有元素  <span style="color: #ff0000;">|</span>大于 pivot 的所有元素 <span style="color: #ff0000;">|</span> 等于pivot 的所有元素B <span style="color: #ff0000;">|</span></p>
+<p>然后我们需要把小于 pivot 的所有元素换到数组的最左边，把原来数组最右边的等于 pivot 的所有元素B换到数组的中间。变成如下排列</p>
+<p><span style="color: #ff0000;">|</span> 小于 pivot 的所有元素  <span style="color: #ff0000;">|</span>  等于 pivot 的所有元素  <span style="color: #ff0000;">|</span>  大于 pivot 的所有元素 <span style="color: #ff0000;">|</span></p>
+<p>这里就需要用到上面的 vecswap，就是两段数之间的交换。将所有等于 pivot 的元素放到中间，所有小于 pivot 的元素放到左边，所有大于 pivot 的元素放到右边</p>
+<p>2. 利用冒泡和插入排序。</p>
+<p>在本方法中，对于少于7个元素的都利用冒泡排序解决（7 是一个 Magical number），然后对于接近已排好序的数组，利用插入排序，我们知道快速排序对于已排好序的数组进行排序复杂度是很高的，因此在内部采用了插入排序解决这一问题<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">if (swap_cnt == 0) &#123;  /* Switch to insertion sort */</div><div class="line">        /** &#123;a[0]&#125;  &#123;a[1]...a[k]&#125;  &#123;a[k+1]...a[n-1]&#125;</div><div class="line">         * a[i] &lt; a[0]  for 1&amp;lt;= i &amp;lt; k+1</div><div class="line">         * a[i] &gt; a[0]  for k+1 &lt;= i &amp;lt; n</div><div class="line">         **/</div><div class="line">		for (pm = (char *) a + es; pm &lt; (char *) a + n * es; pm += es)</div><div class="line">			for (pl = pm; pl &gt; (char *) a &amp;amp; cmp(pl - es, pl) &amp;gt; 0; </div><div class="line">			     pl -= es)</div><div class="line">				swap(pl, pl - es);</div><div class="line">		return;</div><div class="line">	&#125;</div></pre></td></tr></table></figure></p>
+<p>这段代码中的 swap_cnt 是记录了在第一次排序过程中是否进行过交换，等于零表示没有进行过交换。</p>
+<p>3. 找一个更合适的 pivot 这一点，本方法利用下面的方法来进行 pivot 的寻找，其中 pm 指向最终我们设定的 pivot</p>
+<p><pre class="lang:c decode:true">    pm = (char <em>) a + (n / 2) </em> es; /<strong> 首先用数组中间的那个元素做 pivot </strong>/<br>    if (n &gt; 7) { /<strong> 如果元素个数大于 7 </strong>/<br>        pl = (char <em>) a;/</em> 首元素 <em>/<br>        pn = (char </em>) a + (n - 1) <em> es; /</em> 末尾元素 <em>/<br>        if (n &gt; 40) { /<strong> 如果大于40个元素（40 也是一个 Magical Number） </strong>/<br>            d = (n / 8) </em> es; /<strong> 利用下面的 9 个数来近似整个数组的中位数 </strong>/<br>            pl = med3(pl, pl + d, pl + 2 <em> d, cmp); /</em> pl 这三个数里面的一个中位数 <em>/<br>            pm = med3(pm - d, pm, pm + d, cmp); /</em> pm 是这三个数的中位数 <em>/<br>            pn = med3(pn - 2 </em> d, pn - d, pn, cmp); /<em> pn 是这三个数的中位数 </em>/<br>        }<br>        pm = med3(pl, pm, pn, cmp); /<em> pm 是 pl pm pn 的中位数，近似整个数组的中位数 </em>/<br>    }</pre><br>这样找到的 pivot 不会偏向很严重，从而在快排的时候，不会导致某一边（大于 pivot 和小于 pivot 两边）的数据量比较大。</p>
+<p>另外在对数组的右半部分进行排序的时候，利用了 goto，而不是递归，这样可以节省栈空间。</p>
+<p>我在 Github 上存放了一份带所有注释的代码，地址如下：<a href="https://github.com/klion26/redis-1.0-annotation/blob/master/pqsort.c" target="_blank" rel="external">https://github.com/klion26/redis-1.0-annotation/blob/master/pqsort.c</a></p>
+<p>参考文章：</p>
+<ol>
+<li><a href="http://cs.fit.edu/~pkc/classes/writing/samples/bentley93engineering.pdf" target="_blank" rel="external">http://cs.fit.edu/~pkc/classes/writing/samples/bentley93engineering.pdf</a></li>
+</ol>
+<p>2. <a href="http://blog.csdn.net/guodongxiaren/article/details/45567291" target="_blank" rel="external">http://blog.csdn.net/guodongxiaren/article/details/45567291</a></p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -645,40 +696,6 @@ private:
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2014-10-01 </div>
-			<div class="article-title"><a href="/2014/10/01/2014-code-interview/" >2014找工作的那些事</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>先说下自己的背景吧</p>
-<ul>
-<li>中南本科+硕士</li>
-<li>数据结构/算法还过得去</li>
-<li>会一点 Linux 系统编程+网络编程</li>
-<li>无实习经验，无项目经验<br>今年校招有点早，8月就做了阿里的在线笔试，然后9月去武汉参加面试，没鄙视了（遗憾的是不知道是为什么被鄙视的，一个同去的同学和我情况一样）。后来就是腾讯面试，一面气场太差（面试官原话），表现不好，居然还让我过了，二面表现良好，然后就被刷了。。后来来长沙的软件公司基本都参加了，由于腾讯面试和美团笔试冲突，然后美团笔试没有参加。中间参加了华为，深信服的面试（可惜华为 SO 挑战赛的时间和腾讯笔试的时间冲突，没有拿到 SO 挑战赛的手机是一大遗憾）。最后霸面美团，然后成为美团长沙站最后一个参加面试的人（霸面），在9月底终于有一个去处了，至此心里终于有点着落了。</li>
-</ul>
-<p>找工作过程中会遇到各种事情（有同学腾讯的 hr 面面试结果一直被拖着），期间看到身边的人一个个都有 offer 了，也会心急。我算比较幸运的，有同学给我打气，腾讯一面被鄙视后，和四宝在公交上聊的那些，其实对我也挺有帮助的，有同学一起晚上锻炼身体。</p>
-<p>最后面上美团，应该也是运气足够好吧。最后一个参加面试的（还是霸面），而且三个面试官人都很 nice（参加的这些面试官中，个人认为美团的三个面试官和腾讯二面面试官人较好），基本无压力，可以发挥出自己的真实实力。不过美团的面试是我所参加的这些公司中强度最大的，3轮技术面，前两轮都会要求纸上写代码，每个程序基本是50-100行的样子；三面聊一些设计上的东西，代码基本不需要写了。我遇到的几个题大部分来自于 leetcode。刚好还是自己做过的，这个比较幸运。不过有一点小瑕疵的就是，我二面的时候，要求写一个不算太难的程序，然后一面面试官从我的代码中挑出了一个 bug。我当时瞬间都无语了，本以为100行以内的代码能做到 bug free。。。前两面的过程中，基本是代码一个接一个写，而且没有一点可以闲下来的功夫，强度很大。最后第三面的面试官问我一个概率题，我做出了简化版的，然后他问我要不要挑战下高级版的，我可耻的说“还没吃饭，就不挑战了”。</p>
-<p>第二天实验室在开会的时候，接到 HR 的电话，说下午过去谈谈。然后就过去谈了下，薪资基本是平均水平，然后福利貌似一般吧，其他的比如期权之类的由于没有经验，也没有询问，后来才知道原来薪资也是可以谈的（我是直接过去，然后 HR 通知你薪资多少，都没谈判，囧）。不过觉得方向还不错，自己也喜欢，就打算签了，到时候如果有更好的就再说吧。</p>
-<p>真正到了找工作的时候，才发现学校所在地还是很重要的，学校名气也很重要。武汉就比长沙要好很多，很多公司不来长沙招人，招也是很少一部分，基本走过场。在武汉面试的时候，有同学就被直接告知“我们基本只要武大，华科的”。唉，长沙毕竟还没有发展起来。</p>
-<p>找工作如果有真正的项目的话也是有一定优势的（当然如果能吃透一个开源的框架也是有优势的），一个进阿里的同学两轮技术面都是聊的项目，而且他的其中一个项目使用了现阶段的先进技术，面试官很感兴趣。如果没有项目的话，基础知识要求比较广，语言基础，操作系统，数据结构/算法，网络，组成原理，编译原理什么的都会问到，这个要准备起来，还是需要一定时间的。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -689,13 +706,13 @@ private:
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/3/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+    	<li class="prev"><a href="/page/3/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/5/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/5/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -715,7 +732,7 @@ private:
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -724,16 +741,16 @@ private:
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>Categorias</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -761,9 +778,9 @@ private:
 		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
-		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -771,11 +788,11 @@ private:
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -785,15 +802,15 @@ private:
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -810,48 +827,48 @@ private:
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/knapsack/">knapsack<span>1</span></a></li>
+			<li><a href="/tags/linux/">linux<span>24</span></a></li>
 		
-			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
+			<li><a href="/tags/插件/">插件<span>1</span></a></li>
 		
-			<li><a href="/tags/grub/">grub<span>2</span></a></li>
+			<li><a href="/tags/reservior/">reservior<span>1</span></a></li>
 		
-			<li><a href="/tags/offset/">offset<span>1</span></a></li>
-		
-			<li><a href="/tags/python/">python<span>2</span></a></li>
-		
-			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
-		
-			<li><a href="/tags/prim/">prim<span>1</span></a></li>
-		
-			<li><a href="/tags/shell/">shell<span>5</span></a></li>
-		
-			<li><a href="/tags/question/">question<span>1</span></a></li>
-		
-			<li><a href="/tags/network/">network<span>1</span></a></li>
-		
-			<li><a href="/tags/text-plain/">text/plain<span>1</span></a></li>
-		
-			<li><a href="/tags/数论/">数论<span>5</span></a></li>
+			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
 		
 			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
 		
-			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
+			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
 		
-			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
+			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+		
+			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
+		
+			<li><a href="/tags/select/">select<span>2</span></a></li>
 		
 			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
 		
-			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
+			<li><a href="/tags/shortest-paths-in-dag/">shortest paths in dag<span>1</span></a></li>
 		
-			<li><a href="/tags/longest-increasing-subsequences/">longest increasing subsequences<span>1</span></a></li>
+			<li><a href="/tags/update/">update<span>1</span></a></li>
 		
-			<li><a href="/tags/how/">how<span>1</span></a></li>
+			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
 		
-			<li><a href="/tags/storm/">storm<span>3</span></a></li>
+			<li><a href="/tags/rmvb/">rmvb<span>1</span></a></li>
+		
+			<li><a href="/tags/gdb/">gdb<span>2</span></a></li>
+		
+			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
+		
+			<li><a href="/tags/pair/">pair<span>1</span></a></li>
+		
+			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+		
+			<li><a href="/tags/no-recursive/">no-recursive<span>1</span></a></li>
+		
+			<li><a href="/tags/windows/">windows<span>4</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>281</span></a></li>
+		   <li><a href="/tags">...<span>283</span></a></li>
 		 
 		</ul>
 	</div>
@@ -860,8 +877,12 @@ private:
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
+      </li>
     
       <li>
         <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
@@ -877,10 +898,6 @@ private:
     
       <li>
         <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/07/14/tmux-简单使用指南/" ><i class="fa fa-file-o"></i>tmux 简单使用指南</a>
       </li>
     
   </ul>
