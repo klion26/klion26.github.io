@@ -121,6 +121,38 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2013-01-02 </div>
+			<div class="article-title"><a href="/2013/01/02/fedora-15-install-opencv-2-4/" >Fedora 15安装配置OpenCV 2.4</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>在Fedora 15下安装配置OpenCV 2.4的过程和配置。</p>
+<p>首先我想安装OpenCV 2.0或这2.2.可是在Fedora 15上编译2.2的时候，一直会出现错误，然后照着网上的解决方案，还是会出现一些问题，于是就下了2.4的版本，编译的时候，没有出现问题（貌似平台不一样，安装的时候也不一样），网上最多的教程就是Ubuntu下安装。其实可以直接通过yum install opencv在Fedora 15下安装，不过安装了之后，貌似我的还是出现点问题，就直接卸载掉了。下面说说编译OpenCV 2.4的过程和出现的问题，以及处理方法。</p>
+<p>1.下载OpenCV 2.4，地址<a href="http://sourceforge.net/projects/opencvlibrary/files/" target="_blank" rel="external">http://sourceforge.net/projects/opencvlibrary/files/</a><br>2.解压下下来的文件，假设你在$HOME/Desktop下解压的。<br>3。进入OpenCV 2.4的目录<br>4.mkdir release                  #建立目录，用来存cmake命令处理之后的一些文件<br>5.cd release<br>6.cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_PYTHON_SUPPORT=ON ..<br>7.make<br>8.sudo make install</p>
+<p>到这里就安装好了，如果上面的任何一部出现Error的话，可以自行上网解决，编译2.2的时候，出现的错误主要是undefined reference to `cvCreateCameraCapture_V4L(int)’ 类似的问题，网上对这类问题的讨论也不少，可以自行google。假设你现在已经安装好OpenCV 2.4了。那么测试下吧。现在你需要在/etc/ld.so.conf文件中添加一行代码，如下：/usr/local/lib/pkgconfig。在/etc/ld.so.conf.d/opencv.conf文件中添加一句代码如下：/usr/local/lib.注意如果没有此文件，则自己新建就行。然后运行ldconfig命令[需要root权限]设置环境变量export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH</p>
+<p>进入OpenCV 2.4/sample/c目录下，运行build_all.sh文件[可以通过sh build_all.sh来运行]，然后可以通过运行</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">./facedetect –cascade<span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“/usr/local/share/opencv/haarcascades/haarcascade_frontalface_alt.xml”</span> –scale<span style="color: #f5deb3;">=</span>1.5 lena.jpg</div><br>看到一张检测人脸的图像，那么就表示你的OpenCV配置成功了。下面自己写一个简单的程序再测试下呗。</p>
+<p>好的，我们用如下的C程序来检测：</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #eeee00;">#include “opencv2/highgui/highgui_c.h”</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">argc</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;"><em>*</em></span><span style="color: #f5deb3;">argv</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">IplImage</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">img</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">cvLoadImage</span>(<span style="color: #f5deb3;">argv</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">],</span><span style="color: #add8e6;">1</span>);<br><span style="color: #da70d6;">/<em>cvNamedWindow(“Example”,CV_WINDOW_AUTOSIZE);</em>/</span><br><span style="color: #f5deb3;">cvShowImage</span>(<span style="color: #7fffd4;">“Image”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">img</span>);<br><span style="color: #f5deb3;">cvWaitKey</span>(<span style="color: #add8e6;">0</span>);<br><span style="color: #f5deb3;">cvReleaseImage</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">img</span>);<br><span style="color: #f5deb3;">cvDestroyWindow</span>(<span style="color: #7fffd4;">“Example”</span>);<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div><br>用命令</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gcc  <span style="color: #7fffd4;"><code>&lt;/span&gt;pkg-config --cflags --libs  opencv&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span> -o cv cv.c</div><br>来编译，发现出错了，说什么undefined reference to symbol ‘lrint@@GLIBC_2.1’。上网找了下，说要加一些什么编译的动态库之类的，一开始不知道需要添加什么库，后来在突然实验下发现需要用到math库，也就是<span style="color: #ff0000;">需要在编译命令的最后面加上 -lm才行</span>。不过如果改成C++文件，头文件用的highgui.hpp的话，不需要加-lm也可以通过编译且运行良好，编译好了之后，用如下命令：</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">./cv ex.bmp</div><br>来测试刚编译好的文件，ex.bmp是当前目录下的一张bmp图片。如果显示了该图片，就表示成功了。接下来就可以用OpenCV 写自己的其他代码了。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2012-12-28 </div>
 			<div class="article-title"><a href="/2012/12/28/vi-basic-command/" >VI的一些基本命令之一</a></div>						
 		</h3>
@@ -308,7 +340,7 @@
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#x6f;&#58;&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#97;&#x73;&#x74;&#101;&#114;&#x73;&#x2e;&#x6f;&#114;&#103;">&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#97;&#x73;&#x74;&#101;&#114;&#x73;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;">&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -441,35 +473,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-11-15 </div>
-			<div class="article-title"><a href="/2012/11/15/advanced-programming-in-the-unix-environment-apue-h/" >Unix环境高级编程中大apue.h问题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>看《Unix环境高级编程》第一章的时候，遇到的第一个问题就是书中的第一个例子找不到”apue.h”头文件，这个文件是作者编写的，处理的办法是：</p>
-<p>1.从<a href="http://www.apuebook.com/apue2e.html" target="_blank" rel="external">这里</a>下载所需要的文件。</p>
-<p>2.把src.tar.gz解压缩到你的home目录下（当然随便解压到哪都是一样的，这里只是为了方便描述）。</p>
-<p>3.进入到刚解压大apue.2e目录下，修改Make.defines.linux中的WKDIR，改成/home/user/apue.2e  [其中user是你的用户名]，然后把/apue.2e/std/中的linux.mk文件中大所有nawk改为awk</p>
-<p>4.把/home/user/apue.2e/include/apue.h和/home/user/apue.2e/lib/error.c两个文件都copy到/usr/include目录下,这一步需要root权限</p>
-<p>5.修改/usr/include/apue.h文件，在最后一行#endif的前面一行加上一句#include “error.c”然后就完工了，编译通过！</p>
-<p>好好学习，天天向上！</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -548,9 +551,9 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
@@ -562,11 +565,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -578,13 +581,13 @@
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -601,48 +604,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/sap/">sap<span>1</span></a></li>
+			<li><a href="/tags/写作/">写作<span>1</span></a></li>
 		
-			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
+			<li><a href="/tags/shell/">shell<span>5</span></a></li>
 		
-			<li><a href="/tags/积分/">积分<span>1</span></a></li>
+			<li><a href="/tags/错误配置/">错误配置<span>1</span></a></li>
 		
-			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
+			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
 		
-			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
 		
-			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
+			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
 		
-			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
 		
-			<li><a href="/tags/compter-graphics/">compter graphics<span>1</span></a></li>
+			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
 		
-			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
+			<li><a href="/tags/method/">method<span>1</span></a></li>
 		
-			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
 		
-			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
+			<li><a href="/tags/scc/">scc<span>1</span></a></li>
 		
-			<li><a href="/tags/链接排序/">链接排序<span>1</span></a></li>
+			<li><a href="/tags/插件/">插件<span>1</span></a></li>
 		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
 		
-			<li><a href="/tags/linux/">linux<span>24</span></a></li>
+			<li><a href="/tags/lru/">lru<span>1</span></a></li>
 		
-			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
+			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
 		
-			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
+			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
 		
-			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
 		
-			<li><a href="/tags/timestamp/">timestamp<span>1</span></a></li>
+			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
 		
-			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
+			<li><a href="/tags/老师/">老师<span>1</span></a></li>
 		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
+			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>283</span></a></li>
+		   <li><a href="/tags">...<span>289</span></a></li>
 		 
 		</ul>
 	</div>
@@ -653,6 +656,10 @@
 <div class="widget">
   <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
+      </li>
     
       <li>
         <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
@@ -668,10 +675,6 @@
     
       <li>
         <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
       </li>
     
   </ul>

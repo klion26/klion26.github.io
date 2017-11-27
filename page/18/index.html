@@ -122,6 +122,31 @@
 	<!-- display as entry -->	
 		<h3 class="title">
 			<div class="date"> 2011-02-10 </div>
+			<div class="article-title"><a href="/2011/02/10/usaco-4-2-1-drainage-ditches/" >USACO 4-2-1Drainage Ditches</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://www.nocow.cn/index.php/Translate:USACO/ditch" target="_blank" rel="external">题目翻译</a></p>
+<p>一个入门的网络流题目,由于点和边都不多,所以我用了原始的EK算法(其实当时我也只会这最原始的算法),也就是每次用bfs找增广路,复杂度是O(V*E^2)。下面直接给出代码</p>
+<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">  LANG:C</span><br><span style="color: #da70d6;">  TASK:ditch</span><br><span style="color: #da70d6;">  ID:qcx97811</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">206</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">206</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">206</span><span style="color: #f5deb3;">];</span><span style="color: #da70d6;">//graph是原图,pre是用来存每个点的前驱的</span><br><span style="font-weight: bold; color: #98fb98;">int</span> N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">maxflow</span><span style="color: #da70d6;">//N和M是题中的 maxlfow就是结果了</span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">bfs</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">206</span><span style="color: #f5deb3;">];</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">front</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">rear</span><br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">pre</span>));<br>    <span style="color: #f5deb3;">front</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">rear</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>    <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #f5deb3;">front</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">rear</span>)<span style="color: #da70d6;">//bfs找一条从源点到汇点的路径</span><br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">front</span><span style="color: #f5deb3;">];</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #f5deb3;">M</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #add8e6;">0</span>)<br>                        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//如果当前点没有没用而且可用</span><br>                            <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><br>                            <span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">++</span><br>                            <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">j</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">M</span>)<span style="color: #da70d6;">//如果已经到了汇点 也就是已经找到一条增广路径</span><br>                                <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">1</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">max_flow</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">add</span><br>    <span style="color: #f5deb3;">maxflow</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">!=</span> (<span style="color: #f5deb3;">add</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">bfs</span>()))<br>        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//如果还有增广路径</span><br>            <span style="color: #f5deb3;">add</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">10000006</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">1</span>;<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//找出本次能增广的最大流量</span><br>                    <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">add</span>)<br>                        <span style="color: #f5deb3;">add</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">M</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">1</span>;<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//改变残留网络</span><br>                    <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">pre</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                    <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">-=</span> <span style="color: #f5deb3;">add</span><br>                    <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">add</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="color: #f5deb3;">maxflow</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">add</span><span style="color: #da70d6;">//更改结果</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">main</span>(<span style="font-weight: bold; color: #98fb98;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“ditch.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdin</span>);<br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“ditch.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdout</span>);<br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span>s<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">c</span><br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">M</span>);<br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">graph</span>));<br>    <span style="color: #da70d6;">//下面是建图</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> N;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>s<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">c</span>);<br>            <span style="color: #f5deb3;">graph</span><span style="color: #f5deb3;">[</span>s<span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">c</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">max_flow</span>();<span style="color: #da70d6;">//调用max_flow得到结果</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">maxflow</span>);<br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-02-10 </div>
 			<div class="article-title"><a href="/2011/02/10/usaco-4-1-2-fence-rails/" >USACO 4-1-2 Fence Rails</a></div>						
 		</h3>
 	
@@ -397,31 +422,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2010-12-15 </div>
-			<div class="article-title"><a href="/2010/12/15/vmware-redhat9-cant-mount/" >VMware 安装RedHat9时光盘无法挂载</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>昨天,同学把我叫过去,让我帮他装RedHat9.以前我也没装过RedHat9,不过我想应该很容易的,和其他的Linux系统应该没什么差别.不过中间还是遇到了一个小问题。问题如下 当第一个ISO文件安装完成后,得换盘.这时问题来了,换了盘之后出现无法挂载(could not mount).这个原因其实是VMware造成的.也就是说,当你的第一个ISO完成安装后,VMware把它弹出来了,这时它会断掉CD connection.如下图:[红色的地方]</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2010/12/vware.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2010/12/vware-300x194.jpg" alt="" title="vware"></a></p>
-<p>这时红色箭头所指的地方是没勾上的.也就是会出线无法挂载的问题.只要勾上就行了,然后换盘就可以继续安装了。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -500,9 +500,9 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
@@ -514,11 +514,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -530,13 +530,13 @@
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -553,48 +553,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
+			<li><a href="/tags/topic/">topic<span>1</span></a></li>
+		
+			<li><a href="/tags/code/">code<span>2</span></a></li>
+		
+			<li><a href="/tags/source-code/">source_code<span>2</span></a></li>
+		
+			<li><a href="/tags/logger/">logger<span>1</span></a></li>
 		
 			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
 		
-			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
 		
-			<li><a href="/tags/数学/">数学<span>5</span></a></li>
+			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
 		
-			<li><a href="/tags/read/">read<span>3</span></a></li>
+			<li><a href="/tags/linux/">linux<span>24</span></a></li>
 		
-			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
+			<li><a href="/tags/program/">program<span>1</span></a></li>
 		
-			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
+			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
 		
-			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
 		
-			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
+			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
 		
-			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
+			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
 		
-			<li><a href="/tags/DP/">DP<span>1</span></a></li>
+			<li><a href="/tags/zookeeper/">zookeeper<span>3</span></a></li>
 		
-			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
+			<li><a href="/tags/receiver/">receiver<span>1</span></a></li>
 		
-			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
+			<li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
 		
-			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
-		
-			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
+			<li><a href="/tags/at-most-once/">at-most-once<span>1</span></a></li>
 		
 			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
 		
-			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
 		
-			<li><a href="/tags/proof/">proof<span>1</span></a></li>
-		
-			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
-		
-			<li><a href="/tags/stack/">stack<span>1</span></a></li>
+			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>283</span></a></li>
+		   <li><a href="/tags">...<span>289</span></a></li>
 		 
 		</ul>
 	</div>
@@ -605,6 +605,10 @@
 <div class="widget">
   <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
+      </li>
     
       <li>
         <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
@@ -620,10 +624,6 @@
     
       <li>
         <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
       </li>
     
   </ul>

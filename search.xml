@@ -3,6 +3,85 @@
   
     
     <entry>
+      <title><![CDATA[TaskScheduler]]></title>
+      <url>/2017/11/27/TaskScheduler/</url>
+      <content type="html"><![CDATA[<blockquote>
+<p>本文属于自己看源码后的记录</p>
+</blockquote>
+<p>与不同的后端调度器一起，进行 task 的调度（task 是 DAGScheduler 中划分的 Stage 中的具体任务），后端调度器包括 <code>LocalBackend</code>， <code>SparkDeploySchedulerBackend</code>，<code>MesosSchedulerBackend</code>，<code>YarnClientSchedulerBackend</code>， <code>YarnClusterSchedulerBackend</code>，<code>SimrSchedulerBackend</code>等</p>
+<p>整个 TaskSchedulerImpl 比较简单，复杂的地方在于和各种 后端调度器联合，以及具体 <code>TasksetManager</code> 进行联合</p>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">TaskSchedulerImpl(</div><div class="line">	val sc: SparkContext, // SparkContext</div><div class="line">	val maxTaskFailures: Int, //每个 task 允许失败的最大次数</div><div class="line">	isLocal: Boolean = false) //是否本地运行</div></pre></td></tr></table></figure>
+<p>对于没有传入 <code>maxTaskFailures</code> 参数的，使用 <code>sc.conf.getInt(&quot;spark.task.maxFailures&quot;, 4)</code>，可以使用配置参数，默认为 4 次。</p>
+<p><code>TaskSchedulerImple</code> 的入口是 <code>submitTasks()</code> ，由 <code>DAGScheduler</code> 划分好 Stage 之后进行调用</p>
+<p>在 <code>submitTasks</code> 中会进行资源的检测（是否申请到资源，标志位 <code>hasLaunchedTask</code> 由后面的 <code>resourceOffers</code> 进行设置），每 <code>STARVATION_TIMEOUT_MS</code> 检测一次，直到 <code>hasLaunchedTask</code> 为 True 为止，<code>STARVATION_TIMEOUT_MS</code> 默认 15s，可以通过 <code>spark.starvation.timeout</code> 进行配置，该函数会将当前的 taskSetManger 添加到整个 <code>ScheduleablePool</code> 中，然后通过 <code>backend.reviveOffer</code> 将 task 分配到 executor 上去</p>
+<p>另外在 <code>TaskSchedulerImpl</code> 中会启动 推测执行的后台线程，默认 100ms 检测一次，可以通过 <code>spark.speculation.interval</code> 进行配置</p>
+<p>每个 Task 默认使用的 CPU 数由 <code>CPUS_PER_TASK</code> 进行控制，默认为 1，可以通过 <code>spark.task.cpus</code> 进行设置</p>
+<p><code>private val taskSetsByStageIdAndAttempt = new HashMap[Int, HashMap[Int, TaskSetManager]]</code> 根据 StageId 和 Attempt 来确定 taskSets</p>
+<p><code>private val schedulingModeConf = conf.get(&quot;spark.scheduler.mode&quot;, &quot;FIFO&quot;)</code> task 调度的模式，默认为 FIFO</p>
+<p><code>private[spark] var taskResultGetter = new TaskResultGetter(sc.env, this) --- Runs a thread pool that deserializes and remotely fetches (if necessary) task results</code> </p>
+<p><code>executorsByHost = new HashMap[String, HashSet[String]]</code> 保存每个 Host 中运行的所有 executor</p>
+<p><code>hostsByRack = new HashMap[String, HashSet[String]]</code> 不同 Rack 对于的 host</p>
+<p><code>executorIdToHost = new HashMap[String, String]</code> 保存 executorId 到 host 的对于关系</p>
+<p>另外还有 <code>backend: SchedulerBackend</code>， <code>dagScheduler: DAGScheduler</code>，<code>mapOutputTracker = SparkEnv.get.mapOutputTracker</code>，</p>
+<p><code>initialize（）</code> 主要设置 backend 以及 schedulerPool，<br><code>start()</code> 启动 backend, 然后按需启动 推测执行的线程</p>
+<p>Yarn-cluster 模式下的 backend 为 <code>org.apache.spark.scheduler.cluster.YarnClusterSchedulerBackend</code>，其中 backend 在 <code>SparkContext</code> 中初始化（根据运行的模式不同，初始化不同的 backend）</p>
+<p><code>resourceOffers(offers: Seq[WorkerOffer]): Seq[Seq[TaskDescription]]</code> 用于分配资源，将 task 分配到指定的 executor 上，传入的参数是所有可以分配 task 的 executor，流程如下：</p>
+<ol>
+<li>首先更新 executorIdToHost，executorIdToRunningTaskIds 以及 hostsByRack，这些信息在分配 task 的时候会用到</li>
+<li>将所有的 executor 进行打乱，防止全部 task 都分配到一个 executor 上（这里和下面的策略关联，下面使用 round-robin 进行分配），那么分配策略还有其他的吗？不同策略之间的对比是怎样的</li>
+<li>根据具体的策略（FIFO 或者 FAIR 等）将所有 task 进行排序（如果本次有新加的 executor，那么所有的 taskset 都需要重新计算 locality）根据什么规则进行 locality 的重新计算？具体在 TaskSetManager 实现</li>
+<li>通过 resourceOfferSingleTaskSet 进行分配</li>
+</ol>
+<p><code>resourceOfferSingleTaskSet(taskSet: TaskSetManager, maxLocality: TaskLocality, shuffledOffers: Seq[WorkerOffer], availableCpus: Array[Int],tasks: Seq[ArrayBuffer[TaskDescription]]) : Boolean = {}</code> 给一个 TaskSet 分配资源，具体逻辑如下：</p>
+<p>枚举每个 executor，如果当前 executor 的可用 cpu 大于单个 task 需要的 cpu<br>则调用 tasksetManager.resourceOffer() 进行具体的 task 分配，并且更新相应的信息<br>包括 taskIdToTaskSetManager，taskIdToExecutorId, executorIdToRunningTaskIds，executorsByHost 等。然后直接返回</p>
+<p><code>cancelTasks(stageId: Int, interruptThread: Boolean): Unit</code> 取消某个 stage 的所有 task。分两种情况：</p>
+<ul>
+<li>task set manager 已经创建，并且有部分 task 已经被调度，这种情况下，给对于的 executor 发送 kill 指令，然后终止整个 stage</li>
+<li>task set manager 已经创建，但是还没有 task 被调度，直接终止整个 stage 即可</li>
+</ul>
+<p><code>taskSetFinished(manager: TaskSetManager): Unit</code><br>整个 task set manager 的 task 都执行完成了，主要做一些清理公族藕，然后将 task set manager 删除</p>
+<p><code>statusUpdate(tid: Long, state: TaskState, serializedData: ByteBuffer)</code> 进行 task 的状态更新</p>
+<ul>
+<li>如果 task 的状态为 LOST</li>
+<li>这个状态仅仅在 Mesos 中使用，每个 executor 对于一个 task，所以将这个 executor 标记为 Failure</li>
+<li>如果 task 的状态为 {FINISHED, FAILED, KILLED, LOST} 中的任何一种</li>
+<li>首先清理 taskset scheduler 的一些状态信息（比如需要跟踪的 task 等），并根据状态信息（FINISHED 是一类，其他三种为一类）更新相应的状态信息<br>如果检测到有失败的 executor（只在 mesos 模式下会产生），会给 dagscheduler 发送 executorLost 信号，并且调用 backend 的 makeOffer 重新调度 task</li>
+</ul>
+<p><code>executorHeartbeatReceived(execId: String, taskMetrics: Array[(Long, TaskMetrics)], blockManagerId: BlockManagerId): Boolean) = {}</code><br>更新正在运行的 task 的状态， 并且充当 master 和 BlockManager 的心跳，如果 master 认识当前 blockManager，则返回 true，否则返回 false – 表示 blockManager 需要重新注册</p>
+<ul>
+<li>taskMetrics: Array[(Long, TaskMetrics)]  //taskId -&gt; TaskMetrics</li>
+<li>根据每个 taskId 获取对于的信息（taskId, taskSetMgr.stageId, taskSetMgr.taskSet.stageAttemptId, metrics) 发送给 dagScheduler, 其中 metric 为 taskMetrics 的第二维信息</li>
+</ul>
+<p><code>handleTaskGettingResult() &amp; handleSuccessfulTask()</code> 直接调用对应的 taskSetManager 对应方法</p>
+<p><code>handleFailedTask(taskSetManager: TaskSetManager, tid: Long, taskState: TaskState, reason: TaskEndReason): Unit = synchronized {}</code><br>如果对应的 taskSetManger 不是僵尸状态，而且 taskState 不为 KILLED，就重新申请资源</p>
+<p><code>executorLost(executorId: String, reason: ExecutorLossReason): Unit = {}</code></p>
+<ul>
+<li>如果 <code>executorIdToRunningTasksIds</code> 包含当前上报的 executor（失败的 executor 有 task 正在运行）, 则将当前 executor 从所有的数据结构中进行删除，然后通知 <code>DAGScheduler</code> 并且重新申请资源</li>
+<li>否则只进行一些数据结构的处理（包括从所有的数据结构中进行删除，然后打印 logger 等）</li>
+</ul>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Spark </tag>
+            
+            <tag> Task </tag>
+            
+            <tag> Scheduler </tag>
+            
+            <tag> TaskScheduler </tag>
+            
+            <tag> Source_Code </tag>
+            
+            <tag> Code </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[git inside]]></title>
       <url>/2017/11/20/git-inside/</url>
       <content type="html"><![CDATA[<blockquote>
@@ -532,9 +611,9 @@
         
         <tags>
             
-            <tag> code </tag>
-            
             <tag> java </tag>
+            
+            <tag> code </tag>
             
             <tag> metric </tag>
             
@@ -899,11 +978,11 @@
             
             <tag> spark </tag>
             
-            <tag> spark-streaming </tag>
-            
             <tag> append </tag>
             
             <tag> hdfs </tag>
+            
+            <tag> spark-streaming </tag>
             
         </tags>
         
@@ -1316,9 +1395,9 @@
             
             <tag> exactly-once </tag>
             
-            <tag> offset </tag>
-            
             <tag> zookeeper </tag>
+            
+            <tag> offset </tag>
             
         </tags>
         
@@ -1764,9 +1843,9 @@
             
             <tag> distributed-system </tag>
             
-            <tag> kv </tag>
-            
             <tag> mit </tag>
+            
+            <tag> kv </tag>
             
             <tag> viewservice </tag>
             
@@ -1818,11 +1897,11 @@
             
             <tag> distributed-system </tag>
             
-            <tag> mit </tag>
-            
             <tag> go </tag>
             
             <tag> mapreduce </tag>
+            
+            <tag> mit </tag>
             
         </tags>
         
@@ -3262,11 +3341,11 @@ private:
             
             <tag> fedora </tag>
             
-            <tag> plugin </tag>
-            
             <tag> vi </tag>
             
             <tag> vim </tag>
+            
+            <tag> plugin </tag>
             
             <tag> vundle </tag>
             
@@ -4019,13 +4098,13 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> fedora </tag>
             
-            <tag> vi </tag>
-            
-            <tag> vim </tag>
-            
             <tag> command </tag>
             
             <tag> tutorial </tag>
+            
+            <tag> vi </tag>
+            
+            <tag> vim </tag>
             
         </tags>
         
@@ -4208,7 +4287,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#x6f;&#58;&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#97;&#x73;&#x74;&#101;&#114;&#x73;&#x2e;&#x6f;&#114;&#103;">&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#97;&#x73;&#x74;&#101;&#114;&#x73;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;">&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>

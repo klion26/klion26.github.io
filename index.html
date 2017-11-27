@@ -483,9 +483,39 @@
 		
             
 		
+            
+		
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2017-11-27 </div>
+			<div class="article-title"><a href="/2017/11/27/TaskScheduler/" >TaskScheduler</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<blockquote>
+<p>本文属于自己看源码后的记录</p>
+</blockquote>
+<p>与不同的后端调度器一起，进行 task 的调度（task 是 DAGScheduler 中划分的 Stage 中的具体任务），后端调度器包括 <code>LocalBackend</code>， <code>SparkDeploySchedulerBackend</code>，<code>MesosSchedulerBackend</code>，<code>YarnClientSchedulerBackend</code>， <code>YarnClusterSchedulerBackend</code>，<code>SimrSchedulerBackend</code>等</p>
+<p>整个 TaskSchedulerImpl 比较简单，复杂的地方在于和各种 后端调度器联合，以及具体 <code>TasksetManager</code> 进行联合</p>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2017/11/27/TaskScheduler/#more" class="btn btn-default more">Leia Mais</a>
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -766,30 +796,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2017-05-29 </div>
-			<div class="article-title"><a href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/" >从源码级别分析 metric-core 的抽样算法</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://metrics.dropwizard.io" target="_blank" rel="external">metric-core</a> 是一个 java metric 库，用于统计 JVM 层面以及 服务级别 的各种 metric 信息。其中 metric-core 是其核心模块，代码量不多，总共 44 个文件，5700 行左右代码（包括注释）。算是一个很小的开源项目了。由于 metric 在所有项目中都非常重要，因此选择通读该项目，本文分析 metrci-core 中的抽样算法。</p>
-		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/#more" class="btn btn-default more">Leia Mais</a>
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -868,9 +874,9 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
@@ -882,11 +888,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -898,13 +904,13 @@
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -921,48 +927,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/bellman-ford/">bellman-ford<span>1</span></a></li>
+			<li><a href="/tags/pair/">pair<span>1</span></a></li>
 		
-			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
+			<li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/problem-solve/">problem_solve<span>2</span></a></li>
 		
-			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
+			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
 		
-			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
+			<li><a href="/tags/老师/">老师<span>1</span></a></li>
 		
-			<li><a href="/tags/风险/">风险<span>1</span></a></li>
+			<li><a href="/tags/exercise/">exercise<span>8</span></a></li>
 		
-			<li><a href="/tags/queue/">queue<span>1</span></a></li>
-		
-			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
-		
-			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
+			<li><a href="/tags/poll/">poll<span>1</span></a></li>
 		
 			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
 		
-			<li><a href="/tags/shell/">shell<span>5</span></a></li>
+			<li><a href="/tags/blog/">blog<span>2</span></a></li>
 		
-			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
+			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
 		
-			<li><a href="/tags/java/">java<span>2</span></a></li>
+			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
 		
-			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
+			<li><a href="/tags/trident/">trident<span>1</span></a></li>
 		
-			<li><a href="/tags/scc/">scc<span>1</span></a></li>
+			<li><a href="/tags/腾讯/">腾讯<span>1</span></a></li>
+		
+			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
+		
+			<li><a href="/tags/安全/">安全<span>1</span></a></li>
 		
 			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
 		
-			<li><a href="/tags/递归/">递归<span>1</span></a></li>
+			<li><a href="/tags/rmvb/">rmvb<span>1</span></a></li>
 		
-			<li><a href="/tags/微信/">微信<span>1</span></a></li>
+			<li><a href="/tags/thinking/">thinking<span>2</span></a></li>
 		
-			<li><a href="/tags/scala/">scala<span>1</span></a></li>
+			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
 		
-			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
+			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>283</span></a></li>
+		   <li><a href="/tags">...<span>289</span></a></li>
 		 
 		</ul>
 	</div>
@@ -973,6 +979,10 @@
 <div class="widget">
   <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
+      </li>
     
       <li>
         <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
@@ -988,10 +998,6 @@
     
       <li>
         <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
       </li>
     
   </ul>

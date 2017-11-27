@@ -122,6 +122,29 @@
 	<!-- display as entry -->	
 		<h3 class="title">
 			<div class="date"> 2011-03-30 </div>
+			<div class="article-title"><a href="/2011/03/30/pointers-on-c-10-struct-union/" >C和指针 第十章 结构和联合</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>1.数组和结构:数组是相同类型的元素的集合,每个元素通过下标引用或指针间接访问来选择.结构也是一些值的集合,这些值是它的成员,但成员可以是不同的类型.<br>2警惕下面的陷阱:<br>typedef struct<br>{<br>int a;<br>SELF_REF3 <em>b;<br>int c;<br>}SELF_REF3;<br>这个声明的目的是为这个结构创建类型名SELF_REF3.但是,它失败了.类型名直到声明的末尾才定义,所以在结构声明的内部它尚未定义<br>3.如果把一个结构体当做参数传到函数里面或者当做返回值传出来的话,你可以选择使用结构体指针来提升效率,因为传值和返回值的话会先拷贝一份,这样的话,如果结构体的字节数大的话,这样速度会提升不少.当然也可以声明为寄存器类型.<br>4.位段,I.声明的时候如果最好别声明为int 二是直接写成signed和unsigned.因为int会根据具体的机器来决定是有符号还是无符号.II.位段中位的最大数目,许多编译器把位段成员的长度限制在一个整形的长度之内,所以一个能够运行于32位整形的机器上的位段声明可能在16位的整数机器上无法运行.III.位段的成员在内存中可能从右到左分配,也可能从左到右分配.IV.当一个声明指定了两个位段,第2个位段比较大,无法容纳于第1个位段剩余的位时,编译器有可能把第2个位段放在内存的下一个字,也可能直接放在第1个位段后面,从而在两个内存位置的边界上形成重叠.V.位段能够把长度为奇数的数据包装在一起,节省存储空间.当程序需要使用成千上万的这类结构时,这种节省方法就会变得相当重要.<br>5.联合:长度和最长的那个变量的长度一样.联合的初始化,必须是联合的第一个成员的类型,而且它必须位于一对花括号里面.<br>下面给出一个比较易错的东西.<br>1.sizeof(结构体)到底是多少.<br>比如strcut{char a;int b;char c}A;struct{int a,char b,char c}B;sizeof(A)和sizeof(B)是多少,下面是一个简单分析<br><!--easy2hide start reply to this=true--><br>答案是第一个是12,第二个是8.知道为什么吗?首先你要知道整型占4个字节.起始存储位置必须能够被4整除,然后第一个的话,首先a占了1个,然后b只能从下一个字开始,也就是会浪费三个字节,同理c也会浪费3个字节.但是第二个的话,首先a是占4个字节,然后b和c各占一个字节,这样的话,就只占了2个字.<br><!--easy2hide end--><br>还有一个就是要注意’</em>‘ ‘.’和’-&gt;’的先后顺序,比如<em>nodes.a和(</em>nodes).a的区别.</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-03-30 </div>
 			<div class="article-title"><a href="/2011/03/30/pointers-on-c-9-string/" >C和指针第9章[字符串 字符 字节]</a></div>						
 		</h3>
 	
@@ -331,29 +354,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-03-24 </div>
-			<div class="article-title"><a href="/2011/03/24/hdu-3389/" >HDU 3389</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>首先你可以枚举前几个,然后可以看出分成了三个完全不相干的游戏,[1-2-7-8-13……][3-6-9-12-15……][4-5-10-11……],然后接下来你会发现2可以到1,7可以到2,8可以到7和1,6可以到3,12可以到3和9,5可以到4,11可以到10和4,也就是说如果n%3==0的话,那么如果n是偶数,就可以转移到奇数上,其他的是如果n%3==2的话,那么一定可以转移到n%3==1上,然后我们可以知道最后结果只与n%3==0&amp;n%2==0的位置上的和n%3==2上的数确定,那么我们把上面这两个设置设为集合A,其他的放在B集合,那么如果现在的局势是败局的话,玩家可以移动A集合里面的使之到一个胜局,或者移动B集合里面的东西到A集合,到达一个胜局,如果是从B移过来的,那么接下来的玩家只需要移走这些就行了,如果是从A中移走的话,那么我们继续移走A中的一部分,使之到一个败局.如果是胜局的话,只需要从A集合移动一些数到B集合就OK了,然后接下来的玩家就面临败局了.也就是这题的结果只与n%3==0&amp;&amp;n%2==0和n%3==2的位置上的card数有关</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -432,9 +432,9 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
@@ -446,11 +446,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -462,13 +462,13 @@
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -485,48 +485,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
+			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
+		
+			<li><a href="/tags/timestamp/">timestamp<span>1</span></a></li>
+		
+			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+		
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
+		
+			<li><a href="/tags/TaskScheduler/">TaskScheduler<span>1</span></a></li>
+		
+			<li><a href="/tags/Source-Code/">Source_Code<span>1</span></a></li>
+		
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
+		
 			<li><a href="/tags/错误配置/">错误配置<span>1</span></a></li>
 		
-			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
-		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
-		
-			<li><a href="/tags/pair/">pair<span>1</span></a></li>
-		
-			<li><a href="/tags/book/">book<span>1</span></a></li>
-		
-			<li><a href="/tags/source-code/">source_code<span>2</span></a></li>
-		
-			<li><a href="/tags/总结/">总结<span>1</span></a></li>
-		
-			<li><a href="/tags/积分/">积分<span>1</span></a></li>
-		
-			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
-		
-			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
-		
-			<li><a href="/tags/ln/">ln<span>1</span></a></li>
-		
-			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
-		
-			<li><a href="/tags/教师/">教师<span>1</span></a></li>
-		
-			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
-		
-			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
+			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
 		
 			<li><a href="/tags/安全/">安全<span>1</span></a></li>
 		
-			<li><a href="/tags/json/">json<span>1</span></a></li>
+			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
 		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+			<li><a href="/tags/github/">github<span>5</span></a></li>
 		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
+			<li><a href="/tags/free/">free<span>1</span></a></li>
 		
-			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+			<li><a href="/tags/Code/">Code<span>1</span></a></li>
+		
+			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
+		
+			<li><a href="/tags/longest-increasing-subsequences/">longest increasing subsequences<span>1</span></a></li>
+		
+			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
+		
+			<li><a href="/tags/rm/">rm<span>1</span></a></li>
+		
+			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+		
+			<li><a href="/tags/米聊/">米聊<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>283</span></a></li>
+		   <li><a href="/tags">...<span>289</span></a></li>
 		 
 		</ul>
 	</div>
@@ -537,6 +537,10 @@
 <div class="widget">
   <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
+      </li>
     
       <li>
         <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
@@ -552,10 +556,6 @@
     
       <li>
         <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
       </li>
     
   </ul>

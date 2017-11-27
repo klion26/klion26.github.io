@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-11-20T14:04:38.000Z</updated>
+  <updated>2017-11-27T13:12:23.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,95 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>TaskScheduler</title>
+    <link href="http://yoursite.com/2017/11/27/TaskScheduler/"/>
+    <id>http://yoursite.com/2017/11/27/TaskScheduler/</id>
+    <published>2017-11-27T13:02:24.000Z</published>
+    <updated>2017-11-27T13:12:23.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>本文属于自己看源码后的记录</p>
+</blockquote>
+<p>与不同的后端调度器一起，进行 task 的调度（task 是 DAGScheduler 中划分的 Stage 中的具体任务），后端调度器包括 <code>LocalBackend</code>， <code>SparkDeploySchedulerBackend</code>，<code>MesosSchedulerBackend</code>，<code>YarnClientSchedulerBackend</code>， <code>YarnClusterSchedulerBackend</code>，<code>SimrSchedulerBackend</code>等</p>
+<p>整个 TaskSchedulerImpl 比较简单，复杂的地方在于和各种 后端调度器联合，以及具体 <code>TasksetManager</code> 进行联合</p>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">TaskSchedulerImpl(</div><div class="line">	val sc: SparkContext, // SparkContext</div><div class="line">	val maxTaskFailures: Int, //每个 task 允许失败的最大次数</div><div class="line">	isLocal: Boolean = false) //是否本地运行</div></pre></td></tr></table></figure>
+<p>对于没有传入 <code>maxTaskFailures</code> 参数的，使用 <code>sc.conf.getInt(&quot;spark.task.maxFailures&quot;, 4)</code>，可以使用配置参数，默认为 4 次。</p>
+<p><code>TaskSchedulerImple</code> 的入口是 <code>submitTasks()</code> ，由 <code>DAGScheduler</code> 划分好 Stage 之后进行调用</p>
+<p>在 <code>submitTasks</code> 中会进行资源的检测（是否申请到资源，标志位 <code>hasLaunchedTask</code> 由后面的 <code>resourceOffers</code> 进行设置），每 <code>STARVATION_TIMEOUT_MS</code> 检测一次，直到 <code>hasLaunchedTask</code> 为 True 为止，<code>STARVATION_TIMEOUT_MS</code> 默认 15s，可以通过 <code>spark.starvation.timeout</code> 进行配置，该函数会将当前的 taskSetManger 添加到整个 <code>ScheduleablePool</code> 中，然后通过 <code>backend.reviveOffer</code> 将 task 分配到 executor 上去</p>
+<p>另外在 <code>TaskSchedulerImpl</code> 中会启动 推测执行的后台线程，默认 100ms 检测一次，可以通过 <code>spark.speculation.interval</code> 进行配置</p>
+<p>每个 Task 默认使用的 CPU 数由 <code>CPUS_PER_TASK</code> 进行控制，默认为 1，可以通过 <code>spark.task.cpus</code> 进行设置</p>
+<p><code>private val taskSetsByStageIdAndAttempt = new HashMap[Int, HashMap[Int, TaskSetManager]]</code> 根据 StageId 和 Attempt 来确定 taskSets</p>
+<p><code>private val schedulingModeConf = conf.get(&quot;spark.scheduler.mode&quot;, &quot;FIFO&quot;)</code> task 调度的模式，默认为 FIFO</p>
+<p><code>private[spark] var taskResultGetter = new TaskResultGetter(sc.env, this) --- Runs a thread pool that deserializes and remotely fetches (if necessary) task results</code> </p>
+<p><code>executorsByHost = new HashMap[String, HashSet[String]]</code> 保存每个 Host 中运行的所有 executor</p>
+<p><code>hostsByRack = new HashMap[String, HashSet[String]]</code> 不同 Rack 对于的 host</p>
+<p><code>executorIdToHost = new HashMap[String, String]</code> 保存 executorId 到 host 的对于关系</p>
+<p>另外还有 <code>backend: SchedulerBackend</code>， <code>dagScheduler: DAGScheduler</code>，<code>mapOutputTracker = SparkEnv.get.mapOutputTracker</code>，</p>
+<p><code>initialize（）</code> 主要设置 backend 以及 schedulerPool，<br><code>start()</code> 启动 backend, 然后按需启动 推测执行的线程</p>
+<p>Yarn-cluster 模式下的 backend 为 <code>org.apache.spark.scheduler.cluster.YarnClusterSchedulerBackend</code>，其中 backend 在 <code>SparkContext</code> 中初始化（根据运行的模式不同，初始化不同的 backend）</p>
+<p><code>resourceOffers(offers: Seq[WorkerOffer]): Seq[Seq[TaskDescription]]</code> 用于分配资源，将 task 分配到指定的 executor 上，传入的参数是所有可以分配 task 的 executor，流程如下：</p>
+<ol>
+<li>首先更新 executorIdToHost，executorIdToRunningTaskIds 以及 hostsByRack，这些信息在分配 task 的时候会用到</li>
+<li>将所有的 executor 进行打乱，防止全部 task 都分配到一个 executor 上（这里和下面的策略关联，下面使用 round-robin 进行分配），那么分配策略还有其他的吗？不同策略之间的对比是怎样的</li>
+<li>根据具体的策略（FIFO 或者 FAIR 等）将所有 task 进行排序（如果本次有新加的 executor，那么所有的 taskset 都需要重新计算 locality）根据什么规则进行 locality 的重新计算？具体在 TaskSetManager 实现</li>
+<li>通过 resourceOfferSingleTaskSet 进行分配</li>
+</ol>
+<p><code>resourceOfferSingleTaskSet(taskSet: TaskSetManager, maxLocality: TaskLocality, shuffledOffers: Seq[WorkerOffer], availableCpus: Array[Int],tasks: Seq[ArrayBuffer[TaskDescription]]) : Boolean = {}</code> 给一个 TaskSet 分配资源，具体逻辑如下：</p>
+<p>枚举每个 executor，如果当前 executor 的可用 cpu 大于单个 task 需要的 cpu<br>则调用 tasksetManager.resourceOffer() 进行具体的 task 分配，并且更新相应的信息<br>包括 taskIdToTaskSetManager，taskIdToExecutorId, executorIdToRunningTaskIds，executorsByHost 等。然后直接返回</p>
+<p><code>cancelTasks(stageId: Int, interruptThread: Boolean): Unit</code> 取消某个 stage 的所有 task。分两种情况：</p>
+<ul>
+<li>task set manager 已经创建，并且有部分 task 已经被调度，这种情况下，给对于的 executor 发送 kill 指令，然后终止整个 stage</li>
+<li>task set manager 已经创建，但是还没有 task 被调度，直接终止整个 stage 即可</li>
+</ul>
+<p><code>taskSetFinished(manager: TaskSetManager): Unit</code><br>整个 task set manager 的 task 都执行完成了，主要做一些清理公族藕，然后将 task set manager 删除</p>
+<p><code>statusUpdate(tid: Long, state: TaskState, serializedData: ByteBuffer)</code> 进行 task 的状态更新</p>
+<ul>
+<li>如果 task 的状态为 LOST</li>
+<li>这个状态仅仅在 Mesos 中使用，每个 executor 对于一个 task，所以将这个 executor 标记为 Failure</li>
+<li>如果 task 的状态为 {FINISHED, FAILED, KILLED, LOST} 中的任何一种</li>
+<li>首先清理 taskset scheduler 的一些状态信息（比如需要跟踪的 task 等），并根据状态信息（FINISHED 是一类，其他三种为一类）更新相应的状态信息<br>如果检测到有失败的 executor（只在 mesos 模式下会产生），会给 dagscheduler 发送 executorLost 信号，并且调用 backend 的 makeOffer 重新调度 task</li>
+</ul>
+<p><code>executorHeartbeatReceived(execId: String, taskMetrics: Array[(Long, TaskMetrics)], blockManagerId: BlockManagerId): Boolean) = {}</code><br>更新正在运行的 task 的状态， 并且充当 master 和 BlockManager 的心跳，如果 master 认识当前 blockManager，则返回 true，否则返回 false – 表示 blockManager 需要重新注册</p>
+<ul>
+<li>taskMetrics: Array[(Long, TaskMetrics)]  //taskId -&gt; TaskMetrics</li>
+<li>根据每个 taskId 获取对于的信息（taskId, taskSetMgr.stageId, taskSetMgr.taskSet.stageAttemptId, metrics) 发送给 dagScheduler, 其中 metric 为 taskMetrics 的第二维信息</li>
+</ul>
+<p><code>handleTaskGettingResult() &amp; handleSuccessfulTask()</code> 直接调用对应的 taskSetManager 对应方法</p>
+<p><code>handleFailedTask(taskSetManager: TaskSetManager, tid: Long, taskState: TaskState, reason: TaskEndReason): Unit = synchronized {}</code><br>如果对应的 taskSetManger 不是僵尸状态，而且 taskState 不为 KILLED，就重新申请资源</p>
+<p><code>executorLost(executorId: String, reason: ExecutorLossReason): Unit = {}</code></p>
+<ul>
+<li>如果 <code>executorIdToRunningTasksIds</code> 包含当前上报的 executor（失败的 executor 有 task 正在运行）, 则将当前 executor 从所有的数据结构中进行删除，然后通知 <code>DAGScheduler</code> 并且重新申请资源</li>
+<li>否则只进行一些数据结构的处理（包括从所有的数据结构中进行删除，然后打印 logger 等）</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;本文属于自己看源码后的记录&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;与不同的后端调度器一起，进行 task 的调度（task 是 DAGScheduler 中划分的 Stage 中的具体任务），后端调度器包括 &lt;code&gt;LocalBackend&lt;/code&gt;， &lt;code&gt;SparkDeploySchedulerBackend&lt;/code&gt;，&lt;code&gt;MesosSchedulerBackend&lt;/code&gt;，&lt;code&gt;YarnClientSchedulerBackend&lt;/code&gt;， &lt;code&gt;YarnClusterSchedulerBackend&lt;/code&gt;，&lt;code&gt;SimrSchedulerBackend&lt;/code&gt;等&lt;/p&gt;
+&lt;p&gt;整个 TaskSchedulerImpl 比较简单，复杂的地方在于和各种 后端调度器联合，以及具体 &lt;code&gt;TasksetManager&lt;/code&gt; 进行联合&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Spark" scheme="http://yoursite.com/tags/Spark/"/>
+    
+      <category term="Task" scheme="http://yoursite.com/tags/Task/"/>
+    
+      <category term="Scheduler" scheme="http://yoursite.com/tags/Scheduler/"/>
+    
+      <category term="TaskScheduler" scheme="http://yoursite.com/tags/TaskScheduler/"/>
+    
+      <category term="Source_Code" scheme="http://yoursite.com/tags/Source-Code/"/>
+    
+      <category term="Code" scheme="http://yoursite.com/tags/Code/"/>
+    
+  </entry>
   
   <entry>
     <title>git inside</title>
@@ -633,9 +722,9 @@
     </summary>
     
     
-      <category term="code" scheme="http://yoursite.com/tags/code/"/>
-    
       <category term="java" scheme="http://yoursite.com/tags/java/"/>
+    
+      <category term="code" scheme="http://yoursite.com/tags/code/"/>
     
       <category term="metric" scheme="http://yoursite.com/tags/metric/"/>
     
@@ -1034,11 +1123,11 @@
     
       <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
     
-      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
-    
       <category term="append" scheme="http://yoursite.com/tags/append/"/>
     
       <category term="hdfs" scheme="http://yoursite.com/tags/hdfs/"/>
+    
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
     
   </entry>
   
@@ -1096,49 +1185,6 @@
       <category term="partition" scheme="http://yoursite.com/tags/partition/"/>
     
       <category term="topic" scheme="http://yoursite.com/tags/topic/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>要多快才能跑完一场马拉松</title>
-    <link href="http://yoursite.com/2016/10/26/e8-a6-81-e5-a4-9a-e5-bf-ab-e6-89-8d-e8-83-bd-e8-b7-91-e5-ae-8c-e4-b8-80-e5-9c-ba-e9-a9-ac-e6-8b-89-e6-9d-be/"/>
-    <id>http://yoursite.com/2016/10/26/e8-a6-81-e5-a4-9a-e5-bf-ab-e6-89-8d-e8-83-bd-e8-b7-91-e5-ae-8c-e4-b8-80-e5-9c-ba-e9-a9-ac-e6-8b-89-e6-9d-be/</id>
-    <published>2016-10-26T11:43:18.000Z</published>
-    <updated>2017-06-03T03:41:23.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="完成一场马拉松的最慢速度"><a href="#完成一场马拉松的最慢速度" class="headerlink" title="完成一场马拉松的最慢速度"></a>完成一场马拉松的最慢速度</h2><p>工作后身边跑马拉松的人突然就多起来了，或许你也蠢蠢欲动，但是一看到半程马拉松有 21 公理，全称马拉松 42 公理，就提前打退堂鼓了。那么你有没有想过</p>
-<pre><code>到底要多快我们才能跑完一场 半程/全程 马拉松？
-</code></pre><a id="more"></a>
-<p>我们来算一算到底需要多快才能才可以跑完一场马拉松，鉴于体力原因，假设我们开始想完成一场半程马拉松，那么我们需要在 3 小时内跑完 21 公理，也就是说每小时需要跑完 7 公理，这样算还是不够直观，我们换一种方式，我们计算每公里平均最长耗时 M</p>
-<pre><code>M * 21 公里 = 3 小时
-</code></pre><p>这样，我们得到 M 的值为 3 * 60 / 21 约等于  8.57 分钟，即 8 分钟 34 秒。这个值告诉我们平均 8 分钟 34 秒跑完一公里  – 也就是快走的速度 – 以这个速度就能跑完一场半程马拉松比赛。</p>
-<h2 id="最慢速度的作用"><a href="#最慢速度的作用" class="headerlink" title="最慢速度的作用"></a>最慢速度的作用</h2><p>我们知道了跑完一场半程马拉松，最慢平均速度是 8 分 34 秒。</p>
-<pre><code>那么我们知道这个速度有什么用呢？
-</code></pre><p>让我们从心底知道我们能完成这件事，这并不是一件只有少数人才能做的事情，并不需要你在体育方面有超过常人能力，只要你身体健康就行。卡耐基在《人性的优点》里面介绍一个应对恐惧的方法也是类似的：</p>
-<pre><code>把你恐惧的事情会导致的所有最坏可能性都一一罗列出来，然后一一检查它们。
-</code></pre><p>这个方法的好处是让你知道，就算最坏情况也就这样，让你从无边的恐惧中解放出来。</p>
-<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>如果你自己能够一个人跑完十公里，那么你的体力就能跑完半程马拉松。</p>
-<p>跑马拉松是一项群体运动，你会被大家带着跑，但是大家需要找到适合自己的节奏，根据自己的实际情况来确定你能跑完全程的速度。</p>
-<p>如果在比赛过程中有任何不适，要量力而行，千万不要硬撑。</p>
-<p>最后不建议在雾霾天跑马拉松。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;完成一场马拉松的最慢速度&quot;&gt;&lt;a href=&quot;#完成一场马拉松的最慢速度&quot; class=&quot;headerlink&quot; title=&quot;完成一场马拉松的最慢速度&quot;&gt;&lt;/a&gt;完成一场马拉松的最慢速度&lt;/h2&gt;&lt;p&gt;工作后身边跑马拉松的人突然就多起来了，或许你也蠢蠢欲动，但是一看到半程马拉松有 21 公理，全称马拉松 42 公理，就提前打退堂鼓了。那么你有没有想过&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;到底要多快我们才能跑完一场 半程/全程 马拉松？
-&lt;/code&gt;&lt;/pre&gt;
-    
-    </summary>
-    
-      <category term="想清楚" scheme="http://yoursite.com/categories/%E6%83%B3%E6%B8%85%E6%A5%9A/"/>
-    
-    
-      <category term="最坏情况" scheme="http://yoursite.com/tags/%E6%9C%80%E5%9D%8F%E6%83%85%E5%86%B5/"/>
-    
-      <category term="最慢速度" scheme="http://yoursite.com/tags/%E6%9C%80%E6%85%A2%E9%80%9F%E5%BA%A6/"/>
-    
-      <category term="马拉松" scheme="http://yoursite.com/tags/%E9%A9%AC%E6%8B%89%E6%9D%BE/"/>
     
   </entry>
   

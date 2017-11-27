@@ -121,6 +121,32 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-05-08 </div>
+			<div class="article-title"><a href="/2011/05/08/gcj-2011-klion26/" >gcj_2011前三题</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>第四题没看题目,当时就想着反正25分就可以进r1了.所以第四题没看.前三题应该说还是好做的.第一题直接模拟,用两个变量存下在对方走的过程中,自己可以走多远,然后到自己走的时候,算上刚才的时间就行了.注意不管怎么样每人每轮至少需要一秒的时间,这1s是用来按按钮的.</p>
+<p>第二题:直接模拟,每次清空的是整个字符串,所以这里注意下,每次合并的时候只需要考虑最后两个就行了,但是冲突的却要考虑所有已经在字符串里面的字符和当前新加入的字符.</p>
+<p>第三题,一开始时想水的,因为3个small已经超过25分了,后来水过之后还是想了下,发现直接把所有的数异或起来,如果等于0就表示有方案,否则就是no solution.因为等于0的话,就可以把一些数分出来,然后两堆数分别的异或值一样[这样才能保证最后异或是0].然后求最大值,只需要用总值减去最小值就行了.这样就能保证每次都能拿到最大值.</p>
+<p>还有就是gcj可以下代码,有兴趣的可以去下那些大牛的代码来看看.官方也有analysis.最后希望今年能rp爆发拿件衣服吧~~~</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-05-05 </div>
 			<div class="article-title"><a href="/2011/05/05/computational-geometry-hdu-2857/" >HDU_2857_计算几何</a></div>						
 		</h3>
@@ -397,29 +423,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-04-12 </div>
-			<div class="article-title"><a href="/2011/04/12/pointers-on-c-preprocessor/" >C和指针14章 预处理器</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>1.预定义符号:<strong>FILE</strong>进行编译的源文件名<br><strong>LINE</strong> 文件当前的行号<br><strong>DATE</strong> 文件编译的日期<br><strong>TIME</strong> 文件被编译的时间<br><strong>STDC</strong>如果编译器遵循ANSI C其值为1否则未定义<br>2.#define指令 #define name <em>stuff</em><br>在文件中用stuff替换name,<span style="color: #ff0000;">注意是单独的替换.所以有时会有些你意想不到的错误.注意</span><br><span style="color: #000000;">如果stuff是多行的话,那么每行的最后要加’\’</span><br><span style="color: #000000;">注意:你不应该在stuff后面加上分号.因为在调用的时候也会加一个分号,但是这里就出问题了.[两个分号]</span><br><span style="color: #000000;">宏与函数:</span><br><span style="color: #000000;">宏只是简单的替换,因此注意操作符的优先级.它的参数不管类型,这点很不错.宏里面用#value[value是参数]直接表示这个参数.##链接两个字符串.宏每次都会把代码加到相应位置,会加大代码量,如果宏的实现是比较长的,那么最好用函数[这个长是上面的stuff很长].注意宏的副作用.可能会出现你意料之外的事情.下面的宏:</span><br><span style="color: #000000;">#define EVENPARITY(ch)  ((count_ont_bits(ch)1)?(ch)|PARITYBIT:(ch));</span><br><span style="color: #000000;">然后你通过下面的调用就有问题了.ch=EVENPARITY(getchar());//自己想,不会的可以留言</span><br><span style="color: #000000;">#undef移除一个宏定义,如果一个现存的名字需要重新定义,那么它的旧定义首先必须用#undef移除.</span><br><span style="color: #000000;">3.条件编译</span><br><span style="color: #000000;">#if constant-expression</span><br><span style="color: #000000;">         <em>statements</em></span><br><span style="color: #000000;">#elif constnt-expression</span><br><span style="color: #000000;">         <em>statements</em></span><br><span style="color: #000000;">#else</span><br><span style="color: #000000;">         <em>statements</em></span><br><span style="color: #000000;">#endif</span><br><span style="color: #000000;">上面的#elif可以多次出现[&gt;=0]然后就相当于一般的if语句了.</span><br><span style="color: #000000;">是否被定义:</span><br><span style="color: #000000;">#if  defined(<em>symbol</em>)             #ifdef <em>symbol//作用一样 是否已被定义</em></span><br><span style="color: #000000;">_#_if !defined(<em>symbol</em>)            #ifndef <em>symbol//是否没被定义</em></span><br><span style="color: #000000;">这些可以嵌套.</span><br><span style="color: #000000;">4.文件包含.包含库文件就直接用’&lt;&gt;’时间少点.包含本地文件用’ “ ‘.用’ “ ‘是首先从本地找,如果没找到再找库函数,’&lt;&gt;’是直接到库函数找.<span style="color: #ff0000;">一个头文件如果被包含到10个源文件中,它实际上被编译了10次</span></span><br><span style="color: #000000;">可以嵌套包含,标准是编译器必须支持至少8层头文件嵌套.注意包含同一头文件多次的情况[不过这个暂时不知道为什么有错,是不是和编译器有关,我在本地试了下,没错 - -||,哪位看官知道的话,还请告知],下面的方法可以防止同一头文件被多次包含,就是在<span style="color: #ff0000;">头文件<span style="color: #000000;">里面加上一个</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">#ifndef _XXXX_H(这个名字随便你取)</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">#define _XXXX_H 1</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">/<strong>你的代码</strong></span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;"> /</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">#endif</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">5.其他指令:#error允许你生成错误信息.#line <em>number</em> “string”指定下一条指令(number是行数,string是文件名,string可以省略),这条指令会修改<strong>LINE</strong> <strong>FILE</strong></span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">#progma用于支持因编译器而异的特性,不过这个指令<span style="color: #ff0000;">不可移植</span></span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;"><span style="color: #ff0000;">提示:</span></span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">1.避免用#define指令定义可以用函数实现的很长序列的代码</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">2.在那些对表达式求值的宏中,每个宏参数出现的地方应该加上括号,并且在整个宏定义的两边也加上括号</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">3.避免使用#define 宏创建一种新语言</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">4.采用命名约定,使程序员很容易看出某个标示符是否为#define宏[全大写]</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">5.只要合适就应该使用文件包含,不必担心它的额外开销</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">6.头文件只应该包含一组函数和(或)数据的申明</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">7.把不同集合的声明分离到不同的头文件中可以改善信息隐藏</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">8.嵌套的#include文件使我们很难判断源文件之间的依赖关系</span></span></span></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -498,9 +501,9 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
@@ -512,11 +515,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -528,13 +531,13 @@
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -551,48 +554,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
 		
-			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
-		
-			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
-		
-			<li><a href="/tags/latex/">latex<span>1</span></a></li>
-		
-			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
-		
-			<li><a href="/tags/rm/">rm<span>1</span></a></li>
-		
-			<li><a href="/tags/数论/">数论<span>5</span></a></li>
-		
-			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
-		
-			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
+			<li><a href="/tags/插件/">插件<span>1</span></a></li>
 		
 			<li><a href="/tags/receiver/">receiver<span>1</span></a></li>
 		
-			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
+			<li><a href="/tags/longest-increasing-subsequences/">longest increasing subsequences<span>1</span></a></li>
 		
-			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
+			<li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
 		
-			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
+			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
 		
-			<li><a href="/tags/老师/">老师<span>1</span></a></li>
+			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
 		
-			<li><a href="/tags/积分/">积分<span>1</span></a></li>
+			<li><a href="/tags/mit/">mit<span>2</span></a></li>
 		
-			<li><a href="/tags/总结/">总结<span>1</span></a></li>
+			<li><a href="/tags/kv/">kv<span>1</span></a></li>
 		
-			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
+			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
 		
-			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
+			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
+		
+			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
+		
+			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
+		
+			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+		
+			<li><a href="/tags/java/">java<span>2</span></a></li>
+		
+			<li><a href="/tags/array/">array<span>1</span></a></li>
 		
 			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
 		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
+			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+		
+			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
+		
+			<li><a href="/tags/prim/">prim<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>283</span></a></li>
+		   <li><a href="/tags">...<span>289</span></a></li>
 		 
 		</ul>
 	</div>
@@ -603,6 +606,10 @@
 <div class="widget">
   <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
+      </li>
     
       <li>
         <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
@@ -618,10 +625,6 @@
     
       <li>
         <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
       </li>
     
   </ul>

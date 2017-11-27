@@ -121,6 +121,35 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-07-09 </div>
+			<div class="article-title"><a href="/2011/07/09/fedora13-h3c/" >Fedora 13 H3C联网</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>搬了宿舍,然后ip神马的好多都变了,于是又得改了,可是隔了好久了都快忘记了.幸亏有history^-^</p>
+<p>这里把整个过程说下,也当是个备份</p>
+<p>如果想下文件的话<a href="http://www.linuxdiyf.com/viewarticle.php?id=192543" target="_blank" rel="external">猛击我吧 (</a>文件在文章末尾,这里有自动配置脚本,使用请慎重)</p>
+<p>首先你得安装H3C的文件.如果缺一个c++包的话,那么自己下下来之后放在/usr/lib下即可</p>
+<p>然后你需要配置ip和gateway等,下面的操作默认你是root权限</p>
+<p>vi /etc/sysconfig/network-scripts/ifcfg-eth0</p>
+<p>加上你的ip,gateway,dns,netmask等等之后就行了当然到了这里还不能联网,下面你就用system-config-network命令调出一个图形化窗口,修改eth0,这里的修改其实是把ip修改成静态的(其实上面可以不用编辑那么多,直接在这里以下改好也行).然后保存退出,会提醒你重启网卡或计算机之类的,你重启就行了,然后就可以联网了,如果还不行的话,你打电话问网络中心怎么回事吧,那有日志</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-07-03 </div>
 			<div class="article-title"><a href="/2011/07/03/hdu-3074-bit-inver/" >[树状数组&amp;&amp;逆元]HDU_3074</a></div>						
 		</h3>
@@ -365,32 +394,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-05-08 </div>
-			<div class="article-title"><a href="/2011/05/08/gcj-2011-klion26/" >gcj_2011前三题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>第四题没看题目,当时就想着反正25分就可以进r1了.所以第四题没看.前三题应该说还是好做的.第一题直接模拟,用两个变量存下在对方走的过程中,自己可以走多远,然后到自己走的时候,算上刚才的时间就行了.注意不管怎么样每人每轮至少需要一秒的时间,这1s是用来按按钮的.</p>
-<p>第二题:直接模拟,每次清空的是整个字符串,所以这里注意下,每次合并的时候只需要考虑最后两个就行了,但是冲突的却要考虑所有已经在字符串里面的字符和当前新加入的字符.</p>
-<p>第三题,一开始时想水的,因为3个small已经超过25分了,后来水过之后还是想了下,发现直接把所有的数异或起来,如果等于0就表示有方案,否则就是no solution.因为等于0的话,就可以把一些数分出来,然后两堆数分别的异或值一样[这样才能保证最后异或是0].然后求最大值,只需要用总值减去最小值就行了.这样就能保证每次都能拿到最大值.</p>
-<p>还有就是gcj可以下代码,有兴趣的可以去下那些大牛的代码来看看.官方也有analysis.最后希望今年能rp爆发拿件衣服吧~~~</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -469,9 +472,9 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
@@ -483,11 +486,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -499,13 +502,13 @@
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -522,48 +525,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/scc/">scc<span>1</span></a></li>
+			<li><a href="/tags/Code/">Code<span>1</span></a></li>
 		
-			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
+			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
 		
-			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
+			<li><a href="/tags/compter-graphics/">compter graphics<span>1</span></a></li>
 		
-			<li><a href="/tags/方法/">方法<span>1</span></a></li>
+			<li><a href="/tags/json/">json<span>1</span></a></li>
 		
-			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
+			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
 		
-			<li><a href="/tags/stack/">stack<span>1</span></a></li>
+			<li><a href="/tags/数论/">数论<span>5</span></a></li>
 		
-			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
+			<li><a href="/tags/zookeeper/">zookeeper<span>3</span></a></li>
 		
-			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li>
 		
-			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
+			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
 		
-			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
+			<li><a href="/tags/how/">how<span>1</span></a></li>
 		
-			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
+			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
 		
-			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
+			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
 		
-			<li><a href="/tags/latex/">latex<span>1</span></a></li>
+			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
 		
-			<li><a href="/tags/vim/">vim<span>2</span></a></li>
+			<li><a href="/tags/timestamp/">timestamp<span>1</span></a></li>
 		
-			<li><a href="/tags/chain-matrix-multiplication/">chain matrix multiplication<span>1</span></a></li>
+			<li><a href="/tags/my-life/">my life<span>1</span></a></li>
 		
-			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
+			<li><a href="/tags/array/">array<span>1</span></a></li>
 		
-			<li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li>
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
 		
-			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
+			<li><a href="/tags/settings/">settings<span>1</span></a></li>
 		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
 		
-			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
+			<li><a href="/tags/trident/">trident<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>283</span></a></li>
+		   <li><a href="/tags">...<span>289</span></a></li>
 		 
 		</ul>
 	</div>
@@ -574,6 +577,10 @@
 <div class="widget">
   <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
+      </li>
     
       <li>
         <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
@@ -589,10 +596,6 @@
     
       <li>
         <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
       </li>
     
   </ul>

@@ -121,6 +121,29 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-04-12 </div>
+			<div class="article-title"><a href="/2011/04/12/pointers-on-c-preprocessor/" >C和指针14章 预处理器</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>1.预定义符号:<strong>FILE</strong>进行编译的源文件名<br><strong>LINE</strong> 文件当前的行号<br><strong>DATE</strong> 文件编译的日期<br><strong>TIME</strong> 文件被编译的时间<br><strong>STDC</strong>如果编译器遵循ANSI C其值为1否则未定义<br>2.#define指令 #define name <em>stuff</em><br>在文件中用stuff替换name,<span style="color: #ff0000;">注意是单独的替换.所以有时会有些你意想不到的错误.注意</span><br><span style="color: #000000;">如果stuff是多行的话,那么每行的最后要加’\’</span><br><span style="color: #000000;">注意:你不应该在stuff后面加上分号.因为在调用的时候也会加一个分号,但是这里就出问题了.[两个分号]</span><br><span style="color: #000000;">宏与函数:</span><br><span style="color: #000000;">宏只是简单的替换,因此注意操作符的优先级.它的参数不管类型,这点很不错.宏里面用#value[value是参数]直接表示这个参数.##链接两个字符串.宏每次都会把代码加到相应位置,会加大代码量,如果宏的实现是比较长的,那么最好用函数[这个长是上面的stuff很长].注意宏的副作用.可能会出现你意料之外的事情.下面的宏:</span><br><span style="color: #000000;">#define EVENPARITY(ch)  ((count_ont_bits(ch)1)?(ch)|PARITYBIT:(ch));</span><br><span style="color: #000000;">然后你通过下面的调用就有问题了.ch=EVENPARITY(getchar());//自己想,不会的可以留言</span><br><span style="color: #000000;">#undef移除一个宏定义,如果一个现存的名字需要重新定义,那么它的旧定义首先必须用#undef移除.</span><br><span style="color: #000000;">3.条件编译</span><br><span style="color: #000000;">#if constant-expression</span><br><span style="color: #000000;">         <em>statements</em></span><br><span style="color: #000000;">#elif constnt-expression</span><br><span style="color: #000000;">         <em>statements</em></span><br><span style="color: #000000;">#else</span><br><span style="color: #000000;">         <em>statements</em></span><br><span style="color: #000000;">#endif</span><br><span style="color: #000000;">上面的#elif可以多次出现[&gt;=0]然后就相当于一般的if语句了.</span><br><span style="color: #000000;">是否被定义:</span><br><span style="color: #000000;">#if  defined(<em>symbol</em>)             #ifdef <em>symbol//作用一样 是否已被定义</em></span><br><span style="color: #000000;">_#_if !defined(<em>symbol</em>)            #ifndef <em>symbol//是否没被定义</em></span><br><span style="color: #000000;">这些可以嵌套.</span><br><span style="color: #000000;">4.文件包含.包含库文件就直接用’&lt;&gt;’时间少点.包含本地文件用’ “ ‘.用’ “ ‘是首先从本地找,如果没找到再找库函数,’&lt;&gt;’是直接到库函数找.<span style="color: #ff0000;">一个头文件如果被包含到10个源文件中,它实际上被编译了10次</span></span><br><span style="color: #000000;">可以嵌套包含,标准是编译器必须支持至少8层头文件嵌套.注意包含同一头文件多次的情况[不过这个暂时不知道为什么有错,是不是和编译器有关,我在本地试了下,没错 - -||,哪位看官知道的话,还请告知],下面的方法可以防止同一头文件被多次包含,就是在<span style="color: #ff0000;">头文件<span style="color: #000000;">里面加上一个</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">#ifndef _XXXX_H(这个名字随便你取)</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">#define _XXXX_H 1</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">/<strong>你的代码</strong></span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;"> /</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">#endif</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">5.其他指令:#error允许你生成错误信息.#line <em>number</em> “string”指定下一条指令(number是行数,string是文件名,string可以省略),这条指令会修改<strong>LINE</strong> <strong>FILE</strong></span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">#progma用于支持因编译器而异的特性,不过这个指令<span style="color: #ff0000;">不可移植</span></span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;"><span style="color: #ff0000;">提示:</span></span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">1.避免用#define指令定义可以用函数实现的很长序列的代码</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">2.在那些对表达式求值的宏中,每个宏参数出现的地方应该加上括号,并且在整个宏定义的两边也加上括号</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">3.避免使用#define 宏创建一种新语言</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">4.采用命名约定,使程序员很容易看出某个标示符是否为#define宏[全大写]</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">5.只要合适就应该使用文件包含,不必担心它的额外开销</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">6.头文件只应该包含一组函数和(或)数据的申明</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">7.把不同集合的声明分离到不同的头文件中可以改善信息隐藏</span></span></span><br><span style="color: #000000;"><span style="color: #ff0000;"><span style="color: #000000;">8.嵌套的#include文件使我们很难判断源文件之间的依赖关系</span></span></span></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-04-11 </div>
 			<div class="article-title"><a href="/2011/04/11/drab-queue-poj-2823/" >POJ 2823 单调队列+IO优化</a></div>						
 		</h3>
@@ -441,29 +464,6 @@ return 1;
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-03-30 </div>
-			<div class="article-title"><a href="/2011/03/30/pointers-on-c-10-struct-union/" >C和指针 第十章 结构和联合</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>1.数组和结构:数组是相同类型的元素的集合,每个元素通过下标引用或指针间接访问来选择.结构也是一些值的集合,这些值是它的成员,但成员可以是不同的类型.<br>2警惕下面的陷阱:<br>typedef struct<br>{<br>int a;<br>SELF_REF3 <em>b;<br>int c;<br>}SELF_REF3;<br>这个声明的目的是为这个结构创建类型名SELF_REF3.但是,它失败了.类型名直到声明的末尾才定义,所以在结构声明的内部它尚未定义<br>3.如果把一个结构体当做参数传到函数里面或者当做返回值传出来的话,你可以选择使用结构体指针来提升效率,因为传值和返回值的话会先拷贝一份,这样的话,如果结构体的字节数大的话,这样速度会提升不少.当然也可以声明为寄存器类型.<br>4.位段,I.声明的时候如果最好别声明为int 二是直接写成signed和unsigned.因为int会根据具体的机器来决定是有符号还是无符号.II.位段中位的最大数目,许多编译器把位段成员的长度限制在一个整形的长度之内,所以一个能够运行于32位整形的机器上的位段声明可能在16位的整数机器上无法运行.III.位段的成员在内存中可能从右到左分配,也可能从左到右分配.IV.当一个声明指定了两个位段,第2个位段比较大,无法容纳于第1个位段剩余的位时,编译器有可能把第2个位段放在内存的下一个字,也可能直接放在第1个位段后面,从而在两个内存位置的边界上形成重叠.V.位段能够把长度为奇数的数据包装在一起,节省存储空间.当程序需要使用成千上万的这类结构时,这种节省方法就会变得相当重要.<br>5.联合:长度和最长的那个变量的长度一样.联合的初始化,必须是联合的第一个成员的类型,而且它必须位于一对花括号里面.<br>下面给出一个比较易错的东西.<br>1.sizeof(结构体)到底是多少.<br>比如strcut{char a;int b;char c}A;struct{int a,char b,char c}B;sizeof(A)和sizeof(B)是多少,下面是一个简单分析<br><!--easy2hide start reply to this=true--><br>答案是第一个是12,第二个是8.知道为什么吗?首先你要知道整型占4个字节.起始存储位置必须能够被4整除,然后第一个的话,首先a占了1个,然后b只能从下一个字开始,也就是会浪费三个字节,同理c也会浪费3个字节.但是第二个的话,首先a是占4个字节,然后b和c各占一个字节,这样的话,就只占了2个字.<br><!--easy2hide end--><br>还有一个就是要注意’</em>‘ ‘.’和’-&gt;’的先后顺序,比如<em>nodes.a和(</em>nodes).a的区别.</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -542,9 +542,9 @@ return 1;
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
@@ -556,11 +556,11 @@ return 1;
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -572,13 +572,13 @@ return 1;
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -595,48 +595,48 @@ return 1;
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/vim/">vim<span>2</span></a></li>
+			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
 		
-			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
+			<li><a href="/tags/free/">free<span>1</span></a></li>
 		
-			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
+			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
 		
-			<li><a href="/tags/thinking/">thinking<span>2</span></a></li>
+			<li><a href="/tags/jekyll/">jekyll<span>1</span></a></li>
 		
-			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
+			<li><a href="/tags/concrete-mathematics/">concrete-mathematics<span>2</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/compter-graphics/">compter graphics<span>1</span></a></li>
 		
-			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
 		
-			<li><a href="/tags/critical/">critical<span>1</span></a></li>
+			<li><a href="/tags/Task/">Task<span>1</span></a></li>
 		
-			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+			<li><a href="/tags/yum/">yum<span>1</span></a></li>
 		
-			<li><a href="/tags/my-life/">my life<span>1</span></a></li>
+			<li><a href="/tags/linux/">linux<span>24</span></a></li>
 		
-			<li><a href="/tags/learning/">learning<span>1</span></a></li>
+			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
 		
-			<li><a href="/tags/scala/">scala<span>1</span></a></li>
+			<li><a href="/tags/vi/">vi<span>2</span></a></li>
 		
-			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
+			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
 		
-			<li><a href="/tags/算法/">算法<span>1</span></a></li>
+			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
 		
-			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
+			<li><a href="/tags/Scheduler/">Scheduler<span>1</span></a></li>
 		
-			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
+			<li><a href="/tags/trident/">trident<span>1</span></a></li>
 		
-			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
+			<li><a href="/tags/i-o-multiplexing/">i/o multiplexing<span>1</span></a></li>
 		
-			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
+			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
 		
-			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
+			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
 		
-			<li><a href="/tags/tencent/">tencent<span>1</span></a></li>
+			<li><a href="/tags/memset/">memset<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>283</span></a></li>
+		   <li><a href="/tags">...<span>289</span></a></li>
 		 
 		</ul>
 	</div>
@@ -647,6 +647,10 @@ return 1;
 <div class="widget">
   <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
+      </li>
     
       <li>
         <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
@@ -662,10 +666,6 @@ return 1;
     
       <li>
         <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
-      </li>
-    
-      <li>
-        <a href="/2017/09/17/GC-标记-清除算法/" ><i class="fa fa-file-o"></i>GC 标记-清除算法</a>
       </li>
     
   </ul>
