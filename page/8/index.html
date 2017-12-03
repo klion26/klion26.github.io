@@ -121,6 +121,38 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2013-01-03 </div>
+			<div class="article-title"><a href="/2013/01/03/fedora-15-yum-rpm-problem/" >Fedora 15Yum问题和RPM包不能安装的问题</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>由于需要安装fftw库和其他一个神马库，然后自己编译的时候又不怎么对，想着用yum install快速解决得了，结果输入yum之后返回</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">There was a problem importing one of the Python modules<br>required to run yum. The error leading to this problem was:/usr/lib/python2.7/site-packages/pycurl.so: undefined symbol: CRYPTO_set_locking_callback</div></p>
+<p>Please install a package which provides this module, or<br>verify that the module is installed correctly.</p>
+<p>It<span style="color: #7fffd4;">‘s possible that the above module doesn’</span>t match the<br>current version of Python, which is:<br>2.7.1 (r271:86832, Apr 12 2011, 16:16:18)<br><span style="color: #f5deb3;">[</span>GCC 4.6.0 20110331 (Red Hat 4.6.0-2<span style="color: #f5deb3;">)]</span></p>
+<p>If you cannot solve this problem yourself, please go to<br>the yum faq at:<br><a href="http://yum.baseurl.org/wiki/Faq" target="_blank" rel="external">http://yum.baseurl.org/wiki/Faq</a></p>
+<p><br>简单的说就是YUM挂了，对于一个对Linux还不是很熟悉的人来说，这是致命的啊，FUCK！！！。然后上网搜解决方案，发现这个问题好少啊，不过刚好有一篇是在Fedora 15上出现这个问题，地址在<a href="http://forums.fedoraforum.org/archive/index.php/t-263887.html" target="_blank" rel="external">这里</a>，不过是英文的，然后照着做就行了，如果不想看英文，我大致说下意思，主要就是把你/usr/local/lib下所有libcurl开头的文件删除掉（对于新手还是用mv命令比较好，万一错了还可以移回来）。这样操作之后就可以了，这一下运行yum出来提示说没有加参数，觉得好有爱啊。上面的文章说，这个原因有可能是因为1.Fedora的libcurl是通过不同的参数或者路径编译得来的</p>
+<p>2.你系统的编译版本太新，没有相应的符号</p>
+<p>3.你系统的编译版本太久，没有相应的符号</p>
+<p>另外，在Yum出问题的过程中，我连安装rpm包都出现了问题，双击rpm包的时候，出现“An internal system error has occurred”错误，网上找也没人说，不过后来再解决了yum问题的同时，这个问题也解决了。</p>
+<p><span style="color: #0000ff;">PS.在搜解决方案的时候，我真想暴那些搞GFW的人的菊花啊，尼妈google一会断一次，百度答案又他们太坑爹。linux下GoAgent安装还出现问题，暂时还没解决。心里只想说一句：搞GFW的那些人，我问候你全家啊，肏。</span></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2013-01-02 </div>
 			<div class="article-title"><a href="/2013/01/02/fedora-15-install-opencv-2-4/" >Fedora 15安装配置OpenCV 2.4</a></div>						
 		</h3>
@@ -340,7 +372,7 @@
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;">&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#110;&#109;&#97;&#x73;&#x74;&#x65;&#x72;&#x73;&#x2e;&#x6f;&#114;&#103;">&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#110;&#109;&#97;&#x73;&#x74;&#x65;&#x72;&#x73;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -439,40 +471,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-11-21 </div>
-			<div class="article-title"><a href="/2012/11/21/apue-chapter-3-excise-3-2/" >UNIX环境高级编程第3章的一些问题和习题3.2</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>APUE第3章讲的是文件IO，需要了解一些Linux底层的东西，不然看起来好费劲（我现在就这样- -|）。</p>
-<p>首先，讲了文件描述符，文件描述符简单的说就是一个非负整数，你可以通过这个整数来找到打开的文件，比如我们用open函数时返回的是一个整数，这就是open所打开的这个文件的文件描述符，文件描述符是内核向进程返回的。另外shell中的标准输入的文件描述符是0,标准输出是1,错误输出是2,这个是默认这么做的，与内核无关。但是不遵照这个惯例的话，那么很多系统应用程序就不能正常工作。文件描述符的范围是0~OPEN_MAX(每个进程的最大打开文件数)，早期的上限是19（即允许每个进程打开20个文件），现在很多系统则增至63.</p>
-<p>讲了一个文件空洞的东西，就是如果你现在的文件长度是n，然后你用lseek把文件指针位置定位到了一个大于n的位置，接下来你写一些东西，那么就形成了一个文件空洞，中间那一部分就是文件空洞，文件空洞是不占空间的，你可以用两个同样长度的文件，然后比较他们的文件大小，还有没有写过的字节读出来通通为0</p>
-<p>dup和dup2函数，都包含在unistd.h文件中。看到这两个函数的时候，不怎么懂，现在也不保证很懂(-_-|).</p>
-<p>dup的原型是int dup(int filedes) ;//传入参数是已打开的文件描述符，返回一个未用的最小的文件描述符。</p>
-<p>dup2的原型是int dup2(int oldfiledes,int newfiledes);//返回oldfiledes的一个文件描述符copy，然后返回的文件描述符是newfiledes。如果newfiledes已经打开，就先关闭，如果oldfiledes和newfiledes相等，那么就返回newfiledes，而不关闭它。这些返回的新文件描述符和原来的文件描述符（dup中的filedes和dup2中的oldfiledes）共享一个文件表项。如果出错返回-1,比如dup中的参数filedes是一个未打开的文件描述符</p>
-<p>当然这两个函数都可以由fcntl函数来替代，虽然可能不完全等效。比如原子性。</p>
-<p>fcntl原型int fcntl(int filedes,int cmd, … /<em> int arg </em>/ );</p>
-<p>fcntl可以复制文件描述符[cmd=F_DUPFD]，可以获得/设置文件描述符[cmd=F_GETFD/F_SETFD]，可以获得/设置文件状态标志[cmd=F_GETFL/F_SETFL]，可以获得/设置异步I/O所有权[cmd=F_GETOWN/F_SETOWN]，可以获得/设置记录锁[cmd=F_GETLK / F_SETLK / F_SETLKW]。出错返回-1.</p>
-<p>习题3.2需要自己不用fcntl来实现一个dup2函数，有出错提示。一开始脑袋一团浆糊，网上搜到一篇写这个的，用dup函数实现，出错信息要考虑齐全，另外，就是从0到newfiledes这些描述符中，看是否打开，每个都需要试，最后如果所有条件都符合，就可以返回newfiledes，不过刚开始的童鞋可以先照着网上那份写，再自己慢慢揣摩。</p>
-<p>习题3-4中给出，很多程序中都包含下面一段代码：<br>dup2(fd,0);<br>dup2(fd,1);<br>dup2(fd,2);<br>if(fd &gt; 2)<br>close(fd);<br>问为啥要关闭，也就是最后的if意义和在，还需要画出fd=1和fd=3时每次调用dup2时3个描述符项及相应的文件表项的变化情况。</p>
-<p>首先，前面3句就是相当于重定向，所有的标准输入，标准输出和错误输出都会写道fd所指的文件中去。那么如果fd&gt;2的话，执行那3句之后就有4个文件描述符指向同一个文件表项了。但是如果fd&lt;3的话，就只有3个。所以需要手动的把fd关闭掉</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -551,13 +549,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -565,27 +563,27 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
-		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -604,48 +602,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/写作/">写作<span>1</span></a></li>
+			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
 		
-			<li><a href="/tags/shell/">shell<span>5</span></a></li>
+			<li><a href="/tags/数论/">数论<span>5</span></a></li>
 		
-			<li><a href="/tags/错误配置/">错误配置<span>1</span></a></li>
+			<li><a href="/tags/redis/">redis<span>1</span></a></li>
 		
-			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
+			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
 		
-			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
 		
-			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
-		
-			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
-		
-			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
+			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
 		
 			<li><a href="/tags/method/">method<span>1</span></a></li>
 		
-			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
+			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
 		
-			<li><a href="/tags/scc/">scc<span>1</span></a></li>
+			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
 		
-			<li><a href="/tags/插件/">插件<span>1</span></a></li>
+			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
+		
+			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+		
+			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
+		
+			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
+		
+			<li><a href="/tags/sap/">sap<span>1</span></a></li>
+		
+			<li><a href="/tags/apach/">apach<span>0</span></a></li>
+		
+			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
+		
+			<li><a href="/tags/metric/">metric<span>1</span></a></li>
+		
+			<li><a href="/tags/opengl/">opengl<span>1</span></a></li>
+		
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
 		
 			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
 		
-			<li><a href="/tags/lru/">lru<span>1</span></a></li>
 		
-			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
-		
-			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
-		
-			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
-		
-			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
-		
-			<li><a href="/tags/老师/">老师<span>1</span></a></li>
-		
-			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
-		
-		
-		   <li><a href="/tags">...<span>289</span></a></li>
+		   <li><a href="/tags">...<span>292</span></a></li>
 		 
 		</ul>
 	</div>
@@ -656,6 +654,10 @@
 <div class="widget">
   <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
+      </li>
     
       <li>
         <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
@@ -671,10 +673,6 @@
     
       <li>
         <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
-      </li>
-    
-      <li>
-        <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
       </li>
     
   </ul>

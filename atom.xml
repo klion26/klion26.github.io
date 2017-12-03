@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-11-27T13:12:23.000Z</updated>
+  <updated>2017-12-03T09:49:01.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,77 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>tasksetmanager</title>
+    <link href="http://yoursite.com/2017/12/03/tasksetmanager/"/>
+    <id>http://yoursite.com/2017/12/03/tasksetmanager/</id>
+    <published>2017-12-03T07:58:53.000Z</published>
+    <updated>2017-12-03T09:49:01.000Z</updated>
+    
+    <content type="html"><![CDATA[<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">* Schedules the tasks within a single TaskSet in the TaskSchedulerImpl. This class keeps track of</div><div class="line">* each task, retries tasks if they fail (up to a limited number of times), and</div><div class="line">* handles locality-aware scheduling for this TaskSet via delay scheduling. The main interfaces</div><div class="line">* to it are resourceOffer, which asks the TaskSet whether it wants to run a task on one node,</div><div class="line">* and statusUpdate, which tells it that one of its tasks changed state (e.g. finished).</div><div class="line">*</div><div class="line">* THREADING: This class is designed to only be called from code with a lock on the</div><div class="line">* TaskScheduler (e.g. its event handlers). It should not be called from other threads.</div><div class="line">*</div><div class="line">* @param sched           the TaskSchedulerImpl associated with the TaskSetManager</div><div class="line">* @param taskSet         the TaskSet to manage scheduling for</div><div class="line">* @param maxTaskFailures if any particular task fails this number of times, the entire</div><div class="line">*                        task set will be aborted</div><div class="line">*/</div></pre></td></tr></table></figure>
+<p><code>TaskSetManager</code> 负责某个 TaskSet 的调度，对该 TaskSet 的所有 task 进行跟踪，如果有失败的 task，会负责重试（重试有上限），并且通过 delay scheduling（可以想想这个怎么实现的？） 实现 locality  locality-aware scheduling. 主要的接口有 <code>resourceOffer</code> – 用于判断一个 TaskSet 中的 task 是否需要运行到某个 node 上，<code>statusUpdate</code> – 用于跟踪 task 的状态变化。不是线程安全的。</p>
+<a id="more"></a>
+<p><code>dequeeTaskFromList(execId: String, list: ArrayBuffer[Int]): Option[Int]</code> 负责从对应的 list 中删除返回一个 pending Task，如果没有合适的 Task 就返回 None，该 function 中会将那些已经运行的 task 进行删除，会跳过所有的不能在对应 execId 上运行的 task（通过 executorIsBlacklisted(execId, index) 进行判断）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">while (indexOffset &gt; 0) &#123;</div><div class="line">	indexOffset -= 1</div><div class="line">	val index = list(indexOffset)</div><div class="line">	if (!executorIsBlacklisted(execId, index)) &#123;</div><div class="line">		// This should almost always be list.trimEnd(1) to remove tail</div><div class="line">		list.remove(indexOffset)</div><div class="line">		if (copiesRunning(index) == 0 &amp;&amp; !successful(index)) &#123;</div><div class="line">			return Some(index)</div><div class="line">	    &#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>dequeueTask(execId: String, host: String, maxLocality: TaskLocality.Value): Option[(Int, TaskLocality.Value, Boolean)])</code> 删除并返回一个可执行的 task，只返回符合 locality 约束的 task。首先逐个 locality 进行查找，如果有符合的 task 直接返回，否则返回一个合适的 推测执行的 task</p>
+<p><code>executorIsBlacklisted(execId: String, taskId: Int): Boolean</code> 进行判断某个 execId 上能否运行对应的 task（如果之前这个 taskId 在这个 execId 上运行失败了，而且当前时间和之间失败的时间差小于阈值 <code>EXECUTOR_TASK_BLACKLIST_TIMEOUT</code>）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">def executorIsBlacklisted(execId: String, taskId: Int): Boolean = &#123;</div><div class="line">	if (failedExecutors.contains(taskId)) &#123;</div><div class="line">		val failed = failedExecutors.get(taskId).get</div><div class="line"></div><div class="line">		return failed.contains(execId) &amp;&amp;</div><div class="line">		clock.getTimeMillis() - failed.get(execId).get &lt; EXECUTOR_TASK_BLACKLIST_TIMEOUT</div><div class="line">	&#125;</div><div class="line"></div><div class="line">    false</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>dequeueSpeculativeTask(execId: String, host: String, locality: TaskLocality.Value): Option[(Int, TaskLocality.Value)]</code> 负责删除并返回一个 推测执行的 task，如果没有合适的就返回 None。逻辑就是遍历所有 task，然后看 task 是否能运行在特定的 TaskLocality 上，如果可以就返回，并且将该 task 从推测执行的 task list 中删除。TaskLocality 的顺序为 <code>{PROCESS_LOCAL, NODE_LOCAL, NO_PREF, RACK_LOCAL, ANY}</code></p>
+<p>如何实施推测执行，逻辑在 <code>checkSpeculatableTasks</code> 函数中，</p>
+<ol>
+<li>如果该 TaskSetManager 变为 zoombie 了，或者只包含一个 task，就不推测执行（为什么一个 task 就不推测执行）</li>
+<li>如果完成的 task 数大于等于 <code>minFinishedForSpeculation = (SPECULATION_QUANTILE * numTasks).floor.toInt</code>（其中 <code>SPECULATION_QUANTILE</code> 默认 0.75，可以通过 <code>spark.speculation.quantile</code> 设置）且有 task 成功执行过，则执行下面的步骤</li>
+<li>将所有执行成功的 task 的执行时间进行排序，取第 <code>val medianDuration = durations(min((0.5 * tasksSuccessful).round.toInt, durations.size - 1))
+val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  threshold 作为临界值，对每个 task 进行检测。</li>
+<li>如果该 task 还没有运行成功，运行时间超过 <code>threshold</code>，只有一个实例在跑，而且没有推测执行过，就进行推测执行</li>
+<li>推测执行保证同一个 task 的不同实例不会调度到同一台主机上，且不会调度到以及被加进黑名单的主机中</li>
+</ol>
+<p><code>resourceOffer（execId: String,host: String,maxLocality:TaskLocality.TaskLocality): Option[TaskDescription]</code> 负责资源的实际分配，如果当前 taskSetManager 不是 zoombie 状态才进行处理。首先找出当前时间可以被调度到的最高 Locality，然后使用 <code>dequeuTask</code> 删除并找到一个符合条件的 task，如果找到就更新相关的状态数据（包括，更新现在正在运行的 task 有哪些，更新当前的 locality，然后将 task 所需要的文件等序列化，附加到一个 TaskDescription 结构中并且返回），并且通知 DAGScheduler 该 task 已经开始运行。如果序列化有问题，则直接抛异常。</p>
+<p><code>getAllowedLocalityLevel(curTime: Long): TaskLocality.TaskLocality</code> 获取当前时间对应的一个 TaskLocality, 这里面会有时间等待（等待的时间就是每个 TaskLocality 的等待时间，默认 3s，可以配置）</p>
+<p><code>handleTaskGettingResult</code> 主要进行状态标记，然后通知 DAGScheduler<br><code>canFetchMoreResults(size: Long): Boolean</code> 检测是否还能 fetch size 字节大小已经序列化后的数据，如果不能，就将该 taskSetManger 标记为 zoombie，并且通知 DAGScheduler 该 TaskSet 为失败</p>
+<p><code>handleSuccessfulTask(tid: Long, result: DirectTaskResult[_]): Unit</code> 负责将一个 task 标记为成功，并且如果当前 TaskSet 所有 task 都运行完成，就标记为 zoombie 状态，并且通知 DAGScheduler。</p>
+<p><code>handleFailedTask(tid: Long, state: TaskState, reason: TaskEndReason)</code> 将task 标记为失败，并且重新添加到 pendingTask 队列中，然后通知 DAGScheduler。根据失败的信息不同，做不同的处理：</p>
+<ol>
+<li>FetchFailure：直接想当前的 <code>tasksetManager</code> 标记为 zoombie，然后做一定的清理工作，就把当前的 <code>tasksetManager</code> 标记为成功</li>
+<li>ExceptionFailure：如果是 <code>NotSerializableException</code> 就直接退出，否则会打印相应异常，然后进行重试</li>
+<li>其他的异常，打印日志</li>
+</ol>
+<p><code>executorLost(execId: String, host: String, reason: ExecutorLossReason)</code> 负责处理 executorLost 的情况，由 taskSchedulerImp 调用。逻辑如下</p>
+<ul>
+<li>如果是 <code>ShufflleMapTask</code> 且没有开启 <code>externalShuffleServiceEnabled</code> 就进行如下操作：如果 task 以及成功了，就将这些 task 标记为失败，且进行重试（因为后续的 task 需要从这些 task 中获取数据）</li>
+<li>如果是其他的，就直接调用 <code>handleFailedTask</code> 进行处理，然后重新计算 <code>locality</code></li>
+</ul>
+<p><code>getLocalityWait(level: TaskLocality.TaskLocality): Long =</code> 用于获取 locality, 代码如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">val defaultWait = conf.get(&quot;spark.locality.wait&quot;, &quot;3s&quot;)</div><div class="line">val localityWaitKey = level match &#123;</div><div class="line">	case TaskLocality.PROCESS_LOCAL =&gt; &quot;spark.locality.wait.process&quot;</div><div class="line">	case TaskLocality.NODE_LOCAL =&gt; &quot;spark.locality.wait.node&quot;</div><div class="line">	case TaskLocality.RACK_LOCAL =&gt; &quot;spark.locality.wait.rack&quot;</div><div class="line">	case _ =&gt; null</div><div class="line">&#125;</div><div class="line"></div><div class="line">if (localityWaitKey != null) &#123;</div><div class="line">	conf.getTimeAsMs(localityWaitKey, defaultWait)</div><div class="line">&#125; else &#123;</div><div class="line">	0L</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="疑问："><a href="#疑问：" class="headerlink" title="疑问："></a>疑问：</h3><ol>
+<li>推测执行的时候，为什么 TaskSet 只有 1 个 task 的话就不推测执行</li>
+<li>推测执行对每个 task 只会进行一次？<br> a. 可以被 推测执行多次，只执行一次的逻辑是使用 <code>speculatableTasks</code> 做检测的，当运行一个 推测执行的 task 后，该 task 就会从 <code>speculatableTasks</code> 进行删除，然后就可以进行推测执行了。严格的说法是，只运行同一个 task 的一个实例在“排队等待被推测执行”</li>
+<li>每个 task 的 <code>preferredLocations</code> 怎么得到的？根据什么规则？每一个的含义又是什么，总共有 <code>{PROCESS_LOCAL, NODE_LOCAL, NO_PREF, RACK_LOCAL, ANY}</code> 这些可选项</li>
+<li>每个 TaskSet 的所有 task 都是一样的 locality？</li>
+<li>推测执行的时候，如果最后执行成功多个 task，会对结果有影响吗？怎么规避这种影响的</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;/**&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;* Schedules the tasks within a single TaskSet in the TaskSchedulerImpl. This class keeps track of&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;* each task, retries tasks if they fail (up to a limited number of times), and&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;* handles locality-aware scheduling for this TaskSet via delay scheduling. The main interfaces&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;* to it are resourceOffer, which asks the TaskSet whether it wants to run a task on one node,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;* and statusUpdate, which tells it that one of its tasks changed state (e.g. finished).&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;*&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;* THREADING: This class is designed to only be called from code with a lock on the&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;* TaskScheduler (e.g. its event handlers). It should not be called from other threads.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;*&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;* @param sched           the TaskSchedulerImpl associated with the TaskSetManager&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;* @param taskSet         the TaskSet to manage scheduling for&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;* @param maxTaskFailures if any particular task fails this number of times, the entire&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;*                        task set will be aborted&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;*/&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;&lt;code&gt;TaskSetManager&lt;/code&gt; 负责某个 TaskSet 的调度，对该 TaskSet 的所有 task 进行跟踪，如果有失败的 task，会负责重试（重试有上限），并且通过 delay scheduling（可以想想这个怎么实现的？） 实现 locality  locality-aware scheduling. 主要的接口有 &lt;code&gt;resourceOffer&lt;/code&gt; – 用于判断一个 TaskSet 中的 task 是否需要运行到某个 node 上，&lt;code&gt;statusUpdate&lt;/code&gt; – 用于跟踪 task 的状态变化。不是线程安全的。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
+    
+      <category term="source_code" scheme="http://yoursite.com/tags/source-code/"/>
+    
+      <category term="tasksetmanager" scheme="http://yoursite.com/tags/tasksetmanager/"/>
+    
+      <category term="task" scheme="http://yoursite.com/tags/task/"/>
+    
+      <category term="stage" scheme="http://yoursite.com/tags/stage/"/>
+    
+  </entry>
   
   <entry>
     <title>TaskScheduler</title>
@@ -1128,63 +1199,6 @@
       <category term="hdfs" scheme="http://yoursite.com/tags/hdfs/"/>
     
       <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spark Streaming 自适应上游 kafka topic partition 数目变化</title>
-    <link href="http://yoursite.com/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/"/>
-    <id>http://yoursite.com/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/</id>
-    <published>2016-11-01T08:56:13.000Z</published>
-    <updated>2017-06-03T03:40:54.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。</p>
-<a id="more"></a>
-<h2 id="思考过程"><a href="#思考过程" class="headerlink" title="思考过程"></a>思考过程</h2><p>为了作业能够长时间的运行，一开始遇到这种情况的时候，想到两种方案：</p>
-<ol>
-<li>感知上游 topic 的 partition 数目变化，然后发送报警，让用户重启</li>
-<li>直接在作业内部自适应上游 topic partition 的变化，完全不影响作业<br>方案 1 是简单直接，第一反应的结果，但是效果不好，需要用户人工介入，而且需要删除 checkpoint 文件</li>
-</ol>
-<p>方案 2 从根本上解决问题，用户不需要关心上游 partition 数目的变化，但是第一眼会觉得较难实现。</p>
-<p>方案 1 很快被 pass 掉，因为人工介入的成本太高，而且实现起来很别扭。接下来考虑方案 2.</p>
-<p>Spark Streaming 程序中使用 Kafka 的最原始方式为 <code>KafkaUtils.createDirectStream</code> 通过源码，我们找到调用链条大致是这样的</p>
-<p><span style="color: #0000ff;"><strong><code>KafkaUtils.createDirectStream</code></strong></span>   –&gt;   <strong><span style="color: #0000ff;"><code>new DirectKafkaInputDStream</code></span></strong> –&gt; 最终由 <code>DirectKafkaInputDStream#compute(validTime : Time)</code> 函数来生成 KafkaRDD。</p>
-<p>而 KafkaRDD 的 partition 数和 <strong><span style="color: #0000ff;">作业开始运行时</span></strong> topic 的 partition 数一致，topic 的 partition 数保存在 currentOffsets 变量中，currentOffsets 是一个 Map[TopicAndPartition, Long]类型的变量，保存每个 partition 当前消费的 offset 值，但是作业运行过程中 currentOffsets 不会增加 key，就是说不会增加 KafkaRDD 的 partition，这样导致每次生成 KafkaRDD 的时候都使用 <span style="color: #0000ff;"><strong>作业开始运行时</strong></span> topic 的 partition 数作为 KafkaRDD 的 partition 数，从而会造成数据的丢失。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>我们只需要在每次生成 KafkaRDD 的时候，将 currentOffsets 修正为正常的值（往里面增加对应的 partition 数，总共 B-A 个，以及每个增加的 partition 的当前 offset 从零开始）。</p>
-<ul>
-<li>第一个问题出现了，我们不能修改 Spark 的源代码，重新进行编译，因为这不是我们自己维护的。想到的一种方案是继承 DirectKafkaInputDStream。我们发现不能继承 DirectKafkaInputDStream 该类，因为这个类是使用 <code>private[streaming]</code> 修饰的。</li>
-<li>第二个问题出现了，怎么才能够继承 DirectKafkaInputDStream，这时我们只需要将希望继承 DirectKafkaInputDStream 的类放到一个单独的文件 F 中，文件 F 使用 <code>package org.apache.spark.streaming</code> 进行修饰即可，这样可以绕过不能继承 DirectKafkaInputDStream 的问题。这个问题解决后，我们还需要修改 <code>Object KafkaUtils</code>，让该 Object 内部调用我们修改后的 DirectKafkaInputDStream（我命名为 MTDirectKafkaInputDStream)</li>
-<li>第三个问题如何让 Spark 调用 MTDirectKafkaInputDStream，而不是 DirectKafkaInputDStream，这里我们使用简单粗暴的方式，将 KafkaUtils 的代码 copy 一份，然后将其中调用 DirectKafkaInputDStream 的部分都修改为 MTDirectKafkaInputDStream，这样就实现了我们的需要。当然该文件也需要使用 <code>package org.apache.spark.streaming</code> 进行修饰</li>
-<li>第二个和第三个问题的解决方案在  中国 Spark 技术峰会 2016  上，广点通的 林立伟 有提及，后续会进行尝试<br>总结下，我们需要做两件事</li>
-</ul>
-<ol>
-<li>修改 DirectKafkaInputDStream#compute 使得能够自适应 topic 的 partition 变更</li>
-<li>修改 KafkaUtils，使得我们能够调用修改过后的 DirectKafkaInputDStream</li>
-</ol>
-<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div></pre></td><td class="code"><pre><div class="line">package org.apache.spark.streaming.kafka.mt</div><div class="line"></div><div class="line">import com.meituan.data.util.Constants</div><div class="line">import com.meituan.service.inf.kms.client.Kms</div><div class="line">import kafka.common.&#123;ErrorMapping, TopicAndPartition&#125;</div><div class="line">import kafka.javaapi.&#123;TopicMetadata, TopicMetadataRequest&#125;</div><div class="line">import kafka.javaapi.consumer.SimpleConsumer</div><div class="line">import kafka.message.MessageAndMetadata</div><div class="line">import kafka.serializer.Decoder</div><div class="line">import org.apache.spark.streaming.&#123;StreamingContext, Time&#125;</div><div class="line">import org.apache.spark.streaming.kafka.&#123;DirectKafkaInputDStream, KafkaRDD&#125;</div><div class="line"></div><div class="line">import scala.collection.JavaConverters._</div><div class="line">import scala.util.control.Breaks._</div><div class="line">import scala.reflect.ClassTag</div><div class="line"></div><div class="line">/**</div><div class="line">  * Created by qiucongxian on 10/27/16.</div><div class="line">  */</div><div class="line">class MTDirectKafkaInputDStream[</div><div class="line">  K: ClassTag,</div><div class="line">  V: ClassTag,</div><div class="line">  U &lt;: Decoder[K]: ClassTag,</div><div class="line">  T &lt;: Decoder[V]: ClassTag,</div><div class="line">  R: ClassTag](</div><div class="line">    @transient ssc_ : StreamingContext,</div><div class="line">    val MTkafkaParams: Map[String, String],</div><div class="line">    val MTfromOffsets: Map[TopicAndPartition, Long],</div><div class="line">    messageHandler: MessageAndMetadata[K, V] =&gt; R</div><div class="line">) extends DirectKafkaInputDStream[K, V, U, T, R](ssc_, MTkafkaParams , MTfromOffsets, messageHandler) &#123;</div><div class="line">    private val kafkaBrokerList : String = &quot;host1:port1,host2:port2,host3:port3&quot; //根据自己的情况自行修改</div><div class="line"></div><div class="line">    override def compute(validTime: Time) : Option[KafkaRDD[K, V, U, T, R]] = &#123;</div><div class="line">      /**</div><div class="line">        * 在这更新 currentOffsets 从而做到自适应上游 partition 数目变化</div><div class="line">        */</div><div class="line">        updateCurrentOffsetForKafkaPartitionChange()</div><div class="line">        super.compute(validTime)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private def updateCurrentOffsetForKafkaPartitionChange() : Unit = &#123;</div><div class="line">      val topic = currentOffsets.head._1.topic</div><div class="line">      val nextPartitions : Int = getTopicMeta(topic) match &#123;</div><div class="line">          case Some(x) =&gt; x.partitionsMetadata.size()</div><div class="line">          case _ =&gt; 0</div><div class="line">      &#125;</div><div class="line">      val currPartitions = currentOffsets.keySet.size</div><div class="line"></div><div class="line">      if (nextPartitions &gt; currPartitions) &#123;</div><div class="line">        var i = currPartitions</div><div class="line">        while (i &lt; nextPartitions) &#123;</div><div class="line">           currentOffsets = currentOffsets + (TopicAndPartition(topic, i) -&gt; 0)</div><div class="line">           i = i + 1</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      logInfo(s&quot;######### $&#123;nextPartitions&#125;  currentParttions $&#123;currentOffsets.keySet.size&#125; ########&quot;)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private def getTopicMeta(topic: String) : Option[TopicMetadata] = &#123;</div><div class="line">        var metaData : Option[TopicMetadata] = None</div><div class="line">        var consumer : Option[SimpleConsumer] = None</div><div class="line"></div><div class="line">        val topics = List[String](topic)</div><div class="line">        val brokerList = kafkaBrokerList.split(&quot;,&quot;)</div><div class="line">        brokerList.foreach(</div><div class="line">          item =&gt; &#123;</div><div class="line">            val hostPort = item.split(&quot;:&quot;)</div><div class="line">            try &#123;</div><div class="line">              breakable &#123;</div><div class="line">                  for (i &lt;- 0 to 3) &#123;</div><div class="line">                      consumer = Some(new SimpleConsumer(host = hostPort(0), port = hostPort(1).toInt,</div><div class="line">                                            soTimeout = 10000, bufferSize = 64 * 1024, clientId = &quot;leaderLookup&quot;))</div><div class="line">                      val req : TopicMetadataRequest = new TopicMetadataRequest(topics.asJava)</div><div class="line">                      val resp = consumer.get.send(req)</div><div class="line"></div><div class="line">                      metaData = Some(resp.topicsMetadata.get(0))</div><div class="line">                      if (metaData.get.errorCode == ErrorMapping.NoError) break()</div><div class="line">                  &#125;</div><div class="line">              &#125;</div><div class="line">            &#125; catch &#123;</div><div class="line">              case e =&gt; logInfo(s&quot; ###### Error in MTDirectKafkaInputDStream $&#123;e&#125; ######&quot;)</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">        )</div><div class="line">        metaData</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>在修改过后的 KafkaUtils 文件中，将所有的 <code>DirectKafkaInputDStream</code> 都替换为 <code>MTDirectKafkaInputDStream</code> 即可</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="分布式系统" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"/>
-    
-      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
-    
-    
-      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
-    
-      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
-    
-      <category term="auto-adaptive" scheme="http://yoursite.com/tags/auto-adaptive/"/>
-    
-      <category term="partition" scheme="http://yoursite.com/tags/partition/"/>
-    
-      <category term="topic" scheme="http://yoursite.com/tags/topic/"/>
     
   </entry>
   

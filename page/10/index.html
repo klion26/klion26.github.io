@@ -121,6 +121,134 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2012-10-08 </div>
+			<div class="article-title"><a href="/2012/10/08/scheme-and-the-little-scheme/" >Scheme &amp; The Little Scheme</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>很早前就想学一门脚本语言来玩玩，看了一段时间的python，可是没有继续好好的学下去，导致现在python基<br>本不会。暑假的时候看到<a href="http://blog.sina.com.cn/yinwang0" target="_blank" rel="external">王垠</a>的博客写了一篇文章，推荐了Scheme语言和SICP这本书，上网搜了下后面这本书，发现评论非常好，评价非常高，可以和TAOCP相比了。就打算看看这本神书，顺便做做后面的习题，网上很多大神已经写过题解，不过都是Scheme语言写的，所以就打算先学学Scheme语言。暑假看了《The Little Scheme》和《teach yourself scheme in fixnum days》的一部分，前面一本书是以Scheme语言为基础，主讲递归的思想(个人觉得讲的非常好，不过后面的章节需要一定的scheme语言基础)<br>后面这本书就是一本介绍scheme的书，比较薄，不过作为入门书还是可以的(用的scheme版本是R5RS)。<br>t-y Scheme里面首先也是讲数据类型 有boolean number string real等。在scheme里面最基本的东西就属<br>括号了，每一个过程都是用括号来表示，所以scheme的程序会有非常多的括号。而且表达式是前缀表达式，形如(+ 3 2)计算3+2的值，字符使用#\后面加上相应的字母来表示的，其他的和C语言差不多，<br>第三章讲述的是过程，类似于C语言中的函数，下面是一个例子</p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<ol>
+<li><span><span>(define area                                          ;定义过程 名字叫做area   </span></span></li>
+<li><span>   (lambda (length breadth)                           ;两个参数 分别是length 和breadth   </span></li>
+<li><span>      (* length breadth)                              ;计算并返回   </span></li>
+<li><span>   )   </span></li>
+<li><span>)   </span></li>
+<li><p><span>(area </span><span class="number">4</span><span> </span><span class="number">6</span><span>)                                            ;用area过程求值 结果为</span><span class="number">24</span><span>=</span><span class="number">4</span><span>*</span><span class="number">6</span><span>  </span><br></p></li></ol></div><br>过程可以用匿名过程，就是没有define那一行，其他地方都一样<br>第四章讲述的是各种判断，if、when等<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define p </span><span class="number">80</span><span>)   </span></span></p>
+</li>
+<li><span>(</span><span class="keyword">if</span><span> (&gt; p </span><span class="number">70</span><span>)   </span></li>
+<li><span>    ‘safe         ;如果p &gt; </span><span class="number">70</span><span>  </span></li>
+<li><span>    ‘unsafe       ;</span><span class="keyword">else</span><span>  </span></li>
+<li><p><span>)  </span><br></p></li></div><br>;unless 貌似是不会循环的 ，我试验的结果是只运行了一次<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(unless (&gt; p </span><span class="number">90</span><span>)   </span></span></p>
+</li>
+<li><span> ; (begin   </span></li>
+<li><span>    (set! p (+ p </span><span class="number">1</span><span>))    ;   </span></li>
+<li><span>    (display p)   </span></li>
+<li><span>  ;  )   </span></li>
+<li><p><span> )  </span><br></p></li></div><br>when和unless类似，另外我们可以用过程来写递归或者循环，这里面的递归貌似都是尾递归的。不过循环还有<br>一种表达方式就是do表达式，语法如下<br>(do ((var1 val1 update1)…)(test res …) exp …)<br>;说明：类似于C语言的for循环。先将val1赋值给var1,…之后循环开始，在每次循环的开始，先执行表达式<br>test,<br>;如果返回布尔值真，则循环终止，并返回结果res，如果表达式test返回#f，则运行表达式exp…，之后依次<br>;用update1…的值来为变量var1…重新赋值<br>例子如下：<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define </span><span class="keyword">do</span><span>-test                                 ;定义过程   </span></span></p>
+</li>
+<li><span>  (lambda (n)                                   ;一个参数 为n   </span></li>
+<li><span>    (</span><span class="keyword">do</span><span> ((sum </span><span class="number">0</span><span> (+ sum i)) (i </span><span class="number">1</span><span> (+ i </span><span class="number">1</span><span>)) )      ;sum 和i都赋初值，然后每次循环分别用 (+ sum i)和   </span>(+ i <span class="number">1</span>)来改变</li>
+<li><span>         ((&gt; i n) sum)                          ;如果i &gt; n则推出循环 返回sum   </span></li>
+<li><span>         (display sum)                          ;如果i &lt;= n 则循环    </span></li>
+<li><span>       )   </span></li>
+<li><span>      )   </span></li>
+<li><p><span>    )  </span><br></p></li></div><br>第五章讲的是变量的作用域，一般定义的是全局变量，在函数里面定义的只能在函数里面用，而且会屏蔽全局<br>同名变量，可以用let和let<em>来确定一个变量的作用域，let里面局部变量赋初值的时候不能用let里面定义的<br>变量，但是let</em>里面定义的局部变量可以用let*前面已经定义的局部变量来赋初值。例子如下<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define x </span><span class="number">20</span><span>)   </span></span></p>
+</li>
+<li><span>(let (   </span></li>
+<li><span>      (x </span><span class="number">2</span><span>)   </span></li>
+<li><span>      (y x)         </span> ;let:a reference to x in the initialization will refer to the global,not the local x</li>
+<li><span>      )   </span></li>
+<li><span>  (+ x y)                         ;结果是</span><span class="number">20</span><span>+</span><span class="number">2</span><span>  </span></li>
+<li><span>  )   </span></li>
+<li><span>(let* (   </span></li>
+<li><span>       (x </span><span class="number">1</span><span>)   </span></li>
+<li><span>       (z </span><span class="number">2</span><span>)   </span></li>
+<li><span>       (y x)   </span></li>
+<li><span>       )   </span></li>
+<li><span>  (+ x y)                         ;结果是</span><span class="number">1</span><span>+</span><span class="number">1</span><span>  </span></li>
+<li><p><span>  )  </span><br></p></li></div><br>第六章里面讲了多个函数相互调用的递归和letrec，letrec和let，let<em>的功能类似，不过let</em>里面的赋初值<br>只能用前面已经出现过的局部变量，但是不能用没有出现过的，letrec却可以用后面才出现的局部变量和局部<br>过程。例子如下：<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(letrec ((local-even? (lambda (n) (</span><span class="keyword">if</span><span> (= n </span><span class="number">0</span><span>) #t (local-odd? (- n </span><span class="number">1</span><span>)))))   </span></span></p>
+</li>
+<li><span>      ;如果用let* 那么上面的local-odd?过程就会是未定义的   </span></li>
+<li><span>         (local-odd? (lambda (n) (</span><span class="keyword">if</span><span> (= n </span><span class="number">0</span><span>) #f (local-even? (- n </span><span class="number">1</span><span>))))))   </span></li>
+<li><p><span>      (list (local-even? </span><span class="number">23</span><span>) (local-odd? </span><span class="number">23</span><span>)))  </span><br></p></li></div><br>这一章还讲了一个用来翻转list的过程，不过由于R6RS中已经不能用set-cdr!了，所以只能用R5RS来实现，过<br>程如下:<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define reverse!   </span></span></p>
+</li>
+<li><span>  (lambda (s)   </span></li>
+<li><span>    (let loop ((s s) (r ‘()))  ;定义s 和r 并赋初值   </span></li>
+<li><span>      (</span><span class="keyword">if</span><span> (</span><span class="keyword">null</span><span>? s) r   </span></li>
+<li><span>          (let ((d (cdr s)))   ;定义d 并赋初值   </span></li>
+<li><span>            (set-cdr! s r)   </span></li>
+<li><span>            (loop d s)   </span></li>
+<li><span>            )   </span></li>
+<li><span>          )   </span></li>
+<li><span>      )   </span></li>
+<li><span>    )   </span></li>
+<li><p><span>  )  </span><br></p></li></div><br>还有for-each 和 map两个东西，例子如下<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(</span><span class="keyword">for</span><span>-each display   </span></span></p>
+</li>
+<li><span>          (list </span><span class="string">“one”</span><span> </span><span class="string">“two”</span><span> </span><span class="string">“buckle my shoe”</span><span>)         ;输出onetwobuckle my shoe   </span></li>
+<li><span> )   </span></li>
+<li><p><span>(display (map cons ‘(</span><span class="number">1</span><span> </span><span class="number">2</span><span> </span><span class="number">3</span><span> </span><span class="number">4</span><span>) ‘(</span><span class="number">10</span><span> </span><span class="number">20</span><span> </span><span class="number">30</span><span> ())))        ;输出((</span><span class="number">1.10</span><span>) (</span><span class="number">2.20</span><span>) (</span><span class="number">3.30</span><span>) (</span><span class="number">4</span><span>));注意这里连接的两部分元素必须一样多  </span><br></p></li></div><br>第七章讲述了文件的基本操作，默认打开的是控制台，可以用open-input-file filename来打开输入文件，<br>open-output-file filename来打开输出文件，最后一定要关闭，不然操作的数据不会对文件进行相应的操作(<br>特指写功能)，可以用call-with-input-file  call-with-output-file来代替，这样的话可以不需要自己关<br>闭文件，处理完当前的任务就会自动关闭相应的文件，如果用open-output-file打开一个已经存在的文件的时<br>候，不加其他参数的话，是会报错的，如果想打开已经存在的文件可以加参数 #:extis ‘update/‘truncate<br>update的话是直接在原文件上从头开始修改，而truncate则是删掉旧文件，重新建一个新文件。例子如下<p></p>
+<div class="dp-highlighter"><br><div class="bar"></div>
+
+<li><p><span><span>(define i (open-input-file </span><span class="string">“hello.txt”</span><span>))           ;打开文件   </span></span></p>
+</li>
+<li><span>(read-</span><span class="keyword">char</span><span> i)                                      ;读取一个字符   </span></li>
+<li><span>(define j (read i))                                ;定义j为读取剩下的所有字符的一个字符串   </span></li>
+<li><span>(define o (open-output-file </span><span class="string">“greeting.txt”</span><span> #:exists ‘update))      ;以update方式打开一个文件   </span></li>
+<li><span>(display </span><span class="string">“hello”</span><span> o)                                ;输出hello   </span></li>
+<li><span>(write-</span><span class="keyword">char</span><span> #\space o)                             ;输出空格   </span></li>
+<li><span>(display ‘world o)                                 ;输出world   </span></li>
+<li><span>(newline o)                                        ;输出空行  </span><br></li></div><br>如果greeting.txt文件里面的文字原来是”abcdefthijklmn”的话,那么上述操作会使得文件的内容变成”hello<br>worldlmn”,但是如果用truncate方式打开的话，那么就会变成”hello world”
+
+<p>顺便把The Little Scheme的commandment贴在这</p>
+<p><span style="color: #ff0000;">First</span>: When recurring on a list of atoms, lat, ask two questions about it: (null? lat) and else.<br>When recurring on a number, n, ask two questions about it: (zero? n) and else.<br>When recurring on a list of S-expressions, l, ask three questions about it: (null? l), (atom? (car l)), and else.</p>
+<p><span style="color: #ff0000;">Second</span>: Use cons to build lists.</p>
+<p><span style="color: #ff0000;">Third</span>: When building a list, describe the first typical element, and then cons it onto the natural recursion.</p>
+<p><span style="color: #ff0000;">Fourth</span>: Always change at least one argument while recurring .When recurring on a list of atoms, lat, use(cdr lat). When recurring on a number, n, user (sub1 n). And when recurring on a list of S-expressions, l, use (car l) and (cdr l) if neither (null? l) nor (atom? (car l)) are true.<br>It must be changed to be closer to termination. The changing argument must be tested in the termination condition:<br>when using cdr, test termination with null? and<br>when using sub1, test termination with zero?.</p>
+<p><span style="color: #ff0000;">Fifth</span>: When building a value with + , always use 0 for the value of the terminating line, for adding 0 does not change the value of an addition.<br>When building a value with x[multiply] , always use 1 for the value of the terminating line, for multiplying by 1 does not change the value of a multiplication.<br><span style="color: #ff0000;">Sixth</span>: Simplify only after the function is correct.</p>
+<p><span style="color: #ff0000;">Seventh</span>: Recur on the subparts that are of the smae nature:<br>On the sublists of a list.<br>On the subexpressions of an arithmetic expression.</p>
+<p><span style="color: #ff0000;">Eighth</span>: Use help functions to abstract from representations.</p>
+<p><span style="color: #ff0000;">Ninth</span>:  Abstract common patterns with a new function.</p>
+<p><span style="color: #ff0000;">Tenth</span>:  Build functions to collect more than one value at a time.<br>这书断断续续的看了一段时间，打算现在开始边看t-y-scheme边看SICP，然后把SICP的每一章课后习题都做了<br>，也好督促自己好好学习。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2012-09-27 </div>
 			<div class="article-title"><a href="/2012/09/27/concrete-mathematics-chapter-1-homework-exercises/" >具体数学第一章习题</a></div>						
 		</h3>
@@ -482,31 +610,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-03-02 </div>
-			<div class="article-title"><a href="/2012/03/02/e3-80-8a-e6-ad-a4-e7-94-9f-e6-9c-aa-e5-ae-8c-e6-88-90-e3-80-8b-e4-ba-8e-e5-a8-9f/" >《此生未完成》---于娟</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>知道于娟这个人是因为这篇文章《<a href="http://www.klion26.com/why_am_i_cancer.html" target="_blank" rel="external">为什么是我得癌症</a>》。第一眼看到的是她那些头衔，上交本科，挪威奥斯陆大学硕士，复旦博士。看了上面的那篇文章当时对她这个人并不是了解，其实现在也不算了解。当时只觉得文章中有些东西确实可以警示后人。前不久看到有人推荐了她的书《此生未完成》，于是买来看了。书不厚，用了一天就看完了。看她写的那些文字，完全感觉不出她是一个癌症病人，她的文字写的可爱，率真，质朴，生动。她在书中说，不想让别人把她当成一个抗癌战士或者从她身上总结出“晚睡导致癌症”之类的来宣传，因为那样就完全失去了她想表达的意思，就像以前看卢旺达饭店里面那个记者说的一样，很多时候，人们只是把这当成饭后的谈资而已。<br>看这本书，有些地方能让你笑，有些地方能苦，笑完哭完之后，你会觉得她非同一般。第一感觉就是她非常的乐观，或许用她自己的话说是已经完全放下了，放下所有的一切。<br>很多时候用牛B或者犀利来形容一个人，但是在我看来这些词用来形容她似乎都不合适，或许她根本就不需要形容。</p>
-<p>下面的话语全部摘自书中</p>
-<p>我们要用多大的代价，才能认清活着的意义？<br>在确证乳腺癌之后，一个男性亲戚只知她得了重病，发来短信说：“如果需要骨髓、肾脏器官什么的，我来捐！！”丈夫念给她听，她哈哈大笑说“告诉他，我需要他捐乳房。”<br>其实我写这些，只是想告诉所有人：再大的痛苦，都会过去。<br>我不知道有没有机会育子成才，但可以用今天的行动告诉自己的孩子：你的妈妈不是懦夫，所以在你的人生里，遇到关键的人和珍贵的事，要积极争取，可以失败，但是不能放弃。<br>有太多的计划要完成，有太多的事情要应付，总是觉得等做好了手头的事情，陪父母也是来得及的。反正人生很长，时间很多。现在想想并不尽然，只有一天天的过，才是一年年，才是一辈子。无头绪的追逐与奔忙，一旦站定思考，发现半辈子已经过去，自己手里的成败并无多少意义，然后转身，才发现陪伴父母亲人的时间已然不多，发现最重要的幸福已然没有时间享用，人生最大的悲哀莫过于此。<br>父母盼望孩子有出息，但是往往享受不到和所谓有出息的孩子享受天伦的乐趣。即便知道如此，父母宁愿自己孤苦劳累还是希望子女有能力远走高飞好有出息<br>人，开心与否重要在于心态，即心情和状态，心境和姿态。<br>赢了你失去世界又如何<br>国外的闲适犹如一碗清水，腹饥的人吃下，会更怀想故里短短长长千丝万缕的阳春面，那价廉而悠长的过往<br>人越是长大，越是不知道自己要的是什么，越是不知道想要什么，就越是会拼命想自己的到底要什么<br>如今想来，善待自己不是给自己多买几盒价值不菲的化妆品那么简单，宽容他人才是最好的善待自己的方式。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -585,13 +688,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -599,27 +702,27 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
-		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -638,48 +741,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
+			<li><a href="/tags/概率/">概率<span>1</span></a></li>
 		
-			<li><a href="/tags/specify-timestamp/">specify_timestamp<span>1</span></a></li>
+			<li><a href="/tags/yum/">yum<span>1</span></a></li>
 		
-			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
 		
-			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
+			<li><a href="/tags/积分/">积分<span>1</span></a></li>
 		
-			<li><a href="/tags/at-most-once/">at-most-once<span>1</span></a></li>
+			<li><a href="/tags/opengl/">opengl<span>1</span></a></li>
 		
-			<li><a href="/tags/notes/">notes<span>0</span></a></li>
+			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+		
+			<li><a href="/tags/ASM/">ASM<span>1</span></a></li>
+		
+			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
 		
 			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
 		
-			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
+			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+		
+			<li><a href="/tags/链接排序/">链接排序<span>1</span></a></li>
+		
+			<li><a href="/tags/greedy-algorithm/">greedy algorithm<span>1</span></a></li>
 		
 			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
 		
-			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
 		
-			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
+			<li><a href="/tags/fork/">fork<span>2</span></a></li>
 		
-			<li><a href="/tags/windows/">windows<span>4</span></a></li>
+			<li><a href="/tags/office/">office<span>1</span></a></li>
 		
-			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
+			<li><a href="/tags/probability/">probability<span>1</span></a></li>
 		
-			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
+			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
 		
-			<li><a href="/tags/longest-increasing-subsequences/">longest increasing subsequences<span>1</span></a></li>
+			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
 		
-			<li><a href="/tags/于娟/">于娟<span>1</span></a></li>
-		
-			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
-		
-			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
-		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
-		
-			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
+			<li><a href="/tags/compter-graphics/">compter graphics<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>289</span></a></li>
+		   <li><a href="/tags">...<span>292</span></a></li>
 		 
 		</ul>
 	</div>
@@ -690,6 +793,10 @@
 <div class="widget">
   <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
+      </li>
     
       <li>
         <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
@@ -705,10 +812,6 @@
     
       <li>
         <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
-      </li>
-    
-      <li>
-        <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
       </li>
     
   </ul>

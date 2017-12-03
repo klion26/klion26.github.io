@@ -121,6 +121,36 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2014-12-29 </div>
+			<div class="article-title"><a href="/2014/12/29/show-me-the-code/" >Show me the code</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>想着好好的学习下 Python，只看书当然是不行的，就在网上找一些项目做，想找合适的项目太难的，每个人的情况不一样，对 A 是合适的，对 B 就不一定合适，后来找到 <a href="https://github.com/karan/Projects" target="_blank" rel="external">100 project </a>和 <a href="https://github.com/Yixiaohan/show-me-the-code" target="_blank" rel="external">show-me-the-code </a>这两个 Github 上的 repo，想着自己先做做，等逐渐熟练了之后，再去解决其他的问题。期间问了一个美团公司的工程师有什么可以推荐的不，他建议找自己想解决的问题，我当时想着在桌面写一个<a href="http://www.meituan.com/lottery/past?mtt=1.index%2Ffloor.rd.1.i49jroiy" target="_blank" rel="external">美团网自动抽奖</a>的程序，由于自己不熟悉前端，有些地方不懂，问了好几个搞前端的同学，也没搞定。想着干脆先照着前面两个 repo 写，另外写个爬虫，熟悉下。等自己熟悉那个抽奖系统的链接跳转之后，再去搞定它。</p>
+<p>下面是我做这些 project 时遇到的一些问题，这里会逐渐更新，所有的代码都放到<a href="https://github.com/klion26/Projects" target="_blank" rel="external">这个库中</a>。</p>
+<p>1. 在图片的右上角加一个红色的数字（类似 QQ 消息的信息数目提示），直接用 PIL 库可以解决，不过由于在 windows 确实某个库 _imagingft  C，照着网上的安装之后还是不行，不能更改字体，导致添加的数字字体太小。另外应该可以用 PyQt 或者 Opencv来解决。</p>
+<p>2. 生成一个定长的随机字符串：这个学到了好几种方法，个人觉得较好的是 a)跑 for 循环，每次生成一个字符; b) 用 random.sample ；c)用 random.shuffle。写这个的时候，以及其他一些东西的时候，自己还是用 c/c++ 的思想在写 python，另外一个比较明显的例子是交换两个数，这个要慢慢改过来。</p>
+<p>至于用生成的随机字符串生成验证码，也可以用 PIL 库解决，将字符串画到图片上，再在图片上画一些黑点/黑线，然后对图片进行扭曲操作，不过不要操作过头了，导致用户都不认识。</p>
+<p>3. 找出 html 文件中的正文，链接，或者下载某个页面中的所有图片。自己用的正则表达式处理，正文直接匹配的 <body[\s\s]*&lt; body="">，这里中间用 “[\s\S]”表示所有字符，不用通配符 <em>，是因为会有换行等特殊字符在里面；链接用的是 href=\”[^\”]</em>\”, 至于下载某个页面中的所有图片，首先利用正则表达式 src=\”http[^\”]*jpg\”（这里需要考虑多种图片格式），找出所有图片的 url，然后用urllib.urlretrieve() 函数将远程的图片下载到本地。</body[\s\s]*&lt;></p>
+<p>4. 对密码进行加密，直接用 hashlib 库就行了，可以用不同的加密函数，至于加密密码的时候，需要添加 salt，salt可以由用户提供，也可以用 uuid 生成一个随机的字符串，最后把 salt 添加到 hash 后的密码后面，为了后面验证需要。</p>
+<p>未完待续…</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2014-11-02 </div>
 			<div class="article-title"><a href="/2014/11/02/least-recently-used-algorithm/" >Least Recently Used Algorithm</a></div>						
 		</h3>
@@ -647,55 +677,6 @@ private:
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2014-05-09 </div>
-			<div class="article-title"><a href="/2014/05/09/linux-dbm/" >数据库函数库</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><span style="color: #0000ff;">由于这里贴代码效果不太好，而且很多东西讲起来不是很清楚，所以我把自己重写一次，然后加上注释的<span style="color: #ff0000;"><a href="https://github.com/klion26/APUE/blob/master/ch20/20-1.c" target="_blank" rel="external"><span style="color: #ff0000;">代码放在这里</span></a></span>，有意思的可以看下。</span></p>
-<p>本文基于APUE2e第20章，准确的说是自己对这一章的一个解读，如果需要了解更详细的东西，请参考书本。</p>
-<p>本章开发的函数库类似于ndbm函数库，但是增加了并发控制机制，从而允许多进程同时更新同一数据库，主要接口如下</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #98fb98; font-weight: bold;">void</span><span style="color: #f5deb3;"><em></em></span> <span style="color: #f5deb3;">DBHANDLE</span><span style="color: #f5deb3;">DBHANDLE</span>     <span style="color: #f5deb3;">db_open</span>(<span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"></span> pathname<span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">int</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">…);     //用来打开数据库</span><br><span style="color: #98fb98; font-weight: bold;">void</span>         <span style="color: #f5deb3;">db_close</span>(<span style="color: #f5deb3;">DBHANDLE db</span>);                  //用来关闭数据库<br><span style="color: #98fb98; font-weight: bold;">char</span>         <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">db_fetch</span>(<span style="color: #f5deb3;">DBHANDLE db</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"> key</span>);    //用来取特定数据库中特定key所对应的数据<br><span style="color: #98fb98; font-weight: bold;">int</span>         <span style="color: #f5deb3;">db_store</span>(<span style="color: #f5deb3;">DBHANDLE db</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"><em> key</em></span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"> data</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">int flag</span>); //用来更新数据库（插入或者更新）<br><span style="color: #98fb98; font-weight: bold;">int</span>         <span style="color: #f5deb3;">db_delete</span>(<span style="color: #f5deb3;">DBHANDLE db</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;">* key</span>);     //用来删除指定数据库中key所对应的记录<br><span style="color: #98fb98; font-weight: bold;">void</span>         <span style="color: #f5deb3;">db_rewind</span>(<span style="color: #f5deb3;">DBHANDLE db</span>);                     //回滚到数据库的第一条记录</div></p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"><em></em></span>         <span style="color: #f5deb3;">db_nextrec</span>(<span style="color: #f5deb3;">DBHANDLE db</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">key</span>);        //取下一条记录（不保证访问顺序，只保证每条记录访问一次）</div><br>这里给的程序把索引和数据单独存在不同的文件里面。分别对应为 pathname.idx 和 pathname.dat ，对于组织索引，常用的方法有散列（又叫哈希）和B+树，这里用的是固定大小的散列，并采用链表来解决散列冲突（类似于图的邻接表），大致关系图如下：</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2014/05/20-1.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2014/05/20-1-300x247.png" alt="" title="20-1"></a></p>
-<p>上图中给出了索引文件的格式，以及索引文件怎么和数据文件结合起来的。通过这张图对数据库函数库的整体有一个了解。</p>
-<p>对于有多个进程访问同一数据库时，有两种方法可实现库函数：（1）集中式：由一个进程作为数据库管理者，所有的数据库访问工作由此进程完成。其他进程通过IPC机制与此中心进程进行联系。（2）非集中式：每个库函数独立申请并发控制（加锁），然后自己调用I/O函数。使用第一种方法，需要使用IPC，不过可以控制不同进程的优先级，另外在出错的情况下也更容易进行复原。这里使用的是第二种方法。</p>
-<p>因为我们使用了<span style="color: #0000ff;">索引文件</span>和<span style="color: #0000ff;">数据文件</span>两个文件，所以在加锁的情况下，就有两种情况：（1）粗锁：对其中一个文件上锁，然后控制整个过程，这样的缺点是限制了最大程度的并发，因为不能有多个进程同时对数据库进行只读访问。（2）：细锁：如果对数据库进行读/写访问的时候，先获得数据所在散列链的读锁/写锁，允许对同一条散列链有多个读进程，但只能有一个写进程。一个写进程在操作空闲链表前，必须获得空闲链表的写锁。当 db_store 向索引文件或数据文件末尾追加一条新纪录时，必须获得对应文件相应区域的写锁。</p>
-<p>接下来是源代码的分析，借鉴本书的注释，另外加上自己的理解，争取把整个程序讲清楚。</p>
-<p>1. 如果我们想在C里面实现私有函数（类似于C++的 private 函数，那么可以用 static，这样函数就只能在本文件里访问了），上面我们提供了7个对数据库进行操作的函数，当然我们希望这7个函数通过调用其他辅助函数来完成实际的工作，这样能够更好的实现模块化和重用。但是辅助函数我们希望只能够在本文件进行访问，这里就可以用 static 来进行控制了。</p>
-<p>2. 需要说明的是DB结构，该结构用来记录一个打开数据库的所有信息</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span>    <span style="color: #f5deb3;">idxfd</span>  <span style="color: #da70d6;">/<em> 记录文件的文件描述符 </em>/</span><br><span style="color: #98fb98; font-weight: bold;">int</span>    <span style="color: #f5deb3;">datfd</span>  <span style="color: #da70d6;">/<em> 数据文件的文件描述符 </em>/</span><br><span style="color: #98fb98; font-weight: bold;">char</span>  <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idxbuf</span> <span style="color: #da70d6;">/ 为单条记录信息分配的内存 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">char</span>  <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">datbuf</span> <span style="color: #da70d6;">/<em> 为单条数据信息分配的内存</em>/</span><br><span style="color: #98fb98; font-weight: bold;">char</span>  <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">name</span>   <span style="color: #da70d6;">/ 当前打开的数据库（有 .idx/.dat 后缀） 用来打开对应的文件<em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">idxoff</span> <span style="color: #da70d6;">/ 索引文件中索引记录的偏移量 <em>/</em></span><br><span style="color: #da70d6;">/ key is at (idxoff + PTR_SZ + IDXLEN_SZ) 其中PTR_SZ标识链表指针的字节数，IDXLEN_SZ标识索引记录长度，见上图<em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">size_t</span> <span style="color: #f5deb3;">idxlen</span> <span style="color: #da70d6;">/ 索引记录长度 <em>/</em></span><br><span style="color: #da70d6;">/ 从key开始到’\n’结尾 具体的见上图 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">datoff</span> <span style="color: #da70d6;">/ <em>当前</em>数据记录的偏移量 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">size_t</span> <span style="color: #f5deb3;">datlen</span> <span style="color: #da70d6;">/ <em>当前</em>数据记录长度，包括后面的’\n’<em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">ptrval</span> <span style="color: #da70d6;">/ contents of chain ptr in index record <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">ptroff</span> <span style="color: #da70d6;">/ 该条记录链表（已散列）中下一条记录的偏移量 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">chainoff</span> <span style="color: #da70d6;">/ 该条记录散列之后所对应的链表的偏移量 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">hashoff</span>  <span style="color: #da70d6;">/ 散列表的偏移量 <em>/</em></span><br><span style="color: #f5deb3;">DBHASH</span> <span style="color: #f5deb3;">nhash</span>    <span style="color: #da70d6;">/ 当前的散列表大小，DBHASH是unsigned long的typedef <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_delok</span>    <span style="color: #da70d6;">/ delete OK, COUNT是unsigned long的typedef 这些COUNT是统计效率用的，比如删除成功多少次，失败多少次<em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_delerr</span>   <span style="color: #da70d6;">/ delete error <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_fetchok</span>  <span style="color: #da70d6;">/ fetch OK <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_fetcherr</span> <span style="color: #da70d6;">/ fetch error <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_nextrec</span>  <span style="color: #da70d6;">/ nextrec <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_stor1</span>    <span style="color: #da70d6;">/ store: DB_INSERT, no empty, appended <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_stor2</span>    <span style="color: #da70d6;">/ store: DB_INSERT, found empty, reused <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_stor3</span>    <span style="color: #da70d6;">/ store: DB_REPLACE, diff len, appended <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_stor4</span>    <span style="color: #da70d6;">/ store: DB_REPLACE, same len, overwrote <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_storerr</span>  <span style="color: #da70d6;">/ store error */</span><br><span style="color: #f5deb3;">}</span> <span style="color: #f5deb3;">DB</span></div><br>接下来就是打开数据库函数 db_open, 这个函数负责分析调用参数（oflag 是否带 O_CREAT ), 然后打开相应的索引文件和数据文件， 利用一个私有函数 _db_alloc(int) 该函数负责分配一个DB结构所需要的内存，然后返回给调用者。然后打开之后我们需要对数据库进行初始化，这里需要进行加锁，如果不加锁的话，可能会导致数据出错（多进程同时访问一个数据库）。代码如下：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">if</span> ((<span style="color: #f5deb3;">oflag</span> <span style="color: #f5deb3;"></span> (<span style="color: #f5deb3;">O_CREAT</span> | <span style="color: #f5deb3;">O_TRUNC</span>)) <span style="color: #f5deb3;">==</span> (<span style="color: #f5deb3;">O_CREAT</span> | <span style="color: #f5deb3;">O_TRUNC</span>)) <span style="color: #f5deb3;">{  //如果有O_CREAT 和 O_TRUNC 标识</span><br><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      If the database was created, we have to initialize</span><br><span style="color: #da70d6;">     <em> it.  Write lock the entire file so that we can stat</em></span><br><span style="color: #da70d6;">      it, check its size, and initialize it, atomically.</span><br><span style="color: #da70d6;">     */</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">writew_lock</span>(<span style="color: #f5deb3;">db</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">idxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">SEEK_SET</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)  // 在创建成功之后，对文件加一把写锁（其他进程不能读写该文件）<br><span style="color: #f5deb3;">err_dump</span>(<span style="color: #7fffd4;">“db_open: writew_lock error”</span>);      //加锁，是防止出现两个进程交替访问同一个数据库的情况，造成数据不统一<span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">fstat</span>(<span style="color: #f5deb3;">db</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">idxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">statbuff</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)            //得到索引文件的信息<br><span style="color: #f5deb3;">err_sys</span>(<span style="color: #7fffd4;">“db_open: fstat error”</span>);</div></p>
-<p><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">statbuff</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">st_size</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">{                   //如果索引文件长度为0</span><br><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">          We have to build a list of (NHASH_DEF + 1) chain</span><br><span style="color: #da70d6;">         <em> ptrs with a value of 0.  The +1 is for the free</em></span><br><span style="color: #da70d6;">          list pointer that precedes the hash table.</span><br><span style="color: #da70d6;">         <em>/</em></span><br><span style="color: #f5deb3;">sprintf</span>(<span style="color: #f5deb3;">asciiptr</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">PTR_SZ</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>);           //全部设置为0, 其中 %*d, 标识一共占PTR_SZ个位置，值为0<br><span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> (<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">NHASH_DEF</span> <span style="color: #f5deb3;">+</span> <span style="color: #add8e6;">1</span>; <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)            //所有的散列链都置为0, 标识所有散列链都没有数据<br><span style="color: #f5deb3;">strcat</span>(<span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">asciiptr</span>);<br><span style="color: #f5deb3;">strcat</span>(<span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">strlen</span>(<span style="color: #f5deb3;">hash</span>);<br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">write</span>(<span style="color: #f5deb3;">db</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">idxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">i</span>) <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">i</span>)            //初始化散列部分<br><span style="color: #f5deb3;">err_dump</span>(<span style="color: #7fffd4;">“db_open: index file init write error”</span>);<br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">un_lock</span>(<span style="color: #f5deb3;">db</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">idxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">SEEK_SET</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)        //不管初始化成功与否，对文件进行解锁<br><span style="color: #f5deb3;">err_dump</span>(<span style="color: #7fffd4;">“db_open: un_lock error”</span>);<br><span style="color: #f5deb3;">}</span></p>
-<p><br>接下来是关闭数据库 db_close(DBHANDLE h), 这个函数调用了一个内部函数 _db_free(DB*); 对打开的文件描述符进行关闭（在初始化的时候把文件描述符置为-1,在这里就派上用场了），释放分配的内存。 _db_free 函数在其他很多地方也会被调用，比如数据库打开出错的情况下，需要释放分配的内存，然后返回出错。</p>
-<p>接下来是 db_fetch(DBHANDLE, const char<em>) 函数，这个函数返回 指定数据库的特定 key 值的数据项，在这里调用 _db_find_and_lock(DB</em>, const char<em> key, int writelock) 函数进行加锁以及查询， 如果查询成功，那么就使用 _db_readdat(DB</em>)进行数据读取。在处理完成之后，需要在 db_fetch 函数中对加锁文件进行解锁</p>
-<p>_db_find_and_lock(DB<em> db, const char</em> key, int writelock) 对指定指定索引进行查询，并加锁。如果 writelock 非0则加写锁，否则加读锁。这里的锁只加在 key 散列之后所在的散列链上（这样运行不同的进程同时访问不同的散列链，从而增加并发性）。 然后调用 _db_readptr(DB*, off_t offset) 得到散列链中的第一个指针，如果这个函数返回0, 表示散列链为空。然后对散列链进行遍历，一查看是否存在一条需要查询的记录。</p>
-<p>接下来是 db_delete() 函数，首先进行加锁并查找， 如果查找成功，则用 _db_dodelete() 进行删除， 最后不管成功与否，都需要对加锁的数据段进行解锁。因为可能需要更改散列链，所以这里加的是一把写锁。</p>
-<p>_db_dodelete 函数用来实际进行删除操作。操作过程中更新空闲链表以及对应的散列链。更新索引文件和数据为空格（这里在后面的 db_nextrec 会用到）</p>
-<p>_db_writedate 实际进行一个数据的更新，把数据写到相应的内存位置，如果是有 db_store 进行调用，且是追加数据的话，需要对文件进行加写锁。</p>
-<p>_db_writeidx 更新索引数据，与上一个函数类似</p>
-<p>_db_writeptr 将一个链表指针写至索引文件中。</p>
-<p>db_store() 对数据库进行操作，插入，更新。这里面首先需要进行加锁，查找。然后分为四种情况：第一种没有查找到，所以需要添加记录，添加的时候，通过查找我们以前删除过的记录，它的键长度和数据长度与当前的键长度和数据长度一致，如果没有找到，就将这条数据添加到索引文件和数据文件的末尾，然后更新数据，索引部分。第二种，我们在以前删除过的记录中查找到了，那么直接重用就行了。第三种，替换已有数据，且新记录的长度和已有记录的长度不一样，那么直接删除旧数据（前面已经有了），再添加新数据就行了。第四种，新纪录的长度和已有记录的长度一样，直接更新记录即可。</p>
-<p>_db_findfree(DB* db, int keylen, int datlen) 查找一块已经删除了的指定大小的数据块。通过遍历空闲链表，查找合适的数据块，找到就从空闲链表中删除，找不到的话就返回一个出错信息。</p>
-<p>db_rewind() 将索引文件的文件偏移量置为第一条索引记录</p>
-<p>db_nextrec() 遍历索引文件，返回下一条记录。返回的是一个只想DB结构里面的内存区域。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -774,13 +755,13 @@ private:
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
-		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -788,27 +769,27 @@ private:
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
-			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
-		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -827,48 +808,48 @@ private:
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/https/">https<span>1</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li>
 		
-			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
+			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
 		
-			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
+			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
 		
-			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
+			<li><a href="/tags/tencent/">tencent<span>1</span></a></li>
 		
-			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
+			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
 		
-			<li><a href="/tags/半平面交/">半平面交<span>1</span></a></li>
+			<li><a href="/tags/Code/">Code<span>1</span></a></li>
 		
-			<li><a href="/tags/specify-timestamp/">specify_timestamp<span>1</span></a></li>
+			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
 		
-			<li><a href="/tags/notes/">notes<span>0</span></a></li>
+			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
 		
-			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
+			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
 		
-			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
-		
-			<li><a href="/tags/question/">question<span>1</span></a></li>
-		
-			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
-		
-			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
-		
-			<li><a href="/tags/source-code/">source_code<span>2</span></a></li>
-		
-			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
-		
-			<li><a href="/tags/greedy-algorithm/">greedy algorithm<span>1</span></a></li>
+			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
 		
 			<li><a href="/tags/插件/">插件<span>1</span></a></li>
 		
-			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+			<li><a href="/tags/databse/">databse<span>1</span></a></li>
 		
-			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
+			<li><a href="/tags/select/">select<span>2</span></a></li>
 		
-			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
+			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
+		
+			<li><a href="/tags/inside/">inside<span>1</span></a></li>
+		
+			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
+		
+			<li><a href="/tags/code-style/">code-style<span>1</span></a></li>
+		
+			<li><a href="/tags/jekyll/">jekyll<span>1</span></a></li>
+		
+			<li><a href="/tags/ASM/">ASM<span>1</span></a></li>
+		
+			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>289</span></a></li>
+		   <li><a href="/tags">...<span>292</span></a></li>
 		 
 		</ul>
 	</div>
@@ -879,6 +860,10 @@ private:
 <div class="widget">
   <h4>Posts recentes</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
+      </li>
     
       <li>
         <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
@@ -894,10 +879,6 @@ private:
     
       <li>
         <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
-      </li>
-    
-      <li>
-        <a href="/2017/09/22/GC-引用计数法/" ><i class="fa fa-file-o"></i>GC 引用计数法</a>
       </li>
     
   </ul>

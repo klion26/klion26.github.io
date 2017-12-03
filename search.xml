@@ -3,6 +3,70 @@
   
     
     <entry>
+      <title><![CDATA[tasksetmanager]]></title>
+      <url>/2017/12/03/tasksetmanager/</url>
+      <content type="html"><![CDATA[<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">* Schedules the tasks within a single TaskSet in the TaskSchedulerImpl. This class keeps track of</div><div class="line">* each task, retries tasks if they fail (up to a limited number of times), and</div><div class="line">* handles locality-aware scheduling for this TaskSet via delay scheduling. The main interfaces</div><div class="line">* to it are resourceOffer, which asks the TaskSet whether it wants to run a task on one node,</div><div class="line">* and statusUpdate, which tells it that one of its tasks changed state (e.g. finished).</div><div class="line">*</div><div class="line">* THREADING: This class is designed to only be called from code with a lock on the</div><div class="line">* TaskScheduler (e.g. its event handlers). It should not be called from other threads.</div><div class="line">*</div><div class="line">* @param sched           the TaskSchedulerImpl associated with the TaskSetManager</div><div class="line">* @param taskSet         the TaskSet to manage scheduling for</div><div class="line">* @param maxTaskFailures if any particular task fails this number of times, the entire</div><div class="line">*                        task set will be aborted</div><div class="line">*/</div></pre></td></tr></table></figure>
+<p><code>TaskSetManager</code> 负责某个 TaskSet 的调度，对该 TaskSet 的所有 task 进行跟踪，如果有失败的 task，会负责重试（重试有上限），并且通过 delay scheduling（可以想想这个怎么实现的？） 实现 locality  locality-aware scheduling. 主要的接口有 <code>resourceOffer</code> – 用于判断一个 TaskSet 中的 task 是否需要运行到某个 node 上，<code>statusUpdate</code> – 用于跟踪 task 的状态变化。不是线程安全的。</p>
+<a id="more"></a>
+<p><code>dequeeTaskFromList(execId: String, list: ArrayBuffer[Int]): Option[Int]</code> 负责从对应的 list 中删除返回一个 pending Task，如果没有合适的 Task 就返回 None，该 function 中会将那些已经运行的 task 进行删除，会跳过所有的不能在对应 execId 上运行的 task（通过 executorIsBlacklisted(execId, index) 进行判断）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">while (indexOffset &gt; 0) &#123;</div><div class="line">	indexOffset -= 1</div><div class="line">	val index = list(indexOffset)</div><div class="line">	if (!executorIsBlacklisted(execId, index)) &#123;</div><div class="line">		// This should almost always be list.trimEnd(1) to remove tail</div><div class="line">		list.remove(indexOffset)</div><div class="line">		if (copiesRunning(index) == 0 &amp;&amp; !successful(index)) &#123;</div><div class="line">			return Some(index)</div><div class="line">	    &#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>dequeueTask(execId: String, host: String, maxLocality: TaskLocality.Value): Option[(Int, TaskLocality.Value, Boolean)])</code> 删除并返回一个可执行的 task，只返回符合 locality 约束的 task。首先逐个 locality 进行查找，如果有符合的 task 直接返回，否则返回一个合适的 推测执行的 task</p>
+<p><code>executorIsBlacklisted(execId: String, taskId: Int): Boolean</code> 进行判断某个 execId 上能否运行对应的 task（如果之前这个 taskId 在这个 execId 上运行失败了，而且当前时间和之间失败的时间差小于阈值 <code>EXECUTOR_TASK_BLACKLIST_TIMEOUT</code>）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">def executorIsBlacklisted(execId: String, taskId: Int): Boolean = &#123;</div><div class="line">	if (failedExecutors.contains(taskId)) &#123;</div><div class="line">		val failed = failedExecutors.get(taskId).get</div><div class="line"></div><div class="line">		return failed.contains(execId) &amp;&amp;</div><div class="line">		clock.getTimeMillis() - failed.get(execId).get &lt; EXECUTOR_TASK_BLACKLIST_TIMEOUT</div><div class="line">	&#125;</div><div class="line"></div><div class="line">    false</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>dequeueSpeculativeTask(execId: String, host: String, locality: TaskLocality.Value): Option[(Int, TaskLocality.Value)]</code> 负责删除并返回一个 推测执行的 task，如果没有合适的就返回 None。逻辑就是遍历所有 task，然后看 task 是否能运行在特定的 TaskLocality 上，如果可以就返回，并且将该 task 从推测执行的 task list 中删除。TaskLocality 的顺序为 <code>{PROCESS_LOCAL, NODE_LOCAL, NO_PREF, RACK_LOCAL, ANY}</code></p>
+<p>如何实施推测执行，逻辑在 <code>checkSpeculatableTasks</code> 函数中，</p>
+<ol>
+<li>如果该 TaskSetManager 变为 zoombie 了，或者只包含一个 task，就不推测执行（为什么一个 task 就不推测执行）</li>
+<li>如果完成的 task 数大于等于 <code>minFinishedForSpeculation = (SPECULATION_QUANTILE * numTasks).floor.toInt</code>（其中 <code>SPECULATION_QUANTILE</code> 默认 0.75，可以通过 <code>spark.speculation.quantile</code> 设置）且有 task 成功执行过，则执行下面的步骤</li>
+<li>将所有执行成功的 task 的执行时间进行排序，取第 <code>val medianDuration = durations(min((0.5 * tasksSuccessful).round.toInt, durations.size - 1))
+val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  threshold 作为临界值，对每个 task 进行检测。</li>
+<li>如果该 task 还没有运行成功，运行时间超过 <code>threshold</code>，只有一个实例在跑，而且没有推测执行过，就进行推测执行</li>
+<li>推测执行保证同一个 task 的不同实例不会调度到同一台主机上，且不会调度到以及被加进黑名单的主机中</li>
+</ol>
+<p><code>resourceOffer（execId: String,host: String,maxLocality:TaskLocality.TaskLocality): Option[TaskDescription]</code> 负责资源的实际分配，如果当前 taskSetManager 不是 zoombie 状态才进行处理。首先找出当前时间可以被调度到的最高 Locality，然后使用 <code>dequeuTask</code> 删除并找到一个符合条件的 task，如果找到就更新相关的状态数据（包括，更新现在正在运行的 task 有哪些，更新当前的 locality，然后将 task 所需要的文件等序列化，附加到一个 TaskDescription 结构中并且返回），并且通知 DAGScheduler 该 task 已经开始运行。如果序列化有问题，则直接抛异常。</p>
+<p><code>getAllowedLocalityLevel(curTime: Long): TaskLocality.TaskLocality</code> 获取当前时间对应的一个 TaskLocality, 这里面会有时间等待（等待的时间就是每个 TaskLocality 的等待时间，默认 3s，可以配置）</p>
+<p><code>handleTaskGettingResult</code> 主要进行状态标记，然后通知 DAGScheduler<br><code>canFetchMoreResults(size: Long): Boolean</code> 检测是否还能 fetch size 字节大小已经序列化后的数据，如果不能，就将该 taskSetManger 标记为 zoombie，并且通知 DAGScheduler 该 TaskSet 为失败</p>
+<p><code>handleSuccessfulTask(tid: Long, result: DirectTaskResult[_]): Unit</code> 负责将一个 task 标记为成功，并且如果当前 TaskSet 所有 task 都运行完成，就标记为 zoombie 状态，并且通知 DAGScheduler。</p>
+<p><code>handleFailedTask(tid: Long, state: TaskState, reason: TaskEndReason)</code> 将task 标记为失败，并且重新添加到 pendingTask 队列中，然后通知 DAGScheduler。根据失败的信息不同，做不同的处理：</p>
+<ol>
+<li>FetchFailure：直接想当前的 <code>tasksetManager</code> 标记为 zoombie，然后做一定的清理工作，就把当前的 <code>tasksetManager</code> 标记为成功</li>
+<li>ExceptionFailure：如果是 <code>NotSerializableException</code> 就直接退出，否则会打印相应异常，然后进行重试</li>
+<li>其他的异常，打印日志</li>
+</ol>
+<p><code>executorLost(execId: String, host: String, reason: ExecutorLossReason)</code> 负责处理 executorLost 的情况，由 taskSchedulerImp 调用。逻辑如下</p>
+<ul>
+<li>如果是 <code>ShufflleMapTask</code> 且没有开启 <code>externalShuffleServiceEnabled</code> 就进行如下操作：如果 task 以及成功了，就将这些 task 标记为失败，且进行重试（因为后续的 task 需要从这些 task 中获取数据）</li>
+<li>如果是其他的，就直接调用 <code>handleFailedTask</code> 进行处理，然后重新计算 <code>locality</code></li>
+</ul>
+<p><code>getLocalityWait(level: TaskLocality.TaskLocality): Long =</code> 用于获取 locality, 代码如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">val defaultWait = conf.get(&quot;spark.locality.wait&quot;, &quot;3s&quot;)</div><div class="line">val localityWaitKey = level match &#123;</div><div class="line">	case TaskLocality.PROCESS_LOCAL =&gt; &quot;spark.locality.wait.process&quot;</div><div class="line">	case TaskLocality.NODE_LOCAL =&gt; &quot;spark.locality.wait.node&quot;</div><div class="line">	case TaskLocality.RACK_LOCAL =&gt; &quot;spark.locality.wait.rack&quot;</div><div class="line">	case _ =&gt; null</div><div class="line">&#125;</div><div class="line"></div><div class="line">if (localityWaitKey != null) &#123;</div><div class="line">	conf.getTimeAsMs(localityWaitKey, defaultWait)</div><div class="line">&#125; else &#123;</div><div class="line">	0L</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="疑问："><a href="#疑问：" class="headerlink" title="疑问："></a>疑问：</h3><ol>
+<li>推测执行的时候，为什么 TaskSet 只有 1 个 task 的话就不推测执行</li>
+<li>推测执行对每个 task 只会进行一次？<br> a. 可以被 推测执行多次，只执行一次的逻辑是使用 <code>speculatableTasks</code> 做检测的，当运行一个 推测执行的 task 后，该 task 就会从 <code>speculatableTasks</code> 进行删除，然后就可以进行推测执行了。严格的说法是，只运行同一个 task 的一个实例在“排队等待被推测执行”</li>
+<li>每个 task 的 <code>preferredLocations</code> 怎么得到的？根据什么规则？每一个的含义又是什么，总共有 <code>{PROCESS_LOCAL, NODE_LOCAL, NO_PREF, RACK_LOCAL, ANY}</code> 这些可选项</li>
+<li>每个 TaskSet 的所有 task 都是一样的 locality？</li>
+<li>推测执行的时候，如果最后执行成功多个 task，会对结果有影响吗？怎么规避这种影响的</li>
+</ol>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> spark </tag>
+            
+            <tag> source_code </tag>
+            
+            <tag> tasksetmanager </tag>
+            
+            <tag> task </tag>
+            
+            <tag> stage </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[TaskScheduler]]></title>
       <url>/2017/11/27/TaskScheduler/</url>
       <content type="html"><![CDATA[<blockquote>
@@ -1395,9 +1459,9 @@
             
             <tag> exactly-once </tag>
             
-            <tag> zookeeper </tag>
-            
             <tag> offset </tag>
+            
+            <tag> zookeeper </tag>
             
         </tags>
         
@@ -1843,9 +1907,9 @@
             
             <tag> distributed-system </tag>
             
-            <tag> mit </tag>
-            
             <tag> kv </tag>
+            
+            <tag> mit </tag>
             
             <tag> viewservice </tag>
             
@@ -1897,11 +1961,11 @@
             
             <tag> distributed-system </tag>
             
+            <tag> mit </tag>
+            
             <tag> go </tag>
             
             <tag> mapreduce </tag>
-            
-            <tag> mit </tag>
             
         </tags>
         
@@ -2200,9 +2264,9 @@
         
         <tags>
             
-            <tag> blog </tag>
-            
             <tag> github </tag>
+            
+            <tag> blog </tag>
             
             <tag> math-expression </tag>
             
@@ -3341,11 +3405,11 @@ private:
             
             <tag> fedora </tag>
             
+            <tag> plugin </tag>
+            
             <tag> vi </tag>
             
             <tag> vim </tag>
-            
-            <tag> plugin </tag>
             
             <tag> vundle </tag>
             
@@ -3983,9 +4047,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> fedora </tag>
             
-            <tag> blog </tag>
-            
             <tag> github </tag>
+            
+            <tag> blog </tag>
             
             <tag> free </tag>
             
@@ -4098,13 +4162,13 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> fedora </tag>
             
-            <tag> command </tag>
-            
-            <tag> tutorial </tag>
-            
             <tag> vi </tag>
             
             <tag> vim </tag>
+            
+            <tag> command </tag>
+            
+            <tag> tutorial </tag>
             
         </tags>
         
@@ -4287,7 +4351,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;">&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#110;&#109;&#97;&#x73;&#x74;&#x65;&#x72;&#x73;&#x2e;&#x6f;&#114;&#103;">&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#110;&#109;&#97;&#x73;&#x74;&#x65;&#x72;&#x73;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -7287,9 +7351,9 @@ return 1;
         
         <tags>
             
-            <tag> grub </tag>
-            
             <tag> Red Hat9 </tag>
+            
+            <tag> grub </tag>
             
         </tags>
         
