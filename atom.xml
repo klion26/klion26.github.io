@@ -403,41 +403,6 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
   </entry>
   
   <entry>
-    <title>GC 引用计数法</title>
-    <link href="http://yoursite.com/2017/09/22/GC-%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95/"/>
-    <id>http://yoursite.com/2017/09/22/GC-引用计数法/</id>
-    <published>2017-09-22T12:48:06.000Z</published>
-    <updated>2017-10-16T12:19:17.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>本文将将介绍 GC 算法中最基本的三种算法的第二种：引用计数法。</p>
-<h1 id="GC-引用计数法"><a href="#GC-引用计数法" class="headerlink" title="GC 引用计数法"></a>GC 引用计数法</h1><p>GC 本来是一种“释放已经没有被引用的对象的机制”，人们自然就想到，通过记录所有对象的引用次数来进行，这就是 GC 引用计数法。</p>
-<p>引用计数法，一句话来说就是，记录每个对象被引用的多少次，如果引用次数为零，就编程“垃圾”了，可以被回收。</p>
-<p>下面给出引用计数法的基本代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">//分配对象</div><div class="line">new_object(size) &#123;</div><div class="line">    obj = pickup_chunk(size, $free_list) //从 free_list 中查找一个符合大小的块</div><div class="line">    </div><div class="line">    if (obj == NULL) //分配失败</div><div class="line">        allocation_fail()</div><div class="line">    else //分配成功</div><div class="line">        obj.ref_cnt = 1 //更新引用计数</div><div class="line">        return ojb</div><div class="line">&#125;</div><div class="line"></div><div class="line">//更新指针</div><div class="line">update_ptr(ptr, obj) &#123;</div><div class="line">    inc_ref_cnt(obj)  // 更新 obj 的引用</div><div class="line">    dec_ref_cnt(*ptr) // 更新 *ptr 的引用，注意这两句话的顺序，思考是否可以调换顺序</div><div class="line">    *ptr = obj</div><div class="line">&#125;</div><div class="line"></div><div class="line">inc_ref_cnt(obj) &#123;</div><div class="line">    obj.ref_cnt++</div><div class="line">&#125;</div><div class="line"></div><div class="line">dec_ref_cnt(obj) &#123;</div><div class="line">    obj.ref_cnt-- // 更新引用计数</div><div class="line">    if(obj.ref_cnt == 0) //如果该对象变成了 “垃圾”，进行回收</div><div class="line">        for (child: children(obj)) //更新所有子节点的引用</div><div class="line">            dec_ref_cnt(*child)</div><div class="line">        reclaim(obj)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>GC 引用计数法的大致流程如上所述，其中 update_ptr 可以用下图描述</p>
-<h1 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h1><p>对于引用计数法，我们可以来看看它到底有哪些优缺点呢？</p>
-<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ol>
-<li><p>可即刻回收垃圾。</p>
-<p> 在引用计数法中，每个对象都知道自己的被引用数，一旦计数变为 0，就会被链接到空闲链表中。换句话说，所有对象在被标记为垃圾的同时就会被回收。</p>
-</li>
-<li><p>最大暂停时间短</p>
-<p> 只有更新指针的时候才会执行垃圾回收，</p>
-</li>
-<li></li>
-</ol>
-<h1 id="优化方案"><a href="#优化方案" class="headerlink" title="优化方案"></a>优化方案</h1>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;本文将将介绍 GC 算法中最基本的三种算法的第二种：引用计数法。&lt;/p&gt;
-&lt;h1 id=&quot;GC-引用计数法&quot;&gt;&lt;a href=&quot;#GC-引用计数法&quot; class=&quot;headerlink&quot; title=&quot;GC 引用计数法&quot;&gt;&lt;/a&gt;GC 引用计数法&lt;/h1&gt;&lt;p&gt;GC 本来是
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
     <title>GC 标记-清除算法</title>
     <link href="http://yoursite.com/2017/09/17/GC-%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95/"/>
     <id>http://yoursite.com/2017/09/17/GC-标记-清除算法/</id>
@@ -1199,6 +1164,63 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
       <category term="hdfs" scheme="http://yoursite.com/tags/hdfs/"/>
     
       <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark Streaming 自适应上游 kafka topic partition 数目变化</title>
+    <link href="http://yoursite.com/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/"/>
+    <id>http://yoursite.com/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/</id>
+    <published>2016-11-01T08:56:13.000Z</published>
+    <updated>2017-06-03T03:40:54.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。</p>
+<a id="more"></a>
+<h2 id="思考过程"><a href="#思考过程" class="headerlink" title="思考过程"></a>思考过程</h2><p>为了作业能够长时间的运行，一开始遇到这种情况的时候，想到两种方案：</p>
+<ol>
+<li>感知上游 topic 的 partition 数目变化，然后发送报警，让用户重启</li>
+<li>直接在作业内部自适应上游 topic partition 的变化，完全不影响作业<br>方案 1 是简单直接，第一反应的结果，但是效果不好，需要用户人工介入，而且需要删除 checkpoint 文件</li>
+</ol>
+<p>方案 2 从根本上解决问题，用户不需要关心上游 partition 数目的变化，但是第一眼会觉得较难实现。</p>
+<p>方案 1 很快被 pass 掉，因为人工介入的成本太高，而且实现起来很别扭。接下来考虑方案 2.</p>
+<p>Spark Streaming 程序中使用 Kafka 的最原始方式为 <code>KafkaUtils.createDirectStream</code> 通过源码，我们找到调用链条大致是这样的</p>
+<p><span style="color: #0000ff;"><strong><code>KafkaUtils.createDirectStream</code></strong></span>   –&gt;   <strong><span style="color: #0000ff;"><code>new DirectKafkaInputDStream</code></span></strong> –&gt; 最终由 <code>DirectKafkaInputDStream#compute(validTime : Time)</code> 函数来生成 KafkaRDD。</p>
+<p>而 KafkaRDD 的 partition 数和 <strong><span style="color: #0000ff;">作业开始运行时</span></strong> topic 的 partition 数一致，topic 的 partition 数保存在 currentOffsets 变量中，currentOffsets 是一个 Map[TopicAndPartition, Long]类型的变量，保存每个 partition 当前消费的 offset 值，但是作业运行过程中 currentOffsets 不会增加 key，就是说不会增加 KafkaRDD 的 partition，这样导致每次生成 KafkaRDD 的时候都使用 <span style="color: #0000ff;"><strong>作业开始运行时</strong></span> topic 的 partition 数作为 KafkaRDD 的 partition 数，从而会造成数据的丢失。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>我们只需要在每次生成 KafkaRDD 的时候，将 currentOffsets 修正为正常的值（往里面增加对应的 partition 数，总共 B-A 个，以及每个增加的 partition 的当前 offset 从零开始）。</p>
+<ul>
+<li>第一个问题出现了，我们不能修改 Spark 的源代码，重新进行编译，因为这不是我们自己维护的。想到的一种方案是继承 DirectKafkaInputDStream。我们发现不能继承 DirectKafkaInputDStream 该类，因为这个类是使用 <code>private[streaming]</code> 修饰的。</li>
+<li>第二个问题出现了，怎么才能够继承 DirectKafkaInputDStream，这时我们只需要将希望继承 DirectKafkaInputDStream 的类放到一个单独的文件 F 中，文件 F 使用 <code>package org.apache.spark.streaming</code> 进行修饰即可，这样可以绕过不能继承 DirectKafkaInputDStream 的问题。这个问题解决后，我们还需要修改 <code>Object KafkaUtils</code>，让该 Object 内部调用我们修改后的 DirectKafkaInputDStream（我命名为 MTDirectKafkaInputDStream)</li>
+<li>第三个问题如何让 Spark 调用 MTDirectKafkaInputDStream，而不是 DirectKafkaInputDStream，这里我们使用简单粗暴的方式，将 KafkaUtils 的代码 copy 一份，然后将其中调用 DirectKafkaInputDStream 的部分都修改为 MTDirectKafkaInputDStream，这样就实现了我们的需要。当然该文件也需要使用 <code>package org.apache.spark.streaming</code> 进行修饰</li>
+<li>第二个和第三个问题的解决方案在  中国 Spark 技术峰会 2016  上，广点通的 林立伟 有提及，后续会进行尝试<br>总结下，我们需要做两件事</li>
+</ul>
+<ol>
+<li>修改 DirectKafkaInputDStream#compute 使得能够自适应 topic 的 partition 变更</li>
+<li>修改 KafkaUtils，使得我们能够调用修改过后的 DirectKafkaInputDStream</li>
+</ol>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div></pre></td><td class="code"><pre><div class="line">package org.apache.spark.streaming.kafka.mt</div><div class="line"></div><div class="line">import com.meituan.data.util.Constants</div><div class="line">import com.meituan.service.inf.kms.client.Kms</div><div class="line">import kafka.common.&#123;ErrorMapping, TopicAndPartition&#125;</div><div class="line">import kafka.javaapi.&#123;TopicMetadata, TopicMetadataRequest&#125;</div><div class="line">import kafka.javaapi.consumer.SimpleConsumer</div><div class="line">import kafka.message.MessageAndMetadata</div><div class="line">import kafka.serializer.Decoder</div><div class="line">import org.apache.spark.streaming.&#123;StreamingContext, Time&#125;</div><div class="line">import org.apache.spark.streaming.kafka.&#123;DirectKafkaInputDStream, KafkaRDD&#125;</div><div class="line"></div><div class="line">import scala.collection.JavaConverters._</div><div class="line">import scala.util.control.Breaks._</div><div class="line">import scala.reflect.ClassTag</div><div class="line"></div><div class="line">/**</div><div class="line">  * Created by qiucongxian on 10/27/16.</div><div class="line">  */</div><div class="line">class MTDirectKafkaInputDStream[</div><div class="line">  K: ClassTag,</div><div class="line">  V: ClassTag,</div><div class="line">  U &lt;: Decoder[K]: ClassTag,</div><div class="line">  T &lt;: Decoder[V]: ClassTag,</div><div class="line">  R: ClassTag](</div><div class="line">    @transient ssc_ : StreamingContext,</div><div class="line">    val MTkafkaParams: Map[String, String],</div><div class="line">    val MTfromOffsets: Map[TopicAndPartition, Long],</div><div class="line">    messageHandler: MessageAndMetadata[K, V] =&gt; R</div><div class="line">) extends DirectKafkaInputDStream[K, V, U, T, R](ssc_, MTkafkaParams , MTfromOffsets, messageHandler) &#123;</div><div class="line">    private val kafkaBrokerList : String = &quot;host1:port1,host2:port2,host3:port3&quot; //根据自己的情况自行修改</div><div class="line"></div><div class="line">    override def compute(validTime: Time) : Option[KafkaRDD[K, V, U, T, R]] = &#123;</div><div class="line">      /**</div><div class="line">        * 在这更新 currentOffsets 从而做到自适应上游 partition 数目变化</div><div class="line">        */</div><div class="line">        updateCurrentOffsetForKafkaPartitionChange()</div><div class="line">        super.compute(validTime)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private def updateCurrentOffsetForKafkaPartitionChange() : Unit = &#123;</div><div class="line">      val topic = currentOffsets.head._1.topic</div><div class="line">      val nextPartitions : Int = getTopicMeta(topic) match &#123;</div><div class="line">          case Some(x) =&gt; x.partitionsMetadata.size()</div><div class="line">          case _ =&gt; 0</div><div class="line">      &#125;</div><div class="line">      val currPartitions = currentOffsets.keySet.size</div><div class="line"></div><div class="line">      if (nextPartitions &gt; currPartitions) &#123;</div><div class="line">        var i = currPartitions</div><div class="line">        while (i &lt; nextPartitions) &#123;</div><div class="line">           currentOffsets = currentOffsets + (TopicAndPartition(topic, i) -&gt; 0)</div><div class="line">           i = i + 1</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      logInfo(s&quot;######### $&#123;nextPartitions&#125;  currentParttions $&#123;currentOffsets.keySet.size&#125; ########&quot;)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private def getTopicMeta(topic: String) : Option[TopicMetadata] = &#123;</div><div class="line">        var metaData : Option[TopicMetadata] = None</div><div class="line">        var consumer : Option[SimpleConsumer] = None</div><div class="line"></div><div class="line">        val topics = List[String](topic)</div><div class="line">        val brokerList = kafkaBrokerList.split(&quot;,&quot;)</div><div class="line">        brokerList.foreach(</div><div class="line">          item =&gt; &#123;</div><div class="line">            val hostPort = item.split(&quot;:&quot;)</div><div class="line">            try &#123;</div><div class="line">              breakable &#123;</div><div class="line">                  for (i &lt;- 0 to 3) &#123;</div><div class="line">                      consumer = Some(new SimpleConsumer(host = hostPort(0), port = hostPort(1).toInt,</div><div class="line">                                            soTimeout = 10000, bufferSize = 64 * 1024, clientId = &quot;leaderLookup&quot;))</div><div class="line">                      val req : TopicMetadataRequest = new TopicMetadataRequest(topics.asJava)</div><div class="line">                      val resp = consumer.get.send(req)</div><div class="line"></div><div class="line">                      metaData = Some(resp.topicsMetadata.get(0))</div><div class="line">                      if (metaData.get.errorCode == ErrorMapping.NoError) break()</div><div class="line">                  &#125;</div><div class="line">              &#125;</div><div class="line">            &#125; catch &#123;</div><div class="line">              case e =&gt; logInfo(s&quot; ###### Error in MTDirectKafkaInputDStream $&#123;e&#125; ######&quot;)</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">        )</div><div class="line">        metaData</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在修改过后的 KafkaUtils 文件中，将所有的 <code>DirectKafkaInputDStream</code> 都替换为 <code>MTDirectKafkaInputDStream</code> 即可</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="分布式系统" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"/>
+    
+      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
+    
+    
+      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
+    
+      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
+    
+      <category term="auto-adaptive" scheme="http://yoursite.com/tags/auto-adaptive/"/>
+    
+      <category term="partition" scheme="http://yoursite.com/tags/partition/"/>
+    
+      <category term="topic" scheme="http://yoursite.com/tags/topic/"/>
     
   </entry>
   

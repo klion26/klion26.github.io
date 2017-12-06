@@ -121,30 +121,6 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
-			<div class="date"> 2011-03-31 </div>
-			<div class="article-title"><a href="/2011/03/31/poj-2478-eular-function/" >POJ 2478 欧拉函数</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://poj.org/problem?id=2478" target="_blank" rel="external">题目</a><br>这题的实际就是求欧拉函数,也就是给你一个n,然后求从2-n的所有数的欧拉函数的和,至于不知道欧拉函数的还请google之.下面给出两个求欧拉函数的模板,一个是求从1-n的所有数的欧拉函数,一个是求单个数的欧拉函数.这两个函数都是由phi(n)=n<em>(p1-1)</em>(p2-1)<em>……</em>(pn-1)/(p1<em>p2</em>……*pn)这个式子来的.<br>第一个求所有数的欧拉函数</p>
-<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">eular</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="color: #f5deb3;">memset</span>(p<span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(p));<br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">1000001</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">i</span><span style="color: #da70d6;">//初始化</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">1000001</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">==</span>p<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">–</span><span style="color: #da70d6;">//如果是素数 那么等于n-1</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">1000001</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">+=</span><span style="color: #f5deb3;">i</span>)<br>                        <span style="color: #f5deb3;">{</span><br>                            p<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #da70d6;">//这里就是那个公式的应用,这里的P[j]数组是表示这个数是否是素数</span><br>                            <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>);<br>                            <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">/=</span><span style="color: #f5deb3;">i</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span></div><br>第二个,求单个数的欧拉函数:<br><div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">eular</span>(<span style="font-weight: bold; color: #98fb98;">int</span> n)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span>n;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(n<span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">==</span><span style="color: #add8e6;">0</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    n<span style="color: #f5deb3;">/=</span><span style="color: #f5deb3;">i</span><br>                    <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>                    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">==</span>n<span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">i</span>)<br>                        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//这里还是那个公式的应用</span><br>                            n<span style="color: #f5deb3;">/=</span><span style="color: #f5deb3;">i</span><br>                            <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;"><em>=</em></span><span style="color: #f5deb3;">i</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(n<span style="color: #f5deb3;">&gt;</span><span style="color: #add8e6;">1</span>)<span style="color: #da70d6;">//如果剩下的n是素数</span><br>        <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span>n<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">ret</span><br><span style="color: #f5deb3;">}</span></div>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
 			<div class="date"> 2011-03-30 </div>
 			<div class="article-title"><a href="/2011/03/30/pointers-on-c-10-struct-union/" >C和指针 第十章 结构和联合</a></div>						
 		</h3>
@@ -355,6 +331,29 @@
 
            
 		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-03-25 </div>
+			<div class="article-title"><a href="/2011/03/25/undefined-reference-to-sqrt-c/" >C语言编译时的undefined reference to &#39;sqrt&#39;</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>今天编译一C程序时,发现无论如何sqrt就是没定义,math.h也加了.实在是无语阿,后来搜了一下,发现是链接时的问题,也就是需要自己链接数学库,似乎Linux下的数学库是不自动链接的,也就是说需要你去链接.不过有些系统还是自动链接的.如果发现你加了某个系统函数的头文件还是出现没定义的错误的话,可是试着自己在编译时加上链接该库的指令,链接数学库是用的 -lm 也就是gcc -o example.out example.c -lm</p>
+
+	
+	</div>
+</div>
+
+           
+		
 
 		</div>
 
@@ -447,29 +446,29 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
-			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -486,45 +485,45 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/lzo/">lzo<span>1</span></a></li>
-		
-			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
-		
-			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
-		
-			<li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li>
-		
-			<li><a href="/tags/shell/">shell<span>5</span></a></li>
-		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
-		
-			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
-		
-			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
-		
-			<li><a href="/tags/教师/">教师<span>1</span></a></li>
-		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
-		
-			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
-		
-			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
-		
-			<li><a href="/tags/greedy-algorithm/">greedy algorithm<span>1</span></a></li>
-		
-			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
-		
-			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
-		
-			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
-		
-			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
-		
-			<li><a href="/tags/exercise/">exercise<span>8</span></a></li>
-		
-			<li><a href="/tags/queue/">queue<span>1</span></a></li>
+			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
 		
 			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
+		
+			<li><a href="/tags/stack/">stack<span>1</span></a></li>
+		
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+		
+			<li><a href="/tags/trident/">trident<span>1</span></a></li>
+		
+			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+		
+			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+		
+			<li><a href="/tags/Spark/">Spark<span>1</span></a></li>
+		
+			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
+		
+			<li><a href="/tags/specify-timestamp/">specify_timestamp<span>1</span></a></li>
+		
+			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
+		
+			<li><a href="/tags/scala/">scala<span>1</span></a></li>
+		
+			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
+		
+			<li><a href="/tags/json/">json<span>1</span></a></li>
+		
+			<li><a href="/tags/project/">project<span>1</span></a></li>
+		
+			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
+		
+			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
+		
+			<li><a href="/tags/zookeeper/">zookeeper<span>3</span></a></li>
+		
+			<li><a href="/tags/数论/">数论<span>5</span></a></li>
+		
+			<li><a href="/tags/shell/">shell<span>5</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>292</span></a></li>

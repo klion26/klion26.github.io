@@ -121,29 +121,6 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
-			<div class="date"> 2011-03-25 </div>
-			<div class="article-title"><a href="/2011/03/25/undefined-reference-to-sqrt-c/" >C语言编译时的undefined reference to &#39;sqrt&#39;</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>今天编译一C程序时,发现无论如何sqrt就是没定义,math.h也加了.实在是无语阿,后来搜了一下,发现是链接时的问题,也就是需要自己链接数学库,似乎Linux下的数学库是不自动链接的,也就是说需要你去链接.不过有些系统还是自动链接的.如果发现你加了某个系统函数的头文件还是出现没定义的错误的话,可是试着自己在编译时加上链接该库的指令,链接数学库是用的 -lm 也就是gcc -o example.out example.c -lm</p>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
 			<div class="date"> 2011-03-24 </div>
 			<div class="article-title"><a href="/2011/03/24/hdu-3389/" >HDU 3389</a></div>						
 		</h3>
@@ -354,6 +331,30 @@
 
            
 		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-03-15 </div>
+			<div class="article-title"><a href="/2011/03/15/hdu-1730-game/" >HDU 1730 博弈</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>这题首先可以这样想,如果每行的两颗棋子都挨着的话,那么先手就必输,这个好想.那么我们就可以让它变成所有的都挨着,能的话,就能赢,否则就必输[前提是两个人都是按照对自己最有利的形式移动].那么这样就变成了n堆得石子问题了,这里n是行数.这样就简单很多了,只需要算出每行的棋子间距,然后所有的间距异或一下,如果是0的话就是P-position否则是N-position,其中P-position的话先手必输N-position的话先手必赢.至于为什么先手必输或必赢.以前写过一点,等过段时间转到这个博客来.也可以自己参考相应书籍.下面是这题的代码:</p>
+<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">ID:klion26</span><br><span style="color: #da70d6;">  TASK:HDU_1730</span><br><span style="color: #da70d6;">  LANG:C</span><br><span style="color: #da70d6;">*/</span><br><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="color: #eeee00;">#include <math.h></math.h></span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">main</span>(<span style="font-weight: bold; color: #98fb98;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“hdu-1730.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdin</span>);<br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“hdu-1730.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdout</span>);<br>    <span style="font-weight: bold; color: #98fb98;">int</span> n<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">m</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span>b<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #f5deb3;">EOF</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>n<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">m</span>))<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span>n;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span>b);<br>                    <span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">&gt;</span>b<span style="color: #f5deb3;">?</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">-</span>b<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">:</span>b<span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>;<span style="color: #da70d6;">//算间距</span><br>                    <span style="color: #f5deb3;">t</span> <span style="color: #f5deb3;">^=</span> <span style="color: #f5deb3;">k</span><span style="color: #da70d6;">//异或算结果</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">!=</span><span style="color: #f5deb3;">t</span>)<span style="color: #da70d6;">//N-position</span><br>                <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“I WIN!</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>            <span style="font-weight: bold; color: #b0c4de;">else</span><span style="color: #da70d6;">//P-position</span><br>                <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“BAD LUCK!</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div>
+
+	
+	</div>
+</div>
+
+           
+		
 
 		</div>
 
@@ -446,29 +447,29 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
-			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -485,45 +486,45 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/https/">https<span>1</span></a></li>
+			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
 		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
+			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
 		
-			<li><a href="/tags/my-life/">my life<span>1</span></a></li>
+			<li><a href="/tags/job/">job<span>1</span></a></li>
 		
-			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
+			<li><a href="/tags/chinese/">chinese<span>1</span></a></li>
 		
-			<li><a href="/tags/算法/">算法<span>1</span></a></li>
+			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
 		
-			<li><a href="/tags/标记-清除/">标记-清除<span>1</span></a></li>
+			<li><a href="/tags/question/">question<span>1</span></a></li>
 		
-			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
+			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
 		
-			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
+			<li><a href="/tags/how/">how<span>1</span></a></li>
 		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+			<li><a href="/tags/read/">read<span>3</span></a></li>
 		
-			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
+			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
 		
-			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
+			<li><a href="/tags/code/">code<span>2</span></a></li>
 		
-			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
+			<li><a href="/tags/scc/">scc<span>1</span></a></li>
 		
-			<li><a href="/tags/update/">update<span>1</span></a></li>
+			<li><a href="/tags/lru/">lru<span>1</span></a></li>
 		
-			<li><a href="/tags/mapreduce/">mapreduce<span>1</span></a></li>
+			<li><a href="/tags/compter-graphics/">compter graphics<span>1</span></a></li>
 		
-			<li><a href="/tags/概率/">概率<span>1</span></a></li>
+			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
 		
-			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
+			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
 		
-			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
+			<li><a href="/tags/text-plain/">text/plain<span>1</span></a></li>
 		
-			<li><a href="/tags/code-style/">code-style<span>1</span></a></li>
+			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
 		
-			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+			<li><a href="/tags/hive/">hive<span>1</span></a></li>
 		
-			<li><a href="/tags/c/">c++<span>1</span></a></li>
+			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>292</span></a></li>

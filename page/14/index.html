@@ -121,30 +121,6 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
-			<div class="date"> 2011-04-15 </div>
-			<div class="article-title"><a href="/2011/04/15/eular-function-2/" >欧拉函数2</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>记得前面自己写的那个欧拉函数,自己以为应该能够应付所有的和欧拉函数有关的题了.可是这两天遇到的题让我知道.远远还不够.首先欧拉函数可以写的更快.用的是和筛素数一样的筛法.然后就是如果我需要求1-1e9的所有数的欧拉函数的话,那么,对于OJ上的题来说,内存是不够的.怎么办呢？我的做法是:求出从1-sqrt(n)的所有数的欧拉函数,然后求出1-sqrt(n)以内的所有素数.接下来,如果需要求phi(n),n<sqrt(1e9),那么直接给出,否则用phi(n)=p*phi(n p);[0="=" (n="" p)%p]="" (p-1)*phi(n="" p)[0="" !="(n/p)%p]可以得到,这样可能得到一个时间和空间差不多平衡的关系.还有一点是,对于一个数n,如果gcd(i,n)">1[i&lt;n],那么gcd(n-i,n)&gt;1.这个应用可以做HDU3501.下面给出筛法的欧拉函数和只求1-sqrt(n)的欧拉函数的代码</sqrt(1e9),那么直接给出,否则用phi(n)=p*phi(n></p>
-<div class="source" style="background-color: #2f4f4f; font-family: 'Courier New','Consolas','Lucida Console'; color: #f5deb3;"><span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #ffffff;">init</span>(<span style="color: #98fb98; font-weight: bold;">int</span> n)<span style="color: #da70d6;">//n是需要求欧拉函数的最大值</span><br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//结果存在eular数组中</span><br>    <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">eular</span>));<br>    <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><br>    <span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>    <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span>n;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//i是素数</span><br>                    <span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">i</span><br>                    <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;=</span>n;<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">i</span>)<span style="color: #da70d6;">//j从i到n</span><br>                        <span style="color: #f5deb3;">{</span><br>                            <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">])</span><br>                                <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">j</span><br>                            <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">/</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;"><em></em></span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>);<br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">get_eular</span>(<span style="color: #98fb98; font-weight: bold;">int</span> n)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">ret</span><br>    <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><br>    <span style="color: #b0c4de; font-weight: bold;">if</span>(n<span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">31623</span>)<span style="color: #da70d6;">//这里的31623是sqrt(n);</span><br>        <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">eular</span><span style="color: #f5deb3;">[</span>n<span style="color: #f5deb3;">];</span><br>    <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">idx</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> (n<span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]))</span><br>                <span style="color: #b0c4de; font-weight: bold;">break</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">idx</span>)<span style="color: #da70d6;">//n是素数</span><br>        <span style="color: #b0c4de; font-weight: bold;">return</span> n<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>    <span style="color: #f5deb3;">k</span> <span style="color: #f5deb3;">=</span> n<span style="color: #f5deb3;">/</span><span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>    <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> (<span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]))</span><br>        <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">get_eular</span>(<span style="color: #f5deb3;">k</span>)<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>    <span style="color: #b0c4de; font-weight: bold;">else</span><br>        <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">get_eular</span>(<span style="color: #f5deb3;">k</span>)<span style="color: #f5deb3;">*</span>(<span style="color: #f5deb3;">prime</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>);<br>    <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">ret</span><br><span style="color: #f5deb3;">}</span></div>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
 			<div class="date"> 2011-04-12 </div>
 			<div class="article-title"><a href="/2011/04/12/pointers-on-c-preprocessor/" >C和指针14章 预处理器</a></div>						
 		</h3>
@@ -464,6 +440,30 @@ return 1;
 
            
 		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-03-31 </div>
+			<div class="article-title"><a href="/2011/03/31/poj-2478-eular-function/" >POJ 2478 欧拉函数</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://poj.org/problem?id=2478" target="_blank" rel="external">题目</a><br>这题的实际就是求欧拉函数,也就是给你一个n,然后求从2-n的所有数的欧拉函数的和,至于不知道欧拉函数的还请google之.下面给出两个求欧拉函数的模板,一个是求从1-n的所有数的欧拉函数,一个是求单个数的欧拉函数.这两个函数都是由phi(n)=n<em>(p1-1)</em>(p2-1)<em>……</em>(pn-1)/(p1<em>p2</em>……*pn)这个式子来的.<br>第一个求所有数的欧拉函数</p>
+<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">eular</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="color: #f5deb3;">memset</span>(p<span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(p));<br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">1000001</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">i</span><span style="color: #da70d6;">//初始化</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">1000001</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">==</span>p<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">–</span><span style="color: #da70d6;">//如果是素数 那么等于n-1</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">1000001</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">+=</span><span style="color: #f5deb3;">i</span>)<br>                        <span style="color: #f5deb3;">{</span><br>                            p<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #da70d6;">//这里就是那个公式的应用,这里的P[j]数组是表示这个数是否是素数</span><br>                            <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>);<br>                            <span style="color: #f5deb3;">e</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">/=</span><span style="color: #f5deb3;">i</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span></div><br>第二个,求单个数的欧拉函数:<br><div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">eular</span>(<span style="font-weight: bold; color: #98fb98;">int</span> n)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span>n;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(n<span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">==</span><span style="color: #add8e6;">0</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    n<span style="color: #f5deb3;">/=</span><span style="color: #f5deb3;">i</span><br>                    <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>                    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">==</span>n<span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">i</span>)<br>                        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//这里还是那个公式的应用</span><br>                            n<span style="color: #f5deb3;">/=</span><span style="color: #f5deb3;">i</span><br>                            <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;"><em>=</em></span><span style="color: #f5deb3;">i</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(n<span style="color: #f5deb3;">&gt;</span><span style="color: #add8e6;">1</span>)<span style="color: #da70d6;">//如果剩下的n是素数</span><br>        <span style="color: #f5deb3;">ret</span><span style="color: #f5deb3;">=</span>n<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">ret</span><br><span style="color: #f5deb3;">}</span></div>
+
+	
+	</div>
+</div>
+
+           
+		
 
 		</div>
 
@@ -556,29 +556,29 @@ return 1;
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
-			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -595,45 +595,45 @@ return 1;
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/office/">office<span>1</span></a></li>
+			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
 		
-			<li><a href="/tags/code/">code<span>2</span></a></li>
+			<li><a href="/tags/递归/">递归<span>1</span></a></li>
 		
-			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
+			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
 		
-			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+			<li><a href="/tags/metric/">metric<span>1</span></a></li>
 		
-			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
+			<li><a href="/tags/hive/">hive<span>1</span></a></li>
 		
-			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
+			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
 		
-			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
+			<li><a href="/tags/trident/">trident<span>1</span></a></li>
 		
-			<li><a href="/tags/vim/">vim<span>2</span></a></li>
+			<li><a href="/tags/linux/">linux<span>24</span></a></li>
 		
-			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
 		
-			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
+			<li><a href="/tags/blog/">blog<span>2</span></a></li>
 		
-			<li><a href="/tags/go/">go<span>1</span></a></li>
+			<li><a href="/tags/partition/">partition<span>1</span></a></li>
 		
-			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
+			<li><a href="/tags/prim/">prim<span>1</span></a></li>
 		
-			<li><a href="/tags/method/">method<span>1</span></a></li>
+			<li><a href="/tags/scc/">scc<span>1</span></a></li>
 		
-			<li><a href="/tags/mit/">mit<span>2</span></a></li>
+			<li><a href="/tags/latex/">latex<span>1</span></a></li>
 		
-			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
+			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
 		
-			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
+			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
 		
-			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
+			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
 		
-			<li><a href="/tags/fork/">fork<span>2</span></a></li>
+			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
 		
-			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+			<li><a href="/tags/https/">https<span>1</span></a></li>
 		
-			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+			<li><a href="/tags/i-o-multiplexing/">i/o multiplexing<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>292</span></a></li>

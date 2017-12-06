@@ -485,8 +485,6 @@
 		
             
 		
-            
-		
         
         <!-- render other articles -->
         
@@ -635,44 +633,6 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
-			<div class="date"> 2017-09-22 </div>
-			<div class="article-title"><a href="/2017/09/22/GC-引用计数法/" >GC 引用计数法</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>本文将将介绍 GC 算法中最基本的三种算法的第二种：引用计数法。</p>
-<h1 id="GC-引用计数法"><a href="#GC-引用计数法" class="headerlink" title="GC 引用计数法"></a>GC 引用计数法</h1><p>GC 本来是一种“释放已经没有被引用的对象的机制”，人们自然就想到，通过记录所有对象的引用次数来进行，这就是 GC 引用计数法。</p>
-<p>引用计数法，一句话来说就是，记录每个对象被引用的多少次，如果引用次数为零，就编程“垃圾”了，可以被回收。</p>
-<p>下面给出引用计数法的基本代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">//分配对象</div><div class="line">new_object(size) &#123;</div><div class="line">    obj = pickup_chunk(size, $free_list) //从 free_list 中查找一个符合大小的块</div><div class="line">    </div><div class="line">    if (obj == NULL) //分配失败</div><div class="line">        allocation_fail()</div><div class="line">    else //分配成功</div><div class="line">        obj.ref_cnt = 1 //更新引用计数</div><div class="line">        return ojb</div><div class="line">&#125;</div><div class="line"></div><div class="line">//更新指针</div><div class="line">update_ptr(ptr, obj) &#123;</div><div class="line">    inc_ref_cnt(obj)  // 更新 obj 的引用</div><div class="line">    dec_ref_cnt(*ptr) // 更新 *ptr 的引用，注意这两句话的顺序，思考是否可以调换顺序</div><div class="line">    *ptr = obj</div><div class="line">&#125;</div><div class="line"></div><div class="line">inc_ref_cnt(obj) &#123;</div><div class="line">    obj.ref_cnt++</div><div class="line">&#125;</div><div class="line"></div><div class="line">dec_ref_cnt(obj) &#123;</div><div class="line">    obj.ref_cnt-- // 更新引用计数</div><div class="line">    if(obj.ref_cnt == 0) //如果该对象变成了 “垃圾”，进行回收</div><div class="line">        for (child: children(obj)) //更新所有子节点的引用</div><div class="line">            dec_ref_cnt(*child)</div><div class="line">        reclaim(obj)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>GC 引用计数法的大致流程如上所述，其中 update_ptr 可以用下图描述</p>
-<h1 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h1><p>对于引用计数法，我们可以来看看它到底有哪些优缺点呢？</p>
-<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ol>
-<li><p>可即刻回收垃圾。</p>
-<p> 在引用计数法中，每个对象都知道自己的被引用数，一旦计数变为 0，就会被链接到空闲链表中。换句话说，所有对象在被标记为垃圾的同时就会被回收。</p>
-</li>
-<li><p>最大暂停时间短</p>
-<p> 只有更新指针的时候才会执行垃圾回收，</p>
-</li>
-<li></li>
-</ol>
-<h1 id="优化方案"><a href="#优化方案" class="headerlink" title="优化方案"></a>优化方案</h1>
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
 			<div class="date"> 2017-09-17 </div>
 			<div class="article-title"><a href="/2017/09/17/GC-标记-清除算法/" >GC 标记-清除算法</a></div>						
 		</h3>
@@ -796,6 +756,33 @@
 
            
 		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2017-06-01 </div>
+			<div class="article-title"><a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" >如何在不重启 Spark Streaming 作业的情况下，增加消费的 topic</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<blockquote>
+<p>本文所有和 kafka 相关操作都基于 Direct 消费模式</p>
+</blockquote>
+<p>在 Spark Streaming 作业中，每个作业会消费一个或多个 topic，但是这些 topic 需要在作业启动之前确定好，在作业运行中不能进行调整，之前<a href="https://klion26.github.io/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/" target="_blank" rel="external">修改了源码</a>做到了自适应 topic partition 扩容的情况，但是无法动态调整消费的 topic。现在需要在不重启作业的情况下，动态调整消费的 topic。</p>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/#more" class="btn btn-default more">Leia Mais</a>
+	
+	</div>
+</div>
+
+           
+		
 
 		</div>
 
@@ -888,29 +875,29 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
-			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -927,45 +914,45 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/vim/">vim<span>2</span></a></li>
+			<li><a href="/tags/递归/">递归<span>1</span></a></li>
 		
-			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
+			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
 		
-			<li><a href="/tags/spark/">spark<span>8</span></a></li>
+			<li><a href="/tags/alibaba/">alibaba<span>1</span></a></li>
 		
-			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
+			<li><a href="/tags/office/">office<span>1</span></a></li>
 		
-			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
+			<li><a href="/tags/mapreduce/">mapreduce<span>1</span></a></li>
 		
-			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
+			<li><a href="/tags/how/">how<span>1</span></a></li>
 		
-			<li><a href="/tags/problem-solve/">problem_solve<span>2</span></a></li>
+			<li><a href="/tags/风险/">风险<span>1</span></a></li>
 		
-			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
+			<li><a href="/tags/火柴棍式程序题/">火柴棍式程序题<span>1</span></a></li>
 		
-			<li><a href="/tags/kv/">kv<span>1</span></a></li>
+			<li><a href="/tags/scala/">scala<span>1</span></a></li>
 		
-			<li><a href="/tags/数学/">数学<span>5</span></a></li>
+			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
 		
-			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
+			<li><a href="/tags/append/">append<span>2</span></a></li>
 		
-			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
+			<li><a href="/tags/program/">program<span>1</span></a></li>
 		
-			<li><a href="/tags/tencent/">tencent<span>1</span></a></li>
+			<li><a href="/tags/competition/">competition<span>5</span></a></li>
 		
-			<li><a href="/tags/stack/">stack<span>1</span></a></li>
+			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
 		
-			<li><a href="/tags/mit/">mit<span>2</span></a></li>
+			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
 		
-			<li><a href="/tags/code-interview/">code interview<span>1</span></a></li>
+			<li><a href="/tags/probability/">probability<span>1</span></a></li>
 		
-			<li><a href="/tags/receiver/">receiver<span>1</span></a></li>
+			<li><a href="/tags/Scheduler/">Scheduler<span>1</span></a></li>
 		
-			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
+			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
 		
-			<li><a href="/tags/算法/">算法<span>1</span></a></li>
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>292</span></a></li>

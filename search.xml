@@ -340,30 +340,6 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
     </entry>
     
     <entry>
-      <title><![CDATA[GC 引用计数法]]></title>
-      <url>/2017/09/22/GC-%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95/</url>
-      <content type="html"><![CDATA[<p>本文将将介绍 GC 算法中最基本的三种算法的第二种：引用计数法。</p>
-<h1 id="GC-引用计数法"><a href="#GC-引用计数法" class="headerlink" title="GC 引用计数法"></a>GC 引用计数法</h1><p>GC 本来是一种“释放已经没有被引用的对象的机制”，人们自然就想到，通过记录所有对象的引用次数来进行，这就是 GC 引用计数法。</p>
-<p>引用计数法，一句话来说就是，记录每个对象被引用的多少次，如果引用次数为零，就编程“垃圾”了，可以被回收。</p>
-<p>下面给出引用计数法的基本代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">//分配对象</div><div class="line">new_object(size) &#123;</div><div class="line">    obj = pickup_chunk(size, $free_list) //从 free_list 中查找一个符合大小的块</div><div class="line">    </div><div class="line">    if (obj == NULL) //分配失败</div><div class="line">        allocation_fail()</div><div class="line">    else //分配成功</div><div class="line">        obj.ref_cnt = 1 //更新引用计数</div><div class="line">        return ojb</div><div class="line">&#125;</div><div class="line"></div><div class="line">//更新指针</div><div class="line">update_ptr(ptr, obj) &#123;</div><div class="line">    inc_ref_cnt(obj)  // 更新 obj 的引用</div><div class="line">    dec_ref_cnt(*ptr) // 更新 *ptr 的引用，注意这两句话的顺序，思考是否可以调换顺序</div><div class="line">    *ptr = obj</div><div class="line">&#125;</div><div class="line"></div><div class="line">inc_ref_cnt(obj) &#123;</div><div class="line">    obj.ref_cnt++</div><div class="line">&#125;</div><div class="line"></div><div class="line">dec_ref_cnt(obj) &#123;</div><div class="line">    obj.ref_cnt-- // 更新引用计数</div><div class="line">    if(obj.ref_cnt == 0) //如果该对象变成了 “垃圾”，进行回收</div><div class="line">        for (child: children(obj)) //更新所有子节点的引用</div><div class="line">            dec_ref_cnt(*child)</div><div class="line">        reclaim(obj)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>GC 引用计数法的大致流程如上所述，其中 update_ptr 可以用下图描述</p>
-<h1 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h1><p>对于引用计数法，我们可以来看看它到底有哪些优缺点呢？</p>
-<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ol>
-<li><p>可即刻回收垃圾。</p>
-<p> 在引用计数法中，每个对象都知道自己的被引用数，一旦计数变为 0，就会被链接到空闲链表中。换句话说，所有对象在被标记为垃圾的同时就会被回收。</p>
-</li>
-<li><p>最大暂停时间短</p>
-<p> 只有更新指针的时候才会执行垃圾回收，</p>
-</li>
-<li></li>
-</ol>
-<h1 id="优化方案"><a href="#优化方案" class="headerlink" title="优化方案"></a>优化方案</h1>]]></content>
-      
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[GC 标记-清除算法]]></title>
       <url>/2017/09/17/GC-%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95/</url>
       <content type="html"><![CDATA[<p>GC 的世界中有三种基本的算法，分别是：</p>
@@ -1459,9 +1435,9 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> exactly-once </tag>
             
-            <tag> offset </tag>
-            
             <tag> zookeeper </tag>
+            
+            <tag> offset </tag>
             
         </tags>
         
@@ -1907,9 +1883,9 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> distributed-system </tag>
             
-            <tag> kv </tag>
-            
             <tag> mit </tag>
+            
+            <tag> kv </tag>
             
             <tag> viewservice </tag>
             
@@ -1961,11 +1937,11 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> distributed-system </tag>
             
-            <tag> mit </tag>
-            
             <tag> go </tag>
             
             <tag> mapreduce </tag>
+            
+            <tag> mit </tag>
             
         </tags>
         
@@ -4351,7 +4327,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#110;&#109;&#97;&#x73;&#x74;&#x65;&#x72;&#x73;&#x2e;&#x6f;&#114;&#103;">&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#110;&#109;&#97;&#x73;&#x74;&#x65;&#x72;&#x73;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#111;&#x3a;&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#x6e;&#109;&#97;&#x73;&#x74;&#x65;&#x72;&#115;&#x2e;&#111;&#114;&#x67;">&#x6a;&#x63;&#x6d;&#64;&#x6a;&#x6f;&#x6e;&#109;&#97;&#x73;&#x74;&#x65;&#x72;&#115;&#x2e;&#111;&#114;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
