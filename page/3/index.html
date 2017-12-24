@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Página 3 | klion26</title>
+  <title>Page 3 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -121,6 +121,30 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2016-11-01 </div>
+			<div class="article-title"><a href="/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/" >Spark Streaming 自适应上游 kafka topic partition 数目变化</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。</p>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/#more" class="btn btn-default more">Read More</a>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2016-10-26 </div>
 			<div class="article-title"><a href="/2016/10/26/e8-a6-81-e5-a4-9a-e5-bf-ab-e6-89-8d-e8-83-bd-e8-b7-91-e5-ae-8c-e4-b8-80-e5-9c-ba-e9-a9-ac-e6-8b-89-e6-9d-be/" >要多快才能跑完一场马拉松</a></div>						
 		</h3>
@@ -135,7 +159,7 @@
 <pre><code>到底要多快我们才能跑完一场 半程/全程 马拉松？
 </code></pre>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2016/10/26/e8-a6-81-e5-a4-9a-e5-bf-ab-e6-89-8d-e8-83-bd-e8-b7-91-e5-ae-8c-e4-b8-80-e5-9c-ba-e9-a9-ac-e6-8b-89-e6-9d-be/#more" class="btn btn-default more">Leia Mais</a>
+		<a type="button" href="/2016/10/26/e8-a6-81-e5-a4-9a-e5-bf-ab-e6-89-8d-e8-83-bd-e8-b7-91-e5-ae-8c-e4-b8-80-e5-9c-ba-e9-a9-ac-e6-8b-89-e6-9d-be/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -867,54 +891,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2016-03-23 </div>
-			<div class="article-title"><a href="/2016/03/23/mit-6-824-2015-lab-1/" >MIT 6.824 2015 Lab 1 记录</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>===========<span style="color: #0000ff;">本文需要有 Go 的基础，并且知道 6.824 Lab 的相关内容作为预备知识</span>===========</p>
-<p>最开始做这个 Lab 是去年，所以使用的是 2015 年的（现在已经有 2016 年的了），地址<a href="http://nil.csail.mit.edu/6.824/2015/" target="_blank" rel="external">Distributed System</a></p>
-<p>第一个 Lab 是阅读 MapReduce 的论文，然后在提供的框架下实现一个简单版的 MapReduce 程序，论文地址：<a href="http://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf" target="_blank" rel="external">MapReduce</a></p>
-<p>Part I</p>
-<p>在提供的框架下，自己实现 Map 和 Reduce 函数，从而实现单机版的 MapReduce 程序，用来统计单词的数据，类似分布式程序的 Hello World。</p>
-<p>根据提供的代码，以及我们在 Part I 执行的语句可知，在 wc.go 中我们找到如下的语句</p>
-<p><pre class="theme:github lang:go decode:true ">mapreduce.RunSingle(5, 3, os.Args[2], Map, Reduce)</pre><br>我们最终执行的是 mapreduce.RunSingle 这个函数，在 RunSingle 函数中，可以分为如下几步</p>
-<ol>
-<li>InitMapReduce</li>
-<li>Split</li>
-<li>DoMap</li>
-<li>DoReduce<br>其中 InitMapReduce，初始化一个 mapreduce 结构体，在后面使用，Split 则将输入的文件进行，然后顺序调用 DoMap，这里面会调用我们写的 map 函数，DoMap 都做完之后，再继续执行 DoReduce，这个函数会调用我们写的 reduce 函数。然后根据论文中的伪代码，差不多就可以完成这两个函数了<br><pre class="theme:github lang:go decode:true">map(String key, String value):<br>// key: document name<br>// value: document contents<br>for each word w in value:<br>EmitIntermediate(w, “1”);<br>reduce(String key, Iterator values):<br>// key: a word<br>// values: a list of counts<br>int result = 0;<br>for each v in values:<br>result += ParseInt(v);<br>Emit(AsString(result));</pre><br>Part IIIII</li>
-</ol>
-<p>首先查看 test_test.go 中的所有的 test 函数，看是如何实现测试的，大致顺序会形成一张如下的图，从上到下形成调用间的层次，同一层次间的函数执行顺序是从左往右顺序执行，其中绿色的表示是通过 go func()(另起一个线程)来执行的，我们只需要完成 mapreduce.go#RunMaster 函数即可。</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2016/03/part2.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2016/03/part2.png" alt="part2"></a></p>
-<p>从 test 中的代码以及 Part I 中相关代码可以得知，我们需要写的代码（RunMaster 函数），实际上就是把所有的任务（map 或者 reduce）分配给具体的 worker 来执行。</p>
-<p>首先，如果我们不考虑 worker 这个概念，那么怎么实现 RunMaster 函数呢，我们只需要把  Part I 中 RunSingle 中的两个 for 循环改成 goroutine 的，也就是在函数 DoMap 和 DoReduce 之前加关键字 go 即可，当然到这里我们还需要考虑，如何做到所有的 map 都完成之后才处理 reduce？reduce 都处理完成才算 RunMaster 函数处理完成？这就变成了 goroutine 的的同步问题了，可以参考 <a href="https://gobyexample.com/channel-buffering" target="_blank" rel="external">channel buffering。</a></p>
-<p>到这里，如果我们不考虑 worker 的话，所有的 test case 都可以通过了，但是发现 TestBasic 函数的起的 worker 我们根本没有用到（后面几个 test case 还有 worker fail 的情况），那么就变成了，如何将我们上面的代码改写为，使用 worker 来执行，而不是直接通过 go DoMap() 以及 go DoReduce 来执行，通过阅读 worker.go 发现有一个 RPC 接口 DoJob，刚好满足我们的需要，阅读整个项目的其他代码（mapreduce.go#CleanupRegistration())，发现通过调用 common.go#call() 来统一进行 RPC 调用.</p>
-<p>这里我们需要知道，从哪知道一个 worker 准备就绪，以及如何知道一个 woker 从忙状态（处理任务）—&gt; 闲状态（任务处理完成），我们可以看到在 worker.go#RunWoker 里面有一句</p>
-<p><pre class="theme:github lang:go decode:true">Register(MasterAddress, me)</pre><br>我们发现 Register 函数如下</p>
-<p><pre class="theme:github lang:go mark:6 decode:true">// Tell the master we exist and ready to work<br>func Register(master string, me string) {<br>    args := RegisterArgs{}<br>    args.Worker = me<br>    var reply RegisterReply<br>    ok := call(master, “MapReduce.Register”, args, reply)<br>    if ok == false {<br>        fmt.Printf(“Register: RPC %s register error\n”, master)<br>    }<br>}</pre><br>其中第6行调用 MapReduce.Register 这个 RPC 接口，继续看，发现 mapreduce.go#Register 这个函数中有下面一句话</p>
-<p><pre class="theme:github lang:go decode:true">mr.registerChannel &lt;- args.Worker</pre><br>发现 registerChannel 是 mapreduce 这个结构体中的一个 channel，也就是在 RunWorker 的时候，我们能从 mr.registerChannel 得到一个标识 worker 的字符串（可以理解为这个 worker 的名字），而这个字符串，后续我们传给 common.go#call 函数，调用相关的 RPC 接口。</p>
-<p>好，至少我们知道什么时候会得到通知有 worker 注册了，那么如何知道 worker 从忙变成闲呢，通过上面的流程，我们可以复用 registerChannel，也就是如果一个 worker 处理完任务的时候，我们也往这个 channel 发送 args.Worker 这个字段，这里就需要更改 registerChannel 的定义，因为我们不知道注册 worker 和分配任务给 worker 谁先谁后，在这里我们只需要把 registerChannel 变成带 buffer 的就行了。最终需要处理 worker 中途挂掉的情况，只需要在外层起一个死循环，直到 call 这个 函数返回 true 的时候才退出即可。</p>
-<p>总结：</p>
-<p>梳理一下：我们在 RunMaster 中需要并行的执行 Map，所有 Map 操作执行完成之后，并行的执行 Reduce 操作，这些操作需要通过分配给 worker 来执行，通过 channel 可以知道什么时候有空闲的 worker（注册或者由忙变闲），然后在调用 Worker.DoJob 的外层用死循环包装一层，知道 RPC 返回成功才退出即可</p>
-<p>&nbsp;</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -925,13 +901,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/2/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
+    	<li class="prev"><a href="/page/2/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/4/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/4/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -951,7 +927,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -960,7 +936,7 @@
 		
 			
 	<div class="widget">
-		<h4>Categorias</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -997,9 +973,9 @@
 		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
-		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -1007,11 +983,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -1021,15 +997,15 @@
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -1046,48 +1022,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
+			<li><a href="/tags/安全/">安全<span>1</span></a></li>
 		
-			<li><a href="/tags/prim/">prim<span>1</span></a></li>
+			<li><a href="/tags/rm/">rm<span>1</span></a></li>
 		
-			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
+			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
 		
-			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
 		
-			<li><a href="/tags/job/">job<span>1</span></a></li>
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
 		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
 		
-			<li><a href="/tags/Spark/">Spark<span>1</span></a></li>
-		
-			<li><a href="/tags/django/">django<span>1</span></a></li>
-		
-			<li><a href="/tags/算法/">算法<span>1</span></a></li>
-		
-			<li><a href="/tags/knapsack/">knapsack<span>1</span></a></li>
-		
-			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
-		
-			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
-		
-			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
-		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
-		
-			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
-		
-			<li><a href="/tags/english/">english<span>1</span></a></li>
-		
-			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+			<li><a href="/tags/概率/">概率<span>1</span></a></li>
 		
 			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
+			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
 		
-			<li><a href="/tags/trident/">trident<span>1</span></a></li>
+			<li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
+		
+			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
+		
+			<li><a href="/tags/c/">c++<span>1</span></a></li>
+		
+			<li><a href="/tags/alibaba/">alibaba<span>1</span></a></li>
+		
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
+		
+			<li><a href="/tags/Scheduler/">Scheduler<span>1</span></a></li>
+		
+			<li><a href="/tags/rename/">rename<span>1</span></a></li>
+		
+			<li><a href="/tags/TaskScheduler/">TaskScheduler<span>1</span></a></li>
+		
+			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
+		
+			<li><a href="/tags/vim/">vim<span>2</span></a></li>
+		
+			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>292</span></a></li>
+		   <li><a href="/tags">...<span>296</span></a></li>
 		 
 		</ul>
 	</div>
@@ -1096,8 +1072,12 @@
 		
 			
 <div class="widget">
-  <h4>Posts recentes</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
+      </li>
     
       <li>
         <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
@@ -1113,10 +1093,6 @@
     
       <li>
         <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
-      </li>
-    
-      <li>
-        <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
       </li>
     
   </ul>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Página 6 | klion26</title>
+  <title>Page 6 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,55 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2014-05-09 </div>
+			<div class="article-title"><a href="/2014/05/09/linux-dbm/" >数据库函数库</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><span style="color: #0000ff;">由于这里贴代码效果不太好，而且很多东西讲起来不是很清楚，所以我把自己重写一次，然后加上注释的<span style="color: #ff0000;"><a href="https://github.com/klion26/APUE/blob/master/ch20/20-1.c" target="_blank" rel="external"><span style="color: #ff0000;">代码放在这里</span></a></span>，有意思的可以看下。</span></p>
+<p>本文基于APUE2e第20章，准确的说是自己对这一章的一个解读，如果需要了解更详细的东西，请参考书本。</p>
+<p>本章开发的函数库类似于ndbm函数库，但是增加了并发控制机制，从而允许多进程同时更新同一数据库，主要接口如下</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #98fb98; font-weight: bold;">void</span><span style="color: #f5deb3;"><em></em></span> <span style="color: #f5deb3;">DBHANDLE</span><span style="color: #f5deb3;">DBHANDLE</span>     <span style="color: #f5deb3;">db_open</span>(<span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"></span> pathname<span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">int</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">…);     //用来打开数据库</span><br><span style="color: #98fb98; font-weight: bold;">void</span>         <span style="color: #f5deb3;">db_close</span>(<span style="color: #f5deb3;">DBHANDLE db</span>);                  //用来关闭数据库<br><span style="color: #98fb98; font-weight: bold;">char</span>         <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">db_fetch</span>(<span style="color: #f5deb3;">DBHANDLE db</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"> key</span>);    //用来取特定数据库中特定key所对应的数据<br><span style="color: #98fb98; font-weight: bold;">int</span>         <span style="color: #f5deb3;">db_store</span>(<span style="color: #f5deb3;">DBHANDLE db</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"><em> key</em></span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"> data</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">int flag</span>); //用来更新数据库（插入或者更新）<br><span style="color: #98fb98; font-weight: bold;">int</span>         <span style="color: #f5deb3;">db_delete</span>(<span style="color: #f5deb3;">DBHANDLE db</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;">* key</span>);     //用来删除指定数据库中key所对应的记录<br><span style="color: #98fb98; font-weight: bold;">void</span>         <span style="color: #f5deb3;">db_rewind</span>(<span style="color: #f5deb3;">DBHANDLE db</span>);                     //回滚到数据库的第一条记录</div></p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #98fb98; font-weight: bold;">char</span><span style="color: #f5deb3;"><em></em></span>         <span style="color: #f5deb3;">db_nextrec</span>(<span style="color: #f5deb3;">DBHANDLE db</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">key</span>);        //取下一条记录（不保证访问顺序，只保证每条记录访问一次）</div><br>这里给的程序把索引和数据单独存在不同的文件里面。分别对应为 pathname.idx 和 pathname.dat ，对于组织索引，常用的方法有散列（又叫哈希）和B+树，这里用的是固定大小的散列，并采用链表来解决散列冲突（类似于图的邻接表），大致关系图如下：</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2014/05/20-1.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2014/05/20-1-300x247.png" alt="" title="20-1"></a></p>
+<p>上图中给出了索引文件的格式，以及索引文件怎么和数据文件结合起来的。通过这张图对数据库函数库的整体有一个了解。</p>
+<p>对于有多个进程访问同一数据库时，有两种方法可实现库函数：（1）集中式：由一个进程作为数据库管理者，所有的数据库访问工作由此进程完成。其他进程通过IPC机制与此中心进程进行联系。（2）非集中式：每个库函数独立申请并发控制（加锁），然后自己调用I/O函数。使用第一种方法，需要使用IPC，不过可以控制不同进程的优先级，另外在出错的情况下也更容易进行复原。这里使用的是第二种方法。</p>
+<p>因为我们使用了<span style="color: #0000ff;">索引文件</span>和<span style="color: #0000ff;">数据文件</span>两个文件，所以在加锁的情况下，就有两种情况：（1）粗锁：对其中一个文件上锁，然后控制整个过程，这样的缺点是限制了最大程度的并发，因为不能有多个进程同时对数据库进行只读访问。（2）：细锁：如果对数据库进行读/写访问的时候，先获得数据所在散列链的读锁/写锁，允许对同一条散列链有多个读进程，但只能有一个写进程。一个写进程在操作空闲链表前，必须获得空闲链表的写锁。当 db_store 向索引文件或数据文件末尾追加一条新纪录时，必须获得对应文件相应区域的写锁。</p>
+<p>接下来是源代码的分析，借鉴本书的注释，另外加上自己的理解，争取把整个程序讲清楚。</p>
+<p>1. 如果我们想在C里面实现私有函数（类似于C++的 private 函数，那么可以用 static，这样函数就只能在本文件里访问了），上面我们提供了7个对数据库进行操作的函数，当然我们希望这7个函数通过调用其他辅助函数来完成实际的工作，这样能够更好的实现模块化和重用。但是辅助函数我们希望只能够在本文件进行访问，这里就可以用 static 来进行控制了。</p>
+<p>2. 需要说明的是DB结构，该结构用来记录一个打开数据库的所有信息</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">typedef</span> <span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span>    <span style="color: #f5deb3;">idxfd</span>  <span style="color: #da70d6;">/<em> 记录文件的文件描述符 </em>/</span><br><span style="color: #98fb98; font-weight: bold;">int</span>    <span style="color: #f5deb3;">datfd</span>  <span style="color: #da70d6;">/<em> 数据文件的文件描述符 </em>/</span><br><span style="color: #98fb98; font-weight: bold;">char</span>  <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idxbuf</span> <span style="color: #da70d6;">/ 为单条记录信息分配的内存 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">char</span>  <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">datbuf</span> <span style="color: #da70d6;">/<em> 为单条数据信息分配的内存</em>/</span><br><span style="color: #98fb98; font-weight: bold;">char</span>  <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">name</span>   <span style="color: #da70d6;">/ 当前打开的数据库（有 .idx/.dat 后缀） 用来打开对应的文件<em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">idxoff</span> <span style="color: #da70d6;">/ 索引文件中索引记录的偏移量 <em>/</em></span><br><span style="color: #da70d6;">/ key is at (idxoff + PTR_SZ + IDXLEN_SZ) 其中PTR_SZ标识链表指针的字节数，IDXLEN_SZ标识索引记录长度，见上图<em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">size_t</span> <span style="color: #f5deb3;">idxlen</span> <span style="color: #da70d6;">/ 索引记录长度 <em>/</em></span><br><span style="color: #da70d6;">/ 从key开始到’\n’结尾 具体的见上图 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">datoff</span> <span style="color: #da70d6;">/ <em>当前</em>数据记录的偏移量 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">size_t</span> <span style="color: #f5deb3;">datlen</span> <span style="color: #da70d6;">/ <em>当前</em>数据记录长度，包括后面的’\n’<em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">ptrval</span> <span style="color: #da70d6;">/ contents of chain ptr in index record <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">ptroff</span> <span style="color: #da70d6;">/ 该条记录链表（已散列）中下一条记录的偏移量 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">chainoff</span> <span style="color: #da70d6;">/ 该条记录散列之后所对应的链表的偏移量 <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">off_t</span>  <span style="color: #f5deb3;">hashoff</span>  <span style="color: #da70d6;">/ 散列表的偏移量 <em>/</em></span><br><span style="color: #f5deb3;">DBHASH</span> <span style="color: #f5deb3;">nhash</span>    <span style="color: #da70d6;">/ 当前的散列表大小，DBHASH是unsigned long的typedef <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_delok</span>    <span style="color: #da70d6;">/ delete OK, COUNT是unsigned long的typedef 这些COUNT是统计效率用的，比如删除成功多少次，失败多少次<em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_delerr</span>   <span style="color: #da70d6;">/ delete error <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_fetchok</span>  <span style="color: #da70d6;">/ fetch OK <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_fetcherr</span> <span style="color: #da70d6;">/ fetch error <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_nextrec</span>  <span style="color: #da70d6;">/ nextrec <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_stor1</span>    <span style="color: #da70d6;">/ store: DB_INSERT, no empty, appended <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_stor2</span>    <span style="color: #da70d6;">/ store: DB_INSERT, found empty, reused <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_stor3</span>    <span style="color: #da70d6;">/ store: DB_REPLACE, diff len, appended <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_stor4</span>    <span style="color: #da70d6;">/ store: DB_REPLACE, same len, overwrote <em>/</em></span><br><span style="color: #f5deb3;">COUNT</span>  <span style="color: #f5deb3;">cnt_storerr</span>  <span style="color: #da70d6;">/ store error */</span><br><span style="color: #f5deb3;">}</span> <span style="color: #f5deb3;">DB</span></div><br>接下来就是打开数据库函数 db_open, 这个函数负责分析调用参数（oflag 是否带 O_CREAT ), 然后打开相应的索引文件和数据文件， 利用一个私有函数 _db_alloc(int) 该函数负责分配一个DB结构所需要的内存，然后返回给调用者。然后打开之后我们需要对数据库进行初始化，这里需要进行加锁，如果不加锁的话，可能会导致数据出错（多进程同时访问一个数据库）。代码如下：</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">if</span> ((<span style="color: #f5deb3;">oflag</span> <span style="color: #f5deb3;"></span> (<span style="color: #f5deb3;">O_CREAT</span> | <span style="color: #f5deb3;">O_TRUNC</span>)) <span style="color: #f5deb3;">==</span> (<span style="color: #f5deb3;">O_CREAT</span> | <span style="color: #f5deb3;">O_TRUNC</span>)) <span style="color: #f5deb3;">{  //如果有O_CREAT 和 O_TRUNC 标识</span><br><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">      If the database was created, we have to initialize</span><br><span style="color: #da70d6;">     <em> it.  Write lock the entire file so that we can stat</em></span><br><span style="color: #da70d6;">      it, check its size, and initialize it, atomically.</span><br><span style="color: #da70d6;">     */</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">writew_lock</span>(<span style="color: #f5deb3;">db</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">idxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">SEEK_SET</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)  // 在创建成功之后，对文件加一把写锁（其他进程不能读写该文件）<br><span style="color: #f5deb3;">err_dump</span>(<span style="color: #7fffd4;">“db_open: writew_lock error”</span>);      //加锁，是防止出现两个进程交替访问同一个数据库的情况，造成数据不统一<span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">fstat</span>(<span style="color: #f5deb3;">db</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">idxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">statbuff</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)            //得到索引文件的信息<br><span style="color: #f5deb3;">err_sys</span>(<span style="color: #7fffd4;">“db_open: fstat error”</span>);</div></p>
+<p><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">statbuff</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">st_size</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">{                   //如果索引文件长度为0</span><br><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">          We have to build a list of (NHASH_DEF + 1) chain</span><br><span style="color: #da70d6;">         <em> ptrs with a value of 0.  The +1 is for the free</em></span><br><span style="color: #da70d6;">          list pointer that precedes the hash table.</span><br><span style="color: #da70d6;">         <em>/</em></span><br><span style="color: #f5deb3;">sprintf</span>(<span style="color: #f5deb3;">asciiptr</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">PTR_SZ</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>);           //全部设置为0, 其中 %*d, 标识一共占PTR_SZ个位置，值为0<br><span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> (<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">NHASH_DEF</span> <span style="color: #f5deb3;">+</span> <span style="color: #add8e6;">1</span>; <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)            //所有的散列链都置为0, 标识所有散列链都没有数据<br><span style="color: #f5deb3;">strcat</span>(<span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">asciiptr</span>);<br><span style="color: #f5deb3;">strcat</span>(<span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">,</span> <span style="color: #7fffd4;">“</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">strlen</span>(<span style="color: #f5deb3;">hash</span>);<br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">write</span>(<span style="color: #f5deb3;">db</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">idxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">i</span>) <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">i</span>)            //初始化散列部分<br><span style="color: #f5deb3;">err_dump</span>(<span style="color: #7fffd4;">“db_open: index file init write error”</span>);<br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> (<span style="color: #f5deb3;">un_lock</span>(<span style="color: #f5deb3;">db</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">idxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">SEEK_SET</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)        //不管初始化成功与否，对文件进行解锁<br><span style="color: #f5deb3;">err_dump</span>(<span style="color: #7fffd4;">“db_open: un_lock error”</span>);<br><span style="color: #f5deb3;">}</span></p>
+<p><br>接下来是关闭数据库 db_close(DBHANDLE h), 这个函数调用了一个内部函数 _db_free(DB*); 对打开的文件描述符进行关闭（在初始化的时候把文件描述符置为-1,在这里就派上用场了），释放分配的内存。 _db_free 函数在其他很多地方也会被调用，比如数据库打开出错的情况下，需要释放分配的内存，然后返回出错。</p>
+<p>接下来是 db_fetch(DBHANDLE, const char<em>) 函数，这个函数返回 指定数据库的特定 key 值的数据项，在这里调用 _db_find_and_lock(DB</em>, const char<em> key, int writelock) 函数进行加锁以及查询， 如果查询成功，那么就使用 _db_readdat(DB</em>)进行数据读取。在处理完成之后，需要在 db_fetch 函数中对加锁文件进行解锁</p>
+<p>_db_find_and_lock(DB<em> db, const char</em> key, int writelock) 对指定指定索引进行查询，并加锁。如果 writelock 非0则加写锁，否则加读锁。这里的锁只加在 key 散列之后所在的散列链上（这样运行不同的进程同时访问不同的散列链，从而增加并发性）。 然后调用 _db_readptr(DB*, off_t offset) 得到散列链中的第一个指针，如果这个函数返回0, 表示散列链为空。然后对散列链进行遍历，一查看是否存在一条需要查询的记录。</p>
+<p>接下来是 db_delete() 函数，首先进行加锁并查找， 如果查找成功，则用 _db_dodelete() 进行删除， 最后不管成功与否，都需要对加锁的数据段进行解锁。因为可能需要更改散列链，所以这里加的是一把写锁。</p>
+<p>_db_dodelete 函数用来实际进行删除操作。操作过程中更新空闲链表以及对应的散列链。更新索引文件和数据为空格（这里在后面的 db_nextrec 会用到）</p>
+<p>_db_writedate 实际进行一个数据的更新，把数据写到相应的内存位置，如果是有 db_store 进行调用，且是追加数据的话，需要对文件进行加写锁。</p>
+<p>_db_writeidx 更新索引数据，与上一个函数类似</p>
+<p>_db_writeptr 将一个链表指针写至索引文件中。</p>
+<p>db_store() 对数据库进行操作，插入，更新。这里面首先需要进行加锁，查找。然后分为四种情况：第一种没有查找到，所以需要添加记录，添加的时候，通过查找我们以前删除过的记录，它的键长度和数据长度与当前的键长度和数据长度一致，如果没有找到，就将这条数据添加到索引文件和数据文件的末尾，然后更新数据，索引部分。第二种，我们在以前删除过的记录中查找到了，那么直接重用就行了。第三种，替换已有数据，且新记录的长度和已有记录的长度不一样，那么直接删除旧数据（前面已经有了），再添加新数据就行了。第四种，新纪录的长度和已有记录的长度一样，直接更新记录即可。</p>
+<p>_db_findfree(DB* db, int keylen, int datlen) 查找一块已经删除了的指定大小的数据块。通过遍历空闲链表，查找合适的数据块，找到就从空闲链表中删除，找不到的话就返回一个出错信息。</p>
+<p>db_rewind() 将索引文件的文件偏移量置为第一条索引记录</p>
+<p>db_nextrec() 遍历索引文件，返回下一条记录。返回的是一个只想DB结构里面的内存区域。</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -423,65 +472,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2013-10-16 </div>
-			<div class="article-title"><a href="/2013/10/16/algorithms-chapter-6-dynamic-programming/" >Algorithms第六章动态规划</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>这一章以DAG中的最短路开头。对于DAG，所有的节点都是可以linearized的，也就是说所有的点可以排在一排，然后所有的点都只从左到右，没有从右到左的边。<a href="http://www.klion26.com/wp-content/uploads/2013/10/6-1.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/10/6-1-300x82.jpg" alt="" title="6-1"></a></p>
-<p>上图中，如果要算S到D的距离，那么必须从D的前驱{B,C}中任选一个最为D的前一个节点，那么我们只需要算dist(D) = min{dist(B)+1, dist(C)+3}，同理，我们可以得到所有的节点的dist。我们可以一次性算出所有点的dist，步骤如下：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">initialize</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">dist</span><span style="color: #f5deb3;">(.)</span> <span style="color: #f5deb3;">values</span> <span style="color: #f5deb3;">to</span> <span style="color: #f5deb3;">∞</span><br><span style="color: #f5deb3;">dist</span>(s) <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">each</span> <span style="color: #f5deb3;">v</span> <span style="color: #f5deb3;">∈</span> <span style="color: #f5deb3;">V</span><span style="color: #f5deb3;">\</span><span style="color: #f5deb3;">{</span>s<span style="color: #f5deb3;">},</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">linearized</span> <span style="color: #4682b4; font-weight: bold;">order:</span><br><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">v</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">u</span>)<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">l</span>(<span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">v</span><span style="color: #f5deb3;">)}</span>  ((<span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">v</span>)<span style="color: #f5deb3;">∈</span><span style="color: #f5deb3;">E</span>)</div><br>注意到，这个问题是通过解决一系列的子问题{dist(u) : u∈V}来解决的。我们先解决了最小的dist(s)问题，然后通过DAG的linearized性质解决更大的问题。最终解决所有的问题。</p>
-<p>动态规划问题就是一种通过子问题来不断解决问题的有效算法。在动态规划问题中，不会明确的给出我们一个DAG图，这个DAG图是隐藏在题目中的。这个DAG的所有<span style="color: #ff0000;">节点</span>都是我们定义的<span style="color: #ff0000;">子问题</span>，边则是子问题的依赖性：加入我们解决子问题B之前必须解决子问题A的话，那么就会有一条从A到B的边。</p>
-<p>接下来讲的是最长上升子序列的问题：给你一串数字，然后需要你求出这串数字中一个严格递增的子序列，且这个子序列最长。比如说序列：5,2,8,6,3,6,9,7的最长上升子序列是2,3,6,9.长度为4.这个序列的最长上升子序列的DAG如下图所示：</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2013/10/6-2.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/10/6-2-300x95.jpg" alt="" title="6-2"></a></p>
-<p>上图中的箭头表示可以从左边的数字到右边的数字，即在他们可以在同一个上升子序列中。我们注意到(1)上图是一个DAG，而且所有的边(i,j)都有i&lt;j;(2)上图中的每一条路径对应原序列中的一个上升子序列。这样我们只需要找出上图中最长的路径就可以了。算法如下：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">,…,</span><span style="color: #4682b4; font-weight: bold;">n:</span><br><span style="color: #f5deb3;">L</span>(<span style="color: #f5deb3;">j</span>) <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">L</span>(<span style="color: #f5deb3;">i</span>)<span style="color: #f5deb3;">:</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>)<span style="color: #f5deb3;">∈</span><span style="color: #f5deb3;">E</span><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">L</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">)}</span></div><br>其中L(j)表示已j为结尾点的最长上升子序列的长度，因为所有以j为结尾点的路径都会经过j的前驱节点，所以L(j) = 1 + max{L(i):(i,j)∈E}.我们需要的是全局最大值，而任意点为结尾都是可以的，所以最后我们返回max{L(j)}。这就是动态规划的主要思想：<span style="color: #ff0000;">为了解决我们的原问题，我们定义了一系列的子问题{L(j): 1 &lt;= j &lt;= n}，而且解决某个子问题之前，它所需要的其他更小的子问题都已经被解决</span>。这个问题中，我们的子问题就是L(j) = 1 + max{L(i): (i,j)∈E}.</p>
-<p>接下来出场的是叫做编辑距离的问题。这个问题也算比较经典了，很多地方都可以看到。大致意思就是给你两个字符串，可以在字符串中间插入任意的空格，然后对比两个字符串中不同字符的个数。比如</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2013/10/6-3.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/10/6-3-300x48.jpg" alt="" title="6-3"></a></p>
-<p>其中-表示的是空格。下面的cost表示的是不同字符的个数[这里一个不同字符的cost为1，而且所有的字符cost都一样]，在解决动态规划问题我们主要的问题就是要找到子问题，且子问题满足上面标红的动态规划主要思想。我们的目标是找到x[1 … m] 和y[1 … n]两个字符串之间的编辑距离。那么什么是一个好的子问题呢？如果我们去x的前i个字符和y的前j个字符，然后把这个算作一个子问题E(i,j)的话，那么我们的目标就是要算E(m,n)。这样的话，我们需要把E(i,j)用更小的子问题来描述，我们考虑最右一个字符的匹配情况，只有下面三种情况：</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2013/10/6-4.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/10/6-4-300x69.jpg" alt="" title="6-4"></a></p>
-<p>第一种情况会使cost增加1，然后变成了子问题E(i-1,j)，也就是x[1 … i-1]和y[1 … j]；第二种情况会变成子问题E(i, j-1)cost会增加1，第三种情况则会变成子问题E(i-1,j-1),cost的值则根据x[i] 和 y[j]是否相等来判断，如果x[i]==y[j]则cost为0，否则cost为1。这样的话E(i,j) = min{1+E(i-1,j),1+E(i,j-1), diff(i,j)+E(i-1,j-1)}这里的diff(i,j)表示的是x[i]是否等于y[j]，相等则返回0，否则返回1.比如我们算EXPONENTIAL和POLYNOMIAL两个字符串的子问题E(4,3)的时候，也就是前缀EXPO和POL，他们最右边的匹配一定是下面中的一种：</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2013/10/6-5.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/10/6-5-300x54.jpg" alt="" title="6-5"></a></p>
-<p>也就是说E(4,3) = min{1+E(3,3), 1 + E(4,2), 1 + E(3,2)}，所有的E(i,j)讲得到一张表格，如下图所示：</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2013/10/6-6.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/10/6-6-300x153.jpg" alt="" title="6-6"></a></p>
-<p>那么应该以一个什么样的顺序来解决子问题呢，在这个问题中，不过什么样的顺序都是可以的，因为在算E(i,j)的时候，E(i-1,j)，E(i,j-1)和E(i-1,j-1)都已经被算出来了。我们可以每次填一行，从上到下，每一行从左到右；也可以每次填一列，从左到右，每一列从上到下。这样的顺序下，我们所需要的子问题都已经在之前就被解决了。现在只剩下”base cases”了，也就是初始化的问题，也可以说是最小的子问题了，这里就是E(0, <em>)和E(</em> , 0)这个好解决，对所有的E(0, i)都等于i，对所有的E(j,0)都等于j。因为空字符串和长为i的的字符串的编辑距离就是i。这样的话，这个问题的算法如下：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">2</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">…,</span> <span style="color: #4682b4; font-weight: bold;">m:</span><br><span style="color: #f5deb3;">E</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">2</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">…,</span> <span style="color: #4682b4; font-weight: bold;">n:</span><br><span style="color: #f5deb3;">E</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">j</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">j</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">2</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">…,</span> <span style="color: #4682b4; font-weight: bold;">m:</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">2</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">…,</span> <span style="color: #4682b4; font-weight: bold;">n:</span><br><span style="color: #f5deb3;">E</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">E</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>)<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">E</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>)<span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">E</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>)<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">diff</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">)}</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">E</span>(<span style="color: #f5deb3;">m</span><span style="color: #f5deb3;">,</span>n)</div><br>上述算法是每次填一行，然后从左到右的顺序。对于每一个动态规划问题都有一个隐藏的DAG，编辑距离的DAG如图所示[EXPONENTIAL和POLYNOMIAL]</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2013/10/6-71.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/10/6-71-300x182.jpg" alt="" title="6-7"></a></p>
-<p>我们可以更改DAG的边权值来适应不同的要求。比如编辑距离的增删cost。这个问题和DNA问题也是很类似的，比如给你两条DNA，然后给出一些条件，然后问两条DNA的差距有多大。</p>
-<p>接下来讲了背包问题的两中变种。背包问题是指：有一个容量为W的背包，然后有n种物品，每一种物品的价值和体积分别为w1,…,wn和v1, …, vn.问怎么添加物品，使得背包中物品的总价值最大。比如W=10，然后有以下4个物品：</p>
-<p><a href="http://www.klion26.com/wp-content/uploads/2013/10/6-8.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/10/6-8.jpg" alt="" title="6-8"></a></p>
-<p>背包问题有多个变种，这里讲的两种是：1）每个物品都是有限数目的，2）每个物品的可选数目是无限的。如果每个物品的可选数目都是无限的话，那么最优Item 1和Item 4(total: $48). 如果每一种物品都只有一件的话，那么最优的则是选择Item 1和Item 3(total: $46)。我们先来看物品有无限多的这一种情况。在动态规划问题中，最重要的是子问题的选取，这个问题中，子问题的选取，我们有两种可能，1是我们以背包容量作为子问题(w&lt;=W)，或者我们以物品的种类为子问题for instance, items 1, 2, …, j, for j &lt;=n).要找出哪个子问题可行或者哪个子问题更好需要一定的经验。</p>
-<p>如果我们把容量作为子问题的话，我们设K(w) = maximum value achievable with a knapsack of capacity w.那么我们只需要知道怎么用更小的子问题来表示当前问题，也就是传说中的状态转移。如果K(w)的最优值中包含了Item i，那么K(w)可以转到K(w-wi)，且K(w-wi)也肯定是最优的，也就是K(w) = K(w-wi)+vi.但是我们不知道这个i是哪个，所以需要测试所有的可能性。也就是K(w) = max{K(w-wi)+vi} (i:wi&lt;=w)，对于空背包最优价值就变成了0，这样的话我们就得到了如下算法：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">K</span>(<span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">w</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">to</span> <span style="color: #4682b4; font-weight: bold;">W:</span><br><span style="color: #f5deb3;">K</span>(<span style="color: #f5deb3;">w</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">K</span>(<span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">wi</span>)<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">vi</span> <span style="color: #f5deb3;">:</span> <span style="color: #f5deb3;">wi</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">K</span>(<span style="color: #f5deb3;">W</span>)</div><br>这个算法的时间复杂度为W<em>每个K(w)的时间，而每个K(w)的时间都是n，所以总时间是n</em>W。对于这个算法也可以画出一个DAG出来，其中节点表示容量，然后边表示价值，那么我们要找的就是一个最长路径。</p>
-<p>下面的则是各种物品都只有一件的情况，那么上面的子问题就不行了，因为你不能确定到底Item是否已被选，我们得重新定义我们的子问题，我们需要加上一维表示当前想选的Item是否可用。我们可以用K(w,j)表示maximum value achievable using a knapsack of capacity w and items 1, …, j那么我们最后的答案就是K(W,n)，现在需要想怎么用更小的子问题来描述当前子问题，我们只要考虑两种情况就行了，K(w,j)的最优情况中Item j是否被选中就行了，也就是K(w,j) = max{K(w-wj, j-1)+vj, K(w,j-1)}前面一种情况表示Item j被选中，后面一种情况表示Item j没有被选中。那么算法就出来了：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">Initialize</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">K</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>) <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">and</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">K</span>(<span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">to</span> <span style="color: #4682b4; font-weight: bold;">n:</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">w</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">to</span> <span style="color: #4682b4; font-weight: bold;">W:</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">wj</span><span style="color: #f5deb3;">&gt;</span><span style="color: #4682b4; font-weight: bold;">w:</span> <span style="color: #f5deb3;">K</span>(<span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">K</span>(<span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>)<br><span style="color: #b0c4de; font-weight: bold;">else</span><span style="color: #f5deb3;">:</span>  <span style="color: #f5deb3;">K</span>(<span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">K</span>(<span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">),</span><span style="color: #f5deb3;">K</span>(<span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">wj</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>)<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">vj</span><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">K</span>(<span style="color: #f5deb3;">W</span><span style="color: #f5deb3;">,</span>n)</div><br>这个算法的总时间复杂度也是O(nW)的，就是两重循环的时间。至于内存的问题，有关背包的这两个问题都可以利用滚动数组来实现低内存的使用。</p>
-<p>接下来是矩阵乘的问题，给一个含有n个矩阵的矩阵乘式子，让你给出合适的矩阵乘顺序，使得总得乘积次数最少。这个的子问题可以看成是C(i,j)表示minimum cost of multiplying Ai<em> A(i+1) </em> … <em> Aj，那么最小的子问题就是当i==j的时候，也就是C(i,i)。那么我们只需要看怎么表示C(i,j)。也就是C(i,j)=min{C(i,k) + C(k+1,j) + m(i-1)</em>m(k)*m(j)} {i&lt;=k &lt; j}也就是在[i,j]之间找一个点，然后把这个序列分开，先乘起来之后，然后再把两部分乘起来。算法如下：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">to</span> <span style="color: #4682b4; font-weight: bold;">n:</span> <span style="color: #f5deb3;">C</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span>) <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> s <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">to</span> n<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">:</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">to</span> n<span style="color: #f5deb3;">-</span>s;<span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">+</span>s<br><span style="color: #f5deb3;">C</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">C</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span>)<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">C</span>(<span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>)<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">m</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>)<span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">m</span>(<span style="color: #f5deb3;">k</span>)<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">m</span>(<span style="color: #f5deb3;">j</span>)<span style="color: #f5deb3;">:</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #f5deb3;">k</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">C</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span>n)</div><br>这个算法的复杂度是O(n^3)。外层两个循环，然后算C(i,j)的时候是O(n)的。所以总复杂度是O(n^3)。</p>
-<p>接下来是最短路的变种，以及所有点之间的最短路问题。</p>
-<p>我们一般的最短路是求从源点s到其他点的最短路就行了，没有什么限制，不过如果我们加一个限制：最短路径上的边的条数不能超过k条。这样的话Dijkstra就不能直接用了，而且不太好改，因为Dijkstra算法中没有记录每条路径上有多少条边。在动态规划问题中，我们需要确定合适的子问题来记录足够的信息提供给后面的问题。在这个问题中，我们定义dist(v,i)：从源点s到v且使用了i条边的最短路径，初始化的时候，dist(v,0) = ∞，dist(s,0) = 0.那么转移方程变成：dist(v,i) = min { dist(u,i-1) + l(u,v)} {(u,v) ∈E}.接下来如果我们想算所有点之间的距离，而不是单源最短路径。我们可以运行V次单源最短路算法，因为边可能是负的，所以不能用Dijkstra算法，这样总时间复杂度为O(V^2E)，我们可以看到一个复杂度为O(V^3)的动态规划算法。我们需要找到合适的子问题，我们知道从u到v可能经过一系列顶点。我们可以用dist(i,j,k)来表示子问题，dist(i,j,k)的意思则表示：从i到j则只能用前k个顶点的最短路径。dist(i,j,0)初始化为i到j的直接距离，如果i到j没有边的话就置为∞。对于每一对顶点的距离，我们考虑把是否经过顶点k，来更新顶点i到顶点j之间的距离，也就是说看dist(i,k,k-1)+dist(k,j,k-1)是否dist(i,j,k-1).接下来算法就简单了</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">t</span> <span style="color: #f5deb3;">to</span> <span style="color: #4682b4; font-weight: bold;">n:</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">to</span> <span style="color: #4682b4; font-weight: bold;">n:</span><br><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">∞</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">all</span> (<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>) <span style="color: #f5deb3;">∈</span> <span style="color: #4682b4; font-weight: bold;">E:</span><br><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">l</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>)<br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">k</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">to</span> <span style="color: #4682b4; font-weight: bold;">n:</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">to</span> <span style="color: #4682b4; font-weight: bold;">n:</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">to</span> <span style="color: #4682b4; font-weight: bold;">n:</span><br><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>)<span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">),</span><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">)}</span></div><br>这个算法的总时间复杂度是O(V^3)。可以算出任意两点之间的最短距离，而且这个可以更改参数来适应不同的场景和要求。</p>
-<p>接下来是旅行商问题和树上的最大独立集问题。这两个就直接给出一个大概思路和算法了。</p>
-<p>旅行商问题中，我们让C(S,j)表示访问S中的每个顶点一次，且从1开始，到j结束的最短路径，如果|S|&gt;1的话，那么我们使得C(S,1)=∞，因为路径不能从1开始，在1结束。转移方程为C(S,j) = min {C(S-{j},i)+d(ij)} {i∈S: i =/= j).算法如下：</p>
-<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">C</span><span style="color: #f5deb3;">({</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">},</span><span style="color: #add8e6;">1</span>) <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> s <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">2</span> <span style="color: #f5deb3;">to</span> <span style="color: #4682b4; font-weight: bold;">n:</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">subsets</span> S <span style="color: #f5deb3;">∈</span> <span style="color: #f5deb3;">{</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">2</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">…,</span> n<span style="color: #f5deb3;">}</span> <span style="color: #f5deb3;">of</span> <span style="color: #f5deb3;">size</span> s <span style="color: #f5deb3;">and</span> <span style="color: #f5deb3;">containing</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">C</span>(S<span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">1</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">∞</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">∈</span>S<span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=/=</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">:</span><br><span style="color: #f5deb3;">C</span>(S<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">C</span>(S<span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">},</span> <span style="color: #f5deb3;">i</span>) <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">d</span>(<span style="color: #f5deb3;">ij</span>) <span style="color: #f5deb3;">:</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">∈</span>S <span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=/=</span> <span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">{</span><span style="color: #f5deb3;">C</span><span style="color: #f5deb3;">({</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">…,</span> n<span style="color: #f5deb3;">},</span> <span style="color: #f5deb3;">j</span>) <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">dj1</span><span style="color: #f5deb3;">}</span></div><br>总时间复杂度为O(n^2*2^n)。</p>
-<p>树上的最大独立集问题，可以做到线性时间，那么子问题怎么确定呢？我们可以用I(u)表示已u为根节点的子树的最大独立集的数目，那么转移方程可以写成I(u) = max{1 + ∑I(v), ∑I(w)}(其中v是u的孙子节点，w是u的儿子节点)。也就是说算u点出的最大独立集的时候，可以考虑是否把顶点u算进去，如果算进去的话，那么儿子节点都不能算进去，也就变成了1+∑I(v)其中v是u的孙子节点，如果u不算进去的话，那么就是后面那一个表达式∑I(w)。这个算法的总时间复杂度是O(V+E)的。</p>
-<p>这一章讲的动态规划问题算是比较灵活的了，这东西还是要多练习，需要选取合适的子问题，然后写出转移方程。至于动态规划的优化问题，那就属于更深层次的问题了。对于相应的问题可以google查找资料，由于ACM比赛的存在，这一块的资料还是很多的。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -492,13 +482,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/5/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Anterior</a></li>
+    	<li class="prev"><a href="/page/5/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/7/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/7/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -518,7 +508,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -527,7 +517,7 @@
 		
 			
 	<div class="widget">
-		<h4>Categorias</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -564,9 +554,9 @@
 		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
-		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -574,11 +564,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
 		
-			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -588,15 +578,15 @@
 		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -613,48 +603,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/风险/">风险<span>1</span></a></li>
+			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
 		
-			<li><a href="/tags/概率/">概率<span>1</span></a></li>
+			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
+		
+			<li><a href="/tags/command/">command<span>1</span></a></li>
 		
 			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
 		
-			<li><a href="/tags/stack/">stack<span>1</span></a></li>
+			<li><a href="/tags/chain-matrix-multiplication/">chain matrix multiplication<span>1</span></a></li>
 		
-			<li><a href="/tags/ln/">ln<span>1</span></a></li>
+			<li><a href="/tags/风险/">风险<span>1</span></a></li>
 		
-			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
 		
-			<li><a href="/tags/storm/">storm<span>3</span></a></li>
+			<li><a href="/tags/proof/">proof<span>1</span></a></li>
 		
-			<li><a href="/tags/how/">how<span>1</span></a></li>
+			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
 		
-			<li><a href="/tags/sap/">sap<span>1</span></a></li>
+			<li><a href="/tags/hash/">hash<span>1</span></a></li>
 		
-			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
+			<li><a href="/tags/标记-清除/">标记-清除<span>1</span></a></li>
 		
-			<li><a href="/tags/yum/">yum<span>1</span></a></li>
+			<li><a href="/tags/安全/">安全<span>1</span></a></li>
 		
-			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
+			<li><a href="/tags/shell/">shell<span>5</span></a></li>
 		
-			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
+			<li><a href="/tags/list/">list<span>1</span></a></li>
 		
-			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
+			<li><a href="/tags/latex/">latex<span>1</span></a></li>
 		
-			<li><a href="/tags/算法/">算法<span>1</span></a></li>
+			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
 		
-			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
+			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
 		
-			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
+			<li><a href="/tags/方法/">方法<span>1</span></a></li>
 		
-			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
+			<li><a href="/tags/office/">office<span>1</span></a></li>
 		
-			<li><a href="/tags/queue/">queue<span>1</span></a></li>
-		
-			<li><a href="/tags/free/">free<span>1</span></a></li>
+			<li><a href="/tags/prim/">prim<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>292</span></a></li>
+		   <li><a href="/tags">...<span>296</span></a></li>
 		 
 		</ul>
 	</div>
@@ -663,8 +653,12 @@
 		
 			
 <div class="widget">
-  <h4>Posts recentes</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
+      </li>
     
       <li>
         <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
@@ -680,10 +674,6 @@
     
       <li>
         <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
-      </li>
-    
-      <li>
-        <a href="/2017/10/16/spark-dagscheduler/" ><i class="fa fa-file-o"></i>spark_dagscheduler</a>
       </li>
     
   </ul>
