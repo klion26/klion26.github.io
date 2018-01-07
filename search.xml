@@ -3957,6 +3957,8 @@ private:
             
             <tag> algorithm </tag>
             
+            <tag> exercise </tag>
+            
             <tag> algorithms </tag>
             
             <tag> bellman-ford </tag>
@@ -3964,8 +3966,6 @@ private:
             <tag> bfs </tag>
             
             <tag> dijkstra </tag>
-            
-            <tag> exercise </tag>
             
         </tags>
         
@@ -4632,7 +4632,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#105;&#108;&#116;&#x6f;&#x3a;&#x6a;&#x63;&#x6d;&#64;&#106;&#x6f;&#110;&#x6d;&#97;&#x73;&#x74;&#x65;&#x72;&#115;&#x2e;&#x6f;&#114;&#103;">&#x6a;&#x63;&#x6d;&#64;&#106;&#x6f;&#110;&#x6d;&#97;&#x73;&#x74;&#x65;&#x72;&#115;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x6a;&#99;&#x6d;&#x40;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#x73;&#116;&#x65;&#114;&#x73;&#46;&#111;&#114;&#103;">&#x6a;&#99;&#x6d;&#x40;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#x73;&#116;&#x65;&#114;&#x73;&#46;&#111;&#114;&#103;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -4855,9 +4855,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> linux </tag>
             
-            <tag> compter graphics </tag>
-            
             <tag> fedora </tag>
+            
+            <tag> compter graphics </tag>
             
             <tag> opengl </tag>
             
@@ -7632,9 +7632,9 @@ return 1;
         
         <tags>
             
-            <tag> grub </tag>
-            
             <tag> Red Hat9 </tag>
+            
+            <tag> grub </tag>
             
         </tags>
         
