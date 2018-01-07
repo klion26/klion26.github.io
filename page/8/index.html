@@ -121,6 +121,38 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2013-01-21 </div>
+			<div class="article-title"><a href="/2013/01/21/github-pages-jekyll-blog-free/" >github pages+jekyll搭建免费博客</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>不久前得知github page可以用来搭建博客，而且还可以绑定顶级域名（不绑定的话，是一个github.com下面的二级域名）。然后就找教程弄了一个，觉得这东西确实不错啊，如果只是写写文章，没有很多其他要求的话，这样的一个博客完全可以了，而且可以不用买域名，也相当于<span style="color: #ff0000;">完全免费</span>了。而且用Markdown来写文章，感觉也不错，可以用自己喜欢的编辑器来写文章，格式也简单，然后通过git push到github上就可以了，其他的事情全部不用自己管，而且自己可以找一些很炫的主题，这些主题同样可以自己改，而且比改wordpress主题容易多了。下面是简单的流程，参照<span style="color: #3366ff;"><a href="http://www.vikingmute.com/archives/309" target="_blank" rel="external"><span style="color: #3366ff;">这篇文章</span></a></span>.</p>
+<p>首先你得在github上创建一个帐号，然后进行下面的操作，我的环境是fedora 15，当然在其他平台也是可以的，linux下基本一样，win下可以自己google。</p>
+<p>1.安装ruby和jekyll</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">$ sudo yum install ruby-devel<br>$ gem install jekyll</div><br>2.clone这个库<a href="http://jekyllbootstrap.com/" target="_blank" rel="external">http://jekyllbootstrap.com/</a>，这个库在jekyll的基础上进行了一些修改</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">$ git clone <a href="https://github.com/plusjade/jekyll-bootstrap.git" target="_blank" rel="external">https://github.com/plusjade/jekyll-bootstrap.git</a> username.github.com<br><span style="color: #b0c4de; font-weight: bold;">$ cd </span>username.github.com<br>$ git remote <span style="color: #b0c4de; font-weight: bold;">set</span>-url origin <a href="https://github.com/username/username.github.com.git" target="_blank" rel="external">https://github.com/username/username.github.com.git</a><br>$ git push origin master</div><br>其中的username请自行替换成你在github上的用户名（如何安装git的话，linux自带，windows自行google，教程一大堆），期间会让你输入github的帐号和密码，照着做就行了，当然如果你觉得每次都输入密码麻烦的话，可以配置ssh，如何配置请自行google，如果出现port 22错误的话，可以参考<span style="color: #3366ff;"><a href="http://www.klion26.com/github-port-22-error-bad-file-number.html" target="_blank" rel="external"><span style="color: #3366ff;">这篇文章</span></a></span></p>
+<p>然后过上5-10分钟（第一次会比较就一点，以后一般是1分钟左右）。你就可以用username.github.com访问你的博客了，然后会看到介绍jekyll的文章。</p>
+<p>然后，可以用如下操作来编辑你的第一篇文章</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">$ rake post <span style="color: #d8bfd8;">title</span><span style="color: #f5deb3;">=</span>”Hello World”<br><span style="color: #b0c4de; font-weight: bold;">$ cd </span>_posts //看到一个新的hello world命名的.md文件 就是你的文章啦<br>$ vim <em>**</em>hello_world.md //打开他 用markdown格式撰写<br>//commit一下 就是等于发布了～<br>$ git add .<br>$ git commit -m “Add new content”<br>$ git push origin master</div><br>然后刷新一下就可以看到你的第一篇文章了，markdown的语法也很容易懂，而且可以边学边操作，等需要的时候再去学习更高层的东西。如果自己新建markdown文件的话，命名需要注意下，要写成日期加title的格式。</p>
+<p>至于其他的高级操作，可以在下面找到，另外google觉得是个好地方</p>
+<p>Jekyll-Bootstrap ：<a href="http://jekyllbootstrap.com/" target="_blank" rel="external">http://jekyllbootstrap.com/</a><br>Jeklly官方文档 ： <a href="http://jekyllrb.com/" target="_blank" rel="external">http://jekyllrb.com/</a><br>Github pages：<a href="http://pages.github.com/" target="_blank" rel="external">http://pages.github.com/</a></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2013-01-03 </div>
 			<div class="article-title"><a href="/2013/01/03/fedora-15-yum-rpm-problem/" >Fedora 15Yum问题和RPM包不能安装的问题</a></div>						
 		</h3>
@@ -372,7 +404,7 @@
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#105;&#108;&#x74;&#x6f;&#x3a;&#106;&#99;&#x6d;&#x40;&#x6a;&#111;&#x6e;&#x6d;&#x61;&#115;&#x74;&#101;&#x72;&#115;&#x2e;&#x6f;&#114;&#103;">&#106;&#99;&#x6d;&#x40;&#x6a;&#111;&#x6e;&#x6d;&#x61;&#115;&#x74;&#101;&#x72;&#115;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#105;&#108;&#116;&#x6f;&#x3a;&#x6a;&#x63;&#x6d;&#64;&#106;&#x6f;&#110;&#x6d;&#97;&#x73;&#x74;&#x65;&#x72;&#115;&#x2e;&#x6f;&#114;&#103;">&#x6a;&#x63;&#x6d;&#64;&#106;&#x6f;&#110;&#x6d;&#97;&#x73;&#x74;&#x65;&#x72;&#115;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -441,29 +473,6 @@
 <div></div>
 </li>
 </ul>
-
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-11-26 </div>
-			<div class="article-title"><a href="/2012/11/26/fedora-13-movie-mkv-mp4-rmvb-rm-song/" >Fedora13 下看视频，听歌</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>一开始没想在Linux下装视频，不过四宝在fedora-17下装了个视频之后，我也想装了。而且如果想只用Linux的话，那么视频这东西肯定需要的。然后上网搜了下，搜到<a href="http://www.cxybase.com/201104/fedora-13%E5%AE%89%E8%A3%85%E6%92%AD%E6%94%BE%E5%99%A8%E6%92%AD%E6%94%BEmp4%E8%A7%86%E9%A2%91/" target="_blank" rel="external">一篇文章</a>，说怎么安装文件使的可以打开mp4.rmvb，mkv等文件。然后我照着做的时候发现居然要求系统版本在15以上，fuck。。对于一直用fedora-13的我来说，压力很大。就想着去这个<a href="http://download1.rpmfusion.org/free/fedora/这里查看下，然后发现这个网页直接列出来的，系统版本最低要求是14.但是有一个release文件夹。点进去有一个文件夹13的文件夹。然后在里面找到一个文件[rpmfusion-free-release-13-2.noarch.rpm](http://download1.rpmfusion.org/free/fedora/releases/13/Everything/x86_64/os/rpmfusion-free-release-13-2.noarch.rpm)，然后在rpm" target="_blank" rel="external">http://download1.rpmfusion.org/free/fedora/这里查看下，然后发现这个网页直接列出来的，系统版本最低要求是14.但是有一个release文件夹。点进去有一个文件夹13的文件夹。然后在里面找到一个文件[rpmfusion-free-release-13-2.noarch.rpm](http://download1.rpmfusion.org/free/fedora/releases/13/Everything/x86_64/os/rpmfusion-free-release-13-2.noarch.rpm)，然后在rpm</a> -ivh 后面的地址改成这个文件的地址OK了。即就可以添加文件源了。然后yum install gstreamer-plugins-bad gstreamer-ffmpeg gstreamer-plugins-ugly 就行了。这两句需要用sudo来执行。接下来你就可以用Movie Player打开mp4,mkv，rmvb等文件。不过不知道为什么用QQ影音截取的一段rmvb文件却不可以播放。如果知道的还希望告知一声。</p>
 
 	
 	</div>
@@ -583,9 +592,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -602,48 +611,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/tencent/">tencent<span>1</span></a></li>
+			<li><a href="/tags/mit/">mit<span>2</span></a></li>
 		
-			<li><a href="/tags/sap/">sap<span>1</span></a></li>
+			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
 		
-			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
+			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
 		
-			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
+			<li><a href="/tags/递归/">递归<span>1</span></a></li>
 		
-			<li><a href="/tags/rename/">rename<span>1</span></a></li>
+			<li><a href="/tags/Scheduler/">Scheduler<span>1</span></a></li>
 		
-			<li><a href="/tags/链接排序/">链接排序<span>1</span></a></li>
+			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
 		
-			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
+			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
 		
-			<li><a href="/tags/millwheel/">millwheel<span>1</span></a></li>
+			<li><a href="/tags/learning/">learning<span>1</span></a></li>
 		
-			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
+			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
 		
-			<li><a href="/tags/test/">test<span>1</span></a></li>
+			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
 		
-			<li><a href="/tags/latex/">latex<span>1</span></a></li>
+			<li><a href="/tags/pair/">pair<span>1</span></a></li>
 		
-			<li><a href="/tags/go/">go<span>1</span></a></li>
+			<li><a href="/tags/lzo/">lzo<span>1</span></a></li>
 		
-			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
+			<li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li>
 		
-			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
+			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
 		
-			<li><a href="/tags/VC6/">VC6<span>1</span></a></li>
+			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
 		
-			<li><a href="/tags/积分/">积分<span>1</span></a></li>
+			<li><a href="/tags/腾讯/">腾讯<span>1</span></a></li>
 		
-			<li><a href="/tags/english/">english<span>1</span></a></li>
+			<li><a href="/tags/timestamp/">timestamp<span>1</span></a></li>
 		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+			<li><a href="/tags/vundle/">vundle<span>1</span></a></li>
 		
-			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
 		
-			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
+			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>296</span></a></li>
+		   <li><a href="/tags">...<span>300</span></a></li>
 		 
 		</ul>
 	</div>
@@ -654,6 +663,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
+      </li>
     
       <li>
         <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
@@ -669,10 +682,6 @@
     
       <li>
         <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
-      </li>
-    
-      <li>
-        <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
       </li>
     
   </ul>
@@ -741,7 +750,7 @@
   </div>
   <div class="container-narrow">
   <footer> <p>
-  &copy; 2017 klion26
+  &copy; 2018 klion26
   
       with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
 </p> </footer>

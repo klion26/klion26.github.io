@@ -121,6 +121,41 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2015-01-03 </div>
+			<div class="article-title"><a href="/2015/01/03/algorithm-series/" >Algorithm series</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>最近突然有想把自己知道的，学过的算法写成一个系列的想法，即可以理清自己的思路，督促自己学习(复习)相关知识，也可以帮助一部分人，暂时的想法是在自己的能力范围之内，把一些算法尽量的讲解透彻，做到从零开始，也可算是一个入门级别的吧，所以很多东西会讲的很基础，简单。当然由于自己水平有限，如果有些东西讲的不是很详细，明白的话，可以相互讨论，我会尽己所能，把自己想要讲解的东西，写出来。由于每一篇可能都会比较长，所以这个系列的更新频率会比较低，争取一周一篇。现在的预拟的目录如下（可能随着时间的推移而更改）：</p>
+<p>1. <a href="http://www.klion26.com/dynamic-programming.html" target="_blank" rel="external">Dynamic Programming</a></p>
+<p>2. Tree {Binary Tree, 2-3-4 Tree, Red Black Tree, AVL Tree, B/B+ Tree}</p>
+<p>3. Greedy {Huffman encoding, Minimum spanning Tree}</p>
+<p>4. Graph {shortest path, Minimum spanning tree, strongly connected components}</p>
+<p>5. Hash</p>
+<p>6. String {Longest common subsequence, String matching}</p>
+<p>7. Sorting {Bubble sort, Quick sort, Merge sort, Insertion sort, Shell sort, Heap sort}</p>
+<p>8. Searching {DFS, BFS, Binary search}</p>
+<p>9. Bit</p>
+<p>10. Data Compression</p>
+<p>11. Linked list</p>
+<p>12. <a href="http://www.klion26.com/recursion.html" target="_blank" rel="external">Recursion</a></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2014-12-29 </div>
 			<div class="article-title"><a href="/2014/12/29/show-me-the-code/" >Show me the code</a></div>						
 		</h3>
@@ -641,42 +676,6 @@ private:
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2014-05-17 </div>
-			<div class="article-title"><a href="/2014/05/17/srm-620-randomgraph/" >SRM 620 RandomGraph</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://community.topcoder.com/stat?c=problem_statementpm=13143&amp;rd=15853" target="_blank" rel="external">题目链接</a></p>
-<p>题目大意：给你一个图无向图G，G有n个顶点，所有的边<i,j>都是以概率p存在。然后给定 n 和 p, 问图 G 中至少有一个联通子图含有4个以上（包括4个）顶点的概率。其中 2&lt;= n &lt;= 50</i,j></p>
-<p>这个题目还是比较有意思的。</p>
-<p>首先我们可以把4个以上转化为<span style="color: #ff0000;">不超过4个</span>，也就是说变成求这个问题的一个互补问题，因为转化之后的问题情况就变得少了很多，从而能够更好的求解</p>
-<p>接下来我们考虑怎么求图 G 中所有联通子图的顶点数都不超过4个的概率。首先不超过4个的情况只有如下几种<a href="http://www.klion26.com/wp-content/uploads/2014/05/graph1svg.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2014/05/graph1svg-300x115.png" alt="" title="graph1svg"></a></p>
-<p>第一种情况就是只有一个点在子图中，第二种情况是有两个顶点在图中，第三种和第四种是有3个顶点在子图中。我们可以把一个图中 第一种情况的个数设为 a,第二种情况的个数设为 b, 第三种和第四种情况的个数设为 c, 那么我们要求的就是图中只有这四种情况的概率。我们设<span style="color: #ff0000;"> f(r, a, b, c)</span> 表示 r 个顶点中 a 个第一种情况，b 个第二种情况，c个第三和第四种情况的概率。那么我们要求的就是 f(n, a, b, c) 且 a + 2b + 3c == n 的概率（其中 n 是图 G 的顶点个数）。那么接下来就是怎么算 f(r, a, b, c) 的事情了。</p>
-<p>我们假设现在有一个图 T，其中有 a 个第一种情况， b 个第二种情况， c 个第三和第四种情况。那么我们再加入一个顶点的时候，会发生什么呢？</p>
-<ol>
-<li>我们加入的点单独成为一个子图，也就是说不和任何的点有边连接，变成<span style="color: #ff0000;"> f(r+1, a+1, b, c),</span> 那么这种情况的概率是 (1-p)^(a+2b+3c)</li>
-<li>我们和第一种情况中的任何一个点有连接，那么就变成了<span style="color: #ff0000;"> f(r+1, a-1, b+1, c)</span>, 这样情况的概率是 (a<em>p)</em>(1-p)^(a-1)*(1-p)^(2b+3c)，首先是从 a 个点中选择一个，然后算概率</li>
-<li>我们和第一种情况种的任何两个点连接，变成一个第三种情况，那么就变成了<span style="color: #ff0000;"> f(r+1, a-2, b, c+1)</span>, 概率为 (a<em>(a-1))/2</em>p^2 <em> (1-p)^(a-2)</em>(1-p)^(2b+3c)</li>
-<li>我们和第二种情况种的某一个点连接，把连接的这个第二种情况变成第<span style="color: #ff0000;">三</span>种情况，也就是<span style="color: #ff0000;"> f(r+1, a, b-1, c+1)</span>, 概率为 (1-p)^a <em> <span style="color: #0000ff;">(2b)</span></em>p<em>(1-p)^(2b-1) </em> (1-p)^3c,其中标记出来的是从第二种情况种选择一个点进行连接，然后算的概率</li>
-<li>我们和第二种情况种的两个点进行连接，从而变成第<span style="color: #ff0000;">四</span>种情况（<span style="color: #ff0000;">注意这里和上面的区别</span>），也就是<span style="color: #ff0000;"> f(r+1, a, b-1, c+1)</span>, 概率为 (1-p)^a <em> b </em> p^2 <em> (1-p)^(2b-2)</em>(1-p)^3c.<br>接下来就可以用动态规划的思想来计算所有的 f(r, a, b, c) 了，然后计算出来之后我们求的所有 a+2b+3c == n 的 f(n, a, b, c)，记这个为 s 的话，那么我们最终要求的结果就是 1-s。到这里结束了</li>
-</ol>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -789,9 +788,9 @@ private:
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -808,48 +807,48 @@ private:
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/DFS/">DFS<span>2</span></a></li>
+			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
 		
-			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+			<li><a href="/tags/job/">job<span>1</span></a></li>
 		
-			<li><a href="/tags/command/">command<span>1</span></a></li>
+			<li><a href="/tags/redis/">redis<span>1</span></a></li>
 		
-			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
+			<li><a href="/tags/yum/">yum<span>1</span></a></li>
 		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
+			<li><a href="/tags/office/">office<span>1</span></a></li>
 		
-			<li><a href="/tags/方法/">方法<span>1</span></a></li>
+			<li><a href="/tags/mit/">mit<span>2</span></a></li>
 		
-			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
 		
-			<li><a href="/tags/递归/">递归<span>1</span></a></li>
-		
-			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
-		
-			<li><a href="/tags/alibaba/">alibaba<span>1</span></a></li>
-		
-			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
-		
-			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
-		
-			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
-		
-			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
-		
-			<li><a href="/tags/grub/">grub<span>2</span></a></li>
-		
-			<li><a href="/tags/latex/">latex<span>1</span></a></li>
-		
-			<li><a href="/tags/lzo/">lzo<span>1</span></a></li>
-		
-			<li><a href="/tags/learning/">learning<span>1</span></a></li>
+			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
 		
 			<li><a href="/tags/mapreduce/">mapreduce<span>1</span></a></li>
 		
-			<li><a href="/tags/gdb/">gdb<span>2</span></a></li>
+			<li><a href="/tags/blog/">blog<span>2</span></a></li>
+		
+			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
+		
+			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
+		
+			<li><a href="/tags/append/">append<span>2</span></a></li>
+		
+			<li><a href="/tags/Code/">Code<span>1</span></a></li>
+		
+			<li><a href="/tags/knapsack/">knapsack<span>1</span></a></li>
+		
+			<li><a href="/tags/paper/">paper<span>1</span></a></li>
+		
+			<li><a href="/tags/topic/">topic<span>1</span></a></li>
+		
+			<li><a href="/tags/book/">book<span>1</span></a></li>
+		
+			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
+		
+			<li><a href="/tags/apach/">apach<span>0</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>296</span></a></li>
+		   <li><a href="/tags">...<span>300</span></a></li>
 		 
 		</ul>
 	</div>
@@ -860,6 +859,10 @@ private:
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
+      </li>
     
       <li>
         <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
@@ -875,10 +878,6 @@ private:
     
       <li>
         <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
-      </li>
-    
-      <li>
-        <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
       </li>
     
   </ul>
@@ -947,7 +946,7 @@ private:
   </div>
   <div class="container-narrow">
   <footer> <p>
-  &copy; 2017 klion26
+  &copy; 2018 klion26
   
       with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
 </p> </footer>

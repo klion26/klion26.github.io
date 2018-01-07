@@ -121,6 +121,110 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2016-03-30 </div>
+			<div class="article-title"><a href="/2016/03/30/mit-6-824-lab-2-part-a/" >MIT 6.824 Lab 2 Part A</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><strong><span style="color: #ff0000;">做这个实验，最能学习的地方就是调试和思考的过程了，如果你直接参考了别人的思路或者代码，那么对于你来说，这个实验能学习到的东西则会大大减少</span></strong></p>
+<p>记录 MIT 6.824 Lab 2 中 Part A的一些想法以及思路，如果错误，还请指出，谢谢</p>
+<p>Lab 2 的链接如下<a href="http://nil.csail.mit.edu/6.824/2015/labs/lab-2.html" target="_blank" rel="external">http://nil.csail.mit.edu/6.824/2015/labs/lab-2.html</a>，其中 Part A 要求实现一个 ViewService，根据 Server的状态，进行相应的 View 切换（这里 View 表示当前能提供服务的 Server 以及相应的状态组合，ViewService 提供 View 的增删改查功能），这里将该 Lab 的两个部分分开来写。</p>
+<p>Part A 实现 ViewService 的整个功能，ViewService 需要保证如下几点：</p>
+<ol>
+<li><p>在以下几种情况中的任何一种发生的时候才进行 View 的切换</p>
+<ol>
+<li>primary 和 backup 都没有 ack</li>
+<li>primary 或者 backup 重启</li>
+<li>backup 为空，且有闲置的 Server（会发送 Ping 命令给 ViewService）</li>
+</ol>
+</li>
+<li><p>只有在 primary ack 过了当前的 View 之后，才能进行 View 的切换，换句话说，如果 primary 收到一个新的 View，然后挂了，那么 ViewService 就不应该切换 View（<span style="color: #0000ff;">根据页面的介绍，必须 ack 当前 View，那么这里有一个问题，如果 primary 收到一个新的 View，然后重启了，这种情况做何处理？</span>），这个限制简化了架构以及实现，但是可能导致一直不能更换 View</p>
+</li>
+<li>如果 primary 或 backup 在约定好的时间内没有发送 Ping 命令，则认为该 Server 挂了，需要做相应的操作</li>
+<li>View 的 primary 只能是当前 View 的 primary 或者前一个 View 的 backup（在 ViewService 初始化的时候，primary 是第一个连接进来的 Server）</li>
+<li>View 的 backup 可以是除 primary 之外的任何 Server，可为空<br>Part A 的要求实现如下三个函数：<br><pre class="lang:go decode:true ">func (vs <em>ViewServer) Ping(args </em>PingArgs, reply <em>PingReply) error {}<br>func (vs </em>ViewServer) Get(args <em>GetArgs, reply </em>GetReply) error {}<br>func (vs *ViewServer) tick() {}</pre><br>其中 Ping 接受 Server 发送过来的信息，并更新 View 的相应情况，Get 获取当前的 View，tick 则是一个回调函数，在固定时间内调用一次，检查 primary 和 backup 是否已经宕机，这里我实现的 Get 很简单，直接返回当前 View（在 ViewServer 里面定义一个字段 curView 用来表示当前 View），其他两个才是重点</li>
+</ol>
+<p>先把我定义的 ViewServer 贴一下（这个应该不算贴代码吧），下面能够更好的进行描述<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">type ViewServer struct &#123;</div><div class="line">	mu       sync.Mutex</div><div class="line">	l        net.Listener</div><div class="line">	dead     int32 // for testing</div><div class="line">	rpccount int32 // for testing</div><div class="line">	me       string</div><div class="line"></div><div class="line">	// Your declarations here.</div><div class="line">	lastPing map[string]time.Time  //记录 server 上次请求的时间，用来判断是否宕机</div><div class="line">	curView  View                  //当前 View</div><div class="line">	hasView bool                   //当前是否有 View 存在</div><div class="line">	hasAcked bool                  //Primary 是否已经 ack 了当前 View</div><div class="line">	secondBackup string            //将要被提升为 backup 的server</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>先说 tick，在 tick 中，首先我们需要知道 primary 是否已经 ack 了当前 View，如果没有 ack，那么就直接返回即可，<span style="color: #0000ff;">如果 ack 过了当前 View</span>，那么就继续进行下面的操作（<span style="color: #0000ff;">下面的操作必须在 primary ack 过了当前 View 之后才能进行</span>）</p>
+<ol>
+<li><p>判断 Primary 是否超时</p>
+<ol>
+<li><p>如果超时，则判断当前 View 是否存在 backup</p>
+<ol>
+<li>存在 backup，则将 backup 提升为 primary，然后将 primary 从 lastPing 中删除，并且将 hasAcked 置为 false</li>
+<li>不存在，将 hasView 置为 false</li>
+</ol>
+</li>
+<li><p>不超时，不做操作</p>
+</li>
+</ol>
+</li>
+<li><p>判断 backup 是否超时</p>
+<ol>
+<li>超时，则将 curView 中的 backup 置为 “”，然后 hasAcked 置为 false</li>
+<li>不超时，不做操作<br>然后接下来是 Ping 函数</li>
+</ol>
+</li>
+<li><p>判断当前是否有 View（通过 hasView)</p>
+<ol>
+<li>没有，就将当前发送 Ping 的 Server 当成 Primary，然后返回</li>
+<li><p>有当前 View</p>
+<ol>
+<li><p>发送 Ping 的 Server 是 什么角色?</p>
+<ol>
+<li><p>是 primary，考虑 primary 是否重启</p>
+<ol>
+<li><p>重启（通过 ping 命令 请求参数是否为 0 判断），则判断当前 View 是否有 backup</p>
+<ol>
+<li>有，将 backup 提升为 primary，然后将 primary 设置成 secondBackup（会在下次请求的时候加入到 View 中），<span style="color: #0000ff;">这样的实现，是否合理，是否需要直接将 primary 设置为 backup?</span></li>
+<li>没有，则将当前 View 的 Viewnum 加 1 即可</li>
+</ol>
+</li>
+<li><p>不是重启，则 ack 当前 View（<span style="color: #0000ff;">请求参数可能是 当前 View 的 Viewnum 和 0 之外的第三个值吗</span>？）</p>
+<ol>
+<li><p>backup，考虑是否重启</p>
+<ol>
+<li>重启，将 backup 的角色切换到 secondBackup</li>
+<li>不是重启，则不做操作</li>
+</ol>
+</li>
+<li><p>闲置的 Server，考虑当前 View 是否有 backup</p>
+<ol>
+<li>有，不做操作（<span style="color: #0000ff;">这里是否需要将当前 Server 加入到 secondBackup？</span>）</li>
+<li>没有，则将当前 Server 加入到 secondBackup，等待下一次 primary 发送 ping 的时候，提升为 backup</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<p><span style="color: #0000ff;"><del>当然，Ping 和 tick 函数 需要考虑加锁的问题，如果只为了通过测试，可以不加锁，测试都是串行的请求（有 goroutine）,如果不加锁，可能会遇到很诡异的问题</del></span></p>
+<p>思路整理之后发现也不是太难，不过过程中还是有不少细节需要注意，如果可以，最好是自己进行思考，然后不断的调试，通过打印日志，思考是否符合自己的理解，然后进行代码的调整</p>
+<p>&nbsp;</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2016-03-23 </div>
 			<div class="article-title"><a href="/2016/03/23/mit-6-824-2015-lab-1/" >MIT 6.824 2015 Lab 1 记录</a></div>						
 		</h3>
@@ -595,41 +699,6 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2015-01-03 </div>
-			<div class="article-title"><a href="/2015/01/03/algorithm-series/" >Algorithm series</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>最近突然有想把自己知道的，学过的算法写成一个系列的想法，即可以理清自己的思路，督促自己学习(复习)相关知识，也可以帮助一部分人，暂时的想法是在自己的能力范围之内，把一些算法尽量的讲解透彻，做到从零开始，也可算是一个入门级别的吧，所以很多东西会讲的很基础，简单。当然由于自己水平有限，如果有些东西讲的不是很详细，明白的话，可以相互讨论，我会尽己所能，把自己想要讲解的东西，写出来。由于每一篇可能都会比较长，所以这个系列的更新频率会比较低，争取一周一篇。现在的预拟的目录如下（可能随着时间的推移而更改）：</p>
-<p>1. <a href="http://www.klion26.com/dynamic-programming.html" target="_blank" rel="external">Dynamic Programming</a></p>
-<p>2. Tree {Binary Tree, 2-3-4 Tree, Red Black Tree, AVL Tree, B/B+ Tree}</p>
-<p>3. Greedy {Huffman encoding, Minimum spanning Tree}</p>
-<p>4. Graph {shortest path, Minimum spanning tree, strongly connected components}</p>
-<p>5. Hash</p>
-<p>6. String {Longest common subsequence, String matching}</p>
-<p>7. Sorting {Bubble sort, Quick sort, Merge sort, Insertion sort, Shell sort, Heap sort}</p>
-<p>8. Searching {DFS, BFS, Binary search}</p>
-<p>9. Bit</p>
-<p>10. Data Compression</p>
-<p>11. Linked list</p>
-<p>12. <a href="http://www.klion26.com/recursion.html" target="_blank" rel="external">Recursion</a></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -742,9 +811,9 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -761,48 +830,48 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
+			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
 		
-			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
+			<li><a href="/tags/scc/">scc<span>1</span></a></li>
 		
-			<li><a href="/tags/program/">program<span>1</span></a></li>
+			<li><a href="/tags/错误配置/">错误配置<span>1</span></a></li>
 		
-			<li><a href="/tags/append/">append<span>2</span></a></li>
+			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
+			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
 		
-			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
+			<li><a href="/tags/probability/">probability<span>1</span></a></li>
 		
-			<li><a href="/tags/java/">java<span>2</span></a></li>
+			<li><a href="/tags/tree/">tree<span>1</span></a></li>
 		
-			<li><a href="/tags/method/">method<span>1</span></a></li>
+			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
 		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
+			<li><a href="/tags/alibaba/">alibaba<span>1</span></a></li>
 		
-			<li><a href="/tags/pair/">pair<span>1</span></a></li>
+			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
 		
-			<li><a href="/tags/timestamp/">timestamp<span>1</span></a></li>
+			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
 		
-			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
+			<li><a href="/tags/code/">code<span>2</span></a></li>
 		
-			<li><a href="/tags/django/">django<span>1</span></a></li>
+			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
 		
-			<li><a href="/tags/concrete-mathematics/">concrete-mathematics<span>2</span></a></li>
+			<li><a href="/tags/tasksetmanager/">tasksetmanager<span>1</span></a></li>
 		
-			<li><a href="/tags/python/">python<span>2</span></a></li>
+			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
 		
-			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
 		
-			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
 		
-			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
+			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
 		
-			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
+			<li><a href="/tags/方法/">方法<span>1</span></a></li>
 		
-			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
+			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>296</span></a></li>
+		   <li><a href="/tags">...<span>300</span></a></li>
 		 
 		</ul>
 	</div>
@@ -813,6 +882,10 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
+      </li>
     
       <li>
         <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
@@ -828,10 +901,6 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
     
       <li>
         <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
-      </li>
-    
-      <li>
-        <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
       </li>
     
   </ul>
@@ -900,7 +969,7 @@ for(int i=0; i<max; ++i)="" 最大值是自己="" dp[i]="num[MAX-1][i];" for(int
   </div>
   <div class="container-narrow">
   <footer> <p>
-  &copy; 2017 klion26
+  &copy; 2018 klion26
   
       with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
 </p> </footer>

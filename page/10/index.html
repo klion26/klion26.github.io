@@ -121,6 +121,58 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2012-10-16 </div>
+			<div class="article-title"><a href="/2012/10/16/structure-and-interpretation-of-computer-programs-1-1/" >Structure and Interpretation of Computer Programs 1.1</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>这几天没啥事的时候就看看这本书，感觉这书看上去就5章，可是每一章都好多内容，习题也不少，以前还打算每一章写一次习题报告，现在改变想法了，每一节写一下相关知识点习题解答，有些习题解答不怎么好描述，就在网上找了相关的链接放在这里。</p>
+<p>1.1 <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-10.html#%_sec_1.1" target="_blank" rel="external">The Elements of Programming</a></p>
+<p>主要介绍了一些基本东西，然后还介绍了一些scheme的基本语法之类的，分为3个方面讲: 1.<strong>primitive expressions; 2.<strong>means of combination; 3.<strong>means of abstraction. </strong></strong></strong>这个过程中讲解了scheme的一些基本语法，scheme的procedure怎么跑的，怎么写基本的procedure，以保证读者可以用scheme来完成接下来的习题。</p>
+<p>另外讲述了用Newton方法求平方根以及一些优化，Newton方法求平方根就是首先猜测一个值，然后看这个值是否足够好(平方之后是否和这个数相差很小)，然后如果不足够好的话，就用(y+x/y)/2来更新y，其中y是猜测的值，x是我们需要求平方根的值。</p>
+<p>函数/过程再调用的时候应该是一个黑箱操作，也就是我们只需要知道参数是什么，会返回什么，但是我们不需要知道里面的具体实现是什么。相应的，在实现函数/过程的时候，参数的取名就尽量取得有意义些，让调用这个函数/过程的人能够更好的使用它。</p>
+<p>下面是1.1节习题以及简要说明</p>
+<p>1.1 要读者写出每条语句会输出的答案，这个题目看过前面的知识之后，就没问题了，可以看<a href="http://community.schemewiki.org/?sicp-ex-1.1" target="_blank" rel="external">这里</a>对照答案</p>
+<p>1.2 把一个算术表达式转化为前缀表达式，(/ (+ 5 4 (- 2 (- 3 (+ 6 (/ 1 3))))) (* 3 (- 6 2) (- 2 7))), 注意括号</p>
+<p>1.3 定义一个procedure，接受3个参数，然后返回其中2个较大的值的平方和 我的程序:</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span>(define (square-larger x y z)   </span></span></li>
+<li><span>   (</span><span class="keyword">if</span><span> (&gt; x y)   </span></li>
+<li><span>      (</span><span class="keyword">if</span><span> (&gt; z y)   </span></li>
+<li><span>         (+ (square x) (square z))   </span></li>
+<li><span>         (+ (square x) (square y))   </span></li>
+<li><span>      )   </span></li>
+<li><span>      (</span><span class="keyword">if</span><span> (&gt; z x)   </span></li>
+<li><span>         (+ (square y) (square z))   </span></li>
+<li><span>         (+ (square y) (square x))   </span></li>
+<li><span>      )   </span></li>
+<li><span>   )   </span></li>
+<li><span>)  </span><br></li></ol></div><br>可以在<a href="http://community.schemewiki.org/?sicp-ex-1.3" target="_blank" rel="external">这里</a>看到更多种方法来解决这个问题
+
+<p>1.4给出一个procedure，让你解释这个procedure。”如果b &gt; 0 那么返回a+b 否则返回a-b”</p>
+<p>1.5给出一个procedure和调用procedure的语句，然后让你用applicative-order和normal-order分析这个procedure会输出什么，你看过applicative-order和normal-order的知识之后，就基本可以得到了，applicative-order是每次参数是procedure的话，就会调用procedure得到相应的答案，所以这里的话就会出现死循环了，但是normal-order的话就不管这么多了，等到需要这个procedure的返回值的时候，它才会去调用相应的procedure，所以这里就返回0</p>
+<p>1.6给你一个代替if的new-if  procedure，然后让你判断用new-if写出来的Newton方法在scheme下运行会输出什么。这个就用到了1.5中的相关知识了，因为scheme解释器用的是applicative-order，所以会死循环。</p>
+<p>1.7Newton求平方根的时候，怎么判断足够好，请你给出一个足够好的判断函数。这里可以通过判断每次更新的猜测值后更新前的猜测值之间的关系来判断(用y^2-x的差值来判断的话，对于很小的x和很大的x就会出现大误差)，比如更新后的猜测值和更新后的猜测值相差比小于0.01%等，也可以<a href="http://community.schemewiki.org/?sicp-ex-1.7" target="_blank" rel="external">查看这里</a>。</p>
+<p>1.8 给你一个更新函数，让你用Newton方法求一个数的三次方根，这个直接可以通过平方根的程序改编而来，当然判断足够好的函数还是需要自己来斟酌的。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2012-10-08 </div>
 			<div class="article-title"><a href="/2012/10/08/scheme-and-the-little-scheme/" >Scheme &amp; The Little Scheme</a></div>						
 		</h3>
@@ -586,30 +638,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-03-26 </div>
-			<div class="article-title"><a href="/2012/03/26/replay-email/" >站点邮件回复</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>一直以来这个博客就没有邮件回复功能，一开始我还不知道，后来一同学说没有，我才发现确实没有[因为会给作者发评论,就以为会有邮件回复的，汗- -]，今天又看到又看到了邮件回复有关的文章，就花时间搞定了。用的是WP Thread Comment,不过由于以前用的Clickcha插件和这个插件冲突，自己又对PHP和Ajax什么的不懂，就浪费了不少时间，每次两个插件同时启用的时候，两个插件就都没有效果,Clickcha可能是因为我启用了WP Thread Comment的Ajax吧？后来就直接删掉了Clickcha然后用ClickChina替代，后者是仿Clickcha的，不过更适合中国人吧。</p>
-<p><span style="color: #ff0000;">终于这个博客也有评论回复邮件通知啦~~~</span></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -722,9 +750,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -741,48 +769,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/streaming/">streaming<span>1</span></a></li>
+			<li><a href="/tags/线程堆栈/">线程堆栈<span>1</span></a></li>
 		
-			<li><a href="/tags/read/">read<span>3</span></a></li>
+			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
 		
-			<li><a href="/tags/linux/">linux<span>24</span></a></li>
+			<li><a href="/tags/ln/">ln<span>1</span></a></li>
 		
-			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
+			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
 		
-			<li><a href="/tags/腾讯/">腾讯<span>1</span></a></li>
+			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
 		
-			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
+			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
 		
-			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
+			<li><a href="/tags/question/">question<span>1</span></a></li>
 		
-			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
+			<li><a href="/tags/task/">task<span>1</span></a></li>
 		
-			<li><a href="/tags/databse/">databse<span>1</span></a></li>
-		
-			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
-		
-			<li><a href="/tags/rmvb/">rmvb<span>1</span></a></li>
-		
-			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
-		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
-		
-			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
+			<li><a href="/tags/proof/">proof<span>1</span></a></li>
 		
 			<li><a href="/tags/sap/">sap<span>1</span></a></li>
 		
-			<li><a href="/tags/free/">free<span>1</span></a></li>
+			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
 		
-			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
+			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
 		
-			<li><a href="/tags/安全/">安全<span>1</span></a></li>
+			<li><a href="/tags/i-o-multiplexing/">i/o multiplexing<span>1</span></a></li>
 		
-			<li><a href="/tags/opengl/">opengl<span>1</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
 		
-			<li><a href="/tags/storm/">storm<span>3</span></a></li>
+			<li><a href="/tags/list/">list<span>1</span></a></li>
+		
+			<li><a href="/tags/GC/">GC<span>1</span></a></li>
+		
+			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
+		
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
+		
+			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
+		
+			<li><a href="/tags/DFS/">DFS<span>2</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>296</span></a></li>
+		   <li><a href="/tags">...<span>300</span></a></li>
 		 
 		</ul>
 	</div>
@@ -793,6 +821,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
+      </li>
     
       <li>
         <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
@@ -808,10 +840,6 @@
     
       <li>
         <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
-      </li>
-    
-      <li>
-        <a href="/2017/11/09/django-configuration-in-action/" ><i class="fa fa-file-o"></i>django-configuration in act...</a>
       </li>
     
   </ul>
@@ -880,7 +908,7 @@
   </div>
   <div class="container-narrow">
   <footer> <p>
-  &copy; 2017 klion26
+  &copy; 2018 klion26
   
       with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
 </p> </footer>
