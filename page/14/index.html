@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 14 | klion26</title>
+  <title>第 14 页 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,30 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-04-19 </div>
+			<div class="article-title"><a href="/2011/04/19/eular-function-hdu-3307/" >HDU 3307 欧拉函数</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>这题首先可以把a(n)的公式推出来,a(n)=x^n<em>a(0)+Y</em>(x^n-1)/(x-1).然后a(n)%a(0)=0也就是[x^n<em>a(0)+Y</em>(x^n-1)/(x-1)]%a(0)=0那么x^n<em>a(0)这一项省略得到Y</em>(x^n-1)/(x-1)%a(0)=0.我们设k=Y/(x-1).因为题中保证(x-1)|Y.所以k是整数.这样就得到k<em>(x^n-1)=0(mod a(0)).也就是k</em>(x^n-1)=m*a(0),其中m&gt;=0且是整数.两边同时除掉gcd(k,a(0))之后就变成了(x^n-1)=0(mod a(0)).也就是x^n=1(mod a(0))[现在的a(0)是原来的a(0)/gcd(a(0),k)].我们知道如果gcd(x,a(0))==1那么x^phi(a(0))=1(mod a(0)).如果不等于1就无解.但是当gcd(x,a(0))=1的时候是不是Phi(a(0))就是题目的答案呢?显然不是,就想4^4=1(mod 5)但是4^2=1(mod 5).但是我们知道如果对于一个数t,x^t=1(mod a(0))的话,那么t|phi(a(0)).这样我们就好办了.只需要枚举phi(a(0))的所有因子就OK了,然后取最小的那个使得x^t=1(moid a(0))的因子就是本题答案了.代码如下:</p>
+<div class="dp-highlighter"><br><br>1.  <span><span class="comment">/<em> </em></span> </span><br>2.  <span><span class="comment">ID:klion26 </span> </span><br>3.  <span><span class="comment">LANG:C </span> </span><br>4.  <span><span class="comment">TASK:HDU_3307 </span> </span><br>5.  <span><span class="comment"> /</span><span>  </span></span><br>6.  <span> </span><span class="preprocessor">#include <stdio.h> </stdio.h></span><span>  </span><br>7.  <span class="preprocessor">#include <string.h> </string.h></span><span>  </span><br>8.  <span class="preprocessor">#include <stdlib.h> </stdlib.h></span><span>  </span><br>9.  <span class="preprocessor">#include <math.h> </math.h></span><span>  </span><br>10.  <span>  </span><br>11.  <span class="datatypes"><strong>int64</strong></span><span> eular[66000];   </span><br>12.  <span class="datatypes">int64</span><span> idx,prime[6600];   </span><br>13.  <span class="datatypes"><strong>int64</strong></span><span> x,y,a0;   </span><br>14.  <span class="datatypes">int64</span><span> total,num[16][2];   </span><br>15.  <span class="datatypes"><strong>int64</strong></span><span> min;   </span><br>16.  <span class="keyword">void</span><span> init()   </span><br>17.  <span>{   </span><br>18.  <span>    </span><span class="datatypes">int64</span><span> i,j;   </span><br>19.  <span>    </span><span class="datatypes"><strong>int64</strong></span><span> n=65536;   </span><br>20.  <span>    memset(eular,0,</span><span class="keyword">sizeof</span><span>(eular));   </span><br>21.  <span>    eular[1]=1;   </span><br>22.  <span>    </span><span class="keyword">for</span><span>(i=2;i&lt;=n;i++)   </span><br>23.  <span>        {   </span><br>24.  <span>            </span><span class="keyword">if</span><span>(0==eular[i])   </span><br>25.  <span>                {   </span><br>26.  <span>                    prime[idx]=i;   </span><br>27.  <span>                    idx++;   </span><br>28.  <span>                    </span><span class="keyword">for</span><span>(j=i;j&lt;=n;j+=i)   </span><br>29.  <span>                        {   </span><br>30.  <span>                            </span><span class="keyword">if</span><span>(0 == eular[j])   </span><br>31.  <span>                                eular[j]=j;   </span><br>32.  <span>                            eular[j] /= i;   </span><br>33.  <span>                            eular[j] *= (i-1);   </span><br>34.  <span>                        }   </span><br>35.  <span>                }   </span><br>36.  <span>        }   </span><br>37.  <span>}   </span><br>38.  <span class="datatypes">int64</span><span> get_eular(</span><span class="datatypes"><strong>int64</strong></span><span> n)   </span><br>39.  <span>{   </span><br>40.  <span>    </span><span class="datatypes">int64</span><span> ret;   </span><br>41.  <span>    </span><span class="datatypes"><strong>int64</strong></span><span> i,k;   </span><br>42.  <span>    </span><span class="keyword">if</span><span>(n&lt;=65536)   </span><br>43.  <span>        </span><span class="keyword">return</span><span> eular[n];   </span><br>44.  <span>    </span><span class="keyword">for</span><span>(i=0;i<idx;i++) <="" span=""><br>45.  <span>        {   </span><br>46.  <span>            </span><span class="keyword">if</span><span>(0 == (n%prime[i]))   </span><br>47.  <span>                </span><span class="keyword">break</span><span>   </span><br>48.  <span>        }   </span><br>49.  <span>    </span><span class="keyword">if</span><span>(i == idx)   </span><br>50.  <span>        </span><span class="keyword">return</span><span> n-1;   </span><br>51.  <span>    k = n/prime[i];   </span><br>52.  <span>    </span><span class="keyword">if</span><span>(0 == (k%prime[i]))   </span><br>53.  <span>        ret = prime[i]<em>get_eular(k);   </em></span><br>54.  <span>    </span><span class="keyword">else</span><span>  </span><br>55.  <span>        ret = (prime[i]-1)get_eular(k);   </span><br>56.  <span>    </span><span class="keyword">return</span><span> ret;   </span><br>57.  <span>}   </span><br>58.  <span class="datatypes">int64</span><span> gcd(</span><span class="datatypes"><strong>int64</strong></span><span> a,</span><span class="datatypes">int64</span><span> b)   </span><br>59.  <span>{   </span><br>60.  <span>    </span><span class="datatypes">int</span><span> tmp;   </span><br>61.  <span>    </span><span class="keyword">if</span><span>(a &lt; b)   </span><br>62.  <span>        {   </span><br>63.  <span>            tmp = a;   </span><br>64.  <span>            a = b;   </span><br>65.  <span>            b = tmp;   </span><br>66.  <span>        }   </span><br>67.  <span>    </span><span class="keyword">while</span><span>(b)   </span><br>68.  <span>        {   </span><br>69.  <span>            tmp = a;   </span><br>70.  <span>            a = b;   </span><br>71.  <span>            b = tmp%b;   </span><br>72.  <span>        }   </span><br>73.  <span>    </span><span class="keyword">return</span><span> a;   </span><br>74.  <span>}   </span><br>75.  <span class="datatypes"><strong>int64</strong></span><span> pow_mod(</span><span class="datatypes">int64</span><span> a,</span><span class="datatypes"><strong>int64</strong></span><span> b,</span><span class="datatypes">int64</span><span> c)   </span><br>76.  <span>{   </span><br>77.  <span>    </span><span class="datatypes"><strong>int64</strong></span><span> ret = 1;   </span><br>78.  <span>    a %= c;   </span><br>79.  <span>    </span><span class="keyword">while</span><span>(b)   </span><br>80.  <span>        {   </span><br>81.  <span>            </span><span class="keyword">if</span><span>(b1)   </span><br>82.  <span>                {   </span><br>83.  <span>                    ret = (ret<em>a)%c;   </em></span><br>84.  <span>                }   </span><br>85.  <span>            b &gt;&gt;= 1;   </span><br>86.  <span>            a = (aa)%c;   </span><br>87.  <span>        }   </span><br>88.  <span>    </span><span class="keyword">return</span><span> ret;   </span><br>89.  <span>}   </span><br>90.  <span class="keyword">void</span><span> dfs(</span><span class="datatypes">int64</span><span> now,</span><span class="datatypes"><strong>int64</strong></span><span> level)   </span><br>91.  <span>{   </span><br>92.  <span>    </span><span class="datatypes">int64</span><span> i,j;   </span><br>93.  <span>    </span><span class="keyword">if</span><span>(level == total)   </span><br>94.  <span>        {   </span><br>95.  <span>            </span><span class="keyword">if</span><span>((1 == pow_mod(x,now,a0)))   </span><br>96.  <span>                {   </span><br>97.  <span>                    </span><span class="keyword">if</span><span>(now &lt; min)   </span><br>98.  <span>                        {   </span><br>99.  <span>                            min = now;   </span><br>100.  <span>                        }   </span><br>101.  <span>                }   </span><br>102.  <span>            </span><span class="keyword">return</span><span> ;   </span><br>103.  <span>        }   </span><br>104.  <span>    j = 1;   </span><br>105.  <span>    </span><span class="keyword">for</span><span>(i=0;i&lt;=num[level][1];i++)   </span><br>106.  <span>        {   </span><br>107.  <span>            now <em>= j;   </em></span><br>108.  <span>            dfs(now,level+1);   </span><br>109.  <span>            now /= j;   </span><br>110.  <span>            j = num[level][0];   </span><br>111.  <span>        }   </span><br>112.  <span>}   </span><br>113.  <span class="keyword">void</span><span> work()   </span><br>114.  <span>{   </span><br>115.  <span>    </span><span class="datatypes">__int64</span><span> en,i,j;   </span><br>116.  <span>    j = y/(x-1);   </span><br>117.  <span>    i = gcd(j,a0);   </span><br>118.  <span>    a0 /= i;   </span><br>119.  <span>    </span><span class="keyword">if</span><span>(1 != gcd(a0,x))   </span><br>120.  <span>        {   </span><br>121.  <span>            printf(</span><span class="string">“Impossible!\n”</span><span>);   </span><br>122.  <span>            </span><span class="keyword">return</span><span> ;   </span><br>123.  <span>        }   </span><br>124.  <span>    en=get_eular(a0);   </span><br>125.  <span>    total=0;   </span><br>126.  <span>    min = en;   </span><br>127.  <span>    </span><span class="keyword">for</span><span>(i=0;i<idx;i++) <="" span=""><br>128.  <span>        {   </span><br>129.  <span>            </span><span class="keyword">if</span><span>(0 == (en%prime[i]))   </span><br>130.  <span>                {   </span><br>131.  <span>                    num[total][0]=prime[i];   </span><br>132.  <span>                    j=0;   </span><br>133.  <span>                    </span><span class="keyword">while</span><span>(0 == (en%prime[i]))   </span><br>134.  <span>                        {   </span><br>135.  <span>                            j++;   </span><br>136.  <span>                            en /= prime[i];   </span><br>137.  <span>                        }   </span><br>138.  <span>                    num[total][1] = j;   </span><br>139.  <span>                    total++;   </span><br>140.  <span>                }   </span><br>141.  <span>            </span><span class="keyword">if</span><span>(1 == en)   </span><br>142.  <span>                </span><span class="keyword">break</span><span>   </span><br>143.  <span>        }   </span><br>144.  <span>    </span><span class="keyword">if</span><span>(en &gt; 1)   </span><br>145.  <span>        {   </span><br>146.  <span>            num[total][0]=en;   </span><br>147.  <span>            num[total][1] = 1;   </span><br>148.  <span>            total++;   </span><br>149.  <span>        }   </span><br>150.  <span>    dfs(1,0);   </span><br>151.  <span>    printf(</span><span class="string">“%I64d\n”</span><span>,min);   </span><br>152.  <span>}   </span><br>153.  <span class="datatypes">int</span><span> main(</span><span class="keyword">void</span><span>)   </span><br>154.  <span>{   </span><br>155.  <span>    init();   </span><br>156.  <span>    </span><span class="keyword">while</span><span>(EOF != scanf(</span><span class="string">“%I64d%I64d%I64d”</span><span>,x,&amp;y,&amp;a0))   </span><br>157.  <span>        {   </span><br>158.  <span>            </span><span class="keyword">if</span><span>(0 == y)   </span><br>159.  <span>                printf(</span><span class="string">“1\n”</span><span>);   </span><br>160.  <span>            </span><span class="keyword">else</span><span>  </span><br>161.  <span>                work();   </span><br>162.  <span>        }   </span><br>163.  <span>    </span><span class="keyword">return</span><span> 0;   </span><br>164.  <span>}   </span><br></idx;i++)></span></idx;i++)></span></div>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -329,140 +353,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-04-06 </div>
-			<div class="article-title"><a href="/2011/04/06/pointers-on-c-link-list/" >C和指针12章 链表</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>1.链表分为单链表和双链表.其中单链表只能从表头到表尾操作,双链表可以从表头到表尾,也可以从表尾到表头,也可以一时从表头到表尾,一时从表尾到表头.链表包括数据域和指针域,指针域指向下一个节点.</p>
-<p>2.链表的结构清楚之后就是使用了,主要是插入,删除,改变,查找.这里给出插入的函数,首先我们插入的时候可能插入到表头,可能插入到表尾,也可能插入到表的中间.当然表的中间是最简单的,只需要改变两个指针值就行了,插入到表尾的时候也只要注意下查找时的判断条件就行了,同时是改变两个指针值,但是如果插入的是表头的话,我们呢就要特别处理了,有些人说我们可以单独加一个表头节点,这个节点没有数据域,不过这个有点问题,一是创建的时候要创建一个空表头[这个也好操作?],二是各种操作的时候要跳过这个空表头[这个还是好操作],三是会浪费空间.下面是单链表的插入函数,不过插入到表头的时候,得注意下一些小细节</p>
-<!--easy2hide start-->
-<p>int sll_insert(Node **linkp,int new_value)//这里是指向Node的指针的指针,因为会可能插入到表头</p>
-<p>{</p>
-<pre><code>Node *current;
-
-Node *new;
-
-//寻找正确的插入位置,方法是按顺序访问链表,直到到达一个其值大于或等于
-
-//新值的节点.这个函数会重复插入
-
-while((current=*linkp)!=NULL &amp;&amp; current-&gt;value&lt;new_value)        linkp=&amp;current-&gt;link;
-
-//为新节点分配内存,并把新值存储到新节点中,如果内存分配失败,
-
-//函数返回FALSE(FALSE表示0 TRUE表示1)
-
-new = (Node *)malloc(sizeof(Node));
-
-if(NULL == new)
-
-  return FALSE;
-
-new-&gt;value=new_value;
-
-//在链表中插入新节点 并返回TRUE
-
-new-&gt;link=current;
-
-*linkp=new;
-
-return TRUE;
-</code></pre><p>}</p>
-<!--easy2hide end-->
-<p>这个函数考虑了插入位置是表头表尾表中的情况,不过这个函数有很大的隐患.主要是这里面的linkp=&amp;current-&gt;link;这条语句.取地址存在很大的隐患,C语言取地址既威力巨大,又暗伏凶险.C语言的指针哲学:给你锤子,实际上你可以使用好几种锤子,祝你好运.</p>
-<p>3.双链表可以单独拿两个指针来存表头和表尾 也可以单独拿出一个节点存.这样会浪费数据域.这里就看你的取舍了,当然你可以把指针域单独拿出来放在一个struct里面.然后Node这样struct里面包括上面那个struct和一个数据域.这里只需要一个结构标签的不完整声明就OK了.下面给出完整的插入函数</p>
-<p>typedef struct  a</p>
-<p>{</p>
-<p>   struct a *fwd;</p>
-<p>   struct a *bwd;</p>
-<p>   int value;</p>
-<p>}Node;下面用到的结构体</p>
-<!--easy2hide start-->
-<p>int dll_insert(register Node *rootp,int value)</p>
-<p>{</p>
-<pre><code>register Node *this;
-
-register Node *next;
-
-register Node *newnode;
-
-//查找value是否已经存在于链表中,如果是就返回(这个函数不会重复插入)
-
-//否则,为新值创建一个新节点(&quot;newnode&quot;将指向它)
-
-//&quot;this&quot;将指向应该在新节点之前的那个节点
-
-//&quot;next&quot;将指向应该在新节点之后的那个节点
-
-for(this=rootp;(next=this-&gt;fwd)!=NULL;this=next)
-
-   {
-
-      if(next-&gt;value==value)
-
-        return 0;
-
-      if(next-&gt;value&gt;value)
-
-        break;
-
-   }
-
-newnode=(Node *)malloc(sizoef(Node));
-
-if(NULL == newnode)
-
-  return -1;
-
-newnode-&gt;value=value;
-
-//把新节点添加到链表中
-
-newnode-&gt;fwd=next;
-
-  this-&gt;fwd=newnode;
-
- if(this != rootp)
-
-  newnode-&gt;bwd=this;
-
-else
-
-  newnode-&gt;bwd=NULL;
-
-if(next != NULL)
-
-  next-&gt;bwd=newnode;
-
-else
-
-  rootp-&gt;bwd=newnode;
-
-return 1;
-</code></pre><p>}</p>
-<!--easy2hide end-->
-<p>本章的警告总结:</p>
-<p>1.落到链表尾部的外面</p>
-<p>2.使用指针时应该格外小心,因为C并没有对它们的使用提供安全网</p>
-<p>3.从if语句中提炼语句可能会改变测试结果</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -473,13 +363,13 @@ return 1;
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/13/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+    	<li class="prev"><a href="/page/13/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/15/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/15/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -499,7 +389,7 @@ return 1;
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -508,7 +398,7 @@ return 1;
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>分类</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -565,9 +455,9 @@ return 1;
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -575,9 +465,9 @@ return 1;
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -591,51 +481,51 @@ return 1;
 		
 			
 	<div class="widget">
-		<h4>Tag Cloud</h4>
+		<h4>标签云</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
+			<li><a href="/tags/Code/">Code<span>1</span></a></li>
 		
-			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
+			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
 		
-			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
+			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
 		
-			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
 		
-			<li><a href="/tags/scc/">scc<span>1</span></a></li>
+			<li><a href="/tags/jekyll/">jekyll<span>1</span></a></li>
 		
-			<li><a href="/tags/no-recursive/">no-recursive<span>1</span></a></li>
+			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
 		
-			<li><a href="/tags/timestamp/">timestamp<span>1</span></a></li>
+			<li><a href="/tags/scala/">scala<span>1</span></a></li>
 		
-			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
+			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
 		
-			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
+			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
 		
-			<li><a href="/tags/半平面交/">半平面交<span>1</span></a></li>
+			<li><a href="/tags/metric/">metric<span>1</span></a></li>
 		
-			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+			<li><a href="/tags/sap/">sap<span>1</span></a></li>
 		
-			<li><a href="/tags/proof/">proof<span>1</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
 		
-			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
+			<li><a href="/tags/剪枝/">剪枝<span>1</span></a></li>
 		
-			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
+			<li><a href="/tags/job/">job<span>1</span></a></li>
 		
-			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
+			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
 		
-			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
 		
-			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
+			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
 		
-			<li><a href="/tags/notes/">notes<span>0</span></a></li>
+			<li><a href="/tags/reservior/">reservior<span>1</span></a></li>
 		
-			<li><a href="/tags/6-824/">6.824<span>2</span></a></li>
+			<li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
 		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>300</span></a></li>
+		   <li><a href="/tags">...<span>302</span></a></li>
 		 
 		</ul>
 	</div>
@@ -644,8 +534,12 @@ return 1;
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>最新文章</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" ><i class="fa fa-file-o"></i>通过 Java 线程堆栈进行性能瓶颈分析</a>
+      </li>
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
@@ -663,17 +557,13 @@ return 1;
         <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
       </li>
     
-      <li>
-        <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>Links</h4>
+	<h4>链接</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

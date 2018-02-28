@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 18 | klion26</title>
+  <title>第 18 页 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,32 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-02-12 </div>
+			<div class="article-title"><a href="/2011/02/12/usaco-4-2-3-job-processing/" >USACO 4.2.3 Job processing</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://www.nocow.cn/index.php/Translate:USACO/job" target="_blank" rel="external">题意</a></p>
+<p>对于第一问,比较容易想到.直接贪心就可以了,也就是每次都只处理一个任务,每次取当前结束时间最靠前的一个,这样的话,就可以保证总的结束时间一定是最早的.比如说5 2 3 1 1 3 1 4的话,那么一共会循环5次[也就是5个任务],第一次选第一台机器,因为它的结束时间是1,然后它的结束时间就会变成2[这里是指如果这个任务让这台机器来完成,那么完成之后的结束时间],第二次就会选第2台机器,因为第二台机器的结束时间还是1,依次类推,完成A任务的时间就会是1 1 2 2 3也就是一共需要3个单位的时间这是第一问的答案.那么第二问的答案就比这个要稍微难想一点,不过我们知道A B两项任务是没关系的,也就是进水不犯河水,各干各的.而且对于完成每个任务的每种机器也是各干各的,互不干扰.还有一点就是我们可以想象如果把完成A任务的和完成B任务的所需时间一个按从小到大排序,一个从大到小排序,然后对应的相加,也就是说完成A任务最早的放到B那就让它最晚完成,这样总的结束时间就会早一点.但是这里有个问题就是这样可以吗,因为B任务的开始是以A任务的结束为开始的,如果B任务那样一搞,但是A那某个还没完成咋办呢?这样我们来看看一个简单的分析,就那上面的例子来说,那么排序之后会是这样的<br>1 1 2 2 3<br>4 3 3 2 1[单独完成B任务所需的时间]这里还得说一点,就是这个时间是可以”换”的,也就是不一定要特定的任务在特定的机器上完成,反正就是里面的2和3 或者3和4之类的不是指的某个任务在第几个单位时间内完成,而是说最好的安排是有任务在第1个单位完成,有任务在第4个单位完成,这就OK了.<br>那么我们的第二问就是这样排列之后上下两个相加,然后取这些和的最大值.这里是5.但是就会有这样的疑问,也就是说下面那一排是首先不管A的,那么又没有可能是某个时候和下面对应的那个上面的任务还没问成呢?这样不是就不对了么?这里我们可以这样考虑,因为对于B中不同的机器之间是不存在这样的问题的,只有对于同一类机器,可是说同一台机器才会有这样的问题,因为不同机器是互不干扰的,那么我们单独考虑一台机器[B机器]<br>如果我们有如下的情况<br>1 3 6<br>6 4 2[这里是说明这台机器完成一件任务需要2分钟]<br>那么我们得到的结果应该是8[=2+6],那么第1分钟的时候第一件A任务完成了,现在我们可以让B的机器去做它,到了第3分钟刚好完成了,那么我们让它继续做第二件A任务,到了第5分钟的时候完成了,可是现在没有A任务给它,好的,这样更好,因为这样不会有我们认为的那种”忙不过来的”感觉.最终第6分钟来任务了,在第8分钟结束.<br>好了看看下面的一组数据<br>1 4 6<br>9 6 3<br>这里的数据是第1分钟B机器接到任务,然后第4分钟完成了,然后刚好接到第二个任务,继续做,到了第6分钟的时候,还没做完,怎么办?继续做原来的任务,这样就在第7分钟开始做等在那得第三个任务,可是这是不是一个巧合呢?下面就是见证奇迹的时候- -.其实这不是什么巧合,而是事实.你可以这样想,反正B任务得工作9个单位时间,这两个例子里面是不是都工作了9个单位时间呢?对啊,没错啊.可是还是有点糊涂,那么你可以把第一行的后一个减前一个得到一个差,这样就会得到另外一个数列,如下<br>3 2<br>这里要干嘛呢?你可以这样想,如果要是出现前面那种情况,那么后面的和会比较大[8比前面的大,这个原因就是上面的数列决定的]如果要是第二个例子的话,那么后面的结果不会比前面的大,这样只需要知道放在这台机器上工作的A任务的第一个任务的完成时间然后再加上一个几个任务*每个任务的时间久OK了.这样每台机器的搞清楚了,因为不同机器互不干扰,所以这样就是最佳答案了.</p>
+<p>代码如下:</p>
+<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">ID:qcx97811</span><br><span style="color: #da70d6;">LANG:C</span><br><span style="color: #da70d6;">TASK:job</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="font-weight: bold; color: #b0c4de;">typedef</span> <span style="font-weight: bold; color: #b0c4de;">struct</span><br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">end</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">cost</span><br><span style="color: #f5deb3;">}</span><span style="color: #f5deb3;">Node</span><br><br><span style="color: #f5deb3;">Node</span> <span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">36</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">36</span><span style="color: #f5deb3;">];</span><br><span style="font-weight: bold; color: #98fb98;">int</span> N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">A</span><span style="color: #f5deb3;">,</span>B;<br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1006</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">bEnd</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1006</span><span style="color: #f5deb3;">];</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">total</span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">cmp</span>(<span style="font-weight: bold; color: #b0c4de;">const</span> <span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">const</span> <span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #f5deb3;"></span>b)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">Node</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">c</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">Node</span> <span style="color: #f5deb3;"></span>)<span style="color: #f5deb3;">a</span><br>    <span style="color: #f5deb3;">Node</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">d</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">Node</span> <span style="color: #f5deb3;"></span>)b;<br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">end</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">d</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">end</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">end</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">d</span><span style="color: #f5deb3;">-&gt;</span><span style="color: #f5deb3;">end</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">}</span><br><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">work</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">tn</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><br>    <span style="color: #f5deb3;">tn</span> <span style="color: #f5deb3;">=</span> N;<br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">aEnd</span>));<br>    <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #f5deb3;">tn</span>)<br>        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//每次减少一个任务</span><br>            <span style="color: #f5deb3;">qsort</span>(<span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">A</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]),</span><span style="color: #f5deb3;">cmp</span>);<span style="color: #da70d6;">//对结束时间排序</span><br>            <span style="color: #f5deb3;">tn</span><span style="color: #f5deb3;">–</span><br>            <span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">end</span><br>            <span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">end</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">cost</span><span style="color: #da70d6;">//更改当前的结束时间</span><br>            <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#if 0</span><br><span style="color: #da70d6;">    for(i = 0;i &lt; N;i++)</span><br><span style="color: #da70d6;">        printf(“<strong><strong>%d</strong></strong>\n”,aEnd[i]);</span><br><span style="color: #eeee00;">#endif</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">[</span>N<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]);</span><span style="color: #da70d6;">//这个是A Machine工作完所需的时间</span><br>    <span style="color: #f5deb3;">tn</span> <span style="color: #f5deb3;">=</span> N;<br>    <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #f5deb3;">tn</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">qsort</span>(<span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">,</span>B<span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]),</span><span style="color: #f5deb3;">cmp</span>);<br>            <span style="color: #f5deb3;">tn</span><span style="color: #f5deb3;">–</span><br>            <span style="color: #f5deb3;">bEnd</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">end</span><br>            <span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">end</span> <span style="color: #f5deb3;">+=</span> <span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">cost</span><br>            <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#if 0</span><br><span style="color: #da70d6;">    printf(“\n”);</span><br><span style="color: #da70d6;">    for(i = 0;i &lt; N;i++)</span><br><span style="color: #da70d6;">        printf(“####%d####\n”,bEnd[i]);</span><br><span style="color: #eeee00;">#endif</span><br>    <span style="color: #f5deb3;">tn</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">bEnd</span><span style="color: #f5deb3;">[</span>N<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">];</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> N;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">bEnd</span><span style="color: #f5deb3;">[</span>N<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">tn</span>)<br>                <span style="color: #f5deb3;">tn</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">aEnd</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">bEnd</span><span style="color: #f5deb3;">[</span>N<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“ %d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">tn</span>);<br><span style="color: #f5deb3;">}</span><br><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">input</span>(<span style="color: #f5deb3;">Node</span> <span style="color: #f5deb3;">in</span><span style="color: #f5deb3;">[],</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">num</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">num</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">in</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">cost</span>);<br>            <span style="color: #f5deb3;">in</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">end</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">in</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">cost</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">main</span>(<span style="font-weight: bold; color: #98fb98;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“job.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdin</span>);<br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“job.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdout</span>);<br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span>N<span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">A</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span>B);<br>    <span style="color: #f5deb3;">input</span>(<span style="color: #f5deb3;">aMachine</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">A</span>);<br>    <span style="color: #f5deb3;">input</span>(<span style="color: #f5deb3;">bMachine</span><span style="color: #f5deb3;">,</span>B);<br>    <span style="color: #f5deb3;">work</span>();<br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -465,35 +491,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2010-12-22 </div>
-			<div class="article-title"><a href="/2010/12/22/linux-shell-problem/" >Linux Shell遇到的问题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>今天上实验课,遇到了一些Shell的问题,有些是帮同学解决问题时遇到的,有时是自己遇到的,也让我对某些命令有了个更好的了解.写此文章纯属备份.</p>
-<p> 挂载U盘的方法.</p>
-<p>1)插入U盘,fdisk -l得到U盘对应的分区.</p>
-<p>2)新建一个文件夹,一般建在/mnt下,名字一般加usb.[mkdir usb]</p>
-<p>3)挂载.mount  <span style="color: #ff0000;">/dev/sdb1  <span style="color: #000000;">/mnt/usb[红色的地方是你机器上查出来的分区]</span></span></p>
-<p><span style="color: #ff0000;"><span style="color: #000000;">卸载就直接用umount /dev/sdb1或者umount /mnt/usb</span></span></p>
-<p><span style="color: #ff0000;"><span style="color: #000000;">还有就是shell里面的x=x+1的写法,一开始由于这个导致我的程序各种无语,要不就是死循环,要不就是找不到命令.后来一个命令一个命令的分开试,然后再组起来.才发现是这句话的错误,原因是我的’+’两边没加空格.这还是自己写的少的原因.x=x+1有两种写法, x=$(($x + 1))和x=<code>expr $x + 1</code>[是反引号]</span></span></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -504,13 +501,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/17/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+    	<li class="prev"><a href="/page/17/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/19/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/19/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -530,7 +527,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -539,7 +536,7 @@
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>分类</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -596,9 +593,9 @@
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -606,9 +603,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -622,51 +619,51 @@
 		
 			
 	<div class="widget">
-		<h4>Tag Cloud</h4>
+		<h4>标签云</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
+			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
 		
-			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
 		
-			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+			<li><a href="/tags/github/">github<span>5</span></a></li>
 		
-			<li><a href="/tags/数论/">数论<span>5</span></a></li>
+			<li><a href="/tags/hive/">hive<span>1</span></a></li>
 		
-			<li><a href="/tags/教师/">教师<span>1</span></a></li>
+			<li><a href="/tags/kv/">kv<span>1</span></a></li>
 		
-			<li><a href="/tags/alibaba/">alibaba<span>1</span></a></li>
+			<li><a href="/tags/hash/">hash<span>1</span></a></li>
 		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
+			<li><a href="/tags/task/">task<span>1</span></a></li>
 		
-			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
+			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
 		
-			<li><a href="/tags/sap/">sap<span>1</span></a></li>
+			<li><a href="/tags/append/">append<span>2</span></a></li>
 		
-			<li><a href="/tags/vi/">vi<span>2</span></a></li>
+			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
 		
-			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
+			<li><a href="/tags/grub/">grub<span>2</span></a></li>
 		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
+			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
 		
-			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+			<li><a href="/tags/windows/">windows<span>4</span></a></li>
 		
-			<li><a href="/tags/paper/">paper<span>1</span></a></li>
+			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
 		
-			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
 		
-			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
+			<li><a href="/tags/成长/">成长<span>1</span></a></li>
 		
-			<li><a href="/tags/bellman-ford/">bellman-ford<span>1</span></a></li>
+			<li><a href="/tags/6-824/">6.824<span>2</span></a></li>
 		
-			<li><a href="/tags/notes/">notes<span>0</span></a></li>
+			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
 		
-			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
+			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
 		
-			<li><a href="/tags/概率/">概率<span>1</span></a></li>
+			<li><a href="/tags/databse/">databse<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>300</span></a></li>
+		   <li><a href="/tags">...<span>302</span></a></li>
 		 
 		</ul>
 	</div>
@@ -675,8 +672,12 @@
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>最新文章</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" ><i class="fa fa-file-o"></i>通过 Java 线程堆栈进行性能瓶颈分析</a>
+      </li>
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
@@ -694,17 +695,13 @@
         <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
       </li>
     
-      <li>
-        <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>Links</h4>
+	<h4>链接</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

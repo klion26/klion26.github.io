@@ -1,0 +1,473 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>通过 Java 线程堆栈进行性能瓶颈分析 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="通过 Java 线程堆栈进行性能瓶颈分析"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> 通过 Java 线程堆栈进行性能瓶颈分析</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>改善性能意味着用更少的资源做更多的事情。为了利用并发来提高系统性能，我们需要更有效的利用现有的处理器资源，这意味着我们期望使 CPU 尽可能出于忙碌状态（当然，并不是让 CPU 周期出于应付无用计算，而是让 CPU 做有用的事情而忙）。如果程序受限于当前的 CPU 计算能力，那么我们通过增加更多的处理器或者通过集群就能提高总的性能。总的来说，性能提高，需要且仅需要解决当前的受限资源，当前受限资源可能是：</p>
+<ul>
+<li>CPU： 如果当前 CPU 已经能够接近 100% 的利用率，并且代码业务逻辑无法再简化，那么说明该系统的性能以及达到上线，只有通过增加处理器来提高性能</li>
+<li>其他资源：比如连接数等。可以修改代码，尽量利用 CPU，可以获得极大的性能提升</li>
+</ul>
+<a id="more"></a>
+<p>如果你的系统有如下的特点，说明系统存在性能瓶颈：</p>
+<ul>
+<li><p>随着系统逐步增加压力，CPU 使用率无法趋近 100%（如下图）</p>
+<img src="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/image1.png" alt="image1.png" title="">
+</li>
+<li><p>持续运行缓慢。时常发现应用程序运行缓慢。通过改变环境因子（负载，连接数等）也无法有效提升整体响应时间</p>
+</li>
+<li>系统性能随时间的增加逐渐下降。在负载稳定的情况下，系统运行时间越长速度越慢。可能是由于超出某个阈值范围，系统运行频繁出错从而导致系统死锁或崩溃</li>
+<li>系统性能随负载的增加而逐渐下降。</li>
+</ul>
+<p>一个好的程序，应该是能够充分利用 CPU 的。如果一个程序在单 CPU 的机器上无论多大压力都不能使 CPU 使用率接近 100%，说明这个程序设计有问题。一个系统的性能瓶颈分析过程大致如下：</p>
+<ol>
+<li>先进性单流程的性能瓶颈分析，受限让单流程的性能达到最优。</li>
+<li>进行整体性能瓶颈分析。因为单流程性能最优，不一定整个系统性能最优。在多线程场合下，锁争用㩐给也会导致性能下降。</li>
+</ol>
+<p>高性能在不同的应用场合下，有不同的含义：</p>
+<ol>
+<li>有的场合高性能意味着用户速度的体验，如界面操作等</li>
+<li>有的场合，高吞吐量意味着高性能，如短信或者彩信，系统更看重吞吐量，而对每一个消息的处理时间不敏感</li>
+<li>有的场合，是二者的结合</li>
+</ol>
+<p>性能调优的终极目标是：系统的 CPU 利用率接近 100%，如果 CPU 没有被充分利用，那么有如下几个可能：</p>
+<ol>
+<li>施加的压力不足</li>
+<li>系统存在瓶颈</li>
+</ol>
+<h1 id="1-常见的性能瓶颈"><a href="#1-常见的性能瓶颈" class="headerlink" title="1 常见的性能瓶颈"></a>1 常见的性能瓶颈</h1><h2 id="1-1-由于不恰当的同步导致的资源争用"><a href="#1-1-由于不恰当的同步导致的资源争用" class="headerlink" title="1.1 由于不恰当的同步导致的资源争用"></a>1.1 由于不恰当的同步导致的资源争用</h2><h3 id="1-1-1-不相关的两个函数，公用了一个锁，或者不同的共享变量共用了同一个锁，无谓地制造出了资源争用"><a href="#1-1-1-不相关的两个函数，公用了一个锁，或者不同的共享变量共用了同一个锁，无谓地制造出了资源争用" class="headerlink" title="1.1.1 不相关的两个函数，公用了一个锁，或者不同的共享变量共用了同一个锁，无谓地制造出了资源争用"></a>1.1.1 不相关的两个函数，公用了一个锁，或者不同的共享变量共用了同一个锁，无谓地制造出了资源争用</h3><p>下面是一种常见的错误</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class MyClass &#123;</div><div class="line">    Object sharedObj;</div><div class="line">	synchronized fun1() &#123;...&#125; //     访问共享变量 sharedObj</div><div class="line">	synchronized fun2() &#123;...&#125; //     访问共享变量 sharedObj</div><div class="line">	synchronized fun3() &#123;...&#125; //     不访问共享变量  sharedObj</div><div class="line">	synchronized fun4() &#123;...&#125; //     不访问共享变量  sharedObj</div><div class="line">	synchronized fun5() &#123;...&#125; //     不访问共享变量  sharedObj</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的代码将 synchronized 加在类的每一个方法上面，违背了保护什么锁什么的原则。对于无共享资源的方法，使用了同一个锁，人为造成了不必要的等待。Java 缺省提供了 this 锁，这样很多人喜欢直接在方法上使用 synchronized 加锁，很多情况下这样做是不恰当的，如果不考虑清楚就这样做，很容易造成锁粒度过大：</p>
+<ul>
+<li>两个不相干的方法（没有使用同一个共享变量），共用了 this 锁，导致人为的资源竞争</li>
+<li>即使一个方法中的代码也不是处处需要锁保护的。如果整个方法使用了 synchronized，那么很可能就把 synchronized 的作用域给人为扩大了。在方法级别上加锁，是一种粗犷的锁使用习惯。</li>
+</ul>
+<p>上面的代码应该变成下面</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class MyClass &#123;</div><div class="line">	Object sharedObj;</div><div class="line">	synchronized fun1() &#123;...&#125; //     访问共享变量 sharedObj</div><div class="line">	synchronized fun2() &#123;...&#125; //     访问共享变量 sharedObj</div><div class="line">	fun3() &#123;...&#125; //     不访问共享变量  sharedObj</div><div class="line">	fun4() &#123;...&#125; //     不访问共享变量  sharedObj</div><div class="line">	fun5() &#123;...&#125; //     不访问共享变量  sharedObj</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="1-1-2-锁的粒度过大，对共享资源访问完成后，没有将后续的代码放在synchronized-同步代码块之外"><a href="#1-1-2-锁的粒度过大，对共享资源访问完成后，没有将后续的代码放在synchronized-同步代码块之外" class="headerlink" title="1.1.2 锁的粒度过大，对共享资源访问完成后，没有将后续的代码放在synchronized 同步代码块之外"></a>1.1.2 锁的粒度过大，对共享资源访问完成后，没有将后续的代码放在synchronized 同步代码块之外</h3><p>这样会导致当前线程占用锁的时间过长，其他需要锁的线程只能等待，最终导致性能受到极大影响</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">void fun1()</div><div class="line">&#123;</div><div class="line">    synchronized(lock) &#123;</div><div class="line">    ...... //正在访问共享资源</div><div class="line">    ...... //做其他耗时操作，但这些耗时操作与共享资源无关</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的代码，会导致一个线程长时间占有锁，而在这么长的时间里其他线程只能等待，这种写法在不同的场合下有不同的提升余地：</p>
+<ul>
+<li>单 CPU 场合  将耗时操作拿到同步块之外，有的情况下可以提升性能，有的场合则不能：<ul>
+<li>同步块的耗时代码是 CPU 密集型代码（纯 CPU 运算等），不存在磁盘 IO/网络 IO 等低 CPU 消耗的代码，这种情况下，由于 CPU 执行这段代码是 100% 的使用率，因此缩小同步块也不会带来任何性能上的提升。但是，同时缩小同步块也不会带来性能上的下降</li>
+<li>同步块中的耗时代码属于磁盘/网络 IO等低 CPU 消耗的代码，当当前线程正在执行不消耗 CPU 的代码时，这时候 CPU 是空闲的，如果此时让 CPU 忙起来，可以带来整体性能上的提升，所以在这种场景下，将耗时操作的代码放在同步之外，肯定是可以提高整个性能的（？）</li>
+</ul>
+</li>
+<li>多 CPU 场合  将耗时的操作拿到同步块之外，总是可以提升性能<ul>
+<li>同步块的耗时代码是 CPU 密集型代码（纯 CPU 运算等），不存在磁盘 IO/网络 IO 等低 CPU 消耗的代码，这种情况下，由于是多 CPU，其他 CPU也许是空闲的，因此缩小同步块可以让其他线程马上得到执行这段代码，可以带来性能的提升</li>
+<li>同步块中的耗时代码属于磁盘/网络 IO等低 CPU 消耗的代码，当当前线程正在执行不消耗 CPU 的代码时，这时候总有 CPU 是空闲的，如果此时让 CPU 忙起来，可以带来整体性能上的提升，所以在这种场景下，将耗时操作的代码放在同步块之外，肯定是可以提高整个性能的</li>
+</ul>
+</li>
+</ul>
+<p>不管如何，缩小同步范围，对系统没有任何不好的影响，大多数情况下，会带来性能的提升，所以一定要缩小同步范围，因此上面的代码应该改为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">void fun1()</div><div class="line">&#123;</div><div class="line">     synchronized(lock) &#123;</div><div class="line">		...... //正在访问共享资源</div><div class="line">	&#125;</div><div class="line">	...... //做其他耗时操作，但这些耗时操作与共享资源无关</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="1-1-3-其他问题"><a href="#1-1-3-其他问题" class="headerlink" title="1.1.3 其他问题"></a>1.1.3 其他问题</h3><ul>
+<li>Sleep 的滥用，尤其是轮询中使用 sleep，会让用户明显感觉到延迟，可以修改为 notify 和 wait</li>
+<li>String + 的滥用，每次 + 都会产生一个临时对象，并有数据的拷贝</li>
+<li>不恰当的线程模型</li>
+<li>效率地下的 SQL 语句或者不恰当的数据库设计</li>
+<li>不恰当的 GC 参数设置导致的性能低下</li>
+<li>线程数量不足</li>
+<li>内存泄漏导致的频繁 GC</li>
+</ul>
+<h2 id="2-2-性能瓶颈分析的手段和工具"><a href="#2-2-性能瓶颈分析的手段和工具" class="headerlink" title="2.2 性能瓶颈分析的手段和工具"></a>2.2 性能瓶颈分析的手段和工具</h2><p>上面提到的这些原因形成的性能瓶颈，都可以通过线程堆栈分析，找到根本原因。</p>
+<h3 id="2-2-1-如何去模拟，发现性能瓶颈"><a href="#2-2-1-如何去模拟，发现性能瓶颈" class="headerlink" title="2.2.1 如何去模拟，发现性能瓶颈"></a>2.2.1 如何去模拟，发现性能瓶颈</h3><p>性能瓶颈的几个特征：</p>
+<ul>
+<li>当前的性能瓶颈只有一处，只有当解决了这一处，才知道下一处。没有解决当前性能瓶颈，下一处性能瓶颈是不会出现的。如下图所示，第二段是瓶颈，解决第二段的瓶颈后，第一段就变成了瓶颈，如此反复找到所有的性能瓶颈</li>
+</ul>
+<img src="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/image2.png" alt="image2.png" title="">
+<ul>
+<li>性能瓶颈是动态的，低负载下不是瓶颈的地方，高负载下可能成为瓶颈。由于 JProfile 等性能剖析工具依附在 JVM 上带来的开销，使系统根本就无法达到该瓶颈出现时需要的性能，因此在这种场景下线程堆栈分析才是一个真正有效的方法</li>
+</ul>
+<p>鉴于性能瓶颈的以上特点，进行性能模拟的时候，一定要使用比系统当前稍高的压力下进行模拟，否则性能瓶颈不会出现。具体步骤如下：</p>
+<img src="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/image3.png" alt="image3.png" title="">
+<h3 id="2-2-2-如何通过线程堆栈识别性能瓶颈"><a href="#2-2-2-如何通过线程堆栈识别性能瓶颈" class="headerlink" title="2.2.2 如何通过线程堆栈识别性能瓶颈"></a>2.2.2 如何通过线程堆栈识别性能瓶颈</h3><p>通过线程堆栈，可以很容易的识别多线程场合下高负载的时候才会出现的性能瓶颈。一旦一个系统出现性能瓶颈，最重要的就是识别性能瓶颈，然后根据识别的性能瓶颈进行修改。一般多线程系统，先按照线程的功能进行归类（组），把执行相同功能代码的线程作为一组进行分析。当使用堆栈进行分析的时候，以这一组线程进行统计学分析。如果一个线程池为不同的功能代码服务，那么将整个线程池的线程作为一组进行分析即可。</p>
+<p>一般一个系统一旦出现性能瓶颈，从堆栈上分析，有如下三种最为典型的堆栈特征：</p>
+<ol>
+<li>绝大多数线程的堆栈都表现为在同一个调用上下文，且只剩下非常少的空闲线程。可能的原因如下：<ul>
+<li>线程的数量过少</li>
+<li>锁的粒度过大导致的锁竞争</li>
+<li>资源竞争</li>
+<li>锁范围中有大量耗时操作</li>
+<li>远程通信的对方处理缓慢</li>
+</ul>
+</li>
+<li>绝大多数线程出于等待状态，只有几个工作的线程，总体性能上不去。可能的原因是，系统存在关键路径，关键路径已经达到瓶颈</li>
+<li>线程总的数量很少（有些线程池的实现是按需创建线程，可能程序中创建线程</li>
+</ol>
+<p>一个例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div></pre></td><td class="code"><pre><div class="line">&quot;Thread-243&quot; prio=1 tid=0xa58f2048 nid=0x7ac2 runnable</div><div class="line">   [0xaeedb000..0xaeedc480]</div><div class="line">          at java.net.SocketInputStream.socketRead0(Native Method)</div><div class="line">	       at java.net.SocketInputStream.read(SocketInputStream.java:129)</div><div class="line">	       at oracle.net.ns.Packet.receive(Unknown Source)</div><div class="line">	       ... ...</div><div class="line">		          at oracle.jdbc.driver.LongRawAccessor.getBytes()</div><div class="line">	       at oracle.jdbc.driver.OracleResultSetImpl.getBytes()</div><div class="line">	       - locked &lt;0x9350b0d8&gt; (a oracle.jdbc.driver.OracleResultSetImpl)</div><div class="line">	       at oracle.jdbc.driver.OracleResultSet.getBytes(O)</div><div class="line">	       ... ...</div><div class="line">		          at org.hibernate.loader.hql.QueryLoader.list()</div><div class="line">	       at org.hibernate.hql.ast.QueryTranslatorImpl.list()</div><div class="line">	       ... ...</div><div class="line">		          at com.wes.NodeTimerOut.execute(NodeTimerOut.java:175)</div><div class="line">	       at com.wes.timer.TimerTaskImpl.executeAll(TimerTaskImpl.java:707)</div><div class="line">	       at com.wes.timer.TimerTaskImpl.execute(TimerTaskImpl.java:627)</div><div class="line">	       - locked &lt;0x80df8ce8&gt; (a com.wes.timer.TimerTaskImpl)</div><div class="line">	       at com.wes.threadpool.RunnableWrapper.run(RunnableWrapper.java:209)</div><div class="line">	       at com.wes.threadpool.PooledExecutorEx$Worker.run()</div><div class="line">	       at java.lang.Thread.run(Thread.java:595)</div><div class="line">	&quot;Thread-248&quot; prio=1 tid=0xa58f2048 nid=0x7ac2 runnable</div><div class="line">	   [0xaeedb000..0xaeedc480]</div><div class="line">	          at java.net.SocketInputStream.socketRead0(Native Method)</div><div class="line">	       at java.net.SocketInputStream.read(SocketInputStream.java:129)</div><div class="line">	       at oracle.net.ns.Packet.receive(Unknown Source)</div><div class="line">	       ... ...</div><div class="line">		          at oracle.jdbc.driver.LongRawAccessor.getBytes()</div><div class="line">	       at oracle.jdbc.driver.OracleResultSetImpl.getBytes()</div><div class="line">	       - locked &lt;0x9350b0d8&gt; (a oracle.jdbc.driver.OracleResultSetImpl)</div><div class="line">	       at oracle.jdbc.driver.OracleResultSet.getBytes(O)</div><div class="line">	       ... ...</div><div class="line">		          at org.hibernate.loader.hql.QueryLoader.list()</div><div class="line">	       at org.hibernate.hql.ast.QueryTranslatorImpl.list()</div><div class="line">	       ... ...</div><div class="line">		           at com.wes.NodeTimerOut.execute(NodeTimerOut.java:175)</div><div class="line">	        at com.wes.timer.TimerTaskImpl.executeAll(TimerTaskImpl.java:707)</div><div class="line">	        at com.wes.timer.TimerTaskImpl.execute(TimerTaskImpl.java:627)</div><div class="line">	        - locked &lt;0x80df8ce8&gt; (a com.wes.timer.TimerTaskImpl)</div><div class="line">	        at com.wes.threadpool.RunnableWrapper.run(RunnableWrapper.java:209)</div><div class="line">	        at com.wes.threadpool.PooledExecutorEx$Worker.run()</div><div class="line">	        at java.lang.Thread.run(Thread.java:595)</div><div class="line">	        ... ...</div><div class="line">			&quot;Thread-238&quot; prio=1 tid=0xa4a84a58 nid=0x7abd in Object.wait()</div><div class="line">			[0xaec56000..0xaec57700]</div><div class="line">			    at java.lang.Object.wait(Native Method)</div><div class="line">	    at com.wes.collection.SimpleLinkedList.poll(SimpleLinkedList.java:104)</div><div class="line">	    - locked &lt;0x6ae67be0&gt; (a com.wes.collection.SimpleLinkedList)</div><div class="line">	    at com.wes.XADataSourceImpl.getConnection_internal(XADataSourceImpl.java:1642)</div><div class="line">	    ... ...</div><div class="line">		    at org.hibernate.impl.SessionImpl.list()</div><div class="line">	    at org.hibernate.impl.SessionImpl.find()</div><div class="line">	    at com.wes.DBSessionMediatorImpl.find()</div><div class="line">	    at com.wes.ResourceDBInteractorImpl.getCallBackObj()</div><div class="line">	    at com.wes.NodeTimerOut.execute(NodeTimerOut.java:152)</div><div class="line">	    at com.wes.timer.TimerTaskImpl.executeAll()</div><div class="line">	    at com.wes.timer.TimerTaskImpl.execute(TimerTaskImpl.java:627)</div><div class="line">	    - locked &lt;0x80e08c00&gt; (a com.facilities.timer.TimerTaskImpl)</div><div class="line">	    at com.wes.threadpool.RunnableWrapper.run(RunnableWrapper.java:209)</div><div class="line">	    at com.wes.threadpool.PooledExecutorEx$Worker.run()</div><div class="line">	    at java.lang.Thread.run(Thread.java:595)</div><div class="line">	 </div><div class="line">	 </div><div class="line">	&quot;Thread-233&quot; prio=1 tid=0xa4a84a58 nid=0x7abd in Object.wait()</div><div class="line">	[0xaec56000..0xaec57700]</div><div class="line">	 </div><div class="line">	    at java.lang.Object.wait(Native Method)</div><div class="line">	    at com.wes.collection.SimpleLinkedList.poll(SimpleLinkedList.java:104)</div><div class="line">	    - locked &lt;0x6ae67be0&gt; (a com.wes.collection.SimpleLinkedList)</div><div class="line">	    at com.wes.XADataSourceImpl.getConnection_internal(XADataSourceImpl.java:1642)</div><div class="line">	    ... ...</div><div class="line">		    at org.hibernate.impl.SessionImpl.list()</div><div class="line">	    at org.hibernate.impl.SessionImpl.find()</div><div class="line">	    at com.wes.DBSessionMediatorImpl.find()</div><div class="line">	    at com.wes.ResourceDBInteractorImpl.getCallBackObj()</div><div class="line">	    at com.wes.NodeTimerOut.execute(NodeTimerOut.java:152)</div><div class="line">	    at com.wes.timer.TimerTaskImpl.executeAll()</div><div class="line">	    at com.wes.timer.TimerTaskImpl.execute(TimerTaskImpl.java:627)</div><div class="line">	    - locked &lt;0x80e08c00&gt; (a com.facilities.timer.TimerTaskImpl)</div><div class="line">	    at com.wes.threadpool.RunnableWrapper.run(RunnableWrapper.java:209)</div><div class="line">	    at com.wes.threadpool.PooledExecutorEx$Worker.run()</div><div class="line">	    at java.lang.Thread.run(Thread.java:595)</div><div class="line">	    ... ...</div></pre></td></tr></table></figure>
+<p>从堆栈看，有 51 个（socket）访问，其中有 50 个是 JDBC 数据库访问。其他方法被阻塞在 java.lang.Object.wait() 方法上。</p>
+<h3 id="2-2-3-其他提高性能的方法"><a href="#2-2-3-其他提高性能的方法" class="headerlink" title="2.2.3 其他提高性能的方法"></a>2.2.3 其他提高性能的方法</h3><p>减少锁的粒度，比如 ConcurrentHashMap 的实现默认使用 16 个锁的 Array（有一个副作用：锁整个容器会很费力，可以添加一个全局锁）</p>
+<h3 id="2-2-4-性能调优的终结条件"><a href="#2-2-4-性能调优的终结条件" class="headerlink" title="2.2.4 性能调优的终结条件"></a>2.2.4 性能调优的终结条件</h3><p>性能调优总有一个终止条件，如果系统满足如下两个条件，即可终止：</p>
+<ol>
+<li>算法足够优化</li>
+<li>没有线程/资源的使用不当而导致的 CPU 利用不足</li>
+</ol>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+		
+          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+        
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2018/01/06/线程堆栈分析/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2018-02-28 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/Java/">Java<span>2</span></a></li> <li><a href="/tags/线程堆栈/">线程堆栈<span>2</span></a></li> <li><a href="/tags/性能分析/">性能分析<span>1</span></a></li> <li><a href="/tags/瓶颈/">瓶颈<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

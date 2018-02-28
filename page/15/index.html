@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 15 | klion26</title>
+  <title>第 15 页 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,140 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-04-06 </div>
+			<div class="article-title"><a href="/2011/04/06/pointers-on-c-link-list/" >C和指针12章 链表</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>1.链表分为单链表和双链表.其中单链表只能从表头到表尾操作,双链表可以从表头到表尾,也可以从表尾到表头,也可以一时从表头到表尾,一时从表尾到表头.链表包括数据域和指针域,指针域指向下一个节点.</p>
+<p>2.链表的结构清楚之后就是使用了,主要是插入,删除,改变,查找.这里给出插入的函数,首先我们插入的时候可能插入到表头,可能插入到表尾,也可能插入到表的中间.当然表的中间是最简单的,只需要改变两个指针值就行了,插入到表尾的时候也只要注意下查找时的判断条件就行了,同时是改变两个指针值,但是如果插入的是表头的话,我们呢就要特别处理了,有些人说我们可以单独加一个表头节点,这个节点没有数据域,不过这个有点问题,一是创建的时候要创建一个空表头[这个也好操作?],二是各种操作的时候要跳过这个空表头[这个还是好操作],三是会浪费空间.下面是单链表的插入函数,不过插入到表头的时候,得注意下一些小细节</p>
+<!--easy2hide start-->
+<p>int sll_insert(Node **linkp,int new_value)//这里是指向Node的指针的指针,因为会可能插入到表头</p>
+<p>{</p>
+<pre><code>Node *current;
+
+Node *new;
+
+//寻找正确的插入位置,方法是按顺序访问链表,直到到达一个其值大于或等于
+
+//新值的节点.这个函数会重复插入
+
+while((current=*linkp)!=NULL &amp;&amp; current-&gt;value&lt;new_value)        linkp=&amp;current-&gt;link;
+
+//为新节点分配内存,并把新值存储到新节点中,如果内存分配失败,
+
+//函数返回FALSE(FALSE表示0 TRUE表示1)
+
+new = (Node *)malloc(sizeof(Node));
+
+if(NULL == new)
+
+  return FALSE;
+
+new-&gt;value=new_value;
+
+//在链表中插入新节点 并返回TRUE
+
+new-&gt;link=current;
+
+*linkp=new;
+
+return TRUE;
+</code></pre><p>}</p>
+<!--easy2hide end-->
+<p>这个函数考虑了插入位置是表头表尾表中的情况,不过这个函数有很大的隐患.主要是这里面的linkp=&amp;current-&gt;link;这条语句.取地址存在很大的隐患,C语言取地址既威力巨大,又暗伏凶险.C语言的指针哲学:给你锤子,实际上你可以使用好几种锤子,祝你好运.</p>
+<p>3.双链表可以单独拿两个指针来存表头和表尾 也可以单独拿出一个节点存.这样会浪费数据域.这里就看你的取舍了,当然你可以把指针域单独拿出来放在一个struct里面.然后Node这样struct里面包括上面那个struct和一个数据域.这里只需要一个结构标签的不完整声明就OK了.下面给出完整的插入函数</p>
+<p>typedef struct  a</p>
+<p>{</p>
+<p>   struct a *fwd;</p>
+<p>   struct a *bwd;</p>
+<p>   int value;</p>
+<p>}Node;下面用到的结构体</p>
+<!--easy2hide start-->
+<p>int dll_insert(register Node *rootp,int value)</p>
+<p>{</p>
+<pre><code>register Node *this;
+
+register Node *next;
+
+register Node *newnode;
+
+//查找value是否已经存在于链表中,如果是就返回(这个函数不会重复插入)
+
+//否则,为新值创建一个新节点(&quot;newnode&quot;将指向它)
+
+//&quot;this&quot;将指向应该在新节点之前的那个节点
+
+//&quot;next&quot;将指向应该在新节点之后的那个节点
+
+for(this=rootp;(next=this-&gt;fwd)!=NULL;this=next)
+
+   {
+
+      if(next-&gt;value==value)
+
+        return 0;
+
+      if(next-&gt;value&gt;value)
+
+        break;
+
+   }
+
+newnode=(Node *)malloc(sizoef(Node));
+
+if(NULL == newnode)
+
+  return -1;
+
+newnode-&gt;value=value;
+
+//把新节点添加到链表中
+
+newnode-&gt;fwd=next;
+
+  this-&gt;fwd=newnode;
+
+ if(this != rootp)
+
+  newnode-&gt;bwd=this;
+
+else
+
+  newnode-&gt;bwd=NULL;
+
+if(next != NULL)
+
+  next-&gt;bwd=newnode;
+
+else
+
+  rootp-&gt;bwd=newnode;
+
+return 1;
+</code></pre><p>}</p>
+<!--easy2hide end-->
+<p>本章的警告总结:</p>
+<p>1.落到链表尾部的外面</p>
+<p>2.使用指针时应该格外小心,因为C并没有对它们的使用提供安全网</p>
+<p>3.从if语句中提炼语句可能会改变测试结果</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -331,30 +465,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-03-27 </div>
-			<div class="article-title"><a href="/2011/03/27/usaco-5-1-2-starry-night/" >USACO 5.1.2 Starry Night</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://www.nocow.cn/index.php/Translate:USACO/starry" target="_blank" rel="external">中文题目</a><br>直接枚举就行了,主要是判重的问题,也就是说要判断那些图形是出现过的,如果解决了这个问题,那么这题就基本没问题了.我的做法是,如果找到一个新图形,就把这个图形提出来,然后从前面的图形中去找,当然要考虑旋转和翻转了.这样就出现了,要写旋转了[翻转好写],我是把图形扩大到一个正方形,因为这样我觉得好写一点.然后旋转的时候,可以先在草稿纸上画一下,然后得到对应关系,然后每次旋转90°.一共旋转3次,得到4个不同的图形,加上翻转就变成了8次.基本就OK了,不过代码量还是有点的,代码如下:</p>
-<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">ID:qcx97811</span><br><span style="color: #da70d6;">LANG:C</span><br><span style="color: #da70d6;">TASK:starry</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="color: #eeee00;">#include <math.h></math.h></span><br><br><span style="font-weight: bold; color: #98fb98;">char</span> <span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">106</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">106</span><span style="color: #f5deb3;">];</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">H</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">W</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">,</span>b;<br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">y</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">8</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">{</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">};</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">8</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">{</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">};</span><br><span style="font-weight: bold; color: #98fb98;">char</span> <span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">26</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">];</span><span style="color: #da70d6;">//26<em>[100</em>100]</span><br><span style="font-weight: bold; color: #98fb98;">char</span> <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">];</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">idx</span><span style="color: #da70d6;">//now map index</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">stars</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">bfs</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">_i</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">_j</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">front</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">168</span><span style="color: #f5deb3;">];</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">now_i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">now_j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">to_i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">to_j</span><br>    <span style="color: #f5deb3;">front</span><span style="color: #f5deb3;">=-</span><span style="color: #add8e6;">1</span><br>    <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_i</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">W</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">_j</span><br>    <span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">_i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">_j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><br>    <span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_j</span><br>    <span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">=</span>b<span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_i</span><br>    <span style="color: #f5deb3;">stars</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><br>    <span style="font-weight: bold; color: #b0c4de;">while</span>(<span style="color: #f5deb3;">front</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">rear</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">front</span><br>            <span style="color: #f5deb3;">now_j</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">front</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">%</span><span style="color: #f5deb3;">W</span><br>            <span style="color: #f5deb3;">now_i</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">front</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">/</span><span style="color: #f5deb3;">W</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">8</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">to_i</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">now_i</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">x</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                    <span style="color: #f5deb3;">to_j</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">now_j</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">y</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">to_i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">0</span>||<span style="color: #f5deb3;">to_i</span><span style="color: #f5deb3;">&gt;=</span><span style="color: #f5deb3;">H</span>)<br>                        <span style="font-weight: bold; color: #b0c4de;">continue</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">to_j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">0</span>||<span style="color: #f5deb3;">to_j</span><span style="color: #f5deb3;">&gt;=</span><span style="color: #f5deb3;">W</span>)<br>                        <span style="font-weight: bold; color: #b0c4de;">continue</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">to_i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">to_j</span><span style="color: #f5deb3;">])</span><br>                        <span style="color: #f5deb3;">{</span><br>                            <span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">to_i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">to_j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">2</span><br>                            <span style="color: #f5deb3;">q</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">rear</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">to_i</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">W</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">to_j</span><br>                            <span style="color: #f5deb3;">stars</span><span style="color: #f5deb3;">++</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">to_i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">t</span>)<br>                                <span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">to_i</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">to_i</span><span style="color: #f5deb3;">&gt;</span>b)<br>                                b<span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">to_i</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">to_j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">l</span>)<br>                                <span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">to_j</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">to_j</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">r</span>)<br>                                <span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">to_j</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">tmp</span>));<br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span>b;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">r</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">];</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">rotate</span>()<br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//rotate the tmp 90°</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><br>    <span style="font-weight: bold; color: #98fb98;">char</span> <span style="color: #f5deb3;">c</span><br>    <span style="font-weight: bold; color: #98fb98;">char</span> <span style="color: #f5deb3;">exchange</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">];</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">exchange</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">99</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">exchange</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">];</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #da70d6;">//把图形移到左上角</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">2</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">])</span><br>                        <span style="font-weight: bold; color: #b0c4de;">break</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">100</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">j</span>)<br>                <span style="font-weight: bold; color: #b0c4de;">break</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">i</span>;<span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">];</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(;<span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">++</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>            <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">2</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br>                        <span style="font-weight: bold; color: #b0c4de;">break</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">100</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">j</span>)<br>                <span style="font-weight: bold; color: #b0c4de;">break</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">i</span>;<span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(;<span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">++</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">100</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>            <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">test</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">_idx</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">loop</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">tstars</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">stars</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">loop</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">loop</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">4</span>;<span style="color: #f5deb3;">loop</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">tstars</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">stars</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">_idx</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">];</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">_idx</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">];</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                        <span style="color: #f5deb3;">{</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">_idx</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">&amp;</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">])</span><br>                                <span style="color: #f5deb3;">{</span><br>                                    <span style="color: #f5deb3;">tstars</span><span style="color: #f5deb3;">–</span><br>                                <span style="color: #f5deb3;">}</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">tstars</span>)<br>                <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">1</span><br>            <span style="color: #da70d6;">//水平翻转</span><br>            <span style="color: #f5deb3;">tstars</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">stars</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">_idx</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">];</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">_idx</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">];</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                        <span style="color: #f5deb3;">{</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">_idx</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&amp;</span> <span style="color: #add8e6;">2</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">_idx</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">])</span><br>                                <span style="color: #f5deb3;">tstars</span><span style="color: #f5deb3;">–</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">tstars</span>)<br>                <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">1</span><br>            <span style="color: #f5deb3;">rotate</span>();<br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">find</span>()<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j1</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">t_stars</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">stars</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">idx</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">t_stars</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">stars</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">t_stars</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">])</span><span style="color: #da70d6;">//num of stars isn’t equal</span><br>                <span style="font-weight: bold; color: #b0c4de;">continue</span><br><span style="color: #eeee00;">#if 1</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">test</span>(<span style="color: #f5deb3;">i</span>))<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">i</span><br>                <span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#endif</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#if 1</span><br>    <span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span>b<span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><br>    <span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">stars</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">];</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">];</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span> || <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">])</span><br>                        <span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>                    <span style="font-weight: bold; color: #b0c4de;">else</span><br>                        <span style="color: #f5deb3;">map</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#endif</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">main</span>(<span style="font-weight: bold; color: #98fb98;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“starry.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdin</span>);<br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“starry.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdout</span>);<br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j1</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">flag</span><br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d%*c”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">W</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">H</span>);<br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">H</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">W</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%c”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]);</span><br>                    <span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">-</span><span style="color: #7fffd4;">‘0’</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="color: #f5deb3;">getchar</span>();<br>        <span style="color: #f5deb3;">}</span><br><span style="color: #eeee00;">#if 0</span><br><span style="color: #da70d6;">    for(i=0;i<h;i++)< span=""><br><span style="color: #da70d6;">        {</span><br><span style="color: #da70d6;">            for(j=0;j<w;j++)< span=""><br><span style="color: #da70d6;">                printf(“%c”,ori[i][j]);</span><br><span style="color: #da70d6;">            printf(“\n”);</span><br><span style="color: #da70d6;">        }</span><br><span style="color: #eeee00;">#endif</span><br>    <span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">H</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">W</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">1</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">])</span><br>                        <span style="color: #f5deb3;">{</span><br>                            <span style="color: #f5deb3;">bfs</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span>);<br>                            <span style="color: #f5deb3;">flag</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">find</span>();<br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">flag</span>)<br>                                <span style="color: #f5deb3;">{</span><br>                                    <span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">flag</span><span style="color: #f5deb3;">+</span><span style="color: #7fffd4;">‘a’</span><br>                                <span style="color: #f5deb3;">}</span><br>                            <span style="font-weight: bold; color: #b0c4de;">else</span><br>                                <span style="color: #f5deb3;">{</span><br>                                    <span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #7fffd4;">‘a’</span><br>                                    <span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">++</span><br>                                <span style="color: #f5deb3;">}</span><br>                            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i1</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">t</span><span style="color: #f5deb3;">i1</span><span style="color: #f5deb3;">&lt;=</span>b;<span style="color: #f5deb3;">i1</span><span style="color: #f5deb3;">++</span>)<br>                                <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j1</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">j1</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">r</span>;<span style="color: #f5deb3;">j1</span><span style="color: #f5deb3;">++</span>)<br>                                    <span style="color: #f5deb3;">{</span><br>                                        <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i1</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j1</span><span style="color: #f5deb3;">])</span><br>                                            <span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i1</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">k</span><br>                                    <span style="color: #f5deb3;">}</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">H</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">W</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">==</span><span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">])</span><br>                        <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“0”</span>);<br>                    <span style="font-weight: bold; color: #b0c4de;">else</span><br>                        <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%c”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">ori</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">][</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]);</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">memset</span>(<span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">,</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #b0c4de;">sizeof</span>(<span style="color: #f5deb3;">tmp</span>));<br><span style="color: #eeee00;">#if 0</span><br><span style="color: #da70d6;">    tmp[0][1]=2;</span><br><span style="color: #da70d6;">    tmp[1][1]=2;</span><br><span style="color: #da70d6;">    tmp[2][0]=2;</span><br><span style="color: #da70d6;">    rotate();</span><br><span style="color: #da70d6;">    printf(“———————\n”);</span><br><span style="color: #da70d6;">    for(i=0;i<100;i++)< span=""><br><span style="color: #da70d6;">        {</span><br><span style="color: #da70d6;">            for(j=0;j<100;j++)< span=""><br><span style="color: #da70d6;">                printf(“%c”,tmp[i][j]+’0’);</span><br><span style="color: #da70d6;">            printf(“\n”);</span><br><span style="color: #da70d6;">        }</span><br><span style="color: #eeee00;">#endif</span><br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></100;j++)<></span></100;i++)<></span></w;j++)<></span></h;i++)<></span></div>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -365,13 +475,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/14/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+    	<li class="prev"><a href="/page/14/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/16/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/16/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -391,7 +501,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -400,7 +510,7 @@
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>分类</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -457,9 +567,9 @@
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -467,9 +577,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -483,51 +593,51 @@
 		
 			
 	<div class="widget">
-		<h4>Tag Cloud</h4>
+		<h4>标签云</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/微信/">微信<span>1</span></a></li>
+			<li><a href="/tags/apach/">apach<span>0</span></a></li>
 		
-			<li><a href="/tags/file-system/">file-system<span>1</span></a></li>
+			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
 		
-			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
+			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
 		
-			<li><a href="/tags/windows/">windows<span>4</span></a></li>
+			<li><a href="/tags/prim/">prim<span>1</span></a></li>
 		
-			<li><a href="/tags/递归/">递归<span>1</span></a></li>
+			<li><a href="/tags/svm/">svm<span>1</span></a></li>
 		
-			<li><a href="/tags/shortest-paths-in-dag/">shortest paths in dag<span>1</span></a></li>
+			<li><a href="/tags/csu-acm/">csu_acm<span>1</span></a></li>
 		
-			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
+			<li><a href="/tags/metric-core/">metric-core<span>1</span></a></li>
 		
-			<li><a href="/tags/google-adsense/">google-adsense<span>1</span></a></li>
-		
-			<li><a href="/tags/level-order/">level-order<span>1</span></a></li>
+			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
 		
 			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
 		
-			<li><a href="/tags/老师/">老师<span>1</span></a></li>
+			<li><a href="/tags/logger/">logger<span>1</span></a></li>
 		
-			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
+			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
 		
-			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
+			<li><a href="/tags/chinese/">chinese<span>1</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/数论/">数论<span>5</span></a></li>
 		
-			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
+			<li><a href="/tags/tree/">tree<span>1</span></a></li>
 		
-			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
+			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
 		
-			<li><a href="/tags/stack/">stack<span>1</span></a></li>
+			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
 		
-			<li><a href="/tags/TaskScheduler/">TaskScheduler<span>1</span></a></li>
+			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/积分/">积分<span>1</span></a></li>
+			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
 		
-			<li><a href="/tags/list/">list<span>1</span></a></li>
+			<li><a href="/tags/filter/">filter<span>1</span></a></li>
+		
+			<li><a href="/tags/git/">git<span>5</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>300</span></a></li>
+		   <li><a href="/tags">...<span>302</span></a></li>
 		 
 		</ul>
 	</div>
@@ -536,8 +646,12 @@
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>最新文章</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" ><i class="fa fa-file-o"></i>通过 Java 线程堆栈进行性能瓶颈分析</a>
+      </li>
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
@@ -555,17 +669,13 @@
         <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
       </li>
     
-      <li>
-        <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>Links</h4>
+	<h4>链接</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

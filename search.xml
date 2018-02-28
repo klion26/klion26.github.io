@@ -3,6 +3,127 @@
   
     
     <entry>
+      <title><![CDATA[通过 Java 线程堆栈进行性能瓶颈分析]]></title>
+      <url>/2018/02/28/%E9%80%9A%E8%BF%87-Java-%E7%BA%BF%E7%A8%8B%E5%A0%86%E6%A0%88%E8%BF%9B%E8%A1%8C%E6%80%A7%E8%83%BD%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/</url>
+      <content type="html"><![CDATA[<p>改善性能意味着用更少的资源做更多的事情。为了利用并发来提高系统性能，我们需要更有效的利用现有的处理器资源，这意味着我们期望使 CPU 尽可能出于忙碌状态（当然，并不是让 CPU 周期出于应付无用计算，而是让 CPU 做有用的事情而忙）。如果程序受限于当前的 CPU 计算能力，那么我们通过增加更多的处理器或者通过集群就能提高总的性能。总的来说，性能提高，需要且仅需要解决当前的受限资源，当前受限资源可能是：</p>
+<ul>
+<li>CPU： 如果当前 CPU 已经能够接近 100% 的利用率，并且代码业务逻辑无法再简化，那么说明该系统的性能以及达到上线，只有通过增加处理器来提高性能</li>
+<li>其他资源：比如连接数等。可以修改代码，尽量利用 CPU，可以获得极大的性能提升</li>
+</ul>
+<a id="more"></a>
+<p>如果你的系统有如下的特点，说明系统存在性能瓶颈：</p>
+<ul>
+<li><p>随着系统逐步增加压力，CPU 使用率无法趋近 100%（如下图）</p>
+<img src="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/image1.png" alt="image1.png" title="">
+</li>
+<li><p>持续运行缓慢。时常发现应用程序运行缓慢。通过改变环境因子（负载，连接数等）也无法有效提升整体响应时间</p>
+</li>
+<li>系统性能随时间的增加逐渐下降。在负载稳定的情况下，系统运行时间越长速度越慢。可能是由于超出某个阈值范围，系统运行频繁出错从而导致系统死锁或崩溃</li>
+<li>系统性能随负载的增加而逐渐下降。</li>
+</ul>
+<p>一个好的程序，应该是能够充分利用 CPU 的。如果一个程序在单 CPU 的机器上无论多大压力都不能使 CPU 使用率接近 100%，说明这个程序设计有问题。一个系统的性能瓶颈分析过程大致如下：</p>
+<ol>
+<li>先进性单流程的性能瓶颈分析，受限让单流程的性能达到最优。</li>
+<li>进行整体性能瓶颈分析。因为单流程性能最优，不一定整个系统性能最优。在多线程场合下，锁争用㩐给也会导致性能下降。</li>
+</ol>
+<p>高性能在不同的应用场合下，有不同的含义：</p>
+<ol>
+<li>有的场合高性能意味着用户速度的体验，如界面操作等</li>
+<li>有的场合，高吞吐量意味着高性能，如短信或者彩信，系统更看重吞吐量，而对每一个消息的处理时间不敏感</li>
+<li>有的场合，是二者的结合</li>
+</ol>
+<p>性能调优的终极目标是：系统的 CPU 利用率接近 100%，如果 CPU 没有被充分利用，那么有如下几个可能：</p>
+<ol>
+<li>施加的压力不足</li>
+<li>系统存在瓶颈</li>
+</ol>
+<h1 id="1-常见的性能瓶颈"><a href="#1-常见的性能瓶颈" class="headerlink" title="1 常见的性能瓶颈"></a>1 常见的性能瓶颈</h1><h2 id="1-1-由于不恰当的同步导致的资源争用"><a href="#1-1-由于不恰当的同步导致的资源争用" class="headerlink" title="1.1 由于不恰当的同步导致的资源争用"></a>1.1 由于不恰当的同步导致的资源争用</h2><h3 id="1-1-1-不相关的两个函数，公用了一个锁，或者不同的共享变量共用了同一个锁，无谓地制造出了资源争用"><a href="#1-1-1-不相关的两个函数，公用了一个锁，或者不同的共享变量共用了同一个锁，无谓地制造出了资源争用" class="headerlink" title="1.1.1 不相关的两个函数，公用了一个锁，或者不同的共享变量共用了同一个锁，无谓地制造出了资源争用"></a>1.1.1 不相关的两个函数，公用了一个锁，或者不同的共享变量共用了同一个锁，无谓地制造出了资源争用</h3><p>下面是一种常见的错误</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class MyClass &#123;</div><div class="line">    Object sharedObj;</div><div class="line">	synchronized fun1() &#123;...&#125; //     访问共享变量 sharedObj</div><div class="line">	synchronized fun2() &#123;...&#125; //     访问共享变量 sharedObj</div><div class="line">	synchronized fun3() &#123;...&#125; //     不访问共享变量  sharedObj</div><div class="line">	synchronized fun4() &#123;...&#125; //     不访问共享变量  sharedObj</div><div class="line">	synchronized fun5() &#123;...&#125; //     不访问共享变量  sharedObj</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的代码将 synchronized 加在类的每一个方法上面，违背了保护什么锁什么的原则。对于无共享资源的方法，使用了同一个锁，人为造成了不必要的等待。Java 缺省提供了 this 锁，这样很多人喜欢直接在方法上使用 synchronized 加锁，很多情况下这样做是不恰当的，如果不考虑清楚就这样做，很容易造成锁粒度过大：</p>
+<ul>
+<li>两个不相干的方法（没有使用同一个共享变量），共用了 this 锁，导致人为的资源竞争</li>
+<li>即使一个方法中的代码也不是处处需要锁保护的。如果整个方法使用了 synchronized，那么很可能就把 synchronized 的作用域给人为扩大了。在方法级别上加锁，是一种粗犷的锁使用习惯。</li>
+</ul>
+<p>上面的代码应该变成下面</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class MyClass &#123;</div><div class="line">	Object sharedObj;</div><div class="line">	synchronized fun1() &#123;...&#125; //     访问共享变量 sharedObj</div><div class="line">	synchronized fun2() &#123;...&#125; //     访问共享变量 sharedObj</div><div class="line">	fun3() &#123;...&#125; //     不访问共享变量  sharedObj</div><div class="line">	fun4() &#123;...&#125; //     不访问共享变量  sharedObj</div><div class="line">	fun5() &#123;...&#125; //     不访问共享变量  sharedObj</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="1-1-2-锁的粒度过大，对共享资源访问完成后，没有将后续的代码放在synchronized-同步代码块之外"><a href="#1-1-2-锁的粒度过大，对共享资源访问完成后，没有将后续的代码放在synchronized-同步代码块之外" class="headerlink" title="1.1.2 锁的粒度过大，对共享资源访问完成后，没有将后续的代码放在synchronized 同步代码块之外"></a>1.1.2 锁的粒度过大，对共享资源访问完成后，没有将后续的代码放在synchronized 同步代码块之外</h3><p>这样会导致当前线程占用锁的时间过长，其他需要锁的线程只能等待，最终导致性能受到极大影响</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">void fun1()</div><div class="line">&#123;</div><div class="line">    synchronized(lock) &#123;</div><div class="line">    ...... //正在访问共享资源</div><div class="line">    ...... //做其他耗时操作，但这些耗时操作与共享资源无关</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的代码，会导致一个线程长时间占有锁，而在这么长的时间里其他线程只能等待，这种写法在不同的场合下有不同的提升余地：</p>
+<ul>
+<li>单 CPU 场合  将耗时操作拿到同步块之外，有的情况下可以提升性能，有的场合则不能：<ul>
+<li>同步块的耗时代码是 CPU 密集型代码（纯 CPU 运算等），不存在磁盘 IO/网络 IO 等低 CPU 消耗的代码，这种情况下，由于 CPU 执行这段代码是 100% 的使用率，因此缩小同步块也不会带来任何性能上的提升。但是，同时缩小同步块也不会带来性能上的下降</li>
+<li>同步块中的耗时代码属于磁盘/网络 IO等低 CPU 消耗的代码，当当前线程正在执行不消耗 CPU 的代码时，这时候 CPU 是空闲的，如果此时让 CPU 忙起来，可以带来整体性能上的提升，所以在这种场景下，将耗时操作的代码放在同步之外，肯定是可以提高整个性能的（？）</li>
+</ul>
+</li>
+<li>多 CPU 场合  将耗时的操作拿到同步块之外，总是可以提升性能<ul>
+<li>同步块的耗时代码是 CPU 密集型代码（纯 CPU 运算等），不存在磁盘 IO/网络 IO 等低 CPU 消耗的代码，这种情况下，由于是多 CPU，其他 CPU也许是空闲的，因此缩小同步块可以让其他线程马上得到执行这段代码，可以带来性能的提升</li>
+<li>同步块中的耗时代码属于磁盘/网络 IO等低 CPU 消耗的代码，当当前线程正在执行不消耗 CPU 的代码时，这时候总有 CPU 是空闲的，如果此时让 CPU 忙起来，可以带来整体性能上的提升，所以在这种场景下，将耗时操作的代码放在同步块之外，肯定是可以提高整个性能的</li>
+</ul>
+</li>
+</ul>
+<p>不管如何，缩小同步范围，对系统没有任何不好的影响，大多数情况下，会带来性能的提升，所以一定要缩小同步范围，因此上面的代码应该改为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">void fun1()</div><div class="line">&#123;</div><div class="line">     synchronized(lock) &#123;</div><div class="line">		...... //正在访问共享资源</div><div class="line">	&#125;</div><div class="line">	...... //做其他耗时操作，但这些耗时操作与共享资源无关</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="1-1-3-其他问题"><a href="#1-1-3-其他问题" class="headerlink" title="1.1.3 其他问题"></a>1.1.3 其他问题</h3><ul>
+<li>Sleep 的滥用，尤其是轮询中使用 sleep，会让用户明显感觉到延迟，可以修改为 notify 和 wait</li>
+<li>String + 的滥用，每次 + 都会产生一个临时对象，并有数据的拷贝</li>
+<li>不恰当的线程模型</li>
+<li>效率地下的 SQL 语句或者不恰当的数据库设计</li>
+<li>不恰当的 GC 参数设置导致的性能低下</li>
+<li>线程数量不足</li>
+<li>内存泄漏导致的频繁 GC</li>
+</ul>
+<h2 id="2-2-性能瓶颈分析的手段和工具"><a href="#2-2-性能瓶颈分析的手段和工具" class="headerlink" title="2.2 性能瓶颈分析的手段和工具"></a>2.2 性能瓶颈分析的手段和工具</h2><p>上面提到的这些原因形成的性能瓶颈，都可以通过线程堆栈分析，找到根本原因。</p>
+<h3 id="2-2-1-如何去模拟，发现性能瓶颈"><a href="#2-2-1-如何去模拟，发现性能瓶颈" class="headerlink" title="2.2.1 如何去模拟，发现性能瓶颈"></a>2.2.1 如何去模拟，发现性能瓶颈</h3><p>性能瓶颈的几个特征：</p>
+<ul>
+<li>当前的性能瓶颈只有一处，只有当解决了这一处，才知道下一处。没有解决当前性能瓶颈，下一处性能瓶颈是不会出现的。如下图所示，第二段是瓶颈，解决第二段的瓶颈后，第一段就变成了瓶颈，如此反复找到所有的性能瓶颈</li>
+</ul>
+<img src="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/image2.png" alt="image2.png" title="">
+<ul>
+<li>性能瓶颈是动态的，低负载下不是瓶颈的地方，高负载下可能成为瓶颈。由于 JProfile 等性能剖析工具依附在 JVM 上带来的开销，使系统根本就无法达到该瓶颈出现时需要的性能，因此在这种场景下线程堆栈分析才是一个真正有效的方法</li>
+</ul>
+<p>鉴于性能瓶颈的以上特点，进行性能模拟的时候，一定要使用比系统当前稍高的压力下进行模拟，否则性能瓶颈不会出现。具体步骤如下：</p>
+<img src="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/image3.png" alt="image3.png" title="">
+<h3 id="2-2-2-如何通过线程堆栈识别性能瓶颈"><a href="#2-2-2-如何通过线程堆栈识别性能瓶颈" class="headerlink" title="2.2.2 如何通过线程堆栈识别性能瓶颈"></a>2.2.2 如何通过线程堆栈识别性能瓶颈</h3><p>通过线程堆栈，可以很容易的识别多线程场合下高负载的时候才会出现的性能瓶颈。一旦一个系统出现性能瓶颈，最重要的就是识别性能瓶颈，然后根据识别的性能瓶颈进行修改。一般多线程系统，先按照线程的功能进行归类（组），把执行相同功能代码的线程作为一组进行分析。当使用堆栈进行分析的时候，以这一组线程进行统计学分析。如果一个线程池为不同的功能代码服务，那么将整个线程池的线程作为一组进行分析即可。</p>
+<p>一般一个系统一旦出现性能瓶颈，从堆栈上分析，有如下三种最为典型的堆栈特征：</p>
+<ol>
+<li>绝大多数线程的堆栈都表现为在同一个调用上下文，且只剩下非常少的空闲线程。可能的原因如下：<ul>
+<li>线程的数量过少</li>
+<li>锁的粒度过大导致的锁竞争</li>
+<li>资源竞争</li>
+<li>锁范围中有大量耗时操作</li>
+<li>远程通信的对方处理缓慢</li>
+</ul>
+</li>
+<li>绝大多数线程出于等待状态，只有几个工作的线程，总体性能上不去。可能的原因是，系统存在关键路径，关键路径已经达到瓶颈</li>
+<li>线程总的数量很少（有些线程池的实现是按需创建线程，可能程序中创建线程</li>
+</ol>
+<p>一个例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div></pre></td><td class="code"><pre><div class="line">&quot;Thread-243&quot; prio=1 tid=0xa58f2048 nid=0x7ac2 runnable</div><div class="line">   [0xaeedb000..0xaeedc480]</div><div class="line">          at java.net.SocketInputStream.socketRead0(Native Method)</div><div class="line">	       at java.net.SocketInputStream.read(SocketInputStream.java:129)</div><div class="line">	       at oracle.net.ns.Packet.receive(Unknown Source)</div><div class="line">	       ... ...</div><div class="line">		          at oracle.jdbc.driver.LongRawAccessor.getBytes()</div><div class="line">	       at oracle.jdbc.driver.OracleResultSetImpl.getBytes()</div><div class="line">	       - locked &lt;0x9350b0d8&gt; (a oracle.jdbc.driver.OracleResultSetImpl)</div><div class="line">	       at oracle.jdbc.driver.OracleResultSet.getBytes(O)</div><div class="line">	       ... ...</div><div class="line">		          at org.hibernate.loader.hql.QueryLoader.list()</div><div class="line">	       at org.hibernate.hql.ast.QueryTranslatorImpl.list()</div><div class="line">	       ... ...</div><div class="line">		          at com.wes.NodeTimerOut.execute(NodeTimerOut.java:175)</div><div class="line">	       at com.wes.timer.TimerTaskImpl.executeAll(TimerTaskImpl.java:707)</div><div class="line">	       at com.wes.timer.TimerTaskImpl.execute(TimerTaskImpl.java:627)</div><div class="line">	       - locked &lt;0x80df8ce8&gt; (a com.wes.timer.TimerTaskImpl)</div><div class="line">	       at com.wes.threadpool.RunnableWrapper.run(RunnableWrapper.java:209)</div><div class="line">	       at com.wes.threadpool.PooledExecutorEx$Worker.run()</div><div class="line">	       at java.lang.Thread.run(Thread.java:595)</div><div class="line">	&quot;Thread-248&quot; prio=1 tid=0xa58f2048 nid=0x7ac2 runnable</div><div class="line">	   [0xaeedb000..0xaeedc480]</div><div class="line">	          at java.net.SocketInputStream.socketRead0(Native Method)</div><div class="line">	       at java.net.SocketInputStream.read(SocketInputStream.java:129)</div><div class="line">	       at oracle.net.ns.Packet.receive(Unknown Source)</div><div class="line">	       ... ...</div><div class="line">		          at oracle.jdbc.driver.LongRawAccessor.getBytes()</div><div class="line">	       at oracle.jdbc.driver.OracleResultSetImpl.getBytes()</div><div class="line">	       - locked &lt;0x9350b0d8&gt; (a oracle.jdbc.driver.OracleResultSetImpl)</div><div class="line">	       at oracle.jdbc.driver.OracleResultSet.getBytes(O)</div><div class="line">	       ... ...</div><div class="line">		          at org.hibernate.loader.hql.QueryLoader.list()</div><div class="line">	       at org.hibernate.hql.ast.QueryTranslatorImpl.list()</div><div class="line">	       ... ...</div><div class="line">		           at com.wes.NodeTimerOut.execute(NodeTimerOut.java:175)</div><div class="line">	        at com.wes.timer.TimerTaskImpl.executeAll(TimerTaskImpl.java:707)</div><div class="line">	        at com.wes.timer.TimerTaskImpl.execute(TimerTaskImpl.java:627)</div><div class="line">	        - locked &lt;0x80df8ce8&gt; (a com.wes.timer.TimerTaskImpl)</div><div class="line">	        at com.wes.threadpool.RunnableWrapper.run(RunnableWrapper.java:209)</div><div class="line">	        at com.wes.threadpool.PooledExecutorEx$Worker.run()</div><div class="line">	        at java.lang.Thread.run(Thread.java:595)</div><div class="line">	        ... ...</div><div class="line">			&quot;Thread-238&quot; prio=1 tid=0xa4a84a58 nid=0x7abd in Object.wait()</div><div class="line">			[0xaec56000..0xaec57700]</div><div class="line">			    at java.lang.Object.wait(Native Method)</div><div class="line">	    at com.wes.collection.SimpleLinkedList.poll(SimpleLinkedList.java:104)</div><div class="line">	    - locked &lt;0x6ae67be0&gt; (a com.wes.collection.SimpleLinkedList)</div><div class="line">	    at com.wes.XADataSourceImpl.getConnection_internal(XADataSourceImpl.java:1642)</div><div class="line">	    ... ...</div><div class="line">		    at org.hibernate.impl.SessionImpl.list()</div><div class="line">	    at org.hibernate.impl.SessionImpl.find()</div><div class="line">	    at com.wes.DBSessionMediatorImpl.find()</div><div class="line">	    at com.wes.ResourceDBInteractorImpl.getCallBackObj()</div><div class="line">	    at com.wes.NodeTimerOut.execute(NodeTimerOut.java:152)</div><div class="line">	    at com.wes.timer.TimerTaskImpl.executeAll()</div><div class="line">	    at com.wes.timer.TimerTaskImpl.execute(TimerTaskImpl.java:627)</div><div class="line">	    - locked &lt;0x80e08c00&gt; (a com.facilities.timer.TimerTaskImpl)</div><div class="line">	    at com.wes.threadpool.RunnableWrapper.run(RunnableWrapper.java:209)</div><div class="line">	    at com.wes.threadpool.PooledExecutorEx$Worker.run()</div><div class="line">	    at java.lang.Thread.run(Thread.java:595)</div><div class="line">	 </div><div class="line">	 </div><div class="line">	&quot;Thread-233&quot; prio=1 tid=0xa4a84a58 nid=0x7abd in Object.wait()</div><div class="line">	[0xaec56000..0xaec57700]</div><div class="line">	 </div><div class="line">	    at java.lang.Object.wait(Native Method)</div><div class="line">	    at com.wes.collection.SimpleLinkedList.poll(SimpleLinkedList.java:104)</div><div class="line">	    - locked &lt;0x6ae67be0&gt; (a com.wes.collection.SimpleLinkedList)</div><div class="line">	    at com.wes.XADataSourceImpl.getConnection_internal(XADataSourceImpl.java:1642)</div><div class="line">	    ... ...</div><div class="line">		    at org.hibernate.impl.SessionImpl.list()</div><div class="line">	    at org.hibernate.impl.SessionImpl.find()</div><div class="line">	    at com.wes.DBSessionMediatorImpl.find()</div><div class="line">	    at com.wes.ResourceDBInteractorImpl.getCallBackObj()</div><div class="line">	    at com.wes.NodeTimerOut.execute(NodeTimerOut.java:152)</div><div class="line">	    at com.wes.timer.TimerTaskImpl.executeAll()</div><div class="line">	    at com.wes.timer.TimerTaskImpl.execute(TimerTaskImpl.java:627)</div><div class="line">	    - locked &lt;0x80e08c00&gt; (a com.facilities.timer.TimerTaskImpl)</div><div class="line">	    at com.wes.threadpool.RunnableWrapper.run(RunnableWrapper.java:209)</div><div class="line">	    at com.wes.threadpool.PooledExecutorEx$Worker.run()</div><div class="line">	    at java.lang.Thread.run(Thread.java:595)</div><div class="line">	    ... ...</div></pre></td></tr></table></figure>
+<p>从堆栈看，有 51 个（socket）访问，其中有 50 个是 JDBC 数据库访问。其他方法被阻塞在 java.lang.Object.wait() 方法上。</p>
+<h3 id="2-2-3-其他提高性能的方法"><a href="#2-2-3-其他提高性能的方法" class="headerlink" title="2.2.3 其他提高性能的方法"></a>2.2.3 其他提高性能的方法</h3><p>减少锁的粒度，比如 ConcurrentHashMap 的实现默认使用 16 个锁的 Array（有一个副作用：锁整个容器会很费力，可以添加一个全局锁）</p>
+<h3 id="2-2-4-性能调优的终结条件"><a href="#2-2-4-性能调优的终结条件" class="headerlink" title="2.2.4 性能调优的终结条件"></a>2.2.4 性能调优的终结条件</h3><p>性能调优总有一个终止条件，如果系统满足如下两个条件，即可终止：</p>
+<ol>
+<li>算法足够优化</li>
+<li>没有线程/资源的使用不当而导致的 CPU 利用不足</li>
+</ol>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Java </tag>
+            
+            <tag> 线程堆栈 </tag>
+            
+            <tag> 性能分析 </tag>
+            
+            <tag> 瓶颈 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[线程堆栈分析]]></title>
       <url>/2018/01/06/%E7%BA%BF%E7%A8%8B%E5%A0%86%E6%A0%88%E5%88%86%E6%9E%90/</url>
       <content type="html"><![CDATA[<p>本文为读书笔记，关于 Java 线程堆栈分析，在阅读并进行实验的基础上进行整理，如果有问题欢迎反馈<br><a id="more"></a></p>
@@ -165,13 +286,13 @@ ii. 虚拟机自身的代码导致的 CPU 过高，如堆内存不够导致的�
         
         <tags>
             
-            <tag> JVM </tag>
+            <tag> Java </tag>
             
             <tag> 线程堆栈 </tag>
             
-            <tag> 分析 </tag>
+            <tag> JVM </tag>
             
-            <tag> Java </tag>
+            <tag> 分析 </tag>
             
         </tags>
         
@@ -2188,9 +2309,9 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> distributed-system </tag>
             
-            <tag> mit </tag>
-            
             <tag> kv </tag>
+            
+            <tag> mit </tag>
             
             <tag> viewservice </tag>
             
@@ -2242,11 +2363,11 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> distributed-system </tag>
             
+            <tag> mit </tag>
+            
             <tag> go </tag>
             
             <tag> mapreduce </tag>
-            
-            <tag> mit </tag>
             
         </tags>
         
@@ -2545,9 +2666,9 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
         
         <tags>
             
-            <tag> github </tag>
-            
             <tag> blog </tag>
+            
+            <tag> github </tag>
             
             <tag> math-expression </tag>
             
@@ -3957,8 +4078,6 @@ private:
             
             <tag> algorithm </tag>
             
-            <tag> exercise </tag>
-            
             <tag> algorithms </tag>
             
             <tag> bellman-ford </tag>
@@ -3966,6 +4085,8 @@ private:
             <tag> bfs </tag>
             
             <tag> dijkstra </tag>
+            
+            <tag> exercise </tag>
             
         </tags>
         
@@ -4328,9 +4449,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> fedora </tag>
             
-            <tag> github </tag>
-            
             <tag> blog </tag>
+            
+            <tag> github </tag>
             
             <tag> free </tag>
             
@@ -4632,7 +4753,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x6a;&#99;&#x6d;&#x40;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#x73;&#116;&#x65;&#114;&#x73;&#46;&#111;&#114;&#103;">&#x6a;&#99;&#x6d;&#x40;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#x73;&#116;&#x65;&#114;&#x73;&#46;&#111;&#114;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#x6a;&#x63;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#x61;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;">&#x6a;&#x63;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#x61;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>

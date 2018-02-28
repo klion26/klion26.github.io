@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Page 8 | klion26</title>
+  <title>第 8 页 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,31 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-03-07 </div>
+			<div class="article-title"><a href="/2013/03/07/matlab-2012-libsvm/" >Matlab 2012下安装libsvm</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>由于需要使用svm，自己又不是很熟，然后就用到了libsvm，libsvm是网上别人写好的一个库。</p>
+<p>首先从<a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/#download" target="_blank" rel="external">libsvm官网</a>下载最新版本，现在是3.16，然后解压到某个路径，比如d:\libsvm-3.16,然后把d:\libsvm-3.16\matlab添加到matlab的路径中，具体操作如下<br>在matlab中依次打开File -&gt; Set path -&gt; Add Fold,然后添加就行了，接下来就是编译了，步骤如下<br>在matlab命令窗口输入mex -setup其中mex和后面的中间有一个空格，然后选择一个自己系统上安装好的c++编译器，一般选择visual studio是最方便的。然后再把当前目录改到d:\lbsvm-3.16\matlab,然后输入命令make，如果没有出现错误就算安装好了，然后可以用自带的样例做测试。<br>进入到d:\libsvm-3.16，然后用如下命令进行测试<br>[heart_scale_label,heart_scale_inst]=libsvmread(‘heart_scale’);<br>model = svmtrain(heart_scale_label,heart_scale_inst, ‘-c 1 -g 0.07’);<br>[predict_label, accuracy, dec_values] =svmpredict(heart_scale_label, heart_scale_inst, model); % test the trainingdata<br>如果出现一行Accuracy = 86.6667% (234/270) (classification)就说明成功了。就可以在matlab中使用svm了。<br>参考文献<br>[1] <a href="http://blog.csdn.net/lqhbupt/article/details/8596349" target="_blank" rel="external">http://blog.csdn.net/lqhbupt/article/details/8596349</a><br>[2] <a href="http://www.matlabsky.com/thread-11925-1-1.html" target="_blank" rel="external">http://www.matlabsky.com/thread-11925-1-1.html</a></p>
+<p>要是出现错误的话，有可能是你添加路径的时候没有添加正确，或者工作路径不对，也就是Matlab上面的Current path。</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -404,7 +429,7 @@
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x6a;&#99;&#x6d;&#x40;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#x73;&#116;&#x65;&#114;&#x73;&#46;&#111;&#114;&#103;">&#x6a;&#99;&#x6d;&#x40;&#x6a;&#x6f;&#x6e;&#x6d;&#97;&#x73;&#116;&#x65;&#114;&#x73;&#46;&#111;&#114;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#x6a;&#x63;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#x61;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;">&#x6a;&#x63;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#x61;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -426,60 +451,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-11-27 </div>
-			<div class="article-title"><a href="/2012/11/27/why-can-not-use-weixin-miliao/" >为什么不能用微信或米聊这类的软件</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><span style="color: #ff0000;">转自<a href="http://coolshell.cn/articles/8638.html" target="_blank" rel="external"><span style="color: #ff0000;">coolshell</span></a></span></p>
-<p>前两天，我在我的微博上发了<a href="http://weibo.com/1401880315/z5DeR0Hh7" target="_blank" rel="external">一条微博</a>，说腾讯微信的用户体验没有传说中的那么牛。有网友如下答复我：</p>
-<p><img src="http://coolshell.cn//wp-content/uploads/2012/11/%E4%B8%8A%E4%BC%A0%E9%80%9A%E8%AE%AF%E5%BD%95.jpg" alt="" title="上传通讯录"></p>
-<h4 id="事由"><a href="#事由" class="headerlink" title="事由"></a>事由</h4><p>今天下午，我收到了我的一个好友（ <em>[@chengxi</em>](<a href="http://weibo.com/n/chengxi_" target="_blank" rel="external">http://weibo.com/n/chengxi_</a>) _）的微信，我这个朋友现在正在美国出差，昨天还在微信里传了一些美国的照片，在微信里他问我借5000元钱，说话的语气有点不对，而且越聊越不对劲，聊到后面发现他很多信息都是错的，而且还不知道，很明显，朋友的微信帐号被黑了。大家注意了，腾讯的微信有安全问题。小心啊！</p>
-<p><a href="http://weibo.com/n/%E4%B9%8C%E4%BA%91-%E6%BC%8F%E6%B4%9E%E6%8A%A5%E5%91%8A%E5%B9%B3%E5%8F%B0" target="_blank" rel="external">@乌云-漏洞报告平台</a> 也报告过已经有攻击微信的案例出现，主要方式是利用中奖进行欺骗，或者利用美女图片进行色诱…… 他们认为这是在用户窃取账号后的进一步获利的动作。</p>
-<p>我的朋友先说，可能是他在手机上乱点了一些URL。他用的是iPhone啊，没越狱。如果乱点URL可以把微信帐号黑了，那么iPhone就太不安全了，我觉得不是这个原因。<a href="http://weibo.com/1730526490/z6o93kvHX" target="_blank" rel="external">他后来又说</a>，应该是——“QQ号码被盗了。跟QQ相关的我都用最烂的密码，也不太在意，没想到通信录都一并被搞了”。我觉得这个很有可能。</p>
-<p>好，现在我们来看看盗号者和我的微信聊天都聊了什么？</p>
-<p>&nbsp;</p>
-<p><img src="http://coolshell.cn//wp-content/uploads/2012/11/all_mid.jpg" alt="" title="微信聊天记录"></p>
-<p>（大家不要疑问我的iPhone为什么抓了个那么长的图，那是因为我使用了iPhone 10, 巨长巨长的iPhone10，超好用，呵呵）</p>
-<h4 id="为什么不要用微信或米聊"><a href="#为什么不要用微信或米聊" class="headerlink" title="为什么不要用微信或米聊"></a>为什么不要用微信或米聊</h4><p>这个聊天记录中，他知道我的姓名，知道亚马逊，知道朋友在美国，他的确知道很多东西。</p>
-<p><strong>后来也证实——我的这个朋友手贱上传了手机里的通讯录</strong>。<strong>上传自己手机里的通讯录，用户体验很好嘛，可以帮你很快找到你的朋友，但是你和你朋友家人的隐私什么也没有了</strong>。</p>
-<p>一旦朋友的号被盗了，或是手机掉了，那么问题还不只是这个被盗号或是丢手机的用户，他通讯录里所有的朋友都有了潜在的危险。你不觉得这是一个很恐怖的事吗？</p>
-<p>如果你觉得这还不恐怖的话，那么，<strong>你可以想像一下，某个Company手里掌握了你的通讯录，聊天记录，还有你朋友的通讯录和聊天记录，这不恐怖吗？要是他内部不良员工把这些数据泄露出来，如果出现像当年CSDN被爆库一样，你可以想像一下会发生什么事吗？</strong></p>
-<p>就算没有不良员工，那么，也请你看看<a href="http://www.mps.gov.cn/n16/n1282/n3493/n3823/n442104/452223.html" target="_blank" rel="external">我国公安部令第82号</a>。</p>
-<p>你现在觉得这用户体验怎么样？好了，请下次，请千万不要把“上传通讯录”当成不错的“用户体验”了。</p>
-<p>你可能会觉得这是我的朋友没有管好密码的问题，是的，密码太烂，手机丢了，你可以认为这是用户自己的问题，可是，你有没有想过 ，用户隐私信息放在云端的安全问题呢。<strong>最后我们再来回顾一下《<a href="http://coolshell.cn/articles/6976.html" title="谈谈数据安全和云存储" target="_blank" rel="external">李开复老师谈云安全</a>》的那篇文章</strong></p>
-<p><strong>我真的不建议大家使用微信或米聊这类的软件，这绝非耸人听闻！</strong></p>
-<p><strong><em>——————更新 2012年11月23日——————</em></strong></p>
-<p>每次发这样的文章都能看到腾讯的员工来这里留言，首先还是先说明一下，本人不是腾讯黑，我只是在这里就事论事。下面，对一些评论进行回复：</p>
-<p>其一、朋友的手机没有丢，但是微信就被别人登录了。<strong>即然我的朋友上传了通讯录并绑定了自己的手机，为什么盗号者还可以在别的地方登录来黑他的朋友？</strong>这是微信安全问题，还是个人的安全问题？</p>
-<p>其二、有朋友说这是帐号被钓鱼的结果，这是自己没有保护好自己的帐号。是的，<strong>但别忘了而且盗号者还知道了很多我和朋友的信息。通讯录和其它个人隐私是一个很关键的因素</strong>。</p>
-<p>其三、有人说这是因噎废食。并说短信，互联网等都是这样的。我只想说几句，</p>
-<ul>
-<li><p><strong>你可以想一想，大家都把自己的通讯录上传到了某公司的服务器上，你就知道这其中的差别了。</strong></p>
-</li>
-<li><p><strong>做任何事情都有风险，我们需要计算风险了收益值，吃饭喝水，上网，录简历，电话，短信，网上购物，这些行为和 “使用微信上传通讯录” 还是很有差别的</strong>。这其中的差别我觉得不难分辨吧。</p>
-</li>
-<li><p><strong>这就和别人劝你不用360安全卫士是一个道理</strong>。<br>（全文完）</p>
-<div></div>
-</li>
-</ul>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -490,13 +461,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/7/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+    	<li class="prev"><a href="/page/7/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/9/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/9/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -516,7 +487,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -525,7 +496,7 @@
 		
 			
 	<div class="widget">
-		<h4>Categories</h4>
+		<h4>分类</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -582,9 +553,9 @@
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -592,9 +563,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -608,51 +579,51 @@
 		
 			
 	<div class="widget">
-		<h4>Tag Cloud</h4>
+		<h4>标签云</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
+			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
 		
-			<li><a href="/tags/pair/">pair<span>1</span></a></li>
+			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
 		
-			<li><a href="/tags/博弈/">博弈<span>3</span></a></li>
+			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
 		
-			<li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
+			<li><a href="/tags/json/">json<span>1</span></a></li>
 		
-			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
+			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
 		
-			<li><a href="/tags/数论/">数论<span>5</span></a></li>
+			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
 		
-			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
+			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
 		
-			<li><a href="/tags/notes/">notes<span>0</span></a></li>
+			<li><a href="/tags/project/">project<span>1</span></a></li>
 		
-			<li><a href="/tags/stack/">stack<span>1</span></a></li>
-		
-			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
-		
-			<li><a href="/tags/queue/">queue<span>1</span></a></li>
-		
-			<li><a href="/tags/latex/">latex<span>1</span></a></li>
-		
-			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
-		
-			<li><a href="/tags/rmvb/">rmvb<span>1</span></a></li>
-		
-			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
+			<li><a href="/tags/how/">how<span>1</span></a></li>
 		
 			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
 		
-			<li><a href="/tags/append/">append<span>2</span></a></li>
+			<li><a href="/tags/code-style/">code-style<span>1</span></a></li>
 		
-			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
+			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
 		
-			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
+			<li><a href="/tags/grub/">grub<span>2</span></a></li>
 		
-			<li><a href="/tags/kv/">kv<span>1</span></a></li>
+			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+		
+			<li><a href="/tags/storm/">storm<span>3</span></a></li>
+		
+			<li><a href="/tags/半平面交/">半平面交<span>1</span></a></li>
+		
+			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
+		
+			<li><a href="/tags/streaming/">streaming<span>1</span></a></li>
+		
+			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
+		
+			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>300</span></a></li>
+		   <li><a href="/tags">...<span>302</span></a></li>
 		 
 		</ul>
 	</div>
@@ -661,8 +632,12 @@
 		
 			
 <div class="widget">
-  <h4>Recent Posts</h4>
+  <h4>最新文章</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" ><i class="fa fa-file-o"></i>通过 Java 线程堆栈进行性能瓶颈分析</a>
+      </li>
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
@@ -680,17 +655,13 @@
         <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
       </li>
     
-      <li>
-        <a href="/2017/11/20/git-inside/" ><i class="fa fa-file-o"></i>git inside</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>Links</h4>
+	<h4>链接</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>
