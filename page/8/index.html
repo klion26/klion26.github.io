@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>第 8 页 | klion26</title>
+  <title>Page 8 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,44 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-03-26 </div>
+			<div class="article-title"><a href="/2013/03/26/some-easy-math-problems/" >几个简单的数学题</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>由于N久没有看过数学和写代码了，逻辑思维能力和代码功底已经一塌糊涂了，所以打算每周发点时间在这上面。下面是在看书的过程中看到的几个比较有意思的题目</p>
+<p>1.420&gt;422问题<br>我们有一块如下图所示的边长为20×12的长方形<br><a href="http://www.klion26.com/wp-content/uploads/2013/03/20211.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/03/20211-300x187.jpg" alt="" title="2021"></a><br>然后，把这个矩形沿着左上-右下对角线切开，变成两个三角形，把左边的三角形网上移动2cm，变成如下的图片</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2013/03/202121.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/03/202121-300x225.jpg" alt="" title="20212"></a></p>
+<p>&nbsp;</p>
+<p>然后把露出来的两个三角形切掉，并且拼起来，形成如下两个图形<a href="http://www.klion26.com/wp-content/uploads/2013/03/20213.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/03/20213-300x225.jpg" alt="" title="20213"></a></p>
+<p>然后我们算面积可得(20+2)<em>19 + 2</em>2 = 422,但是原图形的面积是20<em>21=420，怎么突然多出来了呢？<span style="color: #ff0000;"><del>原因在哪呢</del></span>？你知道哪里描述出问题了吗？<br><!--easy2hide start{reply_to_this=true}--><br>问题在于左移2个单位的时候，所得的直角三角形的另外一边只可能比2小，可以由原来的矩形得到一个边的比例额。<br><!--easy2hide end--><br>2.有一个4</em>4的格子，其中有些格子有数字，有一个格子是空的，问有没有可能只通过规定使得从左边的图形变到右边的图形，规定如下：和空格相邻的可以和空格交换位置。</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2013/03/puzzle.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/03/puzzle-300x225.jpg" alt="" title="puzzle"></a></p>
+<p>首先我们可以知道这个是不可能的，但是需要证明为什么不可能[就是要寻找一些不变量，然后比较不同状态下这些不变量的情况]，首先我们引入一些辅助概念和变量。</p>
+<p>Ⅰ我们定义把空格和左边或者右边的数字交换叫做一次横向移动，把空格和上面或下面的数字交换叫做一次纵向移动</p>
+<p>Ⅱ我们把所有的15个数按从上到下，从左到右排成一排，然后得到一个序列S</p>
+<p>Ⅲ如果我们横向移动一次的话，S的顺序是不会变的，但是如果我们纵向移动一次的话，就会改变3个<span style="color: #ff0000;">数对<span style="color: #000000;">的顺序，比如上面的左图中如果我们进行一次纵向移动的话，那么就会改变[12,13],[12,15],[12,14]这3个数对的顺序。</span></span></p>
+<p>Ⅳ我们定义序列S的逆序对数为P，那么我们可以得到如果进行一次横向移动的话P是不会变的（S都没变，P当然没变了），但是进行一次纵向移动的话，P会由奇数变成偶数，反之亦反。</p>
+<p>那么我们就可以推出能从左图能到的状态的P的奇偶性和该状态空格所在行的奇偶性相反，因为：首先初始状态的时候，P为1,而空格在第4行，满足条件，然后进行横向移动的话，那么P不变，而且空格的奇偶性也不变，所以满足。如果进行纵向移动的话，那么P的奇偶性会发生改变，同时空格所在行的奇偶性也会发生改变（从奇数到偶数或者相反）。</p>
+<p>所以不能从左边的图变到右边的图，因为右边的图中P的奇偶性和空格所在的行的奇偶性相同。</p>
+<p>3.一共有N个盒子堆成一列，现在需要把这N个分成N堆，每一堆刚好一个盒子，每次把一堆有a+b个盒子的堆分成两个分别有a个盒子和b个盒子的堆，可以得ab分，现在给定你一个N，问你最多能得到多少分呢？比如下面这个张可以得到45分</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2013/03/stack.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/03/stack-300x225.jpg" alt="" title="stack"></a><br>元方你怎么看呢？<br><!--easy2hide start{reply_to_this=true}--><br>其实这是个常量，首先不知道的话，你先算几个，然后就会发现了，然后F[n]=(n-1)<em>n/2，这个可以证明的。这里我们用归纳法证明：<br>1.对于n=1时, f[1] = 0</em>1/2 = 0成立<br>2.假设对于所有的n&gt;0f[n] = (n-1)<em>n/2成立，那么f[n+1]=(n+1)</em>n/2。我们假设n+1分成a和b两堆，那么a+b=n+1.f[a] = a<em>(a-1)/2, f[b] = b</em>(b-1)/2, f[n+1] = f[a]+f[b]+a<em>b = a</em>(a-1)/2 + b<em>(b-1)/2 + a</em>b = (a+b)*(a+b-1)/2满足条件<br>3.得证<br><!--easy2hide end--><br>下面是写good proofs的一些tips<br>一：知道你要用什么方法，并写出来<br>二：不要跳跃式的推理<br>三：对每一步都阐述理由<br>四：不要用过多的符号来表述尼的推理过程<br>五：尽可能简化你的推理过程<br>六：引入适当的中间变量<br>七：对长证明进行结构化<br>八：不要用“显然成立”等过于简单的词语</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -394,63 +432,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-12-03 </div>
-			<div class="article-title"><a href="/2012/12/03/first-linux-module-lvm/" >第一个Linux可装载模块</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>照着《Professional Linux Programming》上的来写的。然后过程中遇到一系列问题，在这里记录下来。</p>
-<p>我的系统是VMware下装的Fedora 16。</p>
-<p>代码如下</p>
-<div class="dp-highlighter">
-
-<ol>
-<li><span><span>#include <linux module.h="">   </linux></span></span></li>
-<li><span>#include <linux init.h="">   </linux></span></li>
-<li><span>  </span></li>
-<li><span class="keyword">int</span><span> __int hello_init(</span><span class="keyword">void</span><span>)   </span></li>
-<li><span>{   </span></li>
-<li><span>    printk(</span><span class="string">“plp: hello reader!\n”</span><span>);   </span></li>
-<li><span>    </span><span class="keyword">return</span><span> </span><span class="number">0</span><span>   </span></li>
-<li><span>}   </span></li>
-<li><span>  </span></li>
-<li><span class="keyword">void</span><span> __exit hello_exit(</span><span class="keyword">void</span><span>)   </span></li>
-<li><span>{   </span></li>
-<li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
-<li><span>}   </span></li>
-<li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#x6a;&#x63;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#x61;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;">&#x6a;&#x63;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#x61;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;</a>“</span><span>);   </span></li>
-<li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
-<li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
-<li><span>  </span></li>
-<li><span>module_init(hello_init);   </span></li>
-<li><span>module_exit(hello_exit);  </span><br></li></ol></div><br>然后你可以用 make -C /usr/src/linux-3.6.8 modules M=$PWD来编译这个可装载模块，在当前文件夹下需要一个Makefile文件，里面写上obj-m  := plp.o
-
-<p>解释下这条语句。-C 后面的参数 是你当前系统的代码所在的位置，貌似需要先编译下系统，可以下载最新版的内核来编译。 modules 应该是告诉make这是要编译啥 然后M=$PWD是参数 表示当前可装载模块在哪。当然你可以把这些放到一个Makefile文件里面。效果是一样的。如果你看到有CC [M] …..这样的那应该就是好了。</p>
-<p>然后编译好了之后你就可以用/sbin/modinfo plp.ko来查看这个可装载模块的相关信息了。这里面可以看到是什么版本的内核。也就是前面你所指定的内核目录相对应的内核版本。</p>
-<p>最后你可以用/sbin/insmod plp.ko和/sbin/rmmod plp来装载这个模块和删除这个模块。</p>
-<p>本来到这里就结束了。不过这里再记录下我所遇到的错误。</p>
-<p>1.make的时候出错。原因是没有写Makefile文件，Makefile文件里面只需要写上obj-m := plp.o就行了。</p>
-<p>2./sbin/insmod plp.ko的时候出现Operation not permitted，这里是因为没有权限，需要用root执行。</p>
-<p>3.用root执行上述命令的时候，出现“Invalid module format”错误。这个是因为内核版本不一致。我编译了3.6.8的内核之后，进入的系统内核版本是3.1的。所以会报错。</p>
-<p>4.printk没有输出。这个是因为输出等级的原因，所以不会输出在控制台。但是你可以用dmesg来查看。一般来说就是最后几条。或者你也可以查看/var/log/messages里面的信息，也是最后几条。貌似可以改输出等级。使得输出在控制台。这个和printk函数有关。printk和printf的用法差不多，不过是用在内核输出，printf用在用户态。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -461,13 +442,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/7/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
+    	<li class="prev"><a href="/page/7/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/9/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/9/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -487,7 +468,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -496,7 +477,7 @@
 		
 			
 	<div class="widget">
-		<h4>分类</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -529,13 +510,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -553,9 +534,9 @@
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -563,9 +544,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -579,51 +560,51 @@
 		
 			
 	<div class="widget">
-		<h4>标签云</h4>
+		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+			<li><a href="/tags/windows/">windows<span>4</span></a></li>
 		
-			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
+			<li><a href="/tags/bit/">bit<span>0</span></a></li>
 		
-			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
 		
-			<li><a href="/tags/json/">json<span>1</span></a></li>
+			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
 		
-			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
+			<li><a href="/tags/方法/">方法<span>1</span></a></li>
+		
+			<li><a href="/tags/lzo/">lzo<span>1</span></a></li>
+		
+			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
+		
+			<li><a href="/tags/english/">english<span>1</span></a></li>
+		
+			<li><a href="/tags/总结/">总结<span>1</span></a></li>
+		
+			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
 		
 			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
 		
-			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
+			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
+			<li><a href="/tags/set-cover/">set cover<span>1</span></a></li>
 		
-			<li><a href="/tags/how/">how<span>1</span></a></li>
+			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
 		
-			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
+			<li><a href="/tags/分析/">分析<span>1</span></a></li>
 		
-			<li><a href="/tags/code-style/">code-style<span>1</span></a></li>
+			<li><a href="/tags/question/">question<span>1</span></a></li>
 		
-			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
+			<li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li>
 		
-			<li><a href="/tags/grub/">grub<span>2</span></a></li>
+			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
 		
-			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
 		
-			<li><a href="/tags/storm/">storm<span>3</span></a></li>
-		
-			<li><a href="/tags/半平面交/">半平面交<span>1</span></a></li>
-		
-			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
-		
-			<li><a href="/tags/streaming/">streaming<span>1</span></a></li>
-		
-			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
-		
-			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
+			<li><a href="/tags/DFS/">DFS<span>2</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>302</span></a></li>
+		   <li><a href="/tags">...<span>304</span></a></li>
 		 
 		</ul>
 	</div>
@@ -632,8 +613,12 @@
 		
 			
 <div class="widget">
-  <h4>最新文章</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
+      </li>
     
       <li>
         <a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" ><i class="fa fa-file-o"></i>通过 Java 线程堆栈进行性能瓶颈分析</a>
@@ -651,17 +636,13 @@
         <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
       </li>
     
-      <li>
-        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>链接</h4>
+	<h4>Links</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>第 12 页 | klion26</title>
+  <title>Page 12 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,34 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-08-20 </div>
+			<div class="article-title"><a href="/2011/08/20/reverse-poj-3761/" >[逆序]POJ_3761</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://poj.org/problem?id=3761" target="_blank" rel="external">想看题目?</a></p>
+<p>题目大致意思就是:求1,2,3…..N有多少个排列是用冒泡排序只需要k轮就好的.给定一个n和一个k,然后让你输出答案模上一个数.因为答案是在太大了</p>
+<p>这里首先给出公式吧对给定的n和k,答案是k!*((k+1)^(n-k)-k^(n-k)).</p>
+<p>ps:以下分析借助了&lt;计算机程序设计艺术&gt;和<a href="http://hi.baidu.com/billdu/blog/item/a1fa28acd0a9ea1d4b36d60e.html" target="_blank" rel="external">这篇博文</a></p>
+<p>首先我们知道对于每个排列和其逆序对是一一对应的.也就是说一个逆序对对应一个排列,一个排列对应一个逆序对,相同排列的逆序是一样的,同一个逆序对的排列也是一样的.下面我们来看看这个和逆序对有啥关系.这里以4 5 3 1 2这个排列为例.那么逆序对为3 3 2 0 0.也就是1的逆序数为3,2的为3,依次下去.那么我们来看下依次冒泡排序会改变什么,首先第一趟我们会发现变成了4 3 1 2 5.那么逆序对变成了2 2 1 0 0也就是所有逆序数&gt;0的都-1了,这个是偶然吗?不是的,因为对于每一趟冒泡,都有一个当前未排好序的最大的沉到最下面去,这样就会导致这个当前最大的数的后面的那些数的逆序数都会-1.上面的当前最大就是5,5后面的是3 1 2,所以3 1 2这几个数的逆序数都会-1.OK,现在我们知道,对于每趟冒泡排序,所有逆序数不为1的都会-1,那么体重要求的我们可以转化成求这样的排列的个数:也就是逆序数的最大值为k的n个数的一个排列.这样我们就得到了一个冒泡最多需要k次的一个排列,而且逆序数和排列是一一对应的,所以我们得到的”逆序数的最大值为k的n个数的排列”的个数就是本题的答案.</p>
+<p>现在的问题变成了求逆序数的最大值为k的n个数的排列的个数,也就是给你n个位置,这n个位置上可以放置一系列数,但是最大为k,最小0的排列的数目,而且我们这里要求的是至少要有一个数=k(不然不需要k趟就排完了).那么我们可以考虑用最大的为k减去最大的为k-1的排列,剩下的就是至少有一个最大值为k的了.现在我们求最大值为k,但不一定有最大值为k的排列的数目.我们可以这么想:对于1,有逆序数为0,1…..k这些选择,也就是它的位置可以选择为0 1 2…k(位置从0开始),放置好1之后,我们再放2,同理可以得到一系列的位置,也就是2也可以有k+1中选择,知道某个数不可能出现逆序数为k为止,那么我们知道一个数的最大逆序数位n-i(i是这个数,这里的环境都是1,2….n这样的排列).那么最大的i就是k了.所以这里有(k+1)^(n-k),然后剩下的就自己选位置吧,有k!种方案,所以就是k!((k+1)^(n-k)).那么我们的结果就是k!<em>(k+1)^(n-k)-(k-1)!</em>k^(n-k+1)然后化简就变成了k!((k+1)^(n-k)-k^(n-k))到这里这题也结束了,不过还有一点,在保证不会越界的情况下,能不用mutil_mod(算a*b%c),这类的函数就不用,所有函数都是有开销的,别到时TLE了还找不到原因</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -374,30 +402,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-05-16 </div>
-			<div class="article-title"><a href="/2011/05/16/sg-function-hdu-2873/" >[博弈]HDU_2873</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://acm.hdu.edu.cn/showproblem.php?pid=2873" target="_blank" rel="external">传送门</a><br>VC时死活过不了的一题,原来是我把题目的输入搞错了,这出题的也太搞了,把读入的第一行的第一个当成(1,1)居然也不表示一下,我表示很蛋疼- -||,一般不都是第一行的最后一个表示(n,m)的么?<br>VC时,我说:我保证sg函数没错,然后我保证是这样搞的,然后就没有然后了,就一直死活过不了,后来找了报告,发现看不懂他的代码,不过思想也是博弈SG函数.然后作死的调啊调.可能是上天可怜我了,给我一组数据,而且我对拍是发现不对,最最重要的是,发现了那个正确的读入和我的不同啊@@@@@@.我想死啊.尼玛就不能说明下啊.<br>下面是说明,对于SG函数,sg[i]=mex{n,i可到n},mex是集合中未出现的最小值(&gt;=0).然后对于对个SG游戏的当前局面就是当前所有点的sg函数的异或,这个Game Theory上有证明,自己去看去.然后就没有然后了,这题就变成水题了.代码:</p>
-<div class="dp-highlighter"><br><br>1.  <span><span>#include <stdio.h>   </stdio.h></span></span><br>2.  <span>#include <string.h>   </string.h></span><br>3.  <span>#include <stdlib.h>   </stdlib.h></span><br>4.  <span>#include <math.h>   </math.h></span><br>5.  <span> </span><span class="keyword">int</span><span> sg[</span><span class="number">56</span><span>][</span><span class="number">56</span><span>];   </span><br>6.  <span class="keyword">int</span><span> n,m;   </span><br>7.  <span class="keyword">void</span><span> init_sg()   </span><br>8.  <span>{   </span><br>9.  <span>    </span><span class="keyword">int</span><span> i,j;   </span><br>10.  <span>    </span><span class="keyword">int</span><span> used[</span><span class="number">51</span><span><em></em></span><span class="number">51</span><span>];   </span><br>11.  <span>    </span><span class="keyword">int</span><span> ii,jj;   </span><br>12.  <span>    </span><span class="keyword">for</span><span>(i=</span><span class="number">1</span><span>i&lt;</span><span class="number">56</span><span>;i++)   </span><br>13.  <span>        {   </span><br>14.  <span>            sg[i][</span><span class="number">1</span><span>]=i-</span><span class="number">1</span><span>   </span><br>15.  <span>            sg[</span><span class="number">1</span><span>][i]=i-</span><span class="number">1</span><span>   </span><br>16.  <span>        }   </span><br>17.  <span>    </span><span class="keyword">for</span><span>(i=</span><span class="number">2</span><span>i&lt;</span><span class="number">51</span><span>;i++)   </span><br>18.  <span>        {   </span><br>19.  <span>            </span><span class="keyword">for</span><span>(j=</span><span class="number">2</span><span>j&lt;</span><span class="number">51</span><span>;j++)   </span><br>20.  <span>                {   </span><br>21.  <span>                    memset(used,</span><span class="number">0</span><span>,sizeof(used));   </span><br>22.  <span>                    </span><span class="keyword">for</span><span>(ii=</span><span class="number">1</span><span>ii<i;ii++) <="" span=""><br>23.  <span>                        {   </span><br>24.  <span>                            </span><span class="keyword">for</span><span>(jj=</span><span class="number">1</span><span>jj<j;jj++) <="" span=""><br>25.  <span>                                {   </span><br>26.  <span>                                    used[sg[ii][j]^sg[i][jj]]=</span><span class="number">1</span><span>   </span><br>27.  <span>                                }   </span><br>28.  <span>                        }   </span><br>29.  <span>                    </span><span class="keyword">for</span><span>(ii=</span><span class="number">0</span><span>ii&lt;</span><span class="number">2501</span><span>;ii++)   </span><br>30.  <span>                        {   </span><br>31.  <span>                            </span><span class="keyword">if</span><span>(</span><span class="number">0</span><span> == used[ii])   </span><br>32.  <span>                                {   </span><br>33.  <span>                                    sg[i][j]=ii;   </span><br>34.  <span>                                    </span><span class="keyword">break</span><span>   </span><br>35.  <span>                                }   </span><br>36.  <span>                        }   </span><br>37.  <span>                }   </span><br>38.  <span>        }   </span><br>39.  <span>    #</span><span class="keyword">if</span><span> </span><span class="number">0</span><span>  </span><br>40.  <span>    printf(</span><span class="string">“:::::::::::::::::::\n”</span><span>);   </span><br>41.  <span>    </span><span class="keyword">for</span><span>(i=</span><span class="number">1</span><span>i&lt;</span><span class="number">6</span><span>;i++)   </span><br>42.  <span>        {   </span><br>43.  <span>            </span><span class="keyword">for</span><span>(j=</span><span class="number">1</span><span>j&lt;</span><span class="number">6</span><span>;j++)   </span><br>44.  <span>                printf(</span><span class="string">“%d “</span><span>,sg[i][j]);   </span><br>45.  <span>            printf(</span><span class="string">“\n”</span><span>);   </span><br>46.  <span>        }   </span><br>47.  <span>    printf(</span><span class="string">“:::::::::::::::::::\n”</span><span>);   </span><br>48.  <span>    #endif   </span><br>49.  <span>}   </span><br>50.  <span class="keyword">void</span><span> work()   </span><br>51.  <span>{   </span><br>52.  <span>    </span><span class="keyword">int</span><span> i,j;   </span><br>53.  <span>    </span><span class="keyword">char</span><span> c;   </span><br>54.  <span>    </span><span class="keyword">int</span><span> ans=</span><span class="number">0</span><span>   </span><br>55.  <span>    </span><span class="keyword">for</span><span>(i=</span><span class="number">1</span><span>i&lt;=n;i++)   </span><br>56.  <span>        {   </span><br>57.  <span>            </span><span class="keyword">for</span><span>(j=</span><span class="number">1</span><span>j&lt;=m;j++)   </span><br>58.  <span>                {   </span><br>59.  <span>                    scanf(</span><span class="string">“%c”</span><span>,c);   </span><br>60.  <span>                    </span><span class="keyword">if</span><span>(‘#’ == c)   </span><br>61.  <span>                        {   </span><br>62.  <span>                            ans ^= sg[i][j];   </span><br>63.  <span>                        }   </span><br>64.  <span>                }   </span><br>65.  <span>            getchar();   </span><br>66.  <span>        }   </span><br>67.  <span>    </span><span class="keyword">if</span><span>(</span><span class="number">0</span><span> == ans)   </span><br>68.  <span>        printf(</span><span class="string">“Jack\n”</span><span>);   </span><br>69.  <span>    </span><span class="keyword">else</span><span>  </span><br>70.  <span>        printf(</span><span class="string">“John\n”</span><span>);   </span><br>71.  <span>    </span><span class="keyword">return</span><span> ;   </span><br>72.  <span>}   </span><br>73.  <span class="keyword">int</span><span> main(</span><span class="keyword">void</span><span>)   </span><br>74.  <span>{   </span><br>75.  <span>    freopen(</span><span class="string">“2873.in”</span><span>,</span><span class="string">“r”</span><span>,stdin);   </span><br>76.  <span>    freopen(</span><span class="string">“2873.out”</span><span>,</span><span class="string">“w”</span><span>,stdout);   </span><br>77.  <span>    init_sg();   </span><br>78.  <span>    </span><span class="keyword">while</span><span>(</span><span class="number">1</span><span>)   </span><br>79.  <span>        {   </span><br>80.  <span>            scanf(</span><span class="string">“%d%d%c”</span><span>,n,&amp;m);   </span><br>81.  <span>            </span><span class="keyword">if</span><span>(</span><span class="number">0</span><span> == n &amp; </span><span class="number">0</span><span>==m)   </span><br>82.  <span>                </span><span class="keyword">break</span><span>   </span><br>83.  <span>            work();   </span><br>84.  <span>        }   </span><br>85.  <span>    </span><span class="keyword">return</span><span> </span><span class="number">0</span><span>   </span><br>86.  <span>}   </span><br></j;jj++)></span></i;ii++)></span></div>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -408,13 +412,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/11/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
+    	<li class="prev"><a href="/page/11/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/13/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/13/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -434,7 +438,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -443,7 +447,7 @@
 		
 			
 	<div class="widget">
-		<h4>分类</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -476,13 +480,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -500,9 +504,9 @@
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -510,9 +514,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -526,51 +530,51 @@
 		
 			
 	<div class="widget">
-		<h4>标签云</h4>
+		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
 		
 			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
 		
-			<li><a href="/tags/vi/">vi<span>2</span></a></li>
+			<li><a href="/tags/chain-matrix-multiplication/">chain matrix multiplication<span>1</span></a></li>
 		
-			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
+			<li><a href="/tags/code-interview/">code interview<span>1</span></a></li>
 		
-			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
+			<li><a href="/tags/MST/">MST<span>1</span></a></li>
 		
-			<li><a href="/tags/zookeeper/">zookeeper<span>3</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li>
 		
-			<li><a href="/tags/PLP/">PLP<span>2</span></a></li>
+			<li><a href="/tags/写作/">写作<span>1</span></a></li>
 		
-			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
+			<li><a href="/tags/receiver/">receiver<span>1</span></a></li>
 		
-			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+			<li><a href="/tags/svm/">svm<span>1</span></a></li>
 		
-			<li><a href="/tags/question/">question<span>1</span></a></li>
+			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
 		
-			<li><a href="/tags/top排序/">top排序<span>2</span></a></li>
+			<li><a href="/tags/概率/">概率<span>1</span></a></li>
 		
-			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
+			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
 		
-			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+			<li><a href="/tags/computing/">computing<span>1</span></a></li>
 		
-			<li><a href="/tags/problem-solve/">problem_solve<span>2</span></a></li>
+			<li><a href="/tags/no-recursive/">no-recursive<span>1</span></a></li>
 		
-			<li><a href="/tags/标记-清除/">标记-清除<span>1</span></a></li>
+			<li><a href="/tags/数学/">数学<span>5</span></a></li>
 		
-			<li><a href="/tags/插件/">插件<span>1</span></a></li>
+			<li><a href="/tags/腾讯/">腾讯<span>1</span></a></li>
 		
-			<li><a href="/tags/linux/">linux<span>24</span></a></li>
+			<li><a href="/tags/settings/">settings<span>1</span></a></li>
 		
-			<li><a href="/tags/DP/">DP<span>1</span></a></li>
+			<li><a href="/tags/grub/">grub<span>2</span></a></li>
 		
-			<li><a href="/tags/mit/">mit<span>2</span></a></li>
+			<li><a href="/tags/django/">django<span>1</span></a></li>
 		
-			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
-		
-			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
+			<li><a href="/tags/memset/">memset<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>302</span></a></li>
+		   <li><a href="/tags">...<span>304</span></a></li>
 		 
 		</ul>
 	</div>
@@ -579,8 +583,12 @@
 		
 			
 <div class="widget">
-  <h4>最新文章</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
+      </li>
     
       <li>
         <a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" ><i class="fa fa-file-o"></i>通过 Java 线程堆栈进行性能瓶颈分析</a>
@@ -598,17 +606,13 @@
         <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
       </li>
     
-      <li>
-        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>链接</h4>
+	<h4>Links</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

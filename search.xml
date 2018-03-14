@@ -3,6 +3,162 @@
   
     
     <entry>
+      <title><![CDATA[Java 内存泄漏分析和对内存设置]]></title>
+      <url>/2018/03/14/Java-%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E5%88%86%E6%9E%90%E5%92%8C%E5%AF%B9%E5%86%85%E5%AD%98%E8%AE%BE%E7%BD%AE/</url>
+      <content type="html"><![CDATA[<h1 id="1-内存泄漏的背景知识"><a href="#1-内存泄漏的背景知识" class="headerlink" title="1 内存泄漏的背景知识"></a>1 内存泄漏的背景知识</h1><p>为了判断 Java 中是否有内存泄漏，我们首先必须了解 Java 是如何管理内存的。下面我们先给出一个简单的内存泄漏的例子，在这个例子中我们循环申请 Object 对象，并将所申请的对象放入一个 HashMap 中，如果我们仅仅释放引用本身，那么 HashMap 仍然引用该对象，所以这个对象对 GC 来说是不可回收的。</p>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">HashMap mapObj = new HashMap()</div><div class="line">	  </div><div class="line">	public void myfun() &#123;</div><div class="line">		String obj1 = new String(&quot;abcd&quot;);</div><div class="line">		mapObj.put(obj1, obj1);</div><div class="line">		...</div><div class="line">		obj1 = null;   //此时 obj1 指向的物理内存没有释放，因为 hashmap 引用该地址</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>JVM 可以自动回收垃圾，但它只能回收满足条件的垃圾，有时需要们确保条件的满足。如果程序中，存在越来越多不在影响程序未来执行的对象（也就是不再需要的对象），而且这些对象和根对象之间存在引用路径，那么就发生了内存泄漏。</p>
+<p>内存泄漏常发生在如下场景：</p>
+<ul>
+<li>全局容器类，对象不再需要时，忘记从容器中 remove</li>
+<li>像 Runnable 对象等被 Java 虚拟机自身管理的对象，没有正确的释放渠道。Runnable 对象必须交给一个 Thread 去 run，否则该对象就永远不会消亡</li>
+</ul>
+<h2 id="1-1-Java-对象的-Size"><a href="#1-1-Java-对象的-Size" class="headerlink" title="1.1 Java 对象的 Size"></a>1.1 Java 对象的 Size</h2><p>在 64 位的平台上，Java 对象的占用内存如下</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>大小</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Object</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Float</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>24</td>
+</tr>
+<tr>
+<td>Integer</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>24</td>
+</tr>
+</tbody>
+</table>
+<h2 id="1-2-对象及其引用"><a href="#1-2-对象及其引用" class="headerlink" title="1.2 对象及其引用"></a>1.2 对象及其引用</h2><p>为了说明对象和引用，我们先定义一个简单的类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">class Person &#123;</div><div class="line">	String name;</div><div class="line">	int age;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Person p1 = new Person() 包含如下几个动作</p>
+<ol>
+<li>右边的 new Person 在堆空间分配一块内存，创建一个 Person 类对象</li>
+<li>末尾的 () 意味着创建对象之后，立即调用构造函数，进行初始化</li>
+<li>左边的 Person p1 创建了一个引用变量，所谓引用变量，就是后来用于指向 Person 类示例的引用</li>
+<li>= 符号使刚刚创建的对象引用指向刚刚创建的对象<br>上面的代码如下所示：</li>
+</ol>
+<img src="/2018/03/14/Java-内存泄漏分析和对内存设置/image1.png" alt="image1.png" title="">
+<p>如果再将对象赋值给 p2 的话，变成下面这样的</p>
+<img src="/2018/03/14/Java-内存泄漏分析和对内存设置/image2.png" alt="image2.png" title="">
+<p>执行 p2 = new Person() 之后变成</p>
+<img src="/2018/03/14/Java-内存泄漏分析和对内存设置/image3.png" alt="image3.png" title="">
+<h2 id="1-3-虚拟机垃圾自动回收机制"><a href="#1-3-虚拟机垃圾自动回收机制" class="headerlink" title="1.3 虚拟机垃圾自动回收机制"></a>1.3 虚拟机垃圾自动回收机制</h2><p>垃圾自动回收做两件事情：</p>
+<ol>
+<li>标记垃圾</li>
+<li>清除垃圾</li>
+</ol>
+<p>标记过程现在主要使用 根可达性 分析（还有引用计数法等），清除之后可能会有一些小的内存快，所有还有压缩的过程。</p>
+<p>下图中的灰色对象表示可以被回收的对象（根不可达）</p>
+<img src="/2018/03/14/Java-内存泄漏分析和对内存设置/image4.png" alt="image4.png" title="">
+<p>哪些对象可以成为 根 呢？ <a href="http://help.eclipse.org/luna/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fgcroots.html&amp;cp=37_2_3" target="_blank" rel="external">http://help.eclipse.org/luna/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fgcroots.html&amp;cp=37_2_3</a></p>
+<ul>
+<li>没有被任何外部对象引用的栈上的对象</li>
+<li>静态变量</li>
+<li>JNI handler 包括全局和局部</li>
+<li>系统 Class</li>
+<li>存活着的监视器</li>
+</ul>
+<h1 id="2-内存泄漏的症状"><a href="#2-内存泄漏的症状" class="headerlink" title="2 内存泄漏的症状"></a>2 内存泄漏的症状</h1><h2 id="2-1-为什么会发生-OOM-问题？"><a href="#2-1-为什么会发生-OOM-问题？" class="headerlink" title="2.1 为什么会发生 OOM 问题？"></a>2.1 为什么会发生 OOM 问题？</h2><p>内存不足会有三种情况：</p>
+<ul>
+<li>对内存不足</li>
+<li>本地内存不足</li>
+<li>Perm 内存不足</li>
+</ul>
+<p>发生 OOM 的时候，可以检查如下几个方面：</p>
+<ul>
+<li>应用程序的缓存功能</li>
+<li>大量长期活动对象</li>
+<li>对内存泄漏</li>
+<li>本地内存泄漏</li>
+</ul>
+<h2 id="2-2-内存泄漏的症状"><a href="#2-2-内存泄漏的症状" class="headerlink" title="2.2 内存泄漏的症状"></a>2.2 内存泄漏的症状</h2><p>内存泄漏一般会有如下几个症状：</p>
+<ul>
+<li>系统越来越慢，并且有 CPU 使用率过高</li>
+<li>运行一段时间后，OOM</li>
+<li>虚拟机 core dump</li>
+</ul>
+<h1 id="3-内存泄漏的定位和分析"><a href="#3-内存泄漏的定位和分析" class="headerlink" title="3 内存泄漏的定位和分析"></a>3 内存泄漏的定位和分析</h1><p>内存泄漏的分析并不复杂，但需要耐心，一般内存泄漏只能事后分析，而重现问题需要耐心。</p>
+<h2 id="3-1-对内存泄漏定位"><a href="#3-1-对内存泄漏定位" class="headerlink" title="3.1 对内存泄漏定位"></a>3.1 对内存泄漏定位</h2><p>当出现 java.lang.OutOfMemoryError: Java Heap Space 异常，就表示堆内存不足了。堆内存不足的原因有如下几种：</p>
+<ul>
+<li>堆内存设置太小</li>
+<li>内存泄漏</li>
+<li>设计不足，缓存了多余的数据</li>
+<li>如果怀疑有内存泄漏，可以添加 -verbose:gc 参数后重现启动 Java 进程，输出大致如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">8190.813: [GC 164675K-&gt;251016K(1277056K), 0.0117749 secs] #8190.813 表示垃圾回收的时间点，秒为单位。GC/Full GC 表示垃圾回收的类型</div><div class="line">8190.825: [Full GC 251016K-&gt;164654K(1277056K), 0.8142190 secs]   # 251016K表示回收前占用的内存大小，164654K 表示回收后占用的内存大小，1277056K 表示当前对内存总大小，0.8142190 表示回收耗时</div><div class="line">8191.644: [GC 164678K-&gt;251214K(1277248K), 0.0123627 secs]</div><div class="line">8191.657: [Full GC 251214K-&gt;164661K(1277248K), 0.8135393 secs]</div><div class="line">8192.478: [GC 164700K-&gt;251285K(1277376K), 0.0130357 secs]</div><div class="line">8192.491: [Full GC 251285K-&gt;164670K(1277376K), 0.8118171 secs]</div><div class="line">8193.311: [GC 164726K-&gt;251182K(1277568K), 0.0121369 secs]</div><div class="line">8193.323 : [Full GC 251182K-&gt;164644K(1277568K), 0.8186925 secs]</div><div class="line">8194.156: [GC 164766K-&gt;251028K(1277760K), 0.0123415 secs]</div><div class="line">8194.169: [Full GC 251028K-&gt;164660K(1277760K), 0.8144430 secs]</div></pre></td></tr></table></figure>
+<p>怀疑内存泄漏后，我们通过 Full GC 日志进一步确认，检查 Full GC  后的可用内存是否持续增大。步骤如下：</p>
+<ul>
+<li>获取系统稳定后的 GC 日志（不稳定的日志不可靠）</li>
+<li>过滤 FullGC 日志，可能会有如下两种情况<ul>
+<li>FullGC 后内存使用量持续增长，一直到设置的堆内存最大值，基本可以确定内存泄漏</li>
+<li>内存使用量增长后又回落，出于一个动态平衡区间，基本排除内存泄漏</li>
+</ul>
+</li>
+</ul>
+<p>GC 日志只能帮忙找到是否有泄漏，找出内存泄漏的地方，需要依赖一些其他的工具</p>
+<ul>
+<li>JProfile</li>
+<li>OptimizedIt</li>
+<li>JProbe</li>
+<li>JConsole</li>
+<li>-Xrunhprof </li>
+</ul>
+<h2 id="3-2-本地内存泄漏的定位"><a href="#3-2-本地内存泄漏的定位" class="headerlink" title="3.2 本地内存泄漏的定位"></a>3.2 本地内存泄漏的定位</h2><p>GC 日志无异常，但 Java 进程使用内存逐渐增大，并且无停止上涨的趋势。本地内存泄漏的原因有如下几个：</p>
+<ul>
+<li>JNI 调用中出现内存泄漏(JNI 调用出现内存泄漏，可以使用 C/C++ 内存泄漏分析方法定位)</li>
+<li>JDK bug</li>
+<li>操作系统问题</li>
+</ul>
+<p>本地内存泄漏可能伴有如下异常<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">java.lang.OutOfMemoryError: unable to create new native thread , Exception in thread &quot;main&quot; java.lang.OutOfMemoryError: unable to create new native thread</div><div class="line">      at java.lang.Thread.start0(Native Method)</div><div class="line">      at java.lang.Thread.start(Thread.java:574)</div><div class="line">      at TestThread.main(TestThread.java:34)</div></pre></td></tr></table></figure></p>
+<p>上面这个异常可能的原因有：</p>
+<ul>
+<li>创建的线程过多，可打印总线程数查看</li>
+<li>swap 分区不足</li>
+<li>堆内存过大，本地内存不足</li>
+</ul>
+<h2 id="3-3-Perm-区内存不足定位"><a href="#3-3-Perm-区内存不足定位" class="headerlink" title="3.3 Perm 区内存不足定位"></a>3.3 Perm 区内存不足定位</h2><p>出现 java.lang.OutOfMemoryError: PermGen space Perm ，说明 Perm 区内存不足</p>
+<ul>
+<li>依赖注入，没有卸载</li>
+<li>Perm 区太小</li>
+</ul>
+<h2 id="3-4-分析方法"><a href="#3-4-分析方法" class="headerlink" title="3.4 分析方法"></a>3.4 分析方法</h2><ol>
+<li>jmap -histo <java pid=""> &gt; objhist.log,  </java></li>
+<li>如果系统已经 OutOfMemory，可以使用  jmap-heap:format=b<javapid> 获取内存信息</javapid></li>
+<li>添加参数 -XX:+HeapDumpOnOutOfMemoryError-XX:HeapDumpPath=”$PATH” 当发生 OOM 时会收集相应信息</li>
+</ol>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Java </tag>
+            
+            <tag> 内存 </tag>
+            
+            <tag> 内存泄漏 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[通过 Java 线程堆栈进行性能瓶颈分析]]></title>
       <url>/2018/02/28/%E9%80%9A%E8%BF%87-Java-%E7%BA%BF%E7%A8%8B%E5%A0%86%E6%A0%88%E8%BF%9B%E8%A1%8C%E6%80%A7%E8%83%BD%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90/</url>
       <content type="html"><![CDATA[<p>改善性能意味着用更少的资源做更多的事情。为了利用并发来提高系统性能，我们需要更有效的利用现有的处理器资源，这意味着我们期望使 CPU 尽可能出于忙碌状态（当然，并不是让 CPU 周期出于应付无用计算，而是让 CPU 做有用的事情而忙）。如果程序受限于当前的 CPU 计算能力，那么我们通过增加更多的处理器或者通过集群就能提高总的性能。总的来说，性能提高，需要且仅需要解决当前的受限资源，当前受限资源可能是：</p>
@@ -288,9 +444,9 @@ ii. 虚拟机自身的代码导致的 CPU 过高，如堆内存不够导致的�
             
             <tag> Java </tag>
             
-            <tag> 线程堆栈 </tag>
-            
             <tag> JVM </tag>
+            
+            <tag> 线程堆栈 </tag>
             
             <tag> 分析 </tag>
             
@@ -2309,9 +2465,9 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> distributed-system </tag>
             
-            <tag> kv </tag>
-            
             <tag> mit </tag>
+            
+            <tag> kv </tag>
             
             <tag> viewservice </tag>
             
@@ -2363,11 +2519,11 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> distributed-system </tag>
             
-            <tag> mit </tag>
-            
             <tag> go </tag>
             
             <tag> mapreduce </tag>
+            
+            <tag> mit </tag>
             
         </tags>
         
@@ -3345,9 +3501,9 @@ private:
         
         <tags>
             
-            <tag> nginx </tag>
-            
             <tag> filter </tag>
+            
+            <tag> nginx </tag>
             
             <tag> text/plain </tag>
             
@@ -3390,11 +3546,11 @@ private:
         
         <tags>
             
+            <tag> nginx </tag>
+            
             <tag> array </tag>
             
             <tag> list </tag>
-            
-            <tag> nginx </tag>
             
             <tag> queue </tag>
             
@@ -4753,7 +4909,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#x6a;&#x63;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#x61;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;">&#x6a;&#x63;&#x6d;&#64;&#106;&#x6f;&#110;&#109;&#x61;&#115;&#116;&#x65;&#x72;&#x73;&#46;&#x6f;&#114;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#x61;&#x69;&#108;&#116;&#x6f;&#58;&#106;&#x63;&#109;&#x40;&#106;&#111;&#110;&#109;&#97;&#x73;&#116;&#x65;&#x72;&#x73;&#x2e;&#111;&#x72;&#x67;">&#106;&#x63;&#109;&#x40;&#106;&#111;&#110;&#109;&#97;&#x73;&#116;&#x65;&#x72;&#x73;&#x2e;&#111;&#x72;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -7753,9 +7909,9 @@ return 1;
         
         <tags>
             
-            <tag> Red Hat9 </tag>
-            
             <tag> grub </tag>
+            
+            <tag> Red Hat9 </tag>
             
         </tags>
         

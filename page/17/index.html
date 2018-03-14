@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>第 17 页 | klion26</title>
+  <title>Page 17 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,30 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2011-03-18 </div>
+			<div class="article-title"><a href="/2011/03/18/usaco-4-4-1-shuttle-puzzle/" >USACO 4.4.1 Shuttle Puzzle</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://www.nocow.cn/index.php/Translate:USACO/shuttle" target="_blank" rel="external">中文题目</a></p>
+<p>这题我是用BFS过的,直接BFS,然后注意下细节就行了,一是那个移动你可以用数组记录下来,二是合法的移动一共只可能是4种:W<em>   WB</em>   _B  <em>WB然后先算前面两个再处理后面两个,这样直接BFS,最慢的是0.4s左右.但是过还是毫无压力的,过了之后一看官方的解法后,我表示压力很大*</em>*..原来还可以那么简洁,而且内存神马的也用的那么少,真的是nb啊,或许是我还太菜,又或许是我一想到BFS就没去想好一点的办法(有点自慰的感觉).官方的<a href="http://u.115.com/file/f9dc71b43c" target="_blank" rel="external">传在这里</a></p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -340,30 +364,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-02-21 </div>
-			<div class="article-title"><a href="/2011/02/21/usaco-4-2-4-cowcycle/" >usaco 4.2.4 cowcycle</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>这题数据不是很BT,用简单的dfs就可以过,不过还是有几点要注意的.我就是死在其中的某点上.<br>1.我一开始自作聪明的加了个剪枝,可是结果是越剪时间用的越多,我的剪枝方法是,确定前轮之后[我先确定前轮,因为我觉得这样比先确定后轮时间要少一点]然后再用那个3倍关系确定后轮的范围,这样时间用的更多.真是画蛇添足了<br>2.我用的排序时qsort,由于一直用c写acm的代码,排序基本是qsort,一般是没问题的,可是这次就死在这里.后来自己写的冒泡就过了,才知道qsort其实不是非常快,尤其是小数据的时候.<br>其他的应该只要读懂题意,然后照着题目的要求算方差就OK了,千万别搞错了differences的个数<br>代码如下:</p>
-<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">  ID:qcx97811</span><br><span style="color: #da70d6;">  LANG:C</span><br><span style="color: #da70d6;">  TASK:cowcycle</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="color: #eeee00;">#include <math.h></math.h></span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">F</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">R</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">F1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">F2</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">R1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">R2</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">amax</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">bmax</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">amin</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">bmin</span><span style="color: #da70d6;">//amax amin是前轮的最小和最大值 bmin和bmax是后轮的最小和最大值</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">10</span><span style="color: #f5deb3;">],</span>b<span style="color: #f5deb3;">[</span><span style="color: #add8e6;">12</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">aa</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">10</span><span style="color: #f5deb3;">],</span>bb<span style="color: #f5deb3;">[</span><span style="color: #add8e6;">12</span><span style="color: #f5deb3;">];</span><span style="color: #da70d6;">//a记录本次的前轮数据 b本次的后轮数据 aa和bb是最优的前轮和</span><br><br><span style="color: #f5deb3;">后轮数据</span><br><span style="font-weight: bold; color: #98fb98;">double</span> <span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">56</span><span style="color: #f5deb3;">],</span><span style="color: #f5deb3;">mean</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">var</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">best</span><span style="color: #da70d6;">//diff和题中的有点不同</span><br><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">dfsb</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">now</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">beg</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="font-weight: bold; color: #98fb98;">double</span> <span style="color: #f5deb3;">k</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">R</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">now</span>)<span style="color: #da70d6;">//后轮选完了</span><br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;"><em></em></span><span style="color: #add8e6;">3</span><span style="color: #f5deb3;"></span>b<span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">F</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;"><em></em></span>b<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">R</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">])</span><span style="color: #da70d6;">//the 3X rule</span><br>                <span style="font-weight: bold; color: #b0c4de;">return</span> ;<br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">F</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">R</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//calc the diff</span><br>                            <span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">R</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;"><em></em></span><span style="color: #add8e6;">1.0</span><span style="color: #f5deb3;">/</span>(b<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span><br><br><span style="color: #f5deb3;"></span><span style="color: #add8e6;">1.0</span>);<br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">F</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">R</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//冒泡排序</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">F</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">R</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">&gt;;</span> <span style="color: #f5deb3;">i</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">–</span>)<br>                        <span style="color: #f5deb3;">{</span><br>                            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">])</span><br>                                <span style="color: #f5deb3;">{</span><br>                                    <span style="color: #f5deb3;">k</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">];</span><br>                                    <span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">];</span><br>                                    <span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">k</span><br>                                <span style="color: #f5deb3;">}</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="color: #f5deb3;">mean</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">-</span> <span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">R</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">F</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">])</span><span style="color: #f5deb3;">/</span>(<span style="color: #f5deb3;">R</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">F</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>);<span style="color: #da70d6;">//the num of the </span><br><br><span style="color: #f5deb3;">differences</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">R</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">F</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>  <span style="color: #f5deb3;">计算平均值</span><br>            <span style="color: #f5deb3;">var</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br>            <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">R</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">F</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br>            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">j</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">var</span> <span style="color: #f5deb3;">+=</span> (<span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">mean</span>)<span style="color: #f5deb3;"><em></em></span>(<span style="color: #f5deb3;">diff</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">diff</span><br><br><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">mean</span>);<br>                <span style="color: #f5deb3;">}</span><br>            <span style="color: #f5deb3;">var</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">var</span><span style="color: #f5deb3;"></span><span style="color: #add8e6;">1.0</span><span style="color: #f5deb3;">/</span>(<span style="color: #f5deb3;">R</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">F</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>);<span style="color: #da70d6;">//计算方差</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">aa</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">])</span><span style="color: #da70d6;">//如果是第一次的话</span><br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">F</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                        <span style="color: #f5deb3;">aa</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">R</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br>                        bb<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> b<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                    <span style="color: #f5deb3;">best</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">var</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">else</span><br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">var</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">best</span>)<br>                        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//如果更优的话</span><br>                            <span style="color: #f5deb3;">best</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">var</span><br>                            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">F</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                                <span style="color: #f5deb3;">aa</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                            <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">R</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>                                bb<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> b<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br>                        <span style="color: #f5deb3;">}</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">return</span> ;<br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">beg</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">bmax</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">return</span> ;<span style="color: #da70d6;">//没后轮选了</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">beg</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #f5deb3;">bmax</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//选下一个后轮</span><br>            b<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">now</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><br>            <span style="color: #f5deb3;">dfsb</span>(<span style="color: #f5deb3;">now</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>);<br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">dfsa</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">now</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">beg</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">k</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">kk</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">F</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">now</span>)<br>        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//前轮选完了</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;"></span><span style="color: #add8e6;">3</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">R1</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">F</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">R2</span>)<br>                <span style="font-weight: bold; color: #b0c4de;">return</span><span style="color: #da70d6;">//3x规则</span><br>            <span style="color: #f5deb3;">dfsb</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">R1</span>);<span style="color: #da70d6;">//开始选后轮</span><br>            <span style="font-weight: bold; color: #b0c4de;">return</span> ;<br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">beg</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">amax</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">return</span> ;<span style="color: #da70d6;">//没前轮选了</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">beg</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #f5deb3;">amax</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//测试当前的前轮 然后开始选下一个前轮</span><br>            <span style="color: #f5deb3;">a</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">now</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><br>            <span style="color: #f5deb3;">dfsa</span>(<span style="color: #f5deb3;">now</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span>);<br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">main</span>(<span style="font-weight: bold; color: #98fb98;">void</span>)<br><span style="color: #f5deb3;">{</span><br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“cowcycle.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdin</span>);<br>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“cowcycle.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdout</span>);<br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">F</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">R</span>);<br>    <span style="color: #f5deb3;">scanf</span>(<span style="color: #7fffd4;">“%d%d%d%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">F1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">F2</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">R1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">R2</span>);<br>    <span style="color: #f5deb3;">amin</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">F1</span><br>    <span style="color: #f5deb3;">amax</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">F2</span><br>    <span style="color: #f5deb3;">bmax</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">R2</span><br>    <span style="color: #f5deb3;">bmin</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">R1</span><br>    <span style="color: #f5deb3;">aa</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #da70d6;">//标记</span><br>    <span style="color: #f5deb3;">dfsa</span>(<span style="color: #add8e6;">0</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">amin</span>);<span style="color: #da70d6;">//开始搜索</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“%d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">aa</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]);</span><br><span style="color: #da70d6;">//下面是输出</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">F</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“ %d”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">aa</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]);</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">%d”</span><span style="color: #f5deb3;">,</span>bb<span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]);</span><br>    <span style="font-weight: bold; color: #b0c4de;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">R</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br>        <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“ %d”</span><span style="color: #f5deb3;">,</span>bb<span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]);</span><br>    <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br>    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -374,13 +374,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/16/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
+    	<li class="prev"><a href="/page/16/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/18/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/18/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -400,7 +400,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -409,7 +409,7 @@
 		
 			
 	<div class="widget">
-		<h4>分类</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -442,13 +442,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -466,9 +466,9 @@
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -476,9 +476,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -492,51 +492,51 @@
 		
 			
 	<div class="widget">
-		<h4>标签云</h4>
+		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
-		
-			<li><a href="/tags/json/">json<span>1</span></a></li>
-		
-			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
 		
 			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
 		
+			<li><a href="/tags/内存/">内存<span>1</span></a></li>
+		
+			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
+		
+			<li><a href="/tags/code-style/">code-style<span>1</span></a></li>
+		
+			<li><a href="/tags/program/">program<span>1</span></a></li>
+		
+			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+		
+			<li><a href="/tags/linked-list/">linked-list<span>1</span></a></li>
+		
+			<li><a href="/tags/ASM/">ASM<span>1</span></a></li>
+		
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
+		
+			<li><a href="/tags/kafka/">kafka<span>10</span></a></li>
+		
+			<li><a href="/tags/数学/">数学<span>5</span></a></li>
+		
+			<li><a href="/tags/english/">english<span>1</span></a></li>
+		
 			<li><a href="/tags/教师/">教师<span>1</span></a></li>
 		
-			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
+			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
 		
-			<li><a href="/tags/jekyll/">jekyll<span>1</span></a></li>
+			<li><a href="/tags/6-824/">6.824<span>2</span></a></li>
 		
-			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
+			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
 		
-			<li><a href="/tags/grub/">grub<span>2</span></a></li>
+			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
 		
-			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
+			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
 		
-			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
+			<li><a href="/tags/老师/">老师<span>1</span></a></li>
 		
-			<li><a href="/tags/update/">update<span>1</span></a></li>
-		
-			<li><a href="/tags/problem-solve/">problem_solve<span>2</span></a></li>
-		
-			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
-		
-			<li><a href="/tags/i-o-multiplexing/">i/o multiplexing<span>1</span></a></li>
-		
-			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
-		
-			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
-		
-			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
-		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
-		
-			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
-		
-			<li><a href="/tags/question/">question<span>1</span></a></li>
+			<li><a href="/tags/specify-timestamp/">specify_timestamp<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>302</span></a></li>
+		   <li><a href="/tags">...<span>304</span></a></li>
 		 
 		</ul>
 	</div>
@@ -545,8 +545,12 @@
 		
 			
 <div class="widget">
-  <h4>最新文章</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
+      </li>
     
       <li>
         <a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" ><i class="fa fa-file-o"></i>通过 Java 线程堆栈进行性能瓶颈分析</a>
@@ -564,17 +568,13 @@
         <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
       </li>
     
-      <li>
-        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>链接</h4>
+	<h4>Links</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

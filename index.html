@@ -491,9 +491,35 @@
 		
             
 		
+            
+		
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2018-03-14 </div>
+			<div class="article-title"><a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" >Java 内存泄漏分析和对内存设置</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<h1 id="1-内存泄漏的背景知识"><a href="#1-内存泄漏的背景知识" class="headerlink" title="1 内存泄漏的背景知识"></a>1 内存泄漏的背景知识</h1><p>为了判断 Java 中是否有内存泄漏，我们首先必须了解 Java 是如何管理内存的。下面我们先给出一个简单的内存泄漏的例子，在这个例子中我们循环申请 Object 对象，并将所申请的对象放入一个 HashMap 中，如果我们仅仅释放引用本身，那么 HashMap 仍然引用该对象，所以这个对象对 GC 来说是不可回收的。</p>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2018/03/14/Java-内存泄漏分析和对内存设置/#more" class="btn btn-default more">Read More</a>
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -515,7 +541,7 @@
 <li>其他资源：比如连接数等。可以修改代码，尽量利用 CPU，可以获得极大的性能提升</li>
 </ul>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -539,7 +565,7 @@
 	
 		<p>本文为读书笔记，关于 Java 线程堆栈分析，在阅读并进行实验的基础上进行整理，如果有问题欢迎反馈<br>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2018/01/06/线程堆栈分析/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2018/01/06/线程堆栈分析/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -563,7 +589,7 @@
 	
 		<p>本文属于 MillWheel 论文的阅读与翻译稿，部分地方使用自己的语言进行描述，部分地方进行翻译（附带原文）<br>讲述 MillWhell 的编程模型以及具体实现。MillWhell 的逻辑时间（logical time）使得开发基于时间的聚合应用更方便，从设计之初，MillWhell 就考虑了容错性以及扩展性。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/12/22/millwheel/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/12/22/millwheel/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -588,7 +614,7 @@
 		<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">* Schedules the tasks within a single TaskSet in the TaskSchedulerImpl. This class keeps track of</div><div class="line">* each task, retries tasks if they fail (up to a limited number of times), and</div><div class="line">* handles locality-aware scheduling for this TaskSet via delay scheduling. The main interfaces</div><div class="line">* to it are resourceOffer, which asks the TaskSet whether it wants to run a task on one node,</div><div class="line">* and statusUpdate, which tells it that one of its tasks changed state (e.g. finished).</div><div class="line">*</div><div class="line">* THREADING: This class is designed to only be called from code with a lock on the</div><div class="line">* TaskScheduler (e.g. its event handlers). It should not be called from other threads.</div><div class="line">*</div><div class="line">* @param sched           the TaskSchedulerImpl associated with the TaskSetManager</div><div class="line">* @param taskSet         the TaskSet to manage scheduling for</div><div class="line">* @param maxTaskFailures if any particular task fails this number of times, the entire</div><div class="line">*                        task set will be aborted</div><div class="line">*/</div></pre></td></tr></table></figure>
 <p><code>TaskSetManager</code> 负责某个 TaskSet 的调度，对该 TaskSet 的所有 task 进行跟踪，如果有失败的 task，会负责重试（重试有上限），并且通过 delay scheduling（可以想想这个怎么实现的？） 实现 locality  locality-aware scheduling. 主要的接口有 <code>resourceOffer</code> – 用于判断一个 TaskSet 中的 task 是否需要运行到某个 node 上，<code>statusUpdate</code> – 用于跟踪 task 的状态变化。不是线程安全的。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/12/03/tasksetmanager/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/12/03/tasksetmanager/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -616,7 +642,7 @@
 <p>与不同的后端调度器一起，进行 task 的调度（task 是 DAGScheduler 中划分的 Stage 中的具体任务），后端调度器包括 <code>LocalBackend</code>， <code>SparkDeploySchedulerBackend</code>，<code>MesosSchedulerBackend</code>，<code>YarnClientSchedulerBackend</code>， <code>YarnClusterSchedulerBackend</code>，<code>SimrSchedulerBackend</code>等</p>
 <p>整个 TaskSchedulerImpl 比较简单，复杂的地方在于和各种 后端调度器联合，以及具体 <code>TasksetManager</code> 进行联合</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/11/27/TaskScheduler/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/11/27/TaskScheduler/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -643,7 +669,7 @@
 </blockquote>
 <h1 id="本文会讲什么"><a href="#本文会讲什么" class="headerlink" title="本文会讲什么"></a>本文会讲什么</h1><p>本文会换一个角度讲述 Git 怎么做的，给大家提供一个另外的视角，这个视角主要设计 Git 的存储，这样给大家一个更深的认识，在平时想了解的时候，也能有合适的渠道进行。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/11/20/git-inside/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/11/20/git-inside/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -674,7 +700,7 @@
 <li>文件数会很多，项目中管理会比较麻烦</li>
 </ol>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/11/09/django-configuration-in-action/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/11/09/django-configuration-in-action/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -703,7 +729,7 @@
 <p>Spark 的 stage 以 RDD 的 shuffle 为界进行划分。窄依赖的 RDD 操作会被穿起来放到一个 task 中，比如 <code>map()</code>, <code>filter()</code> 这样的操作。但是需要使用到 shuffle 依赖的操作，需要多个 stage（至少一个将中间文件写到特定的地方，另外一个从特定的地方进行读取）。每个 Stage，只会对其他 Stage 有 shuffle 依赖，在同一个 stage 中会进行很多计算。实际的将计算串起来的操作在 RDD.compute 中完成。</p>
 <p><code>DAGScheduler</code> 同样会基于缓存状态决定 task 希望运行在那（preferred location），如果 shuffle 输出文件丢失造成的 Stage 失败，会重新被提交。在 <strong>Stage 内部</strong> 的不是由 shuffle 文件丢失造成的失败，由 <code>TaskScheduler</code> 来完成，<code>TaskScheduler</code> 会在取消整个 stage 前进行小部分重试。<br>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/10/16/spark-dagscheduler/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/10/16/spark-dagscheduler/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -733,54 +759,7 @@
 </ul>
 <p>其他的 GC 算法都是在这三种算法上进行修改，优化得来。本文将要介绍的是 标记-清除 算法。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/09/17/GC-标记-清除算法/#more" class="btn btn-default more">阅读此文</a>
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2017-07-14 </div>
-			<div class="article-title"><a href="/2017/07/14/tmux-简单使用指南/" >tmux 简单使用指南</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<h1 id="Tmux-的简单使用说明"><a href="#Tmux-的简单使用说明" class="headerlink" title="Tmux 的简单使用说明"></a>Tmux 的简单使用说明</h1><blockquote>
-<p>工欲善其事，必先利其器</p>
-</blockquote>
-<p>Tmux 是一个多窗口管理程序。可以让用户在一个地方管理多个终端。而不需要在不同的终端间来回切换。</p>
-<h2 id="在-Mac-下如何安装"><a href="#在-Mac-下如何安装" class="headerlink" title="在 Mac 下如何安装"></a>在 Mac 下如何安装</h2><p>直接使用 <code>brew install tmux</code> 就可以了，如果没有 brew，则需要先安装 brew，然后再执行上述命令。</p>
-<h2 id="简单使用流程"><a href="#简单使用流程" class="headerlink" title="简单使用流程"></a>简单使用流程</h2><p>首先，需要了解 tmux 中的几个概念。session，window 以及 pane。这几者的关系如下，tmux 中可以起多个 session，每个 session 可以启动多个 window，然后每个 window 可以启动多个 pane。</p>
-<p>这里给一个基本的流程</p>
-<ol>
-<li><p>启动 tmux（默认会启动一个 session）<br>使用 <code>tmux</code> 启动 tmux，使用 <code>exit</code> 退出 tmux，session 的命名默认是从 0 开始，一直往上加</p>
-</li>
-<li><p>在 session 中启动一个 window<br><code>PREFIX c</code> 会在当前 session 中创建一个 window, 其中 <code>PREFIX</code> 表示 tmux 中的命令前缀符（该条命令表示，先按下 PREFIX，然后按下 c)，</p>
-</li>
-<li><p>在启动的 window 中创建一个 pane<br><code>PREFIX %</code> 竖直方向切分一个 window，<code>PREFIX &quot;</code> 横向切分一个 window。这样就能够在 window 中创建 pane 了。基本的这些就够了。</p>
-</li>
-<li><p>如何在 session，window，pane 中进行移动<br>能够创建 session，window，pane 了，接下来就是如何在 session，window，pane 间进行移动了。<br><code>PREFIX s</code> 会列出所有 session，然后进行具体的选择（可以上下移动光标，然后按 ENTRER 确定）<br><code>PREFIX w</code> 可以列出所有的 window，然后进行具体的筛选<br><code>PREFIX n</code> 可以切换到下一个 window<br><code>PREFIX p</code> 可以切换到上一个 window<br><code>PREFIX &amp;</code> 可以关闭当前 window<br><code>PREFIX o</code> 可以在 pane 之间进行跳转<br><code>tmux ls</code> 会列出当前所有的 session（在非 tmux 环境下）</p>
-</li>
-</ol>
-<h2 id="自定义-tmux"><a href="#自定义-tmux" class="headerlink" title="自定义 tmux"></a>自定义 tmux</h2><p>tmux 的配置文件可以保存在两个地方</p>
-<ol>
-<li>/etc/tmux.conf</li>
-<li>~/.tmux.conf</li>
-</ol>
-<p>其中 2 的优先级会更高，1 的影响面更广</p>
-<h2 id="接下来做什么"><a href="#接下来做什么" class="headerlink" title="接下来做什么"></a>接下来做什么</h2><p>上面的仅仅是一个入门文档，也就是最少基本知识，接下来就是多实践。推荐一本小书《tmux productive mouse-free development》</p>
-<img src="/2017/07/14/tmux-简单使用指南/tmux_pic.png" alt="tmux_pic.png" title="">
-
+		<a type="button" href="/2017/09/17/GC-标记-清除算法/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -797,13 +776,13 @@
 <ul class="pagination">
 	 
 		
-          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
         
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/2/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/2/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -823,7 +802,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -832,7 +811,7 @@
 		
 			
 	<div class="widget">
-		<h4>分类</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -865,13 +844,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -889,9 +868,9 @@
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -899,9 +878,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -915,51 +894,51 @@
 		
 			
 	<div class="widget">
-		<h4>标签云</h4>
+		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li>
+			<li><a href="/tags/lru/">lru<span>1</span></a></li>
 		
-			<li><a href="/tags/longest-increasing-subsequences/">longest increasing subsequences<span>1</span></a></li>
+			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
 		
-			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
+			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
 		
-			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
+			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
 		
-			<li><a href="/tags/network/">network<span>1</span></a></li>
+			<li><a href="/tags/go/">go<span>1</span></a></li>
 		
-			<li><a href="/tags/风险/">风险<span>1</span></a></li>
+			<li><a href="/tags/receiver/">receiver<span>1</span></a></li>
 		
-			<li><a href="/tags/knapsack/">knapsack<span>1</span></a></li>
+			<li><a href="/tags/JVM/">JVM<span>1</span></a></li>
 		
-			<li><a href="/tags/git/">git<span>5</span></a></li>
+			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
 		
-			<li><a href="/tags/shortest-paths-in-dag/">shortest paths in dag<span>1</span></a></li>
+			<li><a href="/tags/MST/">MST<span>1</span></a></li>
 		
-			<li><a href="/tags/latex/">latex<span>1</span></a></li>
+			<li><a href="/tags/file-system/">file-system<span>1</span></a></li>
 		
-			<li><a href="/tags/dagscheduler/">dagscheduler<span>1</span></a></li>
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
 		
-			<li><a href="/tags/how/">how<span>1</span></a></li>
+			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
 		
-			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
+			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
 		
-			<li><a href="/tags/6-824/">6.824<span>2</span></a></li>
+			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
 		
-			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
 		
-			<li><a href="/tags/c/">c++<span>1</span></a></li>
-		
-			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
+			<li><a href="/tags/lzo/">lzo<span>1</span></a></li>
 		
 			<li><a href="/tags/瓶颈/">瓶颈<span>1</span></a></li>
 		
-			<li><a href="/tags/bellman-ford/">bellman-ford<span>1</span></a></li>
+			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
 		
-			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
+			<li><a href="/tags/update/">update<span>1</span></a></li>
+		
+			<li><a href="/tags/pair/">pair<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>302</span></a></li>
+		   <li><a href="/tags">...<span>304</span></a></li>
 		 
 		</ul>
 	</div>
@@ -968,8 +947,12 @@
 		
 			
 <div class="widget">
-  <h4>最新文章</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
+      </li>
     
       <li>
         <a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" ><i class="fa fa-file-o"></i>通过 Java 线程堆栈进行性能瓶颈分析</a>
@@ -987,17 +970,13 @@
         <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
       </li>
     
-      <li>
-        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>链接</h4>
+	<h4>Links</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

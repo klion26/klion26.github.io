@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>第 11 页 | klion26</title>
+  <title>Page 11 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -116,6 +116,59 @@
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-03-29 </div>
+			<div class="article-title"><a href="/2012/03/29/github-port-22-error-bad-file-number/" >github连接出现port 22:Bad file number问题</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>一直想试试用github，可以尝试了很久未果，在windows下和Fedora下都出现了port 22错误，一直以为是GFW的问题，想改host什么的，也找不到host，每次上github都是翻墙出去的，但是ping却能ping通。今天终于找到一篇可以解决这个问题的文章了，转载过来存个档</p>
+<p><span style="color: #ff0000;">原文地址:<a href="http://rangercyh.blog.51cto.com/1444712/749490" target="_blank" rel="external"><span style="color: #ff0000;">http://rangercyh.blog.51cto.com/1444712/749490</span></a></span></p>
+<p>前段时间我试用了时下非常酷的代码托管站点github以及gitorious。感触颇多。</p>
+<p>首先是我以前一直想要有这种代码托管的网站，可是直到前段时间我才知道已经有了。o(︶︿︶)o 唉，跟不上潮流啊！</p>
+<p>其次是这些网站做得比我想要的要漂亮的多了，我最喜欢简洁明了，而这两个网站也正是如此，甚至比我想要的还要好。这里也推荐给大家使用。</p>
+<p>顺带说明一下github是闭源的，gitorious是开源的。不管怎么样，都不错，反正我用免费的。。。。如何在局域网自己架我就不说了，自己去网站上看吧。给出它们的链接：</p>
+<p>github：<a href="https://github.com/" target="_blank" rel="external">https://github.com/</a></p>
+<p>gitorious：<a href="https://gitorious.org/" target="_blank" rel="external">https://gitorious.org/</a></p>
+<p>当然，这两个网站都是使用git版本控制工具来的，虽然我以前只使用过css，但用过git之后我觉得我以前弱爆了。。。好吧。不谈这个。。免得得罪svn和cvs党。。</p>
+<p>不过在使用github时我遇到了点小问题。在官网里也没有说明，其实非常简单，但我想肯定会有跟我一样的菜鸟不知所措的。所以我列一下我遇到的问题。</p>
+<p>按照github官网上Set Up Git来操作，当执行到ssh连接时，会出现我下面的问题：</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/git-1.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/git-1-300x51.png" alt="" title="git-1"></a></p>
+<p>“Bad file number这是个什么玩意”我当时就是这么想的。</p>
+<p>后来我仔细研究了官网上的帮助文档，发现它提到过一个config配置文件，我当然没有创建过这个文件。于是我就google了一下，参考前人写了一个config放到rsa相同目录下：</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/git-2.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/git-2-300x137.png" alt="" title="git-2"></a></p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/git-3.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/git-3-300x35.png" alt="" title="git-3"></a></p>
+<p>但是我重新连接时仍然不行：</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/git-4.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/git-4-300x72.png" alt="" title="git-4"></a></p>
+<p>于是我怒了！！！静下来思考觉得可能是这个port 22的问题，因为我ping了一下github.com发现是可以ping通的。然后我用IceSword查看了一下端口，发现22端口是被禁掉的。原来这个22端口是默认的ssh连接端口，不过貌似这个服务有很多弱点，所以系统默认不开放。。当然，开放它是一个策略，不过既然有弱点，我还是不要去动它，那么我使用另一个端口去连接ssh就行了嘛~~~呵呵！这个新的端口不能和现在程序使用的服务端口重复，而且要确保开放，看到github的网址我想到了443端口，它是用来支持https服务的。这个端口默认开放，哈哈！！</p>
+<p>下面我只需要修改下配置文件就可以了，如下：</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/git-5.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/git-5-300x157.png" alt="" title="git-5"></a></p>
+<p><span style="color: #ff0000;">注意Hostname修改成了ssh.github.com。</span>接下来连接就发现一切OK了~~哈哈！</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/git-6.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/git-6-300x43.png" alt="" title="git-6"></a></p>
+<p>输入yes之后在rsa的路径下会生成一个known_hosts的文件</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/git-7.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/git-7-300x71.png" alt="" title="git-7"></a></p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/git-8.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/git-8-300x76.png" alt="" title="git-8"></a></p>
+<p>打开看了就发现其实就是一个类似cookie的文件罢了：</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/git-9.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/git-9-300x44.png" alt="" title="git-9"></a></p>
+<p>当这个文件存在时以后就不用费劲的输入yes了，直接就连接上了：</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/git-10.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/git-10-300x36.png" alt="" title="git-10"></a></p>
+<p>怎么样！我是不是很有才。。。。好吧。我又2了。。。</p>
+
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -411,34 +464,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-08-20 </div>
-			<div class="article-title"><a href="/2011/08/20/reverse-poj-3761/" >[逆序]POJ_3761</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://poj.org/problem?id=3761" target="_blank" rel="external">想看题目?</a></p>
-<p>题目大致意思就是:求1,2,3…..N有多少个排列是用冒泡排序只需要k轮就好的.给定一个n和一个k,然后让你输出答案模上一个数.因为答案是在太大了</p>
-<p>这里首先给出公式吧对给定的n和k,答案是k!*((k+1)^(n-k)-k^(n-k)).</p>
-<p>ps:以下分析借助了&lt;计算机程序设计艺术&gt;和<a href="http://hi.baidu.com/billdu/blog/item/a1fa28acd0a9ea1d4b36d60e.html" target="_blank" rel="external">这篇博文</a></p>
-<p>首先我们知道对于每个排列和其逆序对是一一对应的.也就是说一个逆序对对应一个排列,一个排列对应一个逆序对,相同排列的逆序是一样的,同一个逆序对的排列也是一样的.下面我们来看看这个和逆序对有啥关系.这里以4 5 3 1 2这个排列为例.那么逆序对为3 3 2 0 0.也就是1的逆序数为3,2的为3,依次下去.那么我们来看下依次冒泡排序会改变什么,首先第一趟我们会发现变成了4 3 1 2 5.那么逆序对变成了2 2 1 0 0也就是所有逆序数&gt;0的都-1了,这个是偶然吗?不是的,因为对于每一趟冒泡,都有一个当前未排好序的最大的沉到最下面去,这样就会导致这个当前最大的数的后面的那些数的逆序数都会-1.上面的当前最大就是5,5后面的是3 1 2,所以3 1 2这几个数的逆序数都会-1.OK,现在我们知道,对于每趟冒泡排序,所有逆序数不为1的都会-1,那么体重要求的我们可以转化成求这样的排列的个数:也就是逆序数的最大值为k的n个数的一个排列.这样我们就得到了一个冒泡最多需要k次的一个排列,而且逆序数和排列是一一对应的,所以我们得到的”逆序数的最大值为k的n个数的排列”的个数就是本题的答案.</p>
-<p>现在的问题变成了求逆序数的最大值为k的n个数的排列的个数,也就是给你n个位置,这n个位置上可以放置一系列数,但是最大为k,最小0的排列的数目,而且我们这里要求的是至少要有一个数=k(不然不需要k趟就排完了).那么我们可以考虑用最大的为k减去最大的为k-1的排列,剩下的就是至少有一个最大值为k的了.现在我们求最大值为k,但不一定有最大值为k的排列的数目.我们可以这么想:对于1,有逆序数为0,1…..k这些选择,也就是它的位置可以选择为0 1 2…k(位置从0开始),放置好1之后,我们再放2,同理可以得到一系列的位置,也就是2也可以有k+1中选择,知道某个数不可能出现逆序数为k为止,那么我们知道一个数的最大逆序数位n-i(i是这个数,这里的环境都是1,2….n这样的排列).那么最大的i就是k了.所以这里有(k+1)^(n-k),然后剩下的就自己选位置吧,有k!种方案,所以就是k!((k+1)^(n-k)).那么我们的结果就是k!<em>(k+1)^(n-k)-(k-1)!</em>k^(n-k+1)然后化简就变成了k!((k+1)^(n-k)-k^(n-k))到这里这题也结束了,不过还有一点,在保证不会越界的情况下,能不用mutil_mod(算a*b%c),这类的函数就不用,所有函数都是有开销的,别到时TLE了还找不到原因</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -449,13 +474,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/page/10/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
+    	<li class="prev"><a href="/page/10/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/12/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/12/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -475,7 +500,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -484,7 +509,7 @@
 		
 			
 	<div class="widget">
-		<h4>分类</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -517,13 +542,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -541,9 +566,9 @@
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -551,9 +576,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -567,51 +592,51 @@
 		
 			
 	<div class="widget">
-		<h4>标签云</h4>
+		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
+			<li><a href="/tags/django/">django<span>1</span></a></li>
 		
-			<li><a href="/tags/metric-core/">metric-core<span>1</span></a></li>
+			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
 		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
 		
-			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
+			<li><a href="/tags/project/">project<span>1</span></a></li>
 		
-			<li><a href="/tags/RecurringTimer/">RecurringTimer<span>1</span></a></li>
+			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
 		
-			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
 		
-			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
+			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+		
+			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
+		
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
 		
 			<li><a href="/tags/json/">json<span>1</span></a></li>
 		
-			<li><a href="/tags/office/">office<span>1</span></a></li>
+			<li><a href="/tags/老师/">老师<span>1</span></a></li>
 		
-			<li><a href="/tags/filter/">filter<span>1</span></a></li>
-		
-			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
-		
-			<li><a href="/tags/rm/">rm<span>1</span></a></li>
-		
-			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
-		
-			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
-		
-			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
-		
-			<li><a href="/tags/proof/">proof<span>1</span></a></li>
-		
-			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
-		
-			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
-		
-			<li><a href="/tags/tasksetmanager/">tasksetmanager<span>1</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
 			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
 		
+			<li><a href="/tags/腾讯/">腾讯<span>1</span></a></li>
 		
-		   <li><a href="/tags">...<span>302</span></a></li>
+			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
+		
+			<li><a href="/tags/成长/">成长<span>1</span></a></li>
+		
+			<li><a href="/tags/kv/">kv<span>1</span></a></li>
+		
+			<li><a href="/tags/JVM/">JVM<span>1</span></a></li>
+		
+			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
+		
+			<li><a href="/tags/free/">free<span>1</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>304</span></a></li>
 		 
 		</ul>
 	</div>
@@ -620,8 +645,12 @@
 		
 			
 <div class="widget">
-  <h4>最新文章</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
+      </li>
     
       <li>
         <a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" ><i class="fa fa-file-o"></i>通过 Java 线程堆栈进行性能瓶颈分析</a>
@@ -639,17 +668,13 @@
         <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
       </li>
     
-      <li>
-        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>链接</h4>
+	<h4>Links</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>

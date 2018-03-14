@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-02-28T09:47:00.000Z</updated>
+  <updated>2018-03-14T04:28:15.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,168 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Java 内存泄漏分析和对内存设置</title>
+    <link href="http://yoursite.com/2018/03/14/Java-%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E5%88%86%E6%9E%90%E5%92%8C%E5%AF%B9%E5%86%85%E5%AD%98%E8%AE%BE%E7%BD%AE/"/>
+    <id>http://yoursite.com/2018/03/14/Java-内存泄漏分析和对内存设置/</id>
+    <published>2018-03-14T04:15:45.000Z</published>
+    <updated>2018-03-14T04:28:15.000Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="1-内存泄漏的背景知识"><a href="#1-内存泄漏的背景知识" class="headerlink" title="1 内存泄漏的背景知识"></a>1 内存泄漏的背景知识</h1><p>为了判断 Java 中是否有内存泄漏，我们首先必须了解 Java 是如何管理内存的。下面我们先给出一个简单的内存泄漏的例子，在这个例子中我们循环申请 Object 对象，并将所申请的对象放入一个 HashMap 中，如果我们仅仅释放引用本身，那么 HashMap 仍然引用该对象，所以这个对象对 GC 来说是不可回收的。</p>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">HashMap mapObj = new HashMap()</div><div class="line">	  </div><div class="line">	public void myfun() &#123;</div><div class="line">		String obj1 = new String(&quot;abcd&quot;);</div><div class="line">		mapObj.put(obj1, obj1);</div><div class="line">		...</div><div class="line">		obj1 = null;   //此时 obj1 指向的物理内存没有释放，因为 hashmap 引用该地址</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>JVM 可以自动回收垃圾，但它只能回收满足条件的垃圾，有时需要们确保条件的满足。如果程序中，存在越来越多不在影响程序未来执行的对象（也就是不再需要的对象），而且这些对象和根对象之间存在引用路径，那么就发生了内存泄漏。</p>
+<p>内存泄漏常发生在如下场景：</p>
+<ul>
+<li>全局容器类，对象不再需要时，忘记从容器中 remove</li>
+<li>像 Runnable 对象等被 Java 虚拟机自身管理的对象，没有正确的释放渠道。Runnable 对象必须交给一个 Thread 去 run，否则该对象就永远不会消亡</li>
+</ul>
+<h2 id="1-1-Java-对象的-Size"><a href="#1-1-Java-对象的-Size" class="headerlink" title="1.1 Java 对象的 Size"></a>1.1 Java 对象的 Size</h2><p>在 64 位的平台上，Java 对象的占用内存如下</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>大小</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Object</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Float</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>24</td>
+</tr>
+<tr>
+<td>Integer</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>24</td>
+</tr>
+</tbody>
+</table>
+<h2 id="1-2-对象及其引用"><a href="#1-2-对象及其引用" class="headerlink" title="1.2 对象及其引用"></a>1.2 对象及其引用</h2><p>为了说明对象和引用，我们先定义一个简单的类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">class Person &#123;</div><div class="line">	String name;</div><div class="line">	int age;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Person p1 = new Person() 包含如下几个动作</p>
+<ol>
+<li>右边的 new Person 在堆空间分配一块内存，创建一个 Person 类对象</li>
+<li>末尾的 () 意味着创建对象之后，立即调用构造函数，进行初始化</li>
+<li>左边的 Person p1 创建了一个引用变量，所谓引用变量，就是后来用于指向 Person 类示例的引用</li>
+<li>= 符号使刚刚创建的对象引用指向刚刚创建的对象<br>上面的代码如下所示：</li>
+</ol>
+<img src="/2018/03/14/Java-内存泄漏分析和对内存设置/image1.png" alt="image1.png" title="">
+<p>如果再将对象赋值给 p2 的话，变成下面这样的</p>
+<img src="/2018/03/14/Java-内存泄漏分析和对内存设置/image2.png" alt="image2.png" title="">
+<p>执行 p2 = new Person() 之后变成</p>
+<img src="/2018/03/14/Java-内存泄漏分析和对内存设置/image3.png" alt="image3.png" title="">
+<h2 id="1-3-虚拟机垃圾自动回收机制"><a href="#1-3-虚拟机垃圾自动回收机制" class="headerlink" title="1.3 虚拟机垃圾自动回收机制"></a>1.3 虚拟机垃圾自动回收机制</h2><p>垃圾自动回收做两件事情：</p>
+<ol>
+<li>标记垃圾</li>
+<li>清除垃圾</li>
+</ol>
+<p>标记过程现在主要使用 根可达性 分析（还有引用计数法等），清除之后可能会有一些小的内存快，所有还有压缩的过程。</p>
+<p>下图中的灰色对象表示可以被回收的对象（根不可达）</p>
+<img src="/2018/03/14/Java-内存泄漏分析和对内存设置/image4.png" alt="image4.png" title="">
+<p>哪些对象可以成为 根 呢？ <a href="http://help.eclipse.org/luna/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fgcroots.html&amp;cp=37_2_3" target="_blank" rel="external">http://help.eclipse.org/luna/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fgcroots.html&amp;cp=37_2_3</a></p>
+<ul>
+<li>没有被任何外部对象引用的栈上的对象</li>
+<li>静态变量</li>
+<li>JNI handler 包括全局和局部</li>
+<li>系统 Class</li>
+<li>存活着的监视器</li>
+</ul>
+<h1 id="2-内存泄漏的症状"><a href="#2-内存泄漏的症状" class="headerlink" title="2 内存泄漏的症状"></a>2 内存泄漏的症状</h1><h2 id="2-1-为什么会发生-OOM-问题？"><a href="#2-1-为什么会发生-OOM-问题？" class="headerlink" title="2.1 为什么会发生 OOM 问题？"></a>2.1 为什么会发生 OOM 问题？</h2><p>内存不足会有三种情况：</p>
+<ul>
+<li>对内存不足</li>
+<li>本地内存不足</li>
+<li>Perm 内存不足</li>
+</ul>
+<p>发生 OOM 的时候，可以检查如下几个方面：</p>
+<ul>
+<li>应用程序的缓存功能</li>
+<li>大量长期活动对象</li>
+<li>对内存泄漏</li>
+<li>本地内存泄漏</li>
+</ul>
+<h2 id="2-2-内存泄漏的症状"><a href="#2-2-内存泄漏的症状" class="headerlink" title="2.2 内存泄漏的症状"></a>2.2 内存泄漏的症状</h2><p>内存泄漏一般会有如下几个症状：</p>
+<ul>
+<li>系统越来越慢，并且有 CPU 使用率过高</li>
+<li>运行一段时间后，OOM</li>
+<li>虚拟机 core dump</li>
+</ul>
+<h1 id="3-内存泄漏的定位和分析"><a href="#3-内存泄漏的定位和分析" class="headerlink" title="3 内存泄漏的定位和分析"></a>3 内存泄漏的定位和分析</h1><p>内存泄漏的分析并不复杂，但需要耐心，一般内存泄漏只能事后分析，而重现问题需要耐心。</p>
+<h2 id="3-1-对内存泄漏定位"><a href="#3-1-对内存泄漏定位" class="headerlink" title="3.1 对内存泄漏定位"></a>3.1 对内存泄漏定位</h2><p>当出现 java.lang.OutOfMemoryError: Java Heap Space 异常，就表示堆内存不足了。堆内存不足的原因有如下几种：</p>
+<ul>
+<li>堆内存设置太小</li>
+<li>内存泄漏</li>
+<li>设计不足，缓存了多余的数据</li>
+<li>如果怀疑有内存泄漏，可以添加 -verbose:gc 参数后重现启动 Java 进程，输出大致如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">8190.813: [GC 164675K-&gt;251016K(1277056K), 0.0117749 secs] #8190.813 表示垃圾回收的时间点，秒为单位。GC/Full GC 表示垃圾回收的类型</div><div class="line">8190.825: [Full GC 251016K-&gt;164654K(1277056K), 0.8142190 secs]   # 251016K表示回收前占用的内存大小，164654K 表示回收后占用的内存大小，1277056K 表示当前对内存总大小，0.8142190 表示回收耗时</div><div class="line">8191.644: [GC 164678K-&gt;251214K(1277248K), 0.0123627 secs]</div><div class="line">8191.657: [Full GC 251214K-&gt;164661K(1277248K), 0.8135393 secs]</div><div class="line">8192.478: [GC 164700K-&gt;251285K(1277376K), 0.0130357 secs]</div><div class="line">8192.491: [Full GC 251285K-&gt;164670K(1277376K), 0.8118171 secs]</div><div class="line">8193.311: [GC 164726K-&gt;251182K(1277568K), 0.0121369 secs]</div><div class="line">8193.323 : [Full GC 251182K-&gt;164644K(1277568K), 0.8186925 secs]</div><div class="line">8194.156: [GC 164766K-&gt;251028K(1277760K), 0.0123415 secs]</div><div class="line">8194.169: [Full GC 251028K-&gt;164660K(1277760K), 0.8144430 secs]</div></pre></td></tr></table></figure>
+<p>怀疑内存泄漏后，我们通过 Full GC 日志进一步确认，检查 Full GC  后的可用内存是否持续增大。步骤如下：</p>
+<ul>
+<li>获取系统稳定后的 GC 日志（不稳定的日志不可靠）</li>
+<li>过滤 FullGC 日志，可能会有如下两种情况<ul>
+<li>FullGC 后内存使用量持续增长，一直到设置的堆内存最大值，基本可以确定内存泄漏</li>
+<li>内存使用量增长后又回落，出于一个动态平衡区间，基本排除内存泄漏</li>
+</ul>
+</li>
+</ul>
+<p>GC 日志只能帮忙找到是否有泄漏，找出内存泄漏的地方，需要依赖一些其他的工具</p>
+<ul>
+<li>JProfile</li>
+<li>OptimizedIt</li>
+<li>JProbe</li>
+<li>JConsole</li>
+<li>-Xrunhprof </li>
+</ul>
+<h2 id="3-2-本地内存泄漏的定位"><a href="#3-2-本地内存泄漏的定位" class="headerlink" title="3.2 本地内存泄漏的定位"></a>3.2 本地内存泄漏的定位</h2><p>GC 日志无异常，但 Java 进程使用内存逐渐增大，并且无停止上涨的趋势。本地内存泄漏的原因有如下几个：</p>
+<ul>
+<li>JNI 调用中出现内存泄漏(JNI 调用出现内存泄漏，可以使用 C/C++ 内存泄漏分析方法定位)</li>
+<li>JDK bug</li>
+<li>操作系统问题</li>
+</ul>
+<p>本地内存泄漏可能伴有如下异常<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">java.lang.OutOfMemoryError: unable to create new native thread , Exception in thread &quot;main&quot; java.lang.OutOfMemoryError: unable to create new native thread</div><div class="line">      at java.lang.Thread.start0(Native Method)</div><div class="line">      at java.lang.Thread.start(Thread.java:574)</div><div class="line">      at TestThread.main(TestThread.java:34)</div></pre></td></tr></table></figure></p>
+<p>上面这个异常可能的原因有：</p>
+<ul>
+<li>创建的线程过多，可打印总线程数查看</li>
+<li>swap 分区不足</li>
+<li>堆内存过大，本地内存不足</li>
+</ul>
+<h2 id="3-3-Perm-区内存不足定位"><a href="#3-3-Perm-区内存不足定位" class="headerlink" title="3.3 Perm 区内存不足定位"></a>3.3 Perm 区内存不足定位</h2><p>出现 java.lang.OutOfMemoryError: PermGen space Perm ，说明 Perm 区内存不足</p>
+<ul>
+<li>依赖注入，没有卸载</li>
+<li>Perm 区太小</li>
+</ul>
+<h2 id="3-4-分析方法"><a href="#3-4-分析方法" class="headerlink" title="3.4 分析方法"></a>3.4 分析方法</h2><ol>
+<li>jmap -histo <java pid=""> &gt; objhist.log,  </java></li>
+<li>如果系统已经 OutOfMemory，可以使用  jmap-heap:format=b<javapid> 获取内存信息</javapid></li>
+<li>添加参数 -XX:+HeapDumpOnOutOfMemoryError-XX:HeapDumpPath=”$PATH” 当发生 OOM 时会收集相应信息</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;1-内存泄漏的背景知识&quot;&gt;&lt;a href=&quot;#1-内存泄漏的背景知识&quot; class=&quot;headerlink&quot; title=&quot;1 内存泄漏的背景知识&quot;&gt;&lt;/a&gt;1 内存泄漏的背景知识&lt;/h1&gt;&lt;p&gt;为了判断 Java 中是否有内存泄漏，我们首先必须了解 Java 是如何管理内存的。下面我们先给出一个简单的内存泄漏的例子，在这个例子中我们循环申请 Object 对象，并将所申请的对象放入一个 HashMap 中，如果我们仅仅释放引用本身，那么 HashMap 仍然引用该对象，所以这个对象对 GC 来说是不可回收的。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Java" scheme="http://yoursite.com/tags/Java/"/>
+    
+      <category term="内存" scheme="http://yoursite.com/tags/%E5%86%85%E5%AD%98/"/>
+    
+      <category term="内存泄漏" scheme="http://yoursite.com/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/"/>
+    
+  </entry>
   
   <entry>
     <title>通过 Java 线程堆栈进行性能瓶颈分析</title>
@@ -319,9 +481,9 @@ ii. 虚拟机自身的代码导致的 CPU 过高，如堆内存不够导致的�
     
       <category term="Java" scheme="http://yoursite.com/tags/Java/"/>
     
-      <category term="线程堆栈" scheme="http://yoursite.com/tags/%E7%BA%BF%E7%A8%8B%E5%A0%86%E6%A0%88/"/>
-    
       <category term="JVM" scheme="http://yoursite.com/tags/JVM/"/>
+    
+      <category term="线程堆栈" scheme="http://yoursite.com/tags/%E7%BA%BF%E7%A8%8B%E5%A0%86%E6%A0%88/"/>
     
       <category term="分析" scheme="http://yoursite.com/tags/%E5%88%86%E6%9E%90/"/>
     
@@ -1480,54 +1642,6 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
       <category term="hive" scheme="http://yoursite.com/tags/hive/"/>
     
       <category term="lzo" scheme="http://yoursite.com/tags/lzo/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spark Streaming Ran out of messages before reaching ending offset 异常</title>
-    <link href="http://yoursite.com/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/"/>
-    <id>http://yoursite.com/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/</id>
-    <published>2016-12-16T06:23:13.000Z</published>
-    <updated>2017-06-03T03:39:33.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>Spark Streaming 处理数据过程中遇到 <code>Ran out of messages before reaching ending offset</code> 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）</p>
-<a id="more"></a>
-<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>通过异常栈信息，我们知道异常从 KafkaRDD.scala#211 行抛出，下面是相应代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">206 override def getNext(): R = &#123;</div><div class="line">	  if (iter == null || !iter.hasNext) &#123;</div><div class="line">208        iter = fetchBatch</div><div class="line">      &#125;</div><div class="line">210      if (!iter.hasNext) &#123;</div><div class="line">211        assert(requestOffset == part.untilOffset, errRanOutBeforeEnd(part))</div><div class="line">212        finished = true</div><div class="line">           null.asInstanceOf[R]</div><div class="line">		&#125; else &#123;</div><div class="line">		   	val item = iter.next()</div><div class="line">			if (item.offset &gt;= part.untilOffset) &#123;</div><div class="line">217 	        assert(item.offset == part.untilOffset, errOvershotEnd(item.offset, part))</div><div class="line">				finished = true</div><div class="line">				null.asInstanceOf[R]</div><div class="line">			&#125; else &#123;</div><div class="line">				requestOffset = item.nextOffset</div><div class="line">				messageHandler(new MessageAndMetadata(</div><div class="line">				part.topic, part.partition, item.message, item.offset, keyDecoder, valueDecoder))</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">226    &#125;</div></pre></td></tr></table></figure>
-<p>通过分析，我们知道这个地方是实际从 Kafka 读取数据的逻辑，首先会调用 <code>fetchBatch</code> 函数（208 行），然后进行逻辑判断，数据是否读取完毕，是否发生异常</p>
-<p>其中 211 行的异常表示还未读取到 part.untilOffset 但是当前迭代器中没有数据了；217 行表示当前读取的数据如果超过了 part.untilOffset ，那么在这个时候退出当前 batch（offset 从 fromOffset 逐次加一增加的，正常的逻辑肯定会和 part.untilOffset 相等）</p>
-<p>我们知道异常从 211 行抛出来的，也知道了异常的最直接原因，那么这个原因是什么造成的呢？</p>
-<p>211 行的代码执行了，也就是 210 行的 if 语句未 true，这样的话，207 行的逻辑也应该为 true。这样的话 iter 就是 fetchBatch 返回的迭代器了。接下来我们看看 fetchBatch 的代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">188 private def fetchBatch: Iterator[MessageAndOffset] = &#123;</div><div class="line">189      val req = new FetchRequestBuilder()</div><div class="line">190         .addFetch(part.topic, part.partition, requestOffset, kc.config.fetchMessageMaxBytes)</div><div class="line">			.build()</div><div class="line">192      val resp = consumer.fetch(req)</div><div class="line">	   	 handleFetchErr(resp)</div><div class="line">		// kafka may return a batch that starts before the requested offset</div><div class="line">		 resp.messageSet(part.topic, part.partition)</div><div class="line">196       .iterator</div><div class="line">          .dropWhile(_.offset &lt; requestOffset)</div><div class="line">		&#125;</div></pre></td></tr></table></figure></p>
-<p>我们发现 192 行会通过 consumer 从 kafka 获取数据，本次从哪获取数据，以及获取多少分别由 190 行的 <code>topic</code>, <code>partition</code> 和 <code>kc.config.fetchMessageMaxBytes</code> 指定。我们查看 <code>kc.config.fetchMessageMaxBytes</code>，发现默认使用的是 1M</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">ConsumerConfig.scala</div><div class="line">29 val FetchSize = 1024 * 1024</div><div class="line"></div><div class="line">114 val fetchMessageMaxBytes = props.getInt(&quot;fetch.message.max.bytes&quot;, FetchSize)</div></pre></td></tr></table></figure>
-<p>从这里我们知道每次从 kafka 上最多获取 1M 的数据（这也是为什么需要在 <code>KafkaRDD.getNext</code> 函数的开头通过 <code>iter.hasNext()</code> 来判断是否需要调用 <code>fetchBatch</code> </p>
-<p>然后看到 fetchBatch 函数对应的 196 行，获取迭代器作为返回值，查看相应代码，跳转到 <code>ByteBufferMessageSet.scala</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">139 override def iterator: Iterator[MessageAndOffset] = internalIterator()</div><div class="line">145 private def internalIterator(isShallow: Boolean = false): Iterator[MessageAndOffset] = &#123;</div><div class="line">		    new IteratorTemplate[MessageAndOffset] &#123;</div><div class="line">				        ......</div><div class="line">152      def makeNextOuter: MessageAndOffset = &#123;</div><div class="line">             // if there isn&apos;t at least an offset and size, we are done</div><div class="line">			if (topIter.remaining &lt; 12)</div><div class="line">				return allDone()</div><div class="line">			    val offset = topIter.getLong()</div><div class="line">			    val size = topIter.getInt()</div><div class="line">		        if(size &lt; Message.MinHeaderSize)</div><div class="line">			         throw new InvalidMessageException(&quot;Message found with corrupt size (&quot; + size + &quot;)&quot;)</div><div class="line">					</div><div class="line">160       // we have an incomplete message</div><div class="line">161       if(topIter.remaining &lt; size)</div><div class="line">162         return allDone()</div><div class="line">		....</div><div class="line">185     &#125;</div></pre></td></tr></table></figure>
-<p>从 161 行我们可以看出，如果读取的消息是一条不完整的，那么本次不处理，默认本次消息读取完成。<br>上面所有的链条穿起来就抛出了我们文章开始的异常。</p>
-<pre><code>1. 从 kafka 读取 1M 的数据（默认大小）
-2. 发现读取的数据不完整（这个消息的大小大于 1M），所以本次读取的 迭代器 为空
-3. 发现迭代器为空，但是当前的 offset 和 part.untilOffset 不想等，抛出异常
-</code></pre><h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通过设置 kafkaParam 的参数 <code>fetch.message.max.bytes</code> 就行了，我们设置成 2M（大于一条数据的最大值即可），就能够运行成功了</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;现象&quot;&gt;&lt;a href=&quot;#现象&quot; class=&quot;headerlink&quot; title=&quot;现象&quot;&gt;&lt;/a&gt;现象&lt;/h2&gt;&lt;p&gt;Spark Streaming 处理数据过程中遇到 &lt;code&gt;Ran out of messages before reaching ending offset&lt;/code&gt; 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
-    
-    
-      <category term="spark" scheme="http://yoursite.com/tags/spark/"/>
-    
-      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
-    
-      <category term="spark-streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
-    
-      <category term="exception" scheme="http://yoursite.com/tags/exception/"/>
-    
-      <category term="ran_out_of_messages" scheme="http://yoursite.com/tags/ran-out-of-messages/"/>
     
   </entry>
   

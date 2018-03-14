@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>第 2 页 | klion26</title>
+  <title>Page 2 | klion26</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="个人博客，记录自己成长的点点滴滴">
@@ -121,6 +121,53 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2017-07-14 </div>
+			<div class="article-title"><a href="/2017/07/14/tmux-简单使用指南/" >tmux 简单使用指南</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<h1 id="Tmux-的简单使用说明"><a href="#Tmux-的简单使用说明" class="headerlink" title="Tmux 的简单使用说明"></a>Tmux 的简单使用说明</h1><blockquote>
+<p>工欲善其事，必先利其器</p>
+</blockquote>
+<p>Tmux 是一个多窗口管理程序。可以让用户在一个地方管理多个终端。而不需要在不同的终端间来回切换。</p>
+<h2 id="在-Mac-下如何安装"><a href="#在-Mac-下如何安装" class="headerlink" title="在 Mac 下如何安装"></a>在 Mac 下如何安装</h2><p>直接使用 <code>brew install tmux</code> 就可以了，如果没有 brew，则需要先安装 brew，然后再执行上述命令。</p>
+<h2 id="简单使用流程"><a href="#简单使用流程" class="headerlink" title="简单使用流程"></a>简单使用流程</h2><p>首先，需要了解 tmux 中的几个概念。session，window 以及 pane。这几者的关系如下，tmux 中可以起多个 session，每个 session 可以启动多个 window，然后每个 window 可以启动多个 pane。</p>
+<p>这里给一个基本的流程</p>
+<ol>
+<li><p>启动 tmux（默认会启动一个 session）<br>使用 <code>tmux</code> 启动 tmux，使用 <code>exit</code> 退出 tmux，session 的命名默认是从 0 开始，一直往上加</p>
+</li>
+<li><p>在 session 中启动一个 window<br><code>PREFIX c</code> 会在当前 session 中创建一个 window, 其中 <code>PREFIX</code> 表示 tmux 中的命令前缀符（该条命令表示，先按下 PREFIX，然后按下 c)，</p>
+</li>
+<li><p>在启动的 window 中创建一个 pane<br><code>PREFIX %</code> 竖直方向切分一个 window，<code>PREFIX &quot;</code> 横向切分一个 window。这样就能够在 window 中创建 pane 了。基本的这些就够了。</p>
+</li>
+<li><p>如何在 session，window，pane 中进行移动<br>能够创建 session，window，pane 了，接下来就是如何在 session，window，pane 间进行移动了。<br><code>PREFIX s</code> 会列出所有 session，然后进行具体的选择（可以上下移动光标，然后按 ENTRER 确定）<br><code>PREFIX w</code> 可以列出所有的 window，然后进行具体的筛选<br><code>PREFIX n</code> 可以切换到下一个 window<br><code>PREFIX p</code> 可以切换到上一个 window<br><code>PREFIX &amp;</code> 可以关闭当前 window<br><code>PREFIX o</code> 可以在 pane 之间进行跳转<br><code>tmux ls</code> 会列出当前所有的 session（在非 tmux 环境下）</p>
+</li>
+</ol>
+<h2 id="自定义-tmux"><a href="#自定义-tmux" class="headerlink" title="自定义 tmux"></a>自定义 tmux</h2><p>tmux 的配置文件可以保存在两个地方</p>
+<ol>
+<li>/etc/tmux.conf</li>
+<li>~/.tmux.conf</li>
+</ol>
+<p>其中 2 的优先级会更高，1 的影响面更广</p>
+<h2 id="接下来做什么"><a href="#接下来做什么" class="headerlink" title="接下来做什么"></a>接下来做什么</h2><p>上面的仅仅是一个入门文档，也就是最少基本知识，接下来就是多实践。推荐一本小书《tmux productive mouse-free development》</p>
+<img src="/2017/07/14/tmux-简单使用指南/tmux_pic.png" alt="tmux_pic.png" title="">
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2017-06-20 </div>
 			<div class="article-title"><a href="/2017/06/20/风险不仅仅是事件发生的概率/" >风险不仅仅是事件发生的概率</a></div>						
 		</h3>
@@ -136,7 +183,7 @@
 </blockquote>
 <p>风险在生活中处处存在，可能我们会想冒个险没啥关系，反正发生的概率小，而且在某些时候会有高收益/回报伴随这风险，这个时候就更有诱惑力了，总有人希望通过冒险得到高回报，但这恰恰是不可取的，是非常危险的。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/06/20/风险不仅仅是事件发生的概率/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/06/20/风险不仅仅是事件发生的概率/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -160,7 +207,7 @@
 	
 		<p>本文作为一个问题追查过程的复盘记录，主要希望找出自己在解决问题中可以优化改进的地方。以后遇到问题，能够快速的进行定位，解决。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -187,7 +234,7 @@
 </blockquote>
 <p>在 Spark Streaming 作业中，每个作业会消费一个或多个 topic，但是这些 topic 需要在作业启动之前确定好，在作业运行中不能进行调整，之前<a href="https://klion26.github.io/2016/11/01/spark-streaming-topic-partition-change-auto-adaptive/" target="_blank" rel="external">修改了源码</a>做到了自适应 topic partition 扩容的情况，但是无法动态调整消费的 topic。现在需要在不重启作业的情况下，动态调整消费的 topic。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -211,7 +258,7 @@
 	
 		<p><a href="http://metrics.dropwizard.io" target="_blank" rel="external">metric-core</a> 是一个 java metric 库，用于统计 JVM 层面以及 服务级别 的各种 metric 信息。其中 metric-core 是其核心模块，代码量不多，总共 44 个文件，5700 行左右代码（包括注释）。算是一个很小的开源项目了。由于 metric 在所有项目中都非常重要，因此选择通读该项目，本文分析 metrci-core 中的抽样算法。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/05/29/从源码级别分析-metric-core-的抽样算法/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -235,7 +282,7 @@
 	
 		<p>本文基于 spark 1.6.2<br>本次的源码全来自 <code>org.apache.spark.streaming.receiver</code> 这个 package 下，包括 <code>BlockGenerator.scala</code>, <code>RateLimiter</code>, <code>ReceiverdBlock.scala</code>, <code>ReceivedBlockHandler.scala</code>, <code>Receiver.scala</code>, <code>ReceiverSupervisor.scala</code>, <code>ReceiverSupervisorImpl.scala</code></p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/05/19/Streaming-中-Receiver-相关源码分析/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/05/19/Streaming-中-Receiver-相关源码分析/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -271,7 +318,7 @@
 </ol>
 <p>上述总结肯定有片面的地方，也有不全的地方，欢迎指出</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/05/10/Python-代码实践小结/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/05/10/Python-代码实践小结/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -301,7 +348,7 @@
 <p>其次，我遇到过这种情况，自己想着是这么回事，可是写下来的时候，发现无从下笔，根本写不出来，写出来之后，也很难向别人清楚、准确的表达自己的意思。这归根结底还是没有思考清楚导致的，而写作可以帮助我整理自己的思路。</p>
 <p>然后，当过客服的人肯定有一个体会，客服非常耗时间，而这些客服的问题大部分是差不多的，一对一的客服是非常低效的，就算在群组里面进行客服，其实很多后来遇到同样问题的人也是不看群历史记录（或者不知道以前有人遇到过类似的问题）的。这种情况下，虽然文档不是最优解，但能够省出自己足够多的时间，实际上这是一件杠杆率非常高（产出投入比高）的事件。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/04/15/从现在开始写作/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/04/15/从现在开始写作/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -325,7 +372,7 @@
 	
 		<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>一批 Spark Streaming 会统一在每分钟的 00 秒开始消费 kafka 数据</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/02/16/spark-streaming-consume-kafka-at-00-second-of-every-minute/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -349,31 +396,7 @@
 	
 		<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将数据从 Kafka 同步到 Hive，并且目标格式希望是 lzo。我们通过 Spark Streaming 做这件事，将文件写成 lzo 格式，并且添加索引。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/#more" class="btn btn-default more">阅读此文</a>
-	
-	</div>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2016-12-16 </div>
-			<div class="article-title"><a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" >Spark Streaming Ran out of messages before reaching ending offset 异常</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>Spark Streaming 处理数据过程中遇到 <code>Ran out of messages before reaching ending offset</code> 异常，导致程序一直 hang 住（因为我们希望接上次消费从而不丢失数据）</p>
-		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/#more" class="btn btn-default more">阅读此文</a>
+		<a type="button" href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -390,13 +413,13 @@
 <ul class="pagination">
 	 
 		
-    	<li class="prev"><a href="/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
+    	<li class="prev"><a href="/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
   		
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/3/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/3/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -416,7 +439,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -425,7 +448,7 @@
 		
 			
 	<div class="widget">
-		<h4>分类</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -458,13 +481,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -482,9 +505,9 @@
 		
 			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
-		
 			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
 			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
 		
@@ -492,9 +515,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
-		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -508,51 +531,51 @@
 		
 			
 	<div class="widget">
-		<h4>标签云</h4>
+		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/json/">json<span>1</span></a></li>
+			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
 		
-			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
+			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
 		
-			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
 		
-			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
-		
-			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
+			<li><a href="/tags/成长/">成长<span>1</span></a></li>
 		
 			<li><a href="/tags/exercise/">exercise<span>8</span></a></li>
 		
-			<li><a href="/tags/file-system/">file-system<span>1</span></a></li>
+			<li><a href="/tags/lzo/">lzo<span>1</span></a></li>
 		
-			<li><a href="/tags/reservior/">reservior<span>1</span></a></li>
+			<li><a href="/tags/内存/">内存<span>1</span></a></li>
 		
-			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
+			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
 		
-			<li><a href="/tags/text-plain/">text/plain<span>1</span></a></li>
+			<li><a href="/tags/vi/">vi<span>2</span></a></li>
 		
-			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
+			<li><a href="/tags/thinking/">thinking<span>2</span></a></li>
 		
-			<li><a href="/tags/databse/">databse<span>1</span></a></li>
+			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
 		
-			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
+			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
+		
+			<li><a href="/tags/stack/">stack<span>1</span></a></li>
+		
+			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
+		
+			<li><a href="/tags/mit/">mit<span>2</span></a></li>
 		
 			<li><a href="/tags/svm/">svm<span>1</span></a></li>
 		
-			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
+			<li><a href="/tags/partition/">partition<span>1</span></a></li>
 		
-			<li><a href="/tags/hive/">hive<span>1</span></a></li>
+			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
 		
-			<li><a href="/tags/Java/">Java<span>2</span></a></li>
+			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/array/">array<span>1</span></a></li>
-		
-			<li><a href="/tags/风险/">风险<span>1</span></a></li>
-		
-			<li><a href="/tags/select/">select<span>2</span></a></li>
+			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>302</span></a></li>
+		   <li><a href="/tags">...<span>304</span></a></li>
 		 
 		</ul>
 	</div>
@@ -561,8 +584,12 @@
 		
 			
 <div class="widget">
-  <h4>最新文章</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
+      </li>
     
       <li>
         <a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" ><i class="fa fa-file-o"></i>通过 Java 线程堆栈进行性能瓶颈分析</a>
@@ -580,17 +607,13 @@
         <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
       </li>
     
-      <li>
-        <a href="/2017/11/27/TaskScheduler/" ><i class="fa fa-file-o"></i>TaskScheduler</a>
-      </li>
-    
   </ul>
 </div>
 
 		
 			
 <div class="widget">
-	<h4>链接</h4>
+	<h4>Links</h4>
 	<ul class="blogroll list-unstyled">
 	
 		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>
