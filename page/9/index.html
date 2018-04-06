@@ -121,6 +121,32 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2012-12-10 </div>
+			<div class="article-title"><a href="/2012/12/10/implicit-declaration-of-function-class-device-create/" >Implicit declaration of function class_device_create</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>在学习PLP的时候，编译Linux驱动时遇到上述错误，查了下发现是函数名已经变了。</p>
+<p>从2.6就开始不用class_device_create和class_device_destroy，取而代之的是下面两个函数</p>
+<p>device_create和device_destroy.改过来之后就没问题了，不过在新内核下编译好多现象都不一样，虽然都实现了相同的功能。</p>
+<p>另外Implicit declaration of function的warning有可能是因为你没有包含头文件所致。比如你用了memset，但是没有包含string.h头文件。另外如果你把函数写错的话也有可能出现上述错误的。比如我在用class_destroy的时候，写成了class_destory，然后找了十多分钟，一直未果。最后突然发现这个，原来敲错函数名了。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2012-12-03 </div>
 			<div class="article-title"><a href="/2012/12/03/first-linux-module-lvm/" >第一个Linux可装载模块</a></div>						
 		</h3>
@@ -151,7 +177,7 @@
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#x61;&#x69;&#108;&#116;&#x6f;&#58;&#106;&#x63;&#109;&#x40;&#106;&#111;&#110;&#109;&#97;&#x73;&#116;&#x65;&#x72;&#x73;&#x2e;&#111;&#x72;&#x67;">&#106;&#x63;&#109;&#x40;&#106;&#111;&#110;&#109;&#97;&#x73;&#116;&#x65;&#x72;&#x73;&#x2e;&#111;&#x72;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#105;&#108;&#x74;&#x6f;&#x3a;&#106;&#99;&#x6d;&#x40;&#106;&#111;&#110;&#x6d;&#97;&#115;&#x74;&#x65;&#114;&#x73;&#46;&#x6f;&#x72;&#x67;">&#106;&#99;&#x6d;&#x40;&#106;&#111;&#110;&#x6d;&#97;&#115;&#x74;&#x65;&#114;&#x73;&#46;&#x6f;&#x72;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -453,30 +479,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-10-23 </div>
-			<div class="article-title"><a href="/2012/10/23/google-adsense/" >Google Adsense</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>在很早以前，就注册了google adsense了。可是一直没有放上来，总觉得找不到合适的位置，最近和朋友聊天的时候，有扯到了google adsense这东西了，才发现原来很早以前我就已经注册了这东西，自己都给忘了。现在，在每篇文章的最下方都加了一个广告，先试试效果再说，其实页面的右下方也可以放的，那里一直空着，等这个实验一段时间之后，再考虑在右边是否添加广告。广告还请各位多多支持，哈哈。</p>
-<p>对于如何申请和投放google adsense，在<a href="https://www.google.com/adsense/support/bin/answer.py?answer=10192topic=8434&amp;sourceid=aso&amp;subid=ww-zh_CN-et-asblog_2008-2-20&amp;medium=link" target="_blank" rel="external">这里</a>可以看到相应的操作。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -559,9 +561,9 @@
 		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
-		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -589,9 +591,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -608,48 +610,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
+			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
 		
-			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+			<li><a href="/tags/MemoryStateBackend/">MemoryStateBackend<span>1</span></a></li>
 		
-			<li><a href="/tags/top排序/">top排序<span>2</span></a></li>
+			<li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
 		
-			<li><a href="/tags/shell/">shell<span>5</span></a></li>
+			<li><a href="/tags/network/">network<span>1</span></a></li>
 		
-			<li><a href="/tags/paper/">paper<span>1</span></a></li>
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
 		
-			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
+			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/数学/">数学<span>5</span></a></li>
+			<li><a href="/tags/成长/">成长<span>1</span></a></li>
 		
-			<li><a href="/tags/program/">program<span>1</span></a></li>
+			<li><a href="/tags/exception/">exception<span>1</span></a></li>
 		
-			<li><a href="/tags/topic/">topic<span>1</span></a></li>
+			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
 		
-			<li><a href="/tags/https/">https<span>1</span></a></li>
+			<li><a href="/tags/yum/">yum<span>1</span></a></li>
 		
-			<li><a href="/tags/text-plain/">text/plain<span>1</span></a></li>
+			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
 		
-			<li><a href="/tags/project/">project<span>1</span></a></li>
+			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
 		
-			<li><a href="/tags/go/">go<span>1</span></a></li>
+			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+		
+			<li><a href="/tags/半平面交/">半平面交<span>1</span></a></li>
+		
+			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
+		
+			<li><a href="/tags/mit/">mit<span>2</span></a></li>
+		
+			<li><a href="/tags/git/">git<span>5</span></a></li>
 		
 			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
 		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/火柴棍式程序题/">火柴棍式程序题<span>1</span></a></li>
-		
-			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
-		
-			<li><a href="/tags/filter/">filter<span>1</span></a></li>
-		
-			<li><a href="/tags/概率/">概率<span>1</span></a></li>
-		
-			<li><a href="/tags/partition/">partition<span>1</span></a></li>
+			<li><a href="/tags/stage/">stage<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>304</span></a></li>
+		   <li><a href="/tags">...<span>308</span></a></li>
 		 
 		</ul>
 	</div>
@@ -660,6 +662,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
+      </li>
     
       <li>
         <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
@@ -675,10 +681,6 @@
     
       <li>
         <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
       </li>
     
   </ul>

@@ -121,6 +121,30 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2017-01-15 </div>
+			<div class="article-title"><a href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/" >Spark Streaming 往 HDFS 追加 LZO 文件</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将数据从 Kafka 同步到 Hive，并且目标格式希望是 lzo。我们通过 Spark Streaming 做这件事，将文件写成 lzo 格式，并且添加索引。</p>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/#more" class="btn btn-default more">Read More</a>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2016-12-16 </div>
 			<div class="article-title"><a href="/2016/12/16/spark-streaming-ran-out-of-messages-before-reaching-ending-offset/" >Spark Streaming Ran out of messages before reaching ending offset 异常</a></div>						
 		</h3>
@@ -531,34 +555,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2016-07-14 </div>
-			<div class="article-title"><a href="/2016/07/14/spark-streaming-save-offset-to-zookeeper/" >Spark Streaming 中使用 zookeeper 保存 offset 并重用</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>在 Spark Streaming 中消费 Kafka 数据的时候，有两种方式分别是 1）基于 Receiver-based 的 createStream 方法和 2）Direct Approach (No Receivers) 方式的 createDirectStream 方法，详细的可以参考 <a href="http://spark.apache.org/docs/latest/streaming-kafka-integration.html" target="_blank" rel="external">Spark Streaming + Kafka Integration Guide</a>，但是第二种使用方式中  kafka 的 offset 是保存在 checkpoint 中的，如果程序重启的话，会丢失一部分数据，可以参考  <a href="http://aseigneurin.github.io/2016/05/07/spark-kafka-achieving-zero-data-loss.html" target="_blank" rel="external">Spark  Kafka - Achieving zero data-loss</a>。</p>
-<p>本文主要讲在使用第二种消费方式（Direct Approach）的情况下，如何将 kafka 中的 offset 保存到 zookeeper 中，以及如何从 zookeeper 中读取已存在的 offset。</p>
-<p>大致思想就是，在初始化 kafka stream 的时候，查看 zookeeper 中是否保存有 offset，有就从该 offset 进行读取，没有就从最新/旧进行读取。在消费 kafka 数据的同时，将每个 partition 的 offset 保存到 zookeeper 中进行备份，具体实现参考下面代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">val topic : String = &quot;topic_name&quot;   //消费的 topic 名字</div><div class="line">   val topics : Set[String] = Set(topic)                    //创建 stream 时使用的 topic 名字集合</div><div class="line"></div><div class="line">   val topicDirs = new ZKGroupTopicDirs(&quot;test_spark_streaming_group&quot;, topic)  //创建一个 ZKGroupTopicDirs 对象，对保存</div><div class="line">   val zkTopicPath = s&quot;$&#123;topicDirs.consumerOffsetDir&#125;&quot;          获取 zookeeper 中的路径，这里会变成 /consumers/test_spark_streaming_group/offsets/topic_name</div><div class="line"></div><div class="line">   val zkClient = new ZkClient(&quot;10.4.232.77:2181&quot;)          //zookeeper 的host 和 ip，创建一个 client</div><div class="line">   val children = zkClient.countChildren(s&quot;$&#123;topicDirs.consumerOffsetDir&#125;&quot;)     //查询该路径下是否字节点（默认有字节点为我们自己保存不同 partition 时生成的）</div><div class="line"></div><div class="line">   var kafkaStream : InputDStream[(String, String)] = null   </div><div class="line">   var fromOffsets: Map[TopicAndPartition, Long] = Map()   //如果 zookeeper 中有保存 offset，我们会利用这个 offset 作为 kafkaStream 的起始位置</div><div class="line"></div><div class="line">   if (children &gt; 0) &#123;   //如果保存过 offset，这里更好的做法，还应该和  kafka 上最小的 offset 做对比，不然会报 OutOfRange 的错误</div><div class="line">       for (i &lt;- 0 until children) &#123;</div><div class="line">         val partitionOffset = zkClient.readData[String](s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;i&#125;&quot;)</div><div class="line">         val tp = TopicAndPartition(topic, i)</div><div class="line">         fromOffsets += (tp -&gt; partitionOffset.toLong)  //将不同 partition 对应的 offset 增加到 fromOffsets 中</div><div class="line">         logInfo(&quot;@@@@@@ topic[&quot; + topic + &quot;] partition[&quot; + i + &quot;] offset[&quot; + partitionOffset + &quot;] @@@@@@&quot;)</div><div class="line">       &#125;</div><div class="line"></div><div class="line">       val messageHandler = (mmd : MessageAndMetadata[String, String]) =&gt; (mmd.topic, mmd.message())  //这个会将 kafka 的消息进行 transform，最终 kafak 的数据都会变成 (topic_name, message) 这样的 tuple</div><div class="line">       kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParam, fromOffsets, messageHandler)</div><div class="line">   &#125;</div><div class="line">   else &#123;</div><div class="line">       kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParam, topics) //如果未保存，根据 kafkaParam 的配置使用最新或者最旧的 offset</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   var offsetRanges = Array[OffsetRange]()</div><div class="line">   kafkaStream.transform&#123; rdd =&gt;</div><div class="line">     offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges //得到该 rdd 对应 kafka 的消息的 offset</div><div class="line">     rdd</div><div class="line">   &#125;.map(msg =&gt; msg._2).foreachRDD &#123; rdd =&amp;gt;     </div><div class="line">     for (o &lt;- offsetRanges) &#123;</div><div class="line">       val zkPath = s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;o.partition&#125;&quot;</div><div class="line">       ZkUtils.updatePersistentPath(zkClient, zkPath, o.fromOffset.toString)  //将该 partition 的 offset 保存到 zookeeper</div><div class="line">       logInfo(s&quot;@@@@@@ topic  $&#123;o.topic&#125;  partition $&#123;o.partition&#125;  fromoffset $&#123;o.fromOffset&#125;  untiloffset $&#123;o.untilOffset&#125; #######&quot;)</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     rdd.foreachPartition(</div><div class="line">       message =&gt; &#123;</div><div class="line">         while(message.hasNext) &#123;</div><div class="line">           logInfo(s&quot;@^_^@   [&quot; + message.next() + &quot;] @^_^@&quot;)</div><div class="line">         &#125;</div><div class="line">       &#125;</div><div class="line">     )</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<p>使用上面的代码，我们可以做到 Spark Streaming 程序从 Kafka 中读取数据是不丢失</p>
-<p>欢迎阅读<a href="http://www.klion26.com/spark-streaming-saving-offset-in-zookeeper-2.html" target="_blank" rel="external">第二篇文章</a>，解决 offset out of range 的问题</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -641,9 +637,9 @@
 		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
-		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -671,9 +667,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -690,48 +686,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/english/">english<span>1</span></a></li>
+			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
 		
-			<li><a href="/tags/job/">job<span>1</span></a></li>
+			<li><a href="/tags/沟通/">沟通<span>1</span></a></li>
 		
-			<li><a href="/tags/windows/">windows<span>4</span></a></li>
+			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
 		
-			<li><a href="/tags/file-system/">file-system<span>1</span></a></li>
+			<li><a href="/tags/project/">project<span>1</span></a></li>
 		
-			<li><a href="/tags/knapsack/">knapsack<span>1</span></a></li>
+			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
 		
-			<li><a href="/tags/metric-core/">metric-core<span>1</span></a></li>
+			<li><a href="/tags/test/">test<span>1</span></a></li>
 		
-			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
+			<li><a href="/tags/update/">update<span>1</span></a></li>
 		
-			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
 		
-			<li><a href="/tags/rm/">rm<span>1</span></a></li>
+			<li><a href="/tags/RocksDBStateBackend/">RocksDBStateBackend<span>1</span></a></li>
 		
-			<li><a href="/tags/bfs/">bfs<span>1</span></a></li>
+			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
 		
-			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
+			<li><a href="/tags/prim/">prim<span>1</span></a></li>
+		
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+		
+			<li><a href="/tags/线程堆栈/">线程堆栈<span>2</span></a></li>
+		
+			<li><a href="/tags/command/">command<span>1</span></a></li>
 		
 			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
 		
-			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
+			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
 		
-			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
+			<li><a href="/tags/RecurringTimer/">RecurringTimer<span>1</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/json/">json<span>1</span></a></li>
 		
-			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
+			<li><a href="/tags/hash/">hash<span>1</span></a></li>
 		
-			<li><a href="/tags/dbm/">dbm<span>1</span></a></li>
-		
-			<li><a href="/tags/博弈/">博弈<span>3</span></a></li>
-		
-			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
-		
-			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
+			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>304</span></a></li>
+		   <li><a href="/tags">...<span>308</span></a></li>
 		 
 		</ul>
 	</div>
@@ -742,6 +738,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
+      </li>
     
       <li>
         <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
@@ -757,10 +757,6 @@
     
       <li>
         <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
       </li>
     
   </ul>

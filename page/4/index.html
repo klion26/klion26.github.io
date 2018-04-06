@@ -121,6 +121,34 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2016-07-14 </div>
+			<div class="article-title"><a href="/2016/07/14/spark-streaming-save-offset-to-zookeeper/" >Spark Streaming 中使用 zookeeper 保存 offset 并重用</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>在 Spark Streaming 中消费 Kafka 数据的时候，有两种方式分别是 1）基于 Receiver-based 的 createStream 方法和 2）Direct Approach (No Receivers) 方式的 createDirectStream 方法，详细的可以参考 <a href="http://spark.apache.org/docs/latest/streaming-kafka-integration.html" target="_blank" rel="external">Spark Streaming + Kafka Integration Guide</a>，但是第二种使用方式中  kafka 的 offset 是保存在 checkpoint 中的，如果程序重启的话，会丢失一部分数据，可以参考  <a href="http://aseigneurin.github.io/2016/05/07/spark-kafka-achieving-zero-data-loss.html" target="_blank" rel="external">Spark  Kafka - Achieving zero data-loss</a>。</p>
+<p>本文主要讲在使用第二种消费方式（Direct Approach）的情况下，如何将 kafka 中的 offset 保存到 zookeeper 中，以及如何从 zookeeper 中读取已存在的 offset。</p>
+<p>大致思想就是，在初始化 kafka stream 的时候，查看 zookeeper 中是否保存有 offset，有就从该 offset 进行读取，没有就从最新/旧进行读取。在消费 kafka 数据的同时，将每个 partition 的 offset 保存到 zookeeper 中进行备份，具体实现参考下面代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">val topic : String = &quot;topic_name&quot;   //消费的 topic 名字</div><div class="line">   val topics : Set[String] = Set(topic)                    //创建 stream 时使用的 topic 名字集合</div><div class="line"></div><div class="line">   val topicDirs = new ZKGroupTopicDirs(&quot;test_spark_streaming_group&quot;, topic)  //创建一个 ZKGroupTopicDirs 对象，对保存</div><div class="line">   val zkTopicPath = s&quot;$&#123;topicDirs.consumerOffsetDir&#125;&quot;          获取 zookeeper 中的路径，这里会变成 /consumers/test_spark_streaming_group/offsets/topic_name</div><div class="line"></div><div class="line">   val zkClient = new ZkClient(&quot;10.4.232.77:2181&quot;)          //zookeeper 的host 和 ip，创建一个 client</div><div class="line">   val children = zkClient.countChildren(s&quot;$&#123;topicDirs.consumerOffsetDir&#125;&quot;)     //查询该路径下是否字节点（默认有字节点为我们自己保存不同 partition 时生成的）</div><div class="line"></div><div class="line">   var kafkaStream : InputDStream[(String, String)] = null   </div><div class="line">   var fromOffsets: Map[TopicAndPartition, Long] = Map()   //如果 zookeeper 中有保存 offset，我们会利用这个 offset 作为 kafkaStream 的起始位置</div><div class="line"></div><div class="line">   if (children &gt; 0) &#123;   //如果保存过 offset，这里更好的做法，还应该和  kafka 上最小的 offset 做对比，不然会报 OutOfRange 的错误</div><div class="line">       for (i &lt;- 0 until children) &#123;</div><div class="line">         val partitionOffset = zkClient.readData[String](s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;i&#125;&quot;)</div><div class="line">         val tp = TopicAndPartition(topic, i)</div><div class="line">         fromOffsets += (tp -&gt; partitionOffset.toLong)  //将不同 partition 对应的 offset 增加到 fromOffsets 中</div><div class="line">         logInfo(&quot;@@@@@@ topic[&quot; + topic + &quot;] partition[&quot; + i + &quot;] offset[&quot; + partitionOffset + &quot;] @@@@@@&quot;)</div><div class="line">       &#125;</div><div class="line"></div><div class="line">       val messageHandler = (mmd : MessageAndMetadata[String, String]) =&gt; (mmd.topic, mmd.message())  //这个会将 kafka 的消息进行 transform，最终 kafak 的数据都会变成 (topic_name, message) 这样的 tuple</div><div class="line">       kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParam, fromOffsets, messageHandler)</div><div class="line">   &#125;</div><div class="line">   else &#123;</div><div class="line">       kafkaStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParam, topics) //如果未保存，根据 kafkaParam 的配置使用最新或者最旧的 offset</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   var offsetRanges = Array[OffsetRange]()</div><div class="line">   kafkaStream.transform&#123; rdd =&gt;</div><div class="line">     offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges //得到该 rdd 对应 kafka 的消息的 offset</div><div class="line">     rdd</div><div class="line">   &#125;.map(msg =&gt; msg._2).foreachRDD &#123; rdd =&amp;gt;     </div><div class="line">     for (o &lt;- offsetRanges) &#123;</div><div class="line">       val zkPath = s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;o.partition&#125;&quot;</div><div class="line">       ZkUtils.updatePersistentPath(zkClient, zkPath, o.fromOffset.toString)  //将该 partition 的 offset 保存到 zookeeper</div><div class="line">       logInfo(s&quot;@@@@@@ topic  $&#123;o.topic&#125;  partition $&#123;o.partition&#125;  fromoffset $&#123;o.fromOffset&#125;  untiloffset $&#123;o.untilOffset&#125; #######&quot;)</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     rdd.foreachPartition(</div><div class="line">       message =&gt; &#123;</div><div class="line">         while(message.hasNext) &#123;</div><div class="line">           logInfo(s&quot;@^_^@   [&quot; + message.next() + &quot;] @^_^@&quot;)</div><div class="line">         &#125;</div><div class="line">       &#125;</div><div class="line">     )</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>使用上面的代码，我们可以做到 Spark Streaming 程序从 Kafka 中读取数据是不丢失</p>
+<p>欢迎阅读<a href="http://www.klion26.com/spark-streaming-saving-offset-in-zookeeper-2.html" target="_blank" rel="external">第二篇文章</a>，解决 offset out of range 的问题</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2016-06-11 </div>
 			<div class="article-title"><a href="/2016/06/11/asking-the-right-questions/" >Asking The Right Questions</a></div>						
 		</h3>
@@ -853,31 +881,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2015-02-18 </div>
-			<div class="article-title"><a href="/2015/02/18/everything-about-2014/" >痛·快二零一四</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>今年外婆去世了，以前总想着以后应该会有机会孝顺她，结果在自己毕业前她去世了，自从读大学以来，每年去看她的机会也变的越来越少，后来几次去看她，她一直和我说我妈不容易，让我以后要孝顺我妈。外婆摔伤之后，由于年龄太大不方便手术，就一直这样护理着，记得同学对我说“你外婆年龄这么大了，摔伤了，你应该有心里准备啊”。我也想过，而且外婆受伤之后，一直只能躺在床上，肯定也不好受，只是自己一直自私的想着等我毕业之后孝顺她。<br>今年终于能像朋友一样和我爸聊天了，从小时候觉得他是最厉害的人，能言善道，能文能武，慢慢的变成他也就那样，他会的我都会，甚至有些比他做的还要好，然后再到现在。其实想想我爸确实也挺厉害的，单就他的账单十多年没出过差错就够厉害的了，只是我和他不是一样的性格，中间一段时间我一直以自己的标准要求他，总是无限放大他的缺点，对他的优点进行无视。<br>明年就毕业了，学生生涯也要正式结束了。今年第一次开始找工作，大学期间搞比赛，保研，过的懒懒散散，就没想着去找工作，面过一次，也是裸面。研究生两年学的东西也很杂，基本今年才确定搞后台方向，发现自己除了会点数据结构，算法，其他的一窍不通。找实习被虐的太惨，期间把后台方向的几本基础书过了一遍，后来9月正式找工作了，阴差阳错找了一个还算过的去的工作，去做大数据存储。父母一直劝我进国企，说稳定，我想着进了国企，按自己的性格估计就废了，不善言辞，技术荒废，就等着养老。还是想趁着年轻出去闯闯，其他的再说吧。至于毕业，呵呵。<br>读了这么久的书，以前一直没有好好的想过自己为什么要读书，从小只被教育要读书，小学要求升初中，初中要求升高中，高中要求升大学，大学之后读研。却没有实实在在的考虑过自己为什么要读书，读了书之后干嘛，现在看来读了这么久的书，给我的好处就是认识到一个更大的世界。遗憾的是，读书的过程中，基本无视了人文的教育，没有好好培养自己的思辨能力，就想着怎么得到标准答案，考高分，思维习惯性的懒惰，这个要慢慢改过来,一遇到非专业问题，基本歇菜。今年下半年事情一件接着一件，在当时的自己看来，每一件都是非常重大。过程中找同学聊过天，看《少有人走的路》和其他杂书，去操场跑步。感谢四宝和PN的开导，虽然PN说的“但行好事，莫问前程”我现在还不一定能做到，只能慢慢的去实践了。幸亏买了一个kindle，无聊和心情不好的时候可以看书，看书非常方便，也让自己能顺利看完一些大部头书，看完了CSAPP，《邓小平时代》和《盗墓笔记》，据说现在《盗墓笔记》拍电视剧了，这又会毁了一部小说，虽然小说的最后还有好多坑没有填上。有段时间一直跑步，坚持了好久，结果后来天冷了就没坚持跑了。<br>以前一直活在一个很小很小的世界中，有一次和同学聊天，我说“以前以为读好书就行了，现在才发现这远远不够”，同学说“你才发现读书不够啊，不过现在发现也不晚”。自己啥也不懂，就像一个小孩子一样，不懂人情世故，听不懂别人说的话，没有爱人的能力，爱是一种能力，需要不断的学习和实践。记得有一次几个同学聚会，我问听不懂别人说话怎么办，然后眼睛同学举了两个例子，结果我顺利的没听懂，在我听来，那完全是两句不同的话，完全听出来其中一句话的话中话:(。<br>我的目标是不断的了解自己，然后接受自己，最后成为一个男人，而不是一个巨婴。要不停的告诉自己“我为什么不是一张桌子，而是一个人，我是特别的”。这是一件不容易的事情，自己会有习惯性的思维，这就需要自己时刻都能感受自己的想法，要能够自己和自己谈判，这个过程中往往就会谈崩:(。发现自己起步晚，进步慢。很多事情会不停的前进，后退，前进，后退，如此循环往复。对于自己不熟悉又重视的事情，往往会不自信，怕出错。需要把自信内化，每个人都是不一样的，都有自己的特别之处，这些特别之处才是我们之所以成为自己的根本。这些最终都可以归结到节奏上，自己需要有自己的节奏，就像有些人进退有度，怎么看怎么舒服，而节奏好只是一个结果，自己需要知道的是怎么样才能节奏好，并不断的实践。至于最终自己能做到啥样子，就像 Dota 中问“猴子，你能起来不？”一样，兵需要一个个去补，装备需要一件件去出，事情需要一件件去做，最终结果只有时间能证明。<br>现在看来，那些难受的事也不过如此，让自己知道欠下多少东西需要补，至于补不补，补到什么程度，就看自己的造化了。感谢遇到的所有人，所有事。<br>良业为取履，因长跪而履之。<br>“跳着走，是不是很好玩啊”<br>“嗯，很好玩。”<br>“那舅舅和你一起跳着走，好不好”<br>“好啊”</p>
-<p>klion26 于家</p>
-<p>二零一四年十二月三十日</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -960,9 +963,9 @@
 		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
-		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -990,9 +993,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -1009,48 +1012,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
+			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
 		
-			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+			<li><a href="/tags/append/">append<span>2</span></a></li>
 		
-			<li><a href="/tags/米聊/">米聊<span>1</span></a></li>
+			<li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li>
 		
-			<li><a href="/tags/mapreduce/">mapreduce<span>1</span></a></li>
+			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
 		
-			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
+			<li><a href="/tags/databse/">databse<span>1</span></a></li>
 		
-			<li><a href="/tags/windows/">windows<span>4</span></a></li>
+			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
 		
-			<li><a href="/tags/ln/">ln<span>1</span></a></li>
+			<li><a href="/tags/DFS/">DFS<span>2</span></a></li>
 		
-			<li><a href="/tags/zookeeper/">zookeeper<span>3</span></a></li>
+			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
 		
-			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
+			<li><a href="/tags/partition/">partition<span>1</span></a></li>
 		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
+			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
 		
-			<li><a href="/tags/topic/">topic<span>1</span></a></li>
+			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
 		
-			<li><a href="/tags/Scheduler/">Scheduler<span>1</span></a></li>
+			<li><a href="/tags/积分/">积分<span>1</span></a></li>
 		
-			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
+			<li><a href="/tags/tencent/">tencent<span>1</span></a></li>
 		
-			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
+			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
 		
-			<li><a href="/tags/post-views-counts/">post-views-counts<span>1</span></a></li>
+			<li><a href="/tags/method/">method<span>1</span></a></li>
 		
-			<li><a href="/tags/瓶颈/">瓶颈<span>1</span></a></li>
+			<li><a href="/tags/probability/">probability<span>1</span></a></li>
 		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
 		
-			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+			<li><a href="/tags/inside/">inside<span>1</span></a></li>
 		
-			<li><a href="/tags/list/">list<span>1</span></a></li>
+			<li><a href="/tags/settings/">settings<span>1</span></a></li>
 		
-			<li><a href="/tags/dagscheduler/">dagscheduler<span>1</span></a></li>
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>304</span></a></li>
+		   <li><a href="/tags">...<span>308</span></a></li>
 		 
 		</ul>
 	</div>
@@ -1061,6 +1064,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
+      </li>
     
       <li>
         <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
@@ -1076,10 +1083,6 @@
     
       <li>
         <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
       </li>
     
   </ul>

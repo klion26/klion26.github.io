@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-03-14T04:28:15.000Z</updated>
+  <updated>2018-04-06T13:52:48.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,191 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Flink-State</title>
+    <link href="http://yoursite.com/2018/04/06/Flink-State/"/>
+    <id>http://yoursite.com/2018/04/06/Flink-State/</id>
+    <published>2018-04-06T09:33:30.000Z</published>
+    <updated>2018-04-06T13:52:48.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>Flink 中 State 用于保存 Task 的状态，Checkpoint 的时候，会将 State 保存到外存中。</p>
+<p>State 有两种，Keyed State 和 Operator State，每一种则可以有两种形式存在：Managed 和 Raw。其中 Keyed State 只能引用在 Keyed Stream 上，在 Flink 中使用 keyBy() 创建一个 keyed Stream. Flink 保证同一个 key 的 Tuple 会被发送到同一个 task 进行处理，Operator State 使用 ListState（用于 rescale），上层是一个 HashMap<string, partitionableliststate=""> Key 是 name，value 是一个封装了 list 的 class。</string,></p>
+<a id="more"></a>
+<p>State 的入口在 AbstractStateBackend，AbstractStateBackend 的子类有 </p>
+<ul>
+<li>MemoryStateBackend</li>
+<li>RocksDBStateBackend </li>
+<li>FsStateBackend</li>
+</ul>
+<p>本文主要分析 MemoryStateBackend 和 RocksDBStateBackend。如无特殊说明，本文所有代码均使用附[1]</p>
+<img src="/2018/04/06/Flink-State/state-hierarchy.png" alt="state-hierarchy.png" title="">
+<h2 id="MemoryStateBackend"><a href="#MemoryStateBackend" class="headerlink" title="MemoryStateBackend"></a>MemoryStateBackend</h2><p>MemoryStateBackend 使用内存作为存储主要包括一些配置项（内存大小 等）以及创建 operator/keyed state 的接口，本文会创建一个 HeapKeyedStateBackend</p>
+<p>HeapKeyedStateBackend 会提供创建各种 State 的接口（ValueState，ListState，MapState，SortedMapState，ReducingState，FoldingState，AggregatingState，RawQueueState，RawSecodaryState，RawStortedSecondaryState 等），返回当前 state 的 snapshot（checkpoint 会用到） 以及从指定的 KeyedStateHandles 恢复的接口。</p>
+<p>其中 createValueState 则创建一个 HeapValueState</p>
+<p>一些重要的变量和方法如下所示：</p>
+<ul>
+<li>变量<ul>
+<li>entries – 记录具体的值，类型为 Map<integer, map<k,="" map<n,="" sv="">&gt;&gt; 每个 value 由<keygroup, key,="" namespace=""> 唯一确定</keygroup,></integer,></li>
+<li>defaultValue – 表示 StateValue 的初始值，没有则为 null</li>
+<li>backend – 当前 state 所属的 stateBackend</li>
+<li>stateDescriptor – 当前 state 的描述信息，主要包括当前 state 的 namespace、value 已经面向用户的 descriptors 等</li>
+</ul>
+</li>
+<li>方法<ul>
+<li>createNewMap() – 创建一个 map，跟进是否为 Queryable 的 state，选择是否创建 ConcurrentHashMap</li>
+<li>snapshot(int, keyGroup, DataOutputView outputView) – 将指定 keyGroup 的 key 进行一次 snapshot，写入到指定的 outputView 中</li>
+<li>restore(int keyGroup, DataInputView intputView)  – 从 inputView 中恢复</li>
+<li>get(int keyGroup, K key, N namespace)  – 获取特定的 value</li>
+<li>clear(int keyGroup, K key, N namespace) – 清空特定的 value</li>
+<li>clear(Set<statekey<k, n="">&gt; stateKeys) – 清空特定的 value</statekey<k,></li>
+<li>value() – 返回特定的 value</li>
+<li>update(V value) – 更新特定的 value</li>
+</ul>
+</li>
+<li>update(int keyGroup, K key, N namespace, V value) </li>
+</ul>
+<h3 id="程序流程解释"><a href="#程序流程解释" class="headerlink" title="程序流程解释"></a>程序流程解释</h3><p>程序和 State 相关的流程如下：</p>
+<ol>
+<li>50 行创建一个 MemoryState，且设置 DefaultValue 为 (0, 0)</li>
+<li>每次处理一个 Tuple 的时候，会首先读取当前 key 对应的 value（第 25 行）</li>
+<li>然后进行处理后，更新 state 值（28 - 34 行）</li>
+<li>最后跟进 state 的值判断是否进行相应处理 – 往下有发送平均值，以及清空 state （37 - 40 行）</li>
+</ol>
+<p>state 的值变化如下所示(红色的 0 为调用 clear 后生成)</p>
+<table>
+<thead>
+<tr>
+<th>f0</th>
+<th>f1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>8</td>
+</tr>
+<tr>
+<td><span data-type="color" style="color:#F5222D;">0</span></td>
+<td><span data-type="color" style="color:#F5222D;">0</span></td>
+</tr>
+<tr>
+<td>1</td>
+<td>7</td>
+</tr>
+<tr>
+<td>2</td>
+<td>11</td>
+</tr>
+<tr>
+<td><span data-type="color" style="color:#F5222D;">0</span></td>
+<td><span data-type="color" style="color:#F5222D;">0</span></td>
+</tr>
+<tr>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="RocksDBStateBackend"><a href="#RocksDBStateBackend" class="headerlink" title="RocksDBStateBackend"></a>RocksDBStateBackend</h2><p>RocksDBStateBackend 和 MemoryStateBackend 的区别主要在于，使用 RocksDB 替代 Memory 来存储 State。</p>
+<p>由于 RocksDB 是一个 Key-Value Store，因此存储数据结构，和 MemoryStateBackend 稍微不一样。其中 key 为 serialized(keyGroup, key, namespace), value 为 serialized(value)</p>
+<h2 id="自问自答"><a href="#自问自答" class="headerlink" title="自问自答"></a>自问自答</h2><ul>
+<li>有哪些 StateBackend 实现，区别都是什么，每一种的优劣是什么<ul>
+<li>StateBackend 的实现在文首给出来，其中 MemoryStateBackend 会很快，但是不仅行持久化，RocksDBStateBackend 使用 RocksDB 进行 State 存储，速度快，且会存储到持久化介质上</li>
+<li>MemoryStateBackend 的局限：<ul>
+<li>每个 state 的大小有上限限制，默认 5M，可配置</li>
+<li>state 大小不能超过 akka frame size（其他的 statebackend 是否可以呢？）</li>
+<li>JobManager 的内存需要能够存放所有的 state</li>
+<li>建议使用场景：开发和调试阶段；state 不大的场景</li>
+</ul>
+</li>
+<li>RocksDBStateBackend<ul>
+<li>RocksDBStateBackend 将 in-flight 数据存在 RocksDB 中，会存放在 TaskManager 的 data 目录下</li>
+<li>经常使用异步 Snapshot</li>
+<li>局限如下：<ul>
+<li>每个 key value 的大小不能超过 2^31（因为RocksDB 的 JNI bridge API 使用 byte[] 格式）</li>
+</ul>
+</li>
+<li>建议使用场景：<ul>
+<li>state 量很大，window 窗口很长的 job</li>
+<li>其他需要 high-available 的场景</li>
+</ul>
+</li>
+<li>支持增量 checkpoint</li>
+</ul>
+</li>
+<li>FsStateBackend<ul>
+<li>将 in-flight 数据存储在 TaskManager 的内存中，checkpoint 的时候将数据存储到外存</li>
+<li>默认使用异步 snapshot </li>
+<li>建议使用场景：<ul>
+<li>大 state，window 窗口很长的 job</li>
+<li>其他需要 high-available 的场景</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>作业选择不同 StateBackend 的标准是什么<ul>
+<li>跟进速度和是否需要持久化到外存选择？</li>
+</ul>
+</li>
+<li>不同 StateBackend 保存的数据结构是什么样的<ul>
+<li>MemoryStateBackend 包括多种 State，其中 HeapValueState 的数据结构为 Map<integer, map<n,="" sv="">&gt;&gt; </integer,></li>
+<li>RocksDBStateBackend 则存储的是 serialized(keyGroup, key, namespace) &lt;-&gt; serialized(value) 的形式</li>
+</ul>
+</li>
+<li>不同 StateBackend 中内存占用怎么估计/计算<ul>
+<li>暂时还不知道</li>
+</ul>
+</li>
+<li>如果需要迁移 State 数据，怎么完成的（作业的并发进行调整）</li>
+<li>哪些节点/角色会有 StateBackend，都用来做什么<ul>
+<li>所有需要保存 State 的节点（？）JobManager、Task 等</li>
+</ul>
+</li>
+<li>Keyed Stream 中不同的 key 会被发送到同一个 task 吗？key 往下发送的逻辑是什么<ul>
+<li>根据 hash(key) 往下游发送</li>
+</ul>
+</li>
+<li>keyGroup 和什么有关，生成规则是什么，在查问题的时候会用到吗（某个 value 属于哪个 keyGroup）<ul>
+<li>keyGroup 的存在主要用于 rescale task，能够避免 random io 等</li>
+<li>现在 keyGroup 在 Job 启动的时候确定，后面不会进行变更</li>
+<li>key 属于哪个 keyGroup 由 hash 函数确定</li>
+</ul>
+</li>
+</ul>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p>[1] <a href="https://flink.apache.org/features/2017/07/04/flink-rescalable-state.html" target="_blank" rel="external">https://flink.apache.org/features/2017/07/04/flink-rescalable-state.html</a><br>[2] <a href="https://ci.apache.org/projects/flink/flink-docs-release-1.4/ops/state/state_backends.html" target="_blank" rel="external">https://ci.apache.org/projects/flink/flink-docs-release-1.4/ops/state/state_backends.html</a></p>
+<h2 id="附"><a href="#附" class="headerlink" title="附"></a>附</h2><p>[1] 本文使用代码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StreamingState</span> </span>&#123;</div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">      <span class="comment">// get the execution environment</span></div><div class="line">      <span class="keyword">final</span> StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();</div><div class="line"><span class="comment">// this can be used in a streaming program like this (assuming we have a StreamExecutionEnvironment env)</span></div><div class="line">      env.fromElements(Tuple2.of(<span class="number">1L</span>, <span class="number">3L</span>), Tuple2.of(<span class="number">1L</span>, <span class="number">5L</span>), Tuple2.of(<span class="number">1L</span>, <span class="number">7L</span>), Tuple2.of(<span class="number">1L</span>, <span class="number">4L</span>), Tuple2.of(<span class="number">1L</span>, <span class="number">2L</span>))</div><div class="line">         .keyBy(<span class="number">0</span>)</div><div class="line">         .flatMap(<span class="keyword">new</span> CountWindowAverage())</div><div class="line">         .print();</div><div class="line"></div><div class="line">      env.execute(<span class="string">"Streaming WordCount"</span>);</div><div class="line">   &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">CountWindowAverage</span> <span class="keyword">extends</span> <span class="title">RichFlatMapFunction</span>&lt;<span class="title">Tuple2</span>&lt;<span class="title">Long</span>, <span class="title">Long</span>&gt;, <span class="title">Tuple2</span>&lt;<span class="title">Long</span>, <span class="title">Long</span>&gt;&gt; </span>&#123;</div><div class="line">   <span class="comment">/**</span></div><div class="line">    * The ValueState handle. The first field is the count, the second field a running sum.</div><div class="line">    */</div><div class="line">   <span class="keyword">private</span> <span class="keyword">transient</span> ValueState&lt;Tuple2&lt;Long, Long&gt;&gt; sum;</div><div class="line">  <span class="meta">@Overridelus</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">flatMap</span><span class="params">(Tuple2&lt;Long, Long&gt; input, Collector&lt;Tuple2&lt;Long, Long&gt;&gt; out)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">      <span class="comment">// access the state value</span></div><div class="line">      Tuple2&lt;Long, Long&gt; currentSum = sum.value();</div><div class="line"></div><div class="line">      <span class="comment">// update the count</span></div><div class="line">      currentSum.f0 += <span class="number">1</span>;</div><div class="line"></div><div class="line">      <span class="comment">// add the second field of the input value</span></div><div class="line">      currentSum.f1 += input.f1;</div><div class="line"></div><div class="line">      <span class="comment">// update the state</span></div><div class="line">      sum.update(currentSum);</div><div class="line"></div><div class="line">      <span class="comment">// if the count reaches 2, emit the average and clear the state</span></div><div class="line">      <span class="keyword">if</span> (currentSum.f0 &gt;= <span class="number">2</span>) &#123;</div><div class="line">         out.collect(<span class="keyword">new</span> Tuple2&lt;&gt;(input.f0, currentSum.f1 / currentSum.f0));</div><div class="line">         sum.clear();</div><div class="line">    &#125;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="meta">@Override</span></div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">open</span><span class="params">(Configuration config)</span> </span>&#123;</div><div class="line">      ValueStateDescriptor&lt;Tuple2&lt;Long, Long&gt;&gt; descriptor =</div><div class="line">         <span class="keyword">new</span> ValueStateDescriptor&lt;&gt;(</div><div class="line">            <span class="string">"average"</span>, <span class="comment">// the state name</span></div><div class="line">            TypeInformation.of(<span class="keyword">new</span> TypeHint&lt;Tuple2&lt;Long, Long&gt;&gt;() &#123;&#125;), <span class="comment">// type information</span></div><div class="line">            Tuple2.of(<span class="number">0L</span>, <span class="number">0L</span>)); <span class="comment">// default value of the state, if nothing was set</span></div><div class="line">      sum = getRuntimeContext().getState(descriptor);</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>[2] keyGroup 的好处</p>
+<img src="/2018/04/06/Flink-State/state-rescale.png" alt="state-rescale.png" title="">
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Flink 中 State 用于保存 Task 的状态，Checkpoint 的时候，会将 State 保存到外存中。&lt;/p&gt;
+&lt;p&gt;State 有两种，Keyed State 和 Operator State，每一种则可以有两种形式存在：Managed 和 Raw。其中 Keyed State 只能引用在 Keyed Stream 上，在 Flink 中使用 keyBy() 创建一个 keyed Stream. Flink 保证同一个 key 的 Tuple 会被发送到同一个 task 进行处理，Operator State 使用 ListState（用于 rescale），上层是一个 HashMap&lt;string, partitionableliststate=&quot;&quot;&gt; Key 是 name，value 是一个封装了 list 的 class。&lt;/string,&gt;&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Flink" scheme="http://yoursite.com/tags/Flink/"/>
+    
+      <category term="State" scheme="http://yoursite.com/tags/State/"/>
+    
+      <category term="MemoryStateBackend" scheme="http://yoursite.com/tags/MemoryStateBackend/"/>
+    
+      <category term="RocksDBStateBackend" scheme="http://yoursite.com/tags/RocksDBStateBackend/"/>
+    
+  </entry>
   
   <entry>
     <title>Java 内存泄漏分析和对内存设置</title>
@@ -481,9 +666,9 @@ ii. 虚拟机自身的代码导致的 CPU 过高，如堆内存不够导致的�
     
       <category term="Java" scheme="http://yoursite.com/tags/Java/"/>
     
-      <category term="JVM" scheme="http://yoursite.com/tags/JVM/"/>
-    
       <category term="线程堆栈" scheme="http://yoursite.com/tags/%E7%BA%BF%E7%A8%8B%E5%A0%86%E6%A0%88/"/>
+    
+      <category term="JVM" scheme="http://yoursite.com/tags/JVM/"/>
     
       <category term="分析" scheme="http://yoursite.com/tags/%E5%88%86%E6%9E%90/"/>
     
@@ -1600,48 +1785,6 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
       <category term="JobGenerator" scheme="http://yoursite.com/tags/JobGenerator/"/>
     
       <category term="RecurringTimer" scheme="http://yoursite.com/tags/RecurringTimer/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spark Streaming 往 HDFS 追加 LZO 文件</title>
-    <link href="http://yoursite.com/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/"/>
-    <id>http://yoursite.com/2017/01/15/spark-streaming-e5-be-80-hdfs-e8-bf-bd-e5-8a-a0-lzo-e6-96-87-e4-bb-b6/</id>
-    <published>2017-01-15T07:38:17.000Z</published>
-    <updated>2017-06-03T03:39:14.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>将数据从 Kafka 同步到 Hive，并且目标格式希望是 lzo。我们通过 Spark Streaming 做这件事，将文件写成 lzo 格式，并且添加索引。</p>
-<a id="more"></a>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>要实现将数据从 Kafka 同步到 Hive 的功能，我们通过将数据直接写到 HDFS 路径来解决，由于担心小文件太多的问题（一个 batch 一个文件的话，可能造成小文件太多，对 HDFS 造成非常大的压力），所以我们通过追加的方式写 HDFS 文件。</p>
-<p>往 HDFS 追加写文件的方式，我们在前面一篇文章中描述了具体的方案。但是对于格式为 LZO 的文件，我们发现一个现象：通过 Hive 查询，只能查到第一个 batch 的数据（也就是说所有 append 的数据都不能被查询到）。这是因为 LZO 文件会在关闭的时候在文件末尾添加一个块结束标记符，导致解析的时候只能读取到块结束符之前的数据（Linux 自带的 lzop 文件可以解析包含块结束符的文件）。到这里我们有两个思路：</p>
-<pre><code>1. 在 Hive 层面进行修改，将 Hive 使用的 InputFormat 重新实现，从而可以解析 multipart 的文件；
-2. 通过某种方式将文件进行追加，但是文件的中间不会出现结束块的标记符。
-</code></pre><p>由于第一种方式影响较大，实现起来周期较长，所以这里采用第二种方法。</p>
-<p>我们考虑如何做到往 HDFS 写完数据之后，文件流不进行关闭，在我们需要关闭的时候再手动关闭。也就是说同一个 Executor 上的多 batch 公用同一个文件流。</p>
-<p>查看<a href="http://spark.apache.org/docs/latest/streaming-programming-guide.html#design-patterns-for-using-foreachrdd" target="_blank" rel="external">官方文档</a>我们可以得到这是可以实现的，也就是文档中的 ConnectionPool 实现的方式，这可以做到在同一个 Executor 上执行的多个 batch 公用同一个文件流（个人觉得这里也可以从 JVM 的层面来考虑，就是利用了 static 变量的声明周期以及可访问范围）。</p>
-<p>当我们手动关闭某个文件的时候，再考虑将这个文件 move 到特定的地方（Hive 表对应的 HDFS 路径），然后添加索引，大致框架就完成了。当然这也仅仅是一个框架，需要处理的细节问题还有很多。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;需求&quot;&gt;&lt;a href=&quot;#需求&quot; class=&quot;headerlink&quot; title=&quot;需求&quot;&gt;&lt;/a&gt;需求&lt;/h2&gt;&lt;p&gt;将数据从 Kafka 同步到 Hive，并且目标格式希望是 lzo。我们通过 Spark Streaming 做这件事，将文件写成 lzo 格式，并且添加索引。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="实时计算" scheme="http://yoursite.com/categories/%E5%AE%9E%E6%97%B6%E8%AE%A1%E7%AE%97/"/>
-    
-    
-      <category term="spark_streaming" scheme="http://yoursite.com/tags/spark-streaming/"/>
-    
-      <category term="kafka" scheme="http://yoursite.com/tags/kafka/"/>
-    
-      <category term="append" scheme="http://yoursite.com/tags/append/"/>
-    
-      <category term="hdfs" scheme="http://yoursite.com/tags/hdfs/"/>
-    
-      <category term="hive" scheme="http://yoursite.com/tags/hive/"/>
-    
-      <category term="lzo" scheme="http://yoursite.com/tags/lzo/"/>
     
   </entry>
   

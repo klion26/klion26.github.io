@@ -493,9 +493,36 @@
 		
             
 		
+            
+		
         
         <!-- render other articles -->
         
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2018-04-06 </div>
+			<div class="article-title"><a href="/2018/04/06/Flink-State/" >Flink-State</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>Flink 中 State 用于保存 Task 的状态，Checkpoint 的时候，会将 State 保存到外存中。</p>
+<p>State 有两种，Keyed State 和 Operator State，每一种则可以有两种形式存在：Managed 和 Raw。其中 Keyed State 只能引用在 Keyed Stream 上，在 Flink 中使用 keyBy() 创建一个 keyed Stream. Flink 保证同一个 key 的 Tuple 会被发送到同一个 task 进行处理，Operator State 使用 ListState（用于 rescale），上层是一个 HashMap<string, partitionableliststate=""> Key 是 name，value 是一个封装了 list 的 class。</string,></p>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2018/04/06/Flink-State/#more" class="btn btn-default more">Read More</a>
+	
+	</div>
+</div>
+
+           
+		
            
 			  
 	
@@ -736,36 +763,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2017-09-17 </div>
-			<div class="article-title"><a href="/2017/09/17/GC-标记-清除算法/" >GC 标记-清除算法</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>GC 的世界中有三种基本的算法，分别是：</p>
-<ul>
-<li>标记清除</li>
-<li>引用计数</li>
-<li>GC 复制</li>
-</ul>
-<p>其他的 GC 算法都是在这三种算法上进行修改，优化得来。本文将要介绍的是 标记-清除 算法。</p>
-		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/09/17/GC-标记-清除算法/#more" class="btn btn-default more">Read More</a>
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -848,9 +845,9 @@
 		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
-		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -878,9 +875,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -897,48 +894,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+			<li><a href="/tags/RocksDBStateBackend/">RocksDBStateBackend<span>1</span></a></li>
 		
-			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
-		
-			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
-		
-			<li><a href="/tags/objdump/">objdump<span>1</span></a></li>
-		
-			<li><a href="/tags/go/">go<span>1</span></a></li>
-		
-			<li><a href="/tags/receiver/">receiver<span>1</span></a></li>
-		
-			<li><a href="/tags/JVM/">JVM<span>1</span></a></li>
-		
-			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
-		
-			<li><a href="/tags/MST/">MST<span>1</span></a></li>
-		
-			<li><a href="/tags/file-system/">file-system<span>1</span></a></li>
-		
-			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
-		
-			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
+			<li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li>
 		
 			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
 		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
+			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
 		
-			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
 		
-			<li><a href="/tags/lzo/">lzo<span>1</span></a></li>
+			<li><a href="/tags/filter/">filter<span>1</span></a></li>
 		
-			<li><a href="/tags/瓶颈/">瓶颈<span>1</span></a></li>
+			<li><a href="/tags/stack/">stack<span>1</span></a></li>
 		
-			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
+			<li><a href="/tags/tasksetmanager/">tasksetmanager<span>1</span></a></li>
 		
-			<li><a href="/tags/update/">update<span>1</span></a></li>
+			<li><a href="/tags/how/">how<span>1</span></a></li>
 		
-			<li><a href="/tags/pair/">pair<span>1</span></a></li>
+			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
+		
+			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+		
+			<li><a href="/tags/redis/">redis<span>1</span></a></li>
+		
+			<li><a href="/tags/方法/">方法<span>1</span></a></li>
+		
+			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+		
+			<li><a href="/tags/性能分析/">性能分析<span>1</span></a></li>
+		
+			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
+		
+			<li><a href="/tags/shortest-paths-in-dag/">shortest paths in dag<span>1</span></a></li>
+		
+			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
+		
+			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
+		
+			<li><a href="/tags/list/">list<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>304</span></a></li>
+		   <li><a href="/tags">...<span>308</span></a></li>
 		 
 		</ul>
 	</div>
@@ -949,6 +946,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
+      </li>
     
       <li>
         <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
@@ -964,10 +965,6 @@
     
       <li>
         <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
       </li>
     
   </ul>

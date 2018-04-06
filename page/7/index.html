@@ -121,6 +121,33 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2013-12-22 </div>
+			<div class="article-title"><a href="/2013/12/22/spiral-matrix/" >Spiral Matrix</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>题目大意：给你一个矩形，然后要你将之螺旋输出。从[0,0]开始。<br>题目链接：<a href="http://oj.leetcode.com/problems/spiral-matrix/" target="_blank" rel="external">Spiral Matrix</a></p>
+<p>看上去是一个挺简单的题目，以前也做过类似的，不过当时做的时候规定是正方形而已。没有好好的想就直接code，然后发现各种bug。慢慢调了好久才最后通过，好久没写算法题了，还是生疏了。</p>
+<p>大致思路如下：首先我们要判断是不是空的矩形，空矩形直接返回一个空的vector即可，如果不是空矩形的话，那么我们可以设多个变量，left，right，top，button分别表示当前矩形还未被输出的部分的最左，最右，最上，最下。然后我们在原始矩阵中进行螺旋访问，输出每一个元素。可以把这个螺旋访问看成是一层一层的剖洋葱，一层一层的来，每一层先处理最上面的一行，然后是最右边的一列，接下来是最下面的一行，最后是最左边的一列。然后在途中不断更新left，right，top和button四个变量值即可。</p>
+<p>到这里已经大致OK了，不过还是有问题，因为不是正方形，可能导致某些元素输出多次，这样的话就不行了，这里可以对输出的元素进行计数，如果已经全部输出完毕，那么就直接退出就行了。</p>
+<p><a href="https://github.com/klion26/LeetCode/blob/master/Spiral-Matrix.cpp" target="_blank" rel="external">代码在这里</a></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2013-12-20 </div>
 			<div class="article-title"><a href="/2013/12/20/level-order-of-a-tree/" >树的按层输出顺序</a></div>						
 		</h3>
@@ -622,42 +649,6 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2013-05-24 </div>
-			<div class="article-title"><a href="/2013/05/24/linux-command-shell-script/" >Linux命令行和shell脚本编程笔记</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>第一部分讲的是一些基本的东西，比如shell入门，了解shell[怎么输入shell命令等]，一些基本的命令，比如ls，cp，mv,cd,touch等，还有一些shell的基本设置，比如可以用set和printenv命令，另外还有一些监控程序，比如df,du等命令的使用，以及排序，压缩命令还有grep命令，还有shell的数组，形如,</p>
-<p>mytest=(one two three four five)这样的，引用的时候用${mytest[n]}n从0开始</p>
-<p>还有使用别名alias命令，接下来讲了和系统安全有点关系的用户的添加删除等[useradd,userdel,usermod,passwd,chpasswd,chsh,chf,chage]还有group有关的东西，以及umask的使用和解释，还有SUID和GUID的设置和使用。</p>
-<p>接下来就是讲编辑器的使用，VI，EMacs，GEdit和KWrite，建议使用VI，学习起来比Emacs要简单，而且功能也强大。</p>
-<p>第二篇是大头，主讲shell脚本的编程</p>
-<p>第8章，讲的是基本的命令和shell命令的编写，管道和数学计算</p>
-<p>基本的shell命令你只要在脚本里面写上可以执行的shell命令，然后会自动照着你写的顺序来执行，，一般命名为xxx.sh，然后需要用chmod u+x xxx.sh来给脚本加上可执行权限，然后就可以用./xxx.sh来执行脚本   了，不然需要用sh xxx.sh来执行，用echo来输出要显示的东西，比如在shell脚本中有</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“This is a test”</span></div><br>那么会输出”This is a test”，这里需要说明的是，在shell中的引号，一般我们说的引号有3种，双引号，单引号和反引号。在shell脚本中，双引号和单引号都是用来把一个字符串包括起来，但是这两者是有区别的，双引号里面的变量会用值来替代，单引号的则输出变量名，比如下面的</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">test</span><span style="color: #f5deb3;">=</span>11<br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“This is a date $test”</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">‘this is a date $test’</span></div><br>第一个会输出:This is a 111,但是第二个输出的是This is a $test,还有就是如果你的字符串里面有单引号的话，那么你得用双引号把这个字符串括起来，不然就不行，比如”This is bob’s test”，反引号就表示执行反引号里面的命令，然后返回命令执行后的结果，如果反引号里面的不是命令，则返回空，如果命令出错，则返回错误信息。</p>
-<p>接下来是使用变量，变量不需要定义，直接用就行了，bash里面默认是没有浮点数的。不过如果不使用浮点数进行判断之类的可以计算并输出浮点数的，当然如果想要支持浮点数，可以试试zsh。</p>
-<p>数学计算，有加减乘除，算式有几种，但是用这种是最好的var=$[$var1 + $var2]这样的会比expr什么的好很多。如果只想输出浮点数，比如要输出3.44/5的结果，其实还是可以的，可以用shell的计算器bc然后通过管道来实现，比如下面的代码</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #d8bfd8;">var</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;"><code>&lt;/span&gt;&lt;span style=&quot;color: #b0c4de; font-weight: bold;&quot;&gt;echo&lt;/span&gt; &lt;span style=&quot;color: #7fffd4;&quot;&gt;&quot; scale=4; 3.44/5&quot;&lt;/span&gt; | bc&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“The answer is $var”</span></div><br>会输出3.44/5之后带4为小数的浮点数结果0.6880，其中scale=4是设置精度的，这个可以参考bc的用法不过，这样得到的浮点数可以用来显示，用来进行比较的话，就不行了。实际上是存成了字符串然后输出的。</p>
-<p>脚本退出有一个状态，用$?表示，如果成功执行的话会是0，不成功的话会是一个1-255的数，可以用exti $var来人工设定脚本的退出值，不过如果var大于255的话，会被取余掉的。比如返回300的话，那么显示出来的是44[=300%256]</p>
-<p>后面的请查看<a href="http://www.klion26.com/linux-command-shell-script-2.html" target="_blank" rel="external">《Linux命令行和shell脚本编程笔记2》</a>和《Linux命令行和shell脚本编程笔记3》</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -740,9 +731,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
-		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -770,9 +761,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -789,48 +780,48 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/databse/">databse<span>1</span></a></li>
-		
-			<li><a href="/tags/knapsack/">knapsack<span>1</span></a></li>
-		
-			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
-		
-			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
-		
-			<li><a href="/tags/notes/">notes<span>0</span></a></li>
-		
-			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
-		
-			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+			<li><a href="/tags/syslog/">syslog<span>1</span></a></li>
 		
 			<li><a href="/tags/TaskScheduler/">TaskScheduler<span>1</span></a></li>
 		
-			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+			<li><a href="/tags/array/">array<span>1</span></a></li>
 		
-			<li><a href="/tags/critical/">critical<span>1</span></a></li>
+			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
 		
-			<li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li>
+			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
 		
-			<li><a href="/tags/腾讯/">腾讯<span>1</span></a></li>
+			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
 		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
 		
-			<li><a href="/tags/proof/">proof<span>1</span></a></li>
+			<li><a href="/tags/update/">update<span>1</span></a></li>
 		
-			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
-			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
 		
-			<li><a href="/tags/my-life/">my life<span>1</span></a></li>
+			<li><a href="/tags/memset/">memset<span>1</span></a></li>
 		
-			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
 		
-			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
+			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+		
+			<li><a href="/tags/sap/">sap<span>1</span></a></li>
+		
+			<li><a href="/tags/总结/">总结<span>1</span></a></li>
+		
+			<li><a href="/tags/数学/">数学<span>5</span></a></li>
+		
+			<li><a href="/tags/线程堆栈/">线程堆栈<span>2</span></a></li>
+		
+			<li><a href="/tags/opengl/">opengl<span>1</span></a></li>
+		
+			<li><a href="/tags/数论/">数论<span>5</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>304</span></a></li>
+		   <li><a href="/tags">...<span>308</span></a></li>
 		 
 		</ul>
 	</div>
@@ -841,6 +832,10 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
+      </li>
     
       <li>
         <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
@@ -856,10 +851,6 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
     
       <li>
         <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/03/tasksetmanager/" ><i class="fa fa-file-o"></i>tasksetmanager</a>
       </li>
     
   </ul>
