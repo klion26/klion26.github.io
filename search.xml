@@ -3,6 +3,59 @@
   
     
     <entry>
+      <title><![CDATA[一次 InputStream#read 使用不当导致的问题]]></title>
+      <url>/2018/09/09/%E4%B8%80%E6%AC%A1-InputStream-read-%E4%BD%BF%E7%94%A8%E4%B8%8D%E5%BD%93%E5%AF%BC%E8%87%B4%E7%9A%84%E9%97%AE%E9%A2%98/</url>
+      <content type="html"><![CDATA[<p> 一句话总结：InputStream#read 对于当次能够读取多少字节不做保证，必须以该函数的返回值做为实际读取字节数的事实。<a id="more"></a></p>
+<p>#1. 问题<br>由于某些功能的需要，实现如下函数，从某个 InputStream copy 特定长度的数据到 OutputStream，其中 InputStream 为打开的某个 HDFS 文件流</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">private void copySpecifiedLengthBytes(final InputStream in, final OutputStream out, final long size) &#123;</div><div class="line">    long current = 0;</div><div class="line">    byte[] bytes = new byte[BLOCKSIZE]; //BLOCKSIZE = 4096;</div><div class="line">    int bytesRead;</div><div class="line">    while (current + BLOCKSIZE &lt; size) &#123;</div><div class="line">        bytesRead = in.read(bytes);</div><div class="line">        current += bytesRead;</div><div class="line">        out.write(bytes);</div><div class="line">    &#125;</div><div class="line">    int byteLeftToRead = (int) (size - current);</div><div class="line">    bytesRead = in.read(bytes, 0, byteLeftToRead);</div><div class="line">    out.write(bytes, 0, bytesRead);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>看到上面的函数，可以先思考下会不会出现问题，如果可能出现问题，则会在哪个地方，以及问题的展现形式会是什么样的。<br>|<br>|<br>|<br>|<br>|<br>|<br>|<br>|<br>|<br>|<br>上面的代码在某些场景下会有问题，大致如下：OutputStream 的中间部分会多出来一些无关字节，导致整个 OutputStream 的内容是错误的。</p>
+<h1 id="2-定位分析"><a href="#2-定位分析" class="headerlink" title="2. 定位分析"></a>2. 定位分析</h1><blockquote>
+<p>当我们知道所有的来龙去脉之后，回过头来看发现其实并没有那么难，但是当我们只看到现象的时候，可能会有无数种解释，这个时候需要能够验证哪种解释才是合理的。</p>
+</blockquote>
+<p>看到 OutputStream 中的数据不对，怀疑如下两点 1) InputStream 中的数据是否准确; 2) 读取的起止位置是否准确;</p>
+<p>通过添加相关日志重现问题，初步确定 InputStream 中的数据是可信的，从 InputStream 中读取的起止位置也是准确的，但是 OutputStream 中得到的数据是非预期的。暂时不知道对不上的数据是怎么来的，但是基本能够定位问题在于上面的 copySpecifiedLengthBytes 函数。</p>
+<p>为了验证确实是这里的问题，将该函数进行了修改，改成如下所示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">private void copySpecifiedLengthBytes(final InputStream in, final OutputStream out, final long size) &#123;</div><div class="line">    byte[] bytes = new byte[BLOCKSIZE]; //BLOCKSIZE = 4096;</div><div class="line">    int bytesRead;</div><div class="line">    long byteLeft = size;</div><div class="line">    while (byteLeft &gt; 0) &#123;</div><div class="line">        bytesRead = in.read(bytes, 0, (int) Math.min(byteLeft, bytes.length));</div><div class="line">        byteLeft -= bytesRead;</div><div class="line">        out.write(bytes, 0, bytesRead);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后尝试进行复现该问题，发现没有再次复现（之前基本每次都能复现），基本确定问题在这里。但是留下几个问题不能完全解释清楚：</p>
+<ol>
+<li><p>把 HDFS 文件 copy 到本地，尝试复现的时候，发现无法复现，且得到的 OutputStream 是预期中的（正确的数据）</p>
+</li>
+<li><p>为什么从同一个 HDFS 多次复现的时候，得到的 OutputStream 结果是一致的（错的一致）</p>
+</li>
+</ol>
+<h1 id="3-原因"><a href="#3-原因" class="headerlink" title="3. 原因"></a>3. 原因</h1><p>上面遗留的第一个问题，从本地文件读取时不能复现，与实现有关，找了下源码，没有发现 read 函数有中间中断的情况，因此没有出现问题。</p>
+<p>第二个问题，看到的现象是从同一台机器上读取同一个文件，得到的 OutputStream 一致（错的一致），也就是说 InputStream#read 的行为在多次复现过程中完全一致，所以导致多次复现得到的 OutputStream 也错的一致。</p>
+<p>然后我们尝试在错误的 copySpecifiedLengthBytes 函数中添加日志，查看哪些地方出错，看到一个现象，在大致读取来 128K 的地方，InputStream#read 真正读取到的字节数少于 BLOCKSIZE，但是我们写出的数据量为 BLOCKSIZE，从而导致后面的 out.write(bytes) 多写出一些无关字节，至此我们基本能够解释上面的遗留问题来，但是又引发了另一个问题</p>
+<blockquote>
+<p>为什么每次都在 128K 左右的地方出错呢？而且每次执行 copySpecifiedLengthBytes 仅仅在第一个 128K 附近出错，后面的地方都没有出错呢？</p>
+</blockquote>
+<p>然后我们打开 hadoop-hdfs-client 的代码，从 DFSInputStream 开始跟踪，发现在 BlockReaderRemote.java 中有一段这样的代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">// First packet will include some data prior to the first byte</div><div class="line">// the user requested. Skip it.</div><div class="line">if (curHeader.getOffsetInBlock() &lt; startOffset) &#123;</div><div class="line">    int newPos = (int) (startOffset - curHeader.getOffsetInBlock());</div><div class="line">    curDataSlice.position(newPos);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这段代码表示读取的第一个 packet（HDFS 读写的最小单元） 头部会包含一些非法数据，需要跳过，但是后续的 packet 则不需要跳过，这个和我们看到的现象基本吻合。那到底是不是这里呢？</p>
+<p>通过准备环境，然后在 curDataSlice.position(newPos) 处添加断点，发现如预期的停在了断点处，也就是说问题的根源来自这里。至此所有的遗留问题都解决了。</p>
+<p>接下来梳理一下整个流程：</p>
+<ol>
+<li><p>使用 InputStream#read 进行读取</p>
+</li>
+<li><p>DFSInputStream 会读取 packet</p>
+</li>
+<li><p>DFSInputStream 读取 packet 的时候会对第一个 packet 进行部分字节的跳过</p>
+</li>
+<li><p>导致第一步中的 read 读取不充分（实际读取的字节数比预期的少），导致 out.write(bytes) 的行为不符合预期</p>
+</li>
+</ol>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> I/O, HDFS, InputStream, read, problem_solving </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Flink-State]]></title>
       <url>/2018/04/06/Flink-State/</url>
       <content type="html"><![CDATA[<p>Flink 中 State 用于保存 Task 的状态，Checkpoint 的时候，会将 State 保存到外存中。</p>
@@ -1778,11 +1831,11 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> spark </tag>
             
-            <tag> spark-streaming </tag>
-            
             <tag> append </tag>
             
             <tag> hdfs </tag>
+            
+            <tag> spark-streaming </tag>
             
         </tags>
         
@@ -2195,9 +2248,9 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> exactly-once </tag>
             
-            <tag> offset </tag>
-            
             <tag> zookeeper </tag>
+            
+            <tag> offset </tag>
             
         </tags>
         
@@ -3000,9 +3053,9 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
         
         <tags>
             
-            <tag> blog </tag>
-            
             <tag> github </tag>
+            
+            <tag> blog </tag>
             
             <tag> math-expression </tag>
             
@@ -4783,9 +4836,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> fedora </tag>
             
-            <tag> blog </tag>
-            
             <tag> github </tag>
+            
+            <tag> blog </tag>
             
             <tag> free </tag>
             
@@ -5087,7 +5140,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#111;&#58;&#106;&#99;&#109;&#64;&#x6a;&#111;&#110;&#109;&#x61;&#115;&#x74;&#x65;&#x72;&#115;&#46;&#111;&#x72;&#x67;">&#106;&#99;&#109;&#64;&#x6a;&#111;&#110;&#109;&#x61;&#115;&#x74;&#x65;&#x72;&#115;&#46;&#111;&#x72;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#x6f;&#58;&#x6a;&#99;&#109;&#x40;&#x6a;&#111;&#110;&#x6d;&#x61;&#115;&#x74;&#101;&#x72;&#115;&#x2e;&#x6f;&#114;&#103;">&#x6a;&#99;&#109;&#x40;&#x6a;&#111;&#110;&#x6d;&#x61;&#115;&#x74;&#101;&#x72;&#115;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>

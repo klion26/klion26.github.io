@@ -121,6 +121,35 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-05-23 </div>
+			<div class="article-title"><a href="/2011/05/23/mon-monsterkill-xiangtan-by-klion26/" >Mon-monsterkill湘潭行by klion26</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>===本来是去湖大校赛的,后来由于某些原因,我们就去了湘潭(当然我更倾向于去湘潭)===</p>
+<p>我们队应该说还是不成熟,个人(我)能力不行,团队配合不是很好,有时另外两个人根本听不懂剩下的那个人在说什么(或者说根本没在听),代码能力还有待加强.1A率不高.下面是流水账,按出题顺序来写.(由于湘潭周二还会挂网络赛,所以就不说算法了,等网络赛完了之后再补吧)</p>
+<p>A,水题,然后写了交上去,由于没加stdio ce了,FB没了.<br>B, 1A           C,1A               D, 1A                F, 3A(4A?)                 J. 1A</p>
+<p>E,两个人理解错题意,一开始想着随机水(因为过的人已经不少了),后来Azuki看题后,才发现其他两个人看错题了,囧啊.让后Gamor敲之,这期间其他两个人在邪恶的吃着中餐(香喷喷的鸡腿-_-||),这题由于一些细节问题TLE了一次,2A.</p>
+<p>接下来就成了垃圾时间了,其实这个时候,我们还是有优势的,不过后面差不多两个小时就没有一点作为,首先是Azuki的H,一直WA,然后三人一直搞这个,思路怎么想都没问题,数据也测了好多,居然没测出问题.然后这题最后也没过,赛后谢大说只错了小数据(他们还手算了我们出错的数据,太谢谢了),这个应该是实现问题了.还有一个G,由于H和G题题意不是很清楚的缘故,没敢上去写,其实给半个小时,G题应该没啥问题.然后郭嘉三国杀那题,确实没想到算法,最后一题Azuki说他会做,还有主要程序段的模板,可是他没看题,然后其他两个看过题的不懂算法= =||。然后就悲剧的收场了.然后没有拿到monsterkill</p>
+<p>比赛结束后我去湘大逛了一圈,不过时间太紧了,然后就回科大了,结果在科大还等了好久-_-||,然后就回来了,这次湘大之行郁闷的占6/10,高兴的占4/10吧,郁闷的是被再踩(这个还好),没有monsterkill.</p>
+<p>解题报告上给的是:<br>A&amp;&amp;B         C语言<br>C              想法题<br>D              GCD<br>E              想法<br>F              数学<br>G              模拟<br>H              DP<br>I               高斯消元<br>J               AC自动机/Trie图<br>K               插头DP</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-05-18 </div>
 			<div class="article-title"><a href="/2011/05/18/number-theory-hdu-2879/" >[数论]HDU_2879</a></div>						
 		</h3>
@@ -365,29 +394,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-04-30 </div>
-			<div class="article-title"><a href="/2011/04/30/primitive-root-poj-1284/" >原根的个数 POJ_1284</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<div>首先e[m,a]表示使得a^e[m,a]=1(mod m)的最小的正整数.那么我们有e[m,a^k]=e[m,a]/gcd(e[m,a],k)(k&gt;0).证明如下:记x=e[m,a],x’=x/gcd(x,k);x’’=e[m,a^k];先证明x’|x’’.</div><br><div>由题意可知a^x=1(mod m)  (a^k)^x’’=1(mod m)</div><br><div>由性质又因为e[m,a]|k<em>x’’,所以 x’=(x/gcd(x,k)) | (k</em>x’’/(gcd(x,k)).又gcd(x/gcd(x,k),k/gcd(x,k))=1.所以x’|x’’.</div><br><div>再证明x’’|x’      </div><br><div>a^(k<em>x’)=(a^k)^x’=1(mod m)—&gt;x’’|x’</em></div><br><div>所以x’=x’’;</div><br><div>推论如果gcd(k,e[m,a])=1,e[m,a^k]=e[m,a];我们可以用这个来求原根的个数.假设一个数n存在原根,且最小的原根等于g.n的欧拉函数为phi[n].那么n的原根的个数就是phi[phi[n]].也就是g的t次方[gcd(t,phi[n])=1 1&lt;=t&lt;phi[n])也是一个原根,当然这里也包含了所有的原根[想想为什么?似乎只能说明原根数至少是phi[phi[n]]个?再好好想想就出来了.注意a^k != 1(mod m)(k&lt;e[m,a])]</div><br><div>那么1284就直接求一个数的欧拉函数了.代码如下:</div><br><div class="dp-highlighter"><br><br>1.  <span><span class="comment">/ </span> </span><br>2.  <span><span class="comment">ID:klion26 </span> </span><br>3.  <span><span class="comment">LANG:C </span> </span><br>4.  <span><span class="comment">TASK:POJ_1284 </span> </span><br>5.  <span><span class="comment"> <em>/</em></span><span>  </span></span><br>6.  <span> </span><span class="preprocessor">#include <stdio.h> </stdio.h></span><span>  </span><br>7.  <span class="preprocessor">#include <string.h> </string.h></span><span>  </span><br>8.  <span class="preprocessor">#include <stdlib.h> </stdlib.h></span><span>  </span><br>9.  <span class="preprocessor">#include <math.h> </math.h></span><span>  </span><br>10.  <span>  </span><br>11.  <span class="datatypes">int</span><span> eular[65540];   </span><br>12.  <span class="keyword">void</span><span> init()   </span><br>13.  <span>{   </span><br>14.  <span>    </span><span class="datatypes">int</span><span> i,j;   </span><br>15.  <span>    memset(eular,0,</span><span class="keyword">sizeof</span><span>(eular));   </span><br>16.  <span>    </span><span class="keyword">for</span><span>(i=2;i<65536;i++) <="" span=""><br>17.  <span>        {   </span><br>18.  <span>            </span><span class="keyword">if</span><span>(0 == eular[i])   </span><br>19.  <span>                {   </span><br>20.  <span>                    </span><span class="keyword">for</span><span>(j=i;j<65536;j+=i) <="" span=""><br>21.  <span>                        {   </span><br>22.  <span>                            </span><span class="keyword">if</span><span>(0 == eular[j])   </span><br>23.  <span>                                eular[j]=j;   </span><br>24.  <span>                            eular[j] /= i;   </span><br>25.  <span>                            eular[j] = (i-1);   </span><br>26.  <span>                        }   </span><br>27.  <span>                }   </span><br>28.  <span>        }   </span><br>29.  <span>}   </span><br>30.  <span class="datatypes">int</span><span> main(</span><span class="keyword">void</span><span>)   </span><br>31.  <span>{   </span><br>32.  <span>    </span><span class="datatypes">int</span><span> p;   </span><br>33.  <span>    init();   </span><br>34.  <span>    </span><span class="keyword">while</span><span>(EOF != scanf(</span><span class="string">“%d”</span><span>,p))   </span><br>35.  <span>        {   </span><br>36.  <span>            printf(</span><span class="string">“%d\n”</span><span>,eular[eular[p]]);   </span><br>37.  <span>        }   </span><br>38.  <span>    </span><span class="keyword">return</span><span> 0;   </span><br>39.  <span>}   </span><br></65536;j+=i)></span></65536;i++)></span></div>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -440,9 +446,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -466,13 +472,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -480,11 +486,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -494,15 +500,15 @@
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -519,48 +525,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/链接排序/">链接排序<span>1</span></a></li>
+			<li><a href="/tags/memset/">memset<span>1</span></a></li>
 		
-			<li><a href="/tags/方法/">方法<span>1</span></a></li>
+			<li><a href="/tags/code-style/">code-style<span>1</span></a></li>
 		
-			<li><a href="/tags/单调队列/">单调队列<span>1</span></a></li>
+			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
 		
-			<li><a href="/tags/spark/">spark<span>8</span></a></li>
+			<li><a href="/tags/sap/">sap<span>1</span></a></li>
 		
-			<li><a href="/tags/Java/">Java<span>3</span></a></li>
+			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
 		
-			<li><a href="/tags/shell/">shell<span>5</span></a></li>
+			<li><a href="/tags/写作/">写作<span>1</span></a></li>
 		
-			<li><a href="/tags/question/">question<span>1</span></a></li>
+			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
 		
-			<li><a href="/tags/github-pages/">github-pages<span>1</span></a></li>
+			<li><a href="/tags/MemoryStateBackend/">MemoryStateBackend<span>1</span></a></li>
 		
-			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
 		
-			<li><a href="/tags/english/">english<span>1</span></a></li>
+			<li><a href="/tags/matlab/">matlab<span>1</span></a></li>
 		
-			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
+			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
 		
-			<li><a href="/tags/此生未完成/">此生未完成<span>1</span></a></li>
+			<li><a href="/tags/redis/">redis<span>1</span></a></li>
 		
-			<li><a href="/tags/Code/">Code<span>1</span></a></li>
+			<li><a href="/tags/django/">django<span>1</span></a></li>
 		
-			<li><a href="/tags/concrete-mathematics/">concrete-mathematics<span>2</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
-			<li><a href="/tags/job/">job<span>1</span></a></li>
+			<li><a href="/tags/GC/">GC<span>1</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/grub/">grub<span>2</span></a></li>
 		
-			<li><a href="/tags/free/">free<span>1</span></a></li>
+			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
 		
-			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
 		
-			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
+			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
 		
-			<li><a href="/tags/性能分析/">性能分析<span>1</span></a></li>
+			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>308</span></a></li>
+		   <li><a href="/tags">...<span>309</span></a></li>
 		 
 		</ul>
 	</div>
@@ -571,6 +577,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/" ><i class="fa fa-file-o"></i>一次 InputStream#read 使用不当导致的问题</a>
+      </li>
     
       <li>
         <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
@@ -586,10 +596,6 @@
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
       </li>
     
   </ul>

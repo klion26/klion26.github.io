@@ -122,6 +122,115 @@
 	<!-- display as entry -->	
 		<h3 class="title">
 			<div class="date"> 2012-03-29 </div>
+			<div class="article-title"><a href="/2012/03/29/user-chrome-cross-gfw/" >利用Chrome零基础翻墙</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><span style="color: #ff0000;">这篇文章是转过来的，由于是下的DOC文档，所以不知道源地址，不过文章后面有原作者的联系方式</span></p>
+<p>=======================邪恶的分割线===========================</p>
+<p>开了tumblr后就想着要写篇翻墙教程，当时想法是只要你知道有墙的存在，即便完完全全在墙内，按照这个零基础教程也能完成翻墙教学，而且我这不会上传任何文件，所有资源均通过官方网站下载。</p>
+<p>不幸的是，昨天发现tumblr疑似被墙了，至少我这上不去了（浙江网通），这篇放在墙外的翻墙教程多少显得有点尴尬，只能寄希望于传播了。</p>
+<p>本教程主要涉及的工具为chrome+goagent</p>
+<p>一、下载安装chrome，并注册gmail邮箱</p>
+<p>1、google出的优秀浏览器，还没用上的速速下载。</p>
+<p><a href="http://www.google.cn/chrome/intl/zh-CN/landing_chrome.html" target="_blank" rel="external">http://www.google.cn/chrome/intl/zh-CN/landing_chrome.html</a></p>
+<p>2、注册一个gmail邮箱</p>
+<p>这一步很关键，后续会多次用到你的gmail邮箱账号。</p>
+<p><a href="https://mail.google.com/mail?hl=zh-CN" target="_blank" rel="external">https://mail.google.com/mail?hl=zh-CN</a></p>
+<p>二、运行“hosts自动更新程序”</p>
+<p>1、用安装好的chrome打开网址：</p>
+<p><a href="https://chrome.google.com/webstore/detail/bcomihljbnefaobillhnajpgompoelme?hl=zh-CN" target="_blank" rel="external">https://chrome.google.com/webstore/detail/bcomihljbnefaobillhnajpgompoelme?hl=zh-CN</a></p>
+<p>点击右上角的“启动应用程序”，接受程序自动下载的以“.bat”结尾文件。</p>
+<p>如果没有出现下载提示，在chrome里打开新标签页，浏览器正中下方选择“应用程序”，然后点击出现的“Hosts自动更新程序”图标，接受下载。</p>
+<p>有时下载的网站不一定能访问，可以在这里直接点击下载脚本文件（这一步需要gmail账号）：</p>
+<p><a href="https://sandbox.google.com/storage/fgqi/hosts/fgqi.bat" target="_blank" rel="external">https://sandbox.google.com/storage/fgqi/hosts/fgqi.bat</a></p>
+<p>2、运行程序</p>
+<p>双击下载好的脚本文件“fgqi.bat”</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/gfw-1.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/gfw-1-300x188.jpg" alt="" title="gfw-1"></a></p>
+<p>由于下述步骤要使用到早就被墙掉的google服务，这里需要先更改对应服务的hosts地址。</p>
+<p>这一步我们需要更新google服务地址，输入数字“1”并回车。</p>
+<p>题外话：输入数字“4”并回车后，能搞定twitter和facebook的基本访问。</p>
+<p>三、在GAE里创建app</p>
+<p>Google App Engine是一个开发、托管网络应用程序的平台，使用Google管理的数据中心。</p>
+<p>1、登陆申请网址（这一步需要gmail账号）：</p>
+<p><a href="https://appengine.google.com/start/createapp" target="_blank" rel="external">https://appengine.google.com/start/createapp</a></p>
+<p>如果上述步骤需要验证手机，输入+86前缀的大陆手机号码后会收到短信，在“Mobile Number”栏里输入你收到短信里的验证码code即可完成验证步骤。</p>
+<p>2、创建app</p>
+<p>完成验证后界面如下：</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/gfw-2.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/gfw-2-300x259.jpg" alt="" title="gfw-2"></a></p>
+<p>在Application Identifier栏输入你要创建的app名称（不支持中文），点击“Check Availability”以确认你要的名称还未被注册过。</p>
+<p>为了方便起见，这里用“chaofannet”借代你创建的app名称。（请自行创建，勿对号入座）</p>
+<p>下一栏“Application Title” 随便填，后期也可以随便改。</p>
+<p>完成后点击页面下方的“Create Application”，如果前面有出现“Terms of Service”即使用条款，则需要在点击“Create Application”前，把使用条款下方的“I accept these terms”打钩。</p>
+<p>至此，app创建成功，得到的AppID即chaofannet（借代用）。</p>
+<p>四、下载goagent</p>
+<p>goagent是一个使用Python和Google Appengine SDK编写的代理软件。</p>
+<p>登陆goagent官网：</p>
+<p><a href="https://code.google.com/p/goagent/" target="_blank" rel="external">https://code.google.com/p/goagent/</a></p>
+<p>主页最上方即给出了下载链接，可见目前最新版为1.6.3稳定版，下载链接为bit.ly短网址，若无法解析，这里给出解析后的完整下载网址，如下：</p>
+<p><a href="http://nodeload.github.com/phus/goagent/zipball/1.0" target="_blank" rel="external">http://nodeload.github.com/phus/goagent/zipball/1.0</a></p>
+<p>下载后得到的压缩包为“phus-goagent-ed8e710.zip”（对应目前最新的1.6.3稳定版），解压后会得到两个文件夹：“local”和“server”.</p>
+<p>五、上传goagent服务端并配置客户端</p>
+<p>1、上传服务端</p>
+<p>双击打开之前解压后的“server”文件夹，找到并双击运行“uploader.bat”</p>
+<p>这时界面提示“AppID:”</p>
+<p>输入之前你在Application Identifier栏创建的app名称，如chaofannet</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/gfw-3.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/gfw-3-300x249.jpg" alt="" title="gfw-3"></a></p>
+<p>出现Email提示后输入你的gmail账号，然后是密码。</p>
+<p>注意：输入密码时，屏幕上不会出现任何符号，请不用担心，完整正确地输入密码后按回车即可。</p>
+<p>上传完毕后会自动关闭。</p>
+<p>2、配置客户端</p>
+<p>双击打开之前解压后的“local”文件夹，找到并双击打开“proxy.ini”文件，</p>
+<p>修改[gae]栏下的appid，将等号后面的“goagent”换成你的AppID，如将原来的“appid = goagent”换成“appid = chaofannet”，其余保持不变。</p>
+<p>至此，绝大部分工作已经完成。</p>
+<p>六、配置chrome</p>
+<p>在chrome下安装Proxy SwitchySharp插件：</p>
+<p><a href="https://chrome.google.com/webstore/detail/dpplabbmogkhghncfbfdeeokoefdjegm" target="_blank" rel="external">https://chrome.google.com/webstore/detail/dpplabbmogkhghncfbfdeeokoefdjegm</a></p>
+<p>安装后打开Proxy SwitchySharp插件的选项：</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/gfw-4.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/gfw-4-300x231.jpg" alt="" title="gfw-4"></a></p>
+<p>在“导入/导出”栏目的最下行，“在线恢复备份”栏输入：</p>
+<p><a href="https://raw.github.com/phus/phus-config/master/SwitchyOptions.bak" target="_blank" rel="external">https://raw.github.com/phus/phus-config/master/SwitchyOptions.bak</a></p>
+<p>至此，大功告成。</p>
+<p>七、翻墙！</p>
+<p>1、运行goagent.exe</p>
+<p>位于之前解压后的“local”文件夹下</p>
+<p>注意：第一次运行可能需要管理员权限。</p>
+<p>题外话：我们还可以设置goagent程序开机自启动，除了最原始的手动拖到系统启动栏下，运行“local”文件夹下的“addto-startup.vbs”文件即可。</p>
+<p>2、代理翻墙</p>
+<p>打开chrom，在右上角Proxy SwitchySharp插件上点击选择GoAgent，如下：</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/gfw-5.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/gfw-5.jpg" alt="" title="gfw-5"></a></p>
+<p>题外话：请无视我的“Telex”代理协议，和本文无关。</p>
+<p>至此，已经挂上代理，可以随意浏览墙外世界。</p>
+<p>要想换回自己的ip，只需选择上图中的“直接连接”，即不用代理，回归墙内。</p>
+<p>八、结束语</p>
+<p>Google App Engine并非毫无限制，每个开发者只能拥有10个应用程序，即你最多只能创建并得到10个AppID。（貌似AppID创建了就不能删除)</p>
+<p>Google App Engine提供给免费用户的流量是每天1GB.一般应用绝对够了。</p>
+<p>登陆<a href="https://appengine.google.com/" target="_blank" rel="external">https://appengine.google.com/</a> 点击你创建的AppID，可以看到你的流量图，以及每天免费配额还剩多少，如下图，我已经用了1GB中的7%</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2012/03/gfw-6.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2012/03/gfw-6-300x158.jpg" alt="" title="gfw-6"></a></p>
+<p>每天的流量重新清零的时间好像是北京时间下午16点整，而非0点。</p>
+<p>最后：</p>
+<p>如还有疑惑需要咨询，请联系我的twitter账号：@chaofannet ；或者邮箱：chaofannet@gmail.com</p>
+<p>We love <a href="http://www.tumblr.com/" target="_blank" rel="external">Tumblr</a>  <a href="http://www.tumblr.com/theme/3292" target="_blank" rel="external">Stationery</a> by <a href="http://thijsjacobs.com/" target="_blank" rel="external">Thijs</a></p>
+<p>======================邪恶的分割线=====================</p>
+<p>本人经过测试，按照上面的做，完全没问题，而且比较方便。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-03-29 </div>
 			<div class="article-title"><a href="/2012/03/29/github-create-project/" >Github之旅一---创建自己的项目</a></div>						
 		</h3>
 	
@@ -426,34 +535,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-11-27 </div>
-			<div class="article-title"><a href="/2011/11/27/fuzhou-a-hdu-4121/" >[模拟]HDU_4121</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><a href="http://acm.hdu.edu.cn/showproblem.php?pid=4121" target="_blank" rel="external">地址</a></p>
-<p>福州赛区的A题,我们队因为没有过这个题导致最后的悲剧,废话不多说了，下面是简单的分析+代码.</p>
-<p>首先我们可以设置一个map[][]数组记录某个点有没有子,然后让将做四个方向，再判断是否会被吃掉，如果有一个方向不会被吃掉，那么就不是死棋，否则就是。</p>
-<p>判断是否会被吃掉的时候，如果是帅，就判断y坐标相等，且中间无子，车的判断类似。炮的判断可以变为炮和将中间有几个子，一个的话就ok，否则炮吃不了将。马的话，考虑不能走就行了。</p>
-<p>代码如下:</p>
-<div class="dp-highlighter"><br><br>1.  <span><span>#include <cstdio> </cstdio></span></span><br>2.  <span>#include <cstring> </cstring></span><br>3.  <span>#include <cstdlib> </cstdlib></span><br>4.  <span>#include <cmath> </cmath></span><br>5.  <span> </span><br>6.  <span> </span><span class="keyword">char</span><span> role[</span><span class="number">30</span><span>]; </span><br>7.  <span class="keyword">int</span><span> x[</span><span class="number">30</span><span>],y[</span><span class="number">30</span><span>]; </span><br>8.  <span class="keyword">int</span><span> dir[</span><span class="number">4</span><span>][</span><span class="number">2</span><span>]={{</span><span class="number">0</span><span>,</span><span class="number">1</span><span>},{</span><span class="number">1</span><span>,</span><span class="number">0</span><span>},{</span><span class="number">0</span><span>,-</span><span class="number">1</span><span>},{-</span><span class="number">1</span><span>,</span><span class="number">0</span><span> }} ; </span><br>9.  <span class="keyword">int</span><span> hdir[</span><span class="number">8</span><span>][</span><span class="number">2</span><span>]= {{ -</span><span class="number">1</span><span>,</span><span class="number">2</span><span>},{</span><span class="number">1</span><span>,</span><span class="number">2</span><span>},{</span><span class="number">2</span><span>,</span><span class="number">1</span><span>},{</span><span class="number">2</span><span>,-</span><span class="number">1</span><span>},{</span><span class="number">1</span><span>,-</span><span class="number">2</span><span>},{-</span><span class="number">1</span><span>,-</span><span class="number">2</span><span>},{-</span><span class="number">2</span><span>,-</span><span class="number">1</span><span>},{-</span><span class="number">2</span><span>,</span><span class="number">1</span><span> }} ; </span><br>10.  <span class="keyword">int</span><span> X,Y; </span><br>11.  <span class="keyword">int</span><span> n; </span><br>12.  <span>bool have[</span><span class="number">30</span><span>][</span><span class="number">30</span><span>]; </span><br>13.  <span> </span><br>14.  <span class="keyword">int</span><span> min(</span><span class="keyword">int</span><span> a,</span><span class="keyword">int</span><span> b) </span><br>15.  <span>{ </span><br>16.  <span> </span><span class="keyword">return</span><span> a<b?a:b; <="" span=""><br>17.  <span>} </span><br>18.  <span class="keyword">int</span><span> max(</span><span class="keyword">int</span><span> a,</span><span class="keyword">int</span><span> b) </span><br>19.  <span>{ </span><br>20.  <span> </span><span class="keyword">return</span><span> a&gt;b?a:b; </span><br>21.  <span>} </span><br>22.  <span> </span><br>23.  <span>bool can(</span><span class="keyword">int</span><span> X,</span><span class="keyword">int</span><span> Y) </span><br>24.  <span>{ </span><br>25.  <span> </span><span class="keyword">int</span><span> i,j; </span><br>26.  <span> </span><span class="keyword">int</span><span> cnt; </span><br>27.  <span> </span><span class="keyword">int</span><span> tx,ty; </span><br>28.  <span> </span><span class="keyword">for</span><span>(i=</span><span class="number">0</span><span>i<n;++i) <="" span=""><br>29.  <span> { </span><br>30.  <span> </span><span class="keyword">if</span><span>(!have[x[i]][y[i]]) </span><br>31.  <span> </span><span class="keyword">continue</span><span> </span><br>32.  <span> </span><span class="comment">//G </span><span> </span><br>33.  <span> </span><span class="keyword">if</span><span>(‘G’==role[i]) </span><br>34.  <span> { </span><br>35.  <span> </span><span class="keyword">if</span><span>(y[i]==Y) </span><br>36.  <span> { </span><br>37.  <span> </span><span class="keyword">for</span><span>(j=min(X,x[i])+</span><span class="number">1</span><span>j<max(x,x[i]);++j) <="" span=""><br>38.  <span> { </span><br>39.  <span> </span><span class="keyword">if</span><span>(have[j][Y]) </span><br>40.  <span> </span><span class="keyword">break</span><span> </span><br>41.  <span> } </span><br>42.  <span> </span><span class="keyword">if</span><span>(j==max(X,x[i])) </span><br>43.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>44.  <span> } </span><br>45.  <span> } </span><br>46.  <span> </span><span class="comment">//R </span><span> </span><br>47.  <span> </span><span class="keyword">if</span><span>(‘R’==role[i]) </span><br>48.  <span> { </span><br>49.  <span> </span><span class="keyword">if</span><span>(Y==y[i]) </span><br>50.  <span> { </span><br>51.  <span> </span><span class="keyword">for</span><span>(j=min(X,x[i])+</span><span class="number">1</span><span>j<max(x,x[i]);++j) <="" span=""><br>52.  <span> { </span><br>53.  <span> </span><span class="keyword">if</span><span>(have[j][Y]) </span><br>54.  <span> </span><span class="keyword">break</span><span> </span><br>55.  <span> } </span><br>56.  <span> </span><span class="keyword">if</span><span>(j==max(X,x[i])) </span><br>57.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>58.  <span> } </span><br>59.  <span> </span><span class="keyword">if</span><span>(X==x[i]) </span><br>60.  <span> { </span><br>61.  <span> </span><span class="keyword">for</span><span>(j=min(Y,y[i])+</span><span class="number">1</span><span>j<max(y,y[i]);++j) <="" span=""><br>62.  <span> </span><span class="keyword">if</span><span>(have[X][j]) </span><br>63.  <span> </span><span class="keyword">break</span><span> </span><br>64.  <span> </span><span class="keyword">if</span><span>(j==max(Y,y[i])) </span><br>65.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>66.  <span> } </span><br>67.  <span> } </span><br>68.  <span> </span><span class="comment">//C </span><span> </span><br>69.  <span> </span><span class="keyword">if</span><span>(‘C’==role[i]) </span><br>70.  <span> { </span><br>71.  <span> </span><span class="keyword">if</span><span>(X==x[i]) </span><br>72.  <span> { </span><br>73.  <span> cnt=</span><span class="number">0</span><span> </span><br>74.  <span> </span><span class="keyword">for</span><span>(j=min(Y,y[i])+</span><span class="number">1</span><span>j<max(y,y[i]);++j) <="" span=""><br>75.  <span> </span><span class="keyword">if</span><span>(have[X][j]) </span><br>76.  <span> ++cnt; </span><br>77.  <span> </span><span class="keyword">if</span><span>(</span><span class="number">1</span><span>==cnt) </span><br>78.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>79.  <span> } </span><br>80.  <span> </span><span class="keyword">if</span><span>(Y==y[i]) </span><br>81.  <span> { </span><br>82.  <span> cnt=</span><span class="number">0</span><span> </span><br>83.  <span> </span><span class="keyword">for</span><span>(j=min(X,x[i])+</span><span class="number">1</span><span>j<max(x,x[i]);++j) <="" span=""><br>84.  <span> </span><span class="keyword">if</span><span>(have[j][Y]) </span><br>85.  <span> ++cnt; </span><br>86.  <span> </span><span class="keyword">if</span><span>(</span><span class="number">1</span><span>==cnt) </span><br>87.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>88.  <span> } </span><br>89.  <span> } </span><br>90.  <span> </span><span class="comment">//H </span><span> </span><br>91.  <span> </span><span class="keyword">if</span><span>(‘H’==role[i]) </span><br>92.  <span> { </span><br>93.  <span> </span><span class="keyword">for</span><span>(j=</span><span class="number">0</span><span>j&lt;</span><span class="number">8</span><span>;++j) </span><br>94.  <span> { </span><br>95.  <span> tx = x[i]+hdir[j][</span><span class="number">0</span><span>]; </span><br>96.  <span> ty = y[i]+hdir[j][</span><span class="number">1</span><span>]; </span><br>97.  <span> </span><span class="keyword">if</span><span>(tx&lt;</span><span class="number">1</span><span>||tx&gt;</span><span class="number">10</span><span>||ty&lt;</span><span class="number">1</span><span>||ty&gt;</span><span class="number">9</span><span>) </span><br>98.  <span> </span><span class="keyword">continue</span><span> </span><br>99.  <span> </span><span class="keyword">int</span><span> sbx,sby; </span><br>100.  <span> sbx = x[i]+hdir[j][</span><span class="number">0</span><span>]/</span><span class="number">2</span><span> </span><br>101.  <span> sby = y[i]+hdir[j][</span><span class="number">1</span><span>]/</span><span class="number">2</span><span> </span><br>102.  <span> </span><span class="keyword">if</span><span>(have[sbx][sby]) </span><br>103.  <span> </span><span class="keyword">continue</span><span> </span><br>104.  <span> </span><span class="keyword">if</span><span>(tx==X&amp;ty==Y) </span><br>105.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>106.  <span> } </span><br>107.  <span> } </span><br>108.  <span> } </span><br>109.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">true</span><span> </span><br>110.  <span>} </span><br>111.  <span> </span><br>112.  <span class="keyword">int</span><span> main(</span><span class="keyword">void</span><span>) </span><br>113.  <span>{ </span><br>114.  <span> #ifndef ONLINE_JUDGE </span><br>115.  <span> freopen(</span><span class="string">“1001.in”</span><span>,</span><span class="string">“r”</span><span>,stdin); </span><br>116.  <span> freopen(</span><span class="string">“1001.out”</span><span>,</span><span class="string">“w”</span><span>,stdout); </span><br>117.  <span> #endif </span><br>118.  <span> </span><span class="keyword">int</span><span> i; </span><br>119.  <span> </span><span class="keyword">int</span><span> tx,ty; </span><br>120.  <span> bool tmp; </span><br>121.  <span> </span><span class="keyword">char</span><span> ch; </span><br>122.  <span> </span><span class="keyword">while</span><span>(EOF!=scanf(</span><span class="string">“%d%d%d”</span><span>,n,&amp;X,&amp;Y)) </span><br>123.  <span> { </span><br>124.  <span> </span><span class="keyword">if</span><span>(</span><span class="number">0</span><span>==n&amp;</span><span class="number">0</span><span>==X&amp;&amp;</span><span class="number">0</span><span>==Y) </span><br>125.  <span> </span><span class="keyword">break</span><span> </span><br>126.  <span> </span><br>127.  <span> memset(have,</span><span class="keyword">false</span><span>,sizeof(have)); </span><br>128.  <span> </span><span class="keyword">for</span><span>(i=</span><span class="number">0</span><span>i<n;++i) <="" span=""><br>129.  <span> { </span><br>130.  <span> ch=getchar(); </span><br>131.  <span> </span><span class="keyword">while</span><span>(!(ch&gt;=’A’&amp;ch&lt;=’Z’)) </span><br>132.  <span> ch=getchar(); </span><br>133.  <span> role[i]=ch; </span><br>134.  <span> scanf(</span><span class="string">“%d%d”</span><span>,x[i],&amp;y[i]); </span><br>135.  <span> have[x[i]][y[i]]=</span><span class="keyword">true</span><span> </span><br>136.  <span> } </span><br>137.  <span> </span><span class="keyword">for</span><span>(i=</span><span class="number">0</span><span>i&lt;</span><span class="number">4</span><span>;++i) </span><br>138.  <span> { </span><br>139.  <span> tx = X+dir[i][</span><span class="number">0</span><span>]; </span><br>140.  <span> ty = Y+dir[i][</span><span class="number">1</span><span>]; </span><br>141.  <span> </span><span class="keyword">if</span><span>(tx&lt;</span><span class="number">1</span><span>||tx&gt;</span><span class="number">3</span><span>||ty&lt;</span><span class="number">4</span><span>||ty&gt;</span><span class="number">6</span><span>) </span><br>142.  <span> </span><span class="keyword">continue</span><span> </span><br>143.  <span> tmp = have[tx][ty]; </span><br>144.  <span> have[tx][ty]=</span><span class="keyword">false</span><span> </span><br>145.  <span> </span><span class="keyword">if</span><span>(can(tx,ty)) </span><br>146.  <span> { </span><br>147.  <span> </span><span class="keyword">break</span><span> </span><br>148.  <span> } </span><br>149.  <span> have[tx][ty]=tmp; </span><br>150.  <span> } </span><br>151.  <span> </span><br>152.  <span> </span><span class="keyword">if</span><span>(</span><span class="number">4</span><span>==i) </span><br>153.  <span> { </span><br>154.  <span> printf(</span><span class="string">“YES\n”</span><span>); </span><br>155.  <span> } </span><br>156.  <span> </span><span class="keyword">else</span><span> </span><br>157.  <span> { </span><br>158.  <span> printf(</span><span class="string">“NO\n”</span><span>); </span><br>159.  <span> } </span><br>160.  <span> } </span><br>161.  <span> </span><span class="keyword">return</span><span> </span><span class="number">0</span><span> </span><br>162.  <span>} </span><br></n;++i)></span></max(x,x[i]);++j)></span></max(y,y[i]);++j)></span></max(y,y[i]);++j)></span></max(x,x[i]);++j)></span></max(x,x[i]);++j)></span></n;++i)></span></b?a:b;></span></div>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -506,9 +587,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -532,13 +613,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -546,11 +627,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -560,15 +641,15 @@
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -585,48 +666,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/MemoryStateBackend/">MemoryStateBackend<span>1</span></a></li>
+			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
 		
-			<li><a href="/tags/单用户模式/">单用户模式<span>1</span></a></li>
+			<li><a href="/tags/搜索/">搜索<span>1</span></a></li>
 		
-			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
+			<li><a href="/tags/prim/">prim<span>1</span></a></li>
 		
-			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
+			<li><a href="/tags/DP/">DP<span>1</span></a></li>
 		
-			<li><a href="/tags/exercise/">exercise<span>8</span></a></li>
+			<li><a href="/tags/Spark/">Spark<span>1</span></a></li>
 		
-			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
+			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
 		
-			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
+			<li><a href="/tags/partition/">partition<span>1</span></a></li>
 		
-			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
+			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
 		
-			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
+			<li><a href="/tags/插件/">插件<span>1</span></a></li>
 		
-			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
+			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
 		
-			<li><a href="/tags/logger/">logger<span>1</span></a></li>
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
 		
-			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+			<li><a href="/tags/概率/">概率<span>1</span></a></li>
 		
-			<li><a href="/tags/reservior/">reservior<span>1</span></a></li>
+			<li><a href="/tags/network/">network<span>1</span></a></li>
 		
-			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+			<li><a href="/tags/mapreduce/">mapreduce<span>1</span></a></li>
 		
-			<li><a href="/tags/tutorial/">tutorial<span>1</span></a></li>
+			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
 		
-			<li><a href="/tags/traveling-salesman-problem/">traveling salesman problem<span>1</span></a></li>
+			<li><a href="/tags/paper/">paper<span>1</span></a></li>
 		
-			<li><a href="/tags/text-plain/">text/plain<span>1</span></a></li>
+			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
 		
-			<li><a href="/tags/dagscheduler/">dagscheduler<span>1</span></a></li>
+			<li><a href="/tags/test/">test<span>1</span></a></li>
 		
-			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
+			<li><a href="/tags/RecurringTimer/">RecurringTimer<span>1</span></a></li>
 		
-			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
+			<li><a href="/tags/question/">question<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>308</span></a></li>
+		   <li><a href="/tags">...<span>309</span></a></li>
 		 
 		</ul>
 	</div>
@@ -637,6 +718,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/" ><i class="fa fa-file-o"></i>一次 InputStream#read 使用不当导致的问题</a>
+      </li>
     
       <li>
         <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
@@ -652,10 +737,6 @@
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
       </li>
     
   </ul>

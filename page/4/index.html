@@ -121,6 +121,36 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2016-07-15 </div>
+			<div class="article-title"><a href="/2016/07/15/spark-streaming-saving-offset-in-zookeeper-2/" >Spark Streaming 中使用 zookeeper 保存 offset 并重用（二）</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://www.klion26.com/spark-streaming-save-offset-to-zookeeper.html" target="_blank" rel="external">上一篇文章</a>中，我们讲了如何在将 offset 保存在 zk 中，以及进行重用，但是程序中有个小问题“如果程序停了很长很长一段后再启动，zk 中保存的 offset 已经过期了，那会怎样呢？”本文将解决这个问题</p>
+<p>如果 kafka 上的 offset 已经过期，那么就会报 OffsetOutOfRange 的异常，因为之前保存在 zk 的 offset 已经 topic 中找不到了。所以我们需要在 从 zk 找到 offset 的这种情况下增加一个判断条件，如果 zk 中保存的 offset 小于当前 kafka topic 中最小的 offset，则设置为 kafka topic 中最小的 offset。假设我们上次保存在 zk 中的 offset 值为 123（某一个 partition），然后程序停了一周，现在 kafka topic 的最小 offset 变成了 200，那么用前文的代码，就会得到 OffsetOutOfRange 的异常，因为 123 对应的数据已经找不到了。下面我们给出，如何获取 <topic, parition=""> 的最小 offset，这样我们就可以进行对比了</topic,></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">val partitionOffset = zkClient.readData[String](s&quot;$&#123;topicDirs.consumerOffsetDir&#125;/$&#123;i&#125;&quot;)</div><div class="line">val tp = TopicAndPartition(topic, i)</div><div class="line"></div><div class="line">val requestMin = OffsetRequest(Map(tp -&gt; PartitionOffsetRequestInfo(OffsetRequest.EarliestTime, 1)))</div><div class="line">val consumerMin = new SimpleConsumer(&quot;broker_host&quot;, 9092, 10000, 10000, &quot;getMinOffset&quot;)  //注意这里的 broker_host，因为这里会导致查询不到，解决方法在下面</div><div class="line">val curOffsets = consumerMin.getOffsetsBefore(requestMin).partitionErrorAndOffsets(tp).offsets</div><div class="line">var nextOffset = partitionOffset.toLong</div><div class="line">if (curOffsets.length &gt; 0 &amp;amp; nextOffset &lt; curOffsets.head) &#123;  // 通过比较从 kafka 上该 partition 的最小 offset 和 zk 上保存的 offset，进行选择</div><div class="line">  nextOffset = curOffsets.head</div><div class="line">&#125;</div><div class="line">fromOffsets += (tp -&gt; nextOffset) //设置正确的 offset，这里将 nextOffset 设置为 0（0 只是一个特殊值），可以观察到 offset 过期的现象&lt;/pre&gt;</div></pre></td></tr></table></figure>
+<p>但是上面的代码有一定的问题，因为我们从 kafka 上获取 offset 的时候，需要寻找对应的 leader，从 leader 来获取 offset，而不是 broker，不然可能得到的 curOffsets 会是空的（表示获取不到）。下面的代码就是获取不同 partition 的 leader 相关代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">val topic_name = &quot;topic_name&quot;     //topic_name 表示我们希望获取的 topic 名字</div><div class="line">val topic2 = List(topic_name)       </div><div class="line">val req = new TopicMetadataRequest(topic2, 0)</div><div class="line">val getLeaderConsumer = new SimpleConsumer(&quot;broker_host&quot;, 9092, 10000, 10000, &quot;OffsetLookup&quot;)  // 第一个参数是 kafka broker 的host，第二个是 port</div><div class="line">val res = getLeaderConsumer.send(req)</div><div class="line">val topicMetaOption = res.topicsMetadata.headOption</div><div class="line">val partitions = topicMetaOption match &#123;</div><div class="line">  case Some(tm) =&gt;</div><div class="line">    tm.partitionsMetadata.map(pm =&gt; (pm.partitionId, pm.leader.get.host)).toMap[Int, String]  // 将结果转化为 partition -&amp;gt; leader 的映射关系</div><div class="line">  case None =&gt;</div><div class="line">    Map[Int, String]()</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的代码能够得到所有 partition 的 leader 地址，然后将 leader 地址替换掉上面第一份代码中的 broker_list 即可。</p>
+<p>到此，在 spark streaming 中将 kafka 的 offset 保存到 zk，并重用的大部分情况都覆盖到了</p>
+<p><br><br><br>&nbsp;</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2016-07-14 </div>
 			<div class="article-title"><a href="/2016/07/14/spark-streaming-save-offset-to-zookeeper/" >Spark Streaming 中使用 zookeeper 保存 offset 并重用</a></div>						
 		</h3>
@@ -854,33 +884,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2015-03-08 </div>
-			<div class="article-title"><a href="/2015/03/08/github-blog-math-expression-support/" >让 Github Blog 支持数学公式</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>本文将提供一种方法，让 github blog 可以支持数学公式，通俗的说就是支持 latex 写法。假设已经有一个 github blog。本文利用的是 Mathjax 来支持 latex 公式的解析和显示。下面假设本地仓库所在的文件夹为”xxx.github.com”</p>
-<p>1. 切换到”xxx.github.com_includes\themes\dinky” 其中 dinky 是你现在使用的模板名称</p>
-<p>2. 用文本编辑器打开”default.html” 文件，跳转到文件末尾，在  和 &lt;/html&gt; 之间加上如下代码</p>
-<p><pre class="lang:js decode:true">  <script type="text/javascript">window.MathJax = false;&lt;/script&gt;<br>  <script type="text/x-mathjax-config"><br>          MathJax.Hub.Config({<br>          tex2jax: {inlineMath: [[“$”,”$”],[“\(“,”\)”]]}<br>              });<br></script>&lt;script type=”text/javascript” src=”<a href="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full&quot;&gt;MathJax.Hub.Queue([&quot;Typeset&quot;,MathJax.Hub" target="_blank" rel="external">http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full&quot;&gt;MathJax.Hub.Queue([&quot;Typeset&quot;,MathJax.Hub</a>]);<br></pre><br>3. 在 “xxx.githu.com” 下建立一个名为 extensions 的目录，然后把 <a href="https://github.com/mathjax/MathJax/blob/master/extensions/MathMenu.js" target="_blank" rel="external">MathMenu</a> 和 <a href="https://github.com/mathjax/MathJax/blob/master/extensions/MathZoom.js" target="_blank" rel="external">MathZoom</a> 两个文件添加到 extensions 目录下（如果到这一步还出现问题的话，可以利用 chrome 打开相应的 github blog 页面，然后按下 F12 打开 console，把缺少的文件添加到 extensions 目录即可）</p>
-<p>4. 在 github blog 中使用相应的数学公式，查看就会发现可以显示了。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -933,9 +936,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -959,13 +962,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -973,11 +976,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -987,15 +990,15 @@
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -1012,48 +1015,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
+			<li><a href="/tags/TaskScheduler/">TaskScheduler<span>1</span></a></li>
 		
-			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
+			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
 		
-			<li><a href="/tags/风险/">风险<span>1</span></a></li>
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
 		
-			<li><a href="/tags/vi/">vi<span>2</span></a></li>
+			<li><a href="/tags/RecurringTimer/">RecurringTimer<span>1</span></a></li>
 		
-			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
+			<li><a href="/tags/Java/">Java<span>3</span></a></li>
 		
-			<li><a href="/tags/windows/">windows<span>4</span></a></li>
+			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
 		
-			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
+			<li><a href="/tags/grub/">grub<span>2</span></a></li>
 		
-			<li><a href="/tags/network/">network<span>1</span></a></li>
+			<li><a href="/tags/test/">test<span>1</span></a></li>
 		
-			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+			<li><a href="/tags/火柴棍式程序题/">火柴棍式程序题<span>1</span></a></li>
 		
-			<li><a href="/tags/list/">list<span>1</span></a></li>
+			<li><a href="/tags/twitter/">twitter<span>1</span></a></li>
 		
-			<li><a href="/tags/分析/">分析<span>1</span></a></li>
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
 		
-			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
 		
-			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
+			<li><a href="/tags/memset/">memset<span>1</span></a></li>
 		
-			<li><a href="/tags/概率/">概率<span>1</span></a></li>
+			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
 		
-			<li><a href="/tags/quick-sort/">quick-sort<span>1</span></a></li>
+			<li><a href="/tags/thinking/">thinking<span>2</span></a></li>
 		
-			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+			<li><a href="/tags/command/">command<span>1</span></a></li>
 		
-			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
+			<li><a href="/tags/how/">how<span>1</span></a></li>
 		
-			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
+			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
 		
-			<li><a href="/tags/tree/">tree<span>1</span></a></li>
+			<li><a href="/tags/implicit-declaration/">implicit-declaration<span>1</span></a></li>
 		
-			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
+			<li><a href="/tags/job/">job<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>308</span></a></li>
+		   <li><a href="/tags">...<span>309</span></a></li>
 		 
 		</ul>
 	</div>
@@ -1064,6 +1067,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/" ><i class="fa fa-file-o"></i>一次 InputStream#read 使用不当导致的问题</a>
+      </li>
     
       <li>
         <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
@@ -1079,10 +1086,6 @@
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
       </li>
     
   </ul>

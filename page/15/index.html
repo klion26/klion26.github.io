@@ -121,6 +121,29 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-04-09 </div>
+			<div class="article-title"><a href="/2011/04/09/pointers-on-c-advanced-point/" >C和指针13章 高级指针话题</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>本章的东西比较少,主要是关于指针的高级应用.对于指针的应用有一点就必须要注意了.运算符的顺序,比如怎么写是指针数组,怎么写是指向数组的指针.<br>1.int <em>f();//一个函数,返回值是int </em><br>    int (<em>f)();//一个函数指针,指向一个返回值是int的函数.<span style="color: #ff0000;">注意这里我省略了参数</span><br><span style="color: #ff0000;">   <span style="color: #000000;">int </span></span></em>(<em>f)();//一个函数指针,指向的函数的返回值是int </em><br><span style="color: #ff0000;"><span style="color: #000000;">   对于这些可以这么理解,int (<em>f)();把</em>f看成一个整体,是个函数,然后<em>f就变成了指向这个整体的一个指针.</em></span></span><br><span style="color: #ff0000;"><span style="color: #000000;"> int (<em>f[])();//f是一个数组,数组的每个元素是一个指针类型,指针指向返回值是int </em>的函数</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">在Unix系统中,可以用cdecl程序来帮助你解释这些声明.</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">2.函数指针的两个应用:I.回调函数,大致模板如下:int fun(int a,int (<em>com)(void const </em>a,void const <em>b));这里的com就是一个回调函数,也就是用户需要用fun函数的时候,需要传一个函数的指针过来,而指向的这个函数是由用户来编写的.这里可以参照qsort的cmp函数.</em></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">什么时候用回调函数:编写的函数必须能够在不同的时候执行不同类型的工作或者执行只能由函数调用者定义的工作,你都可以使用这个技巧。</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">注意:回调函数传过来的是一个函数指针,而不是函数本身.这个函数参数必须是void const .在函数里面你必须保证转换成正确的类型.如果想和系统的一些函数保持兼容的话,那么相等返回0.不相等返回1.这个主要好似字符串的时候,这样可以表示3种情况.0:相等,-1:第一个小.1(或者只是一个大于0的书):第一个大.</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">II.转移表:就是一个数组的每个元素都是函数指针.然后通过下标来访问对应的函数.double (<em>oper_func [])(double,double)={add,sub,mul,div};</em></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">转移表要非常注意下标的溢出,一点溢出就可能非常难于调试.</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">3.main函数的两个参数.这个没什么讲的,argc表示参数个数,argv是参数指针.argv的第一个是文件名.</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">4.字符串常量,是一个指针常量.”abc”[2]的值是’c’.这里的[2]可以看成是指针+2.这样就很好理解了,下面的函数打印出的’‘随n的不同而不同</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">void mystery(int n)</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">{//n有范围限制</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">      n += 5;</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">     n /= 10;</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">    printf(“%s\n”,”<strong><strong>**</strong></strong>“+10-n);</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">}</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">本章编程提示总结:</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">1.如果并非必要,避免使用多层间接访问</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">2.cdecl程序可以帮助你分析复杂的声明</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">3.把void *强制转换为其他类型的指针时必须小心</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">4.使用转移表时,应该始终验证下标的有效性.[可以在调用函数的开始和结束输出一些有意义的话语]</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">5.破坏性的命令行参数处理方式使你以后无法再次进行处理</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">6.不寻常的代码始终应该加上一条注释,描述它的目的和原理</span></span></p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-04-08 </div>
 			<div class="article-title"><a href="/2011/04/08/why-am-i-cancer/" >为何是我得癌症</a></div>						
 		</h3>
@@ -443,30 +466,6 @@ return 1;
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-03-29 </div>
-			<div class="article-title"><a href="/2011/03/29/segment-tree-my-templete/" >我的线段树模板[静态版]</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>由于上次师大的邀请赛有一个线段树和并查集的综合题,可是我的线段树死活过不了,原来是我自己写错了一个地方,赋值错了,然后就一直悲剧了,现在把我的线段树模板放在这里,以后要用的时候就直接来取好了,不多说了,直接贴代码:</p>
-<div class="source" style="color: #f5deb3; font-family: 'Courier New','Lucida Console','monospace'; background-color: #2f4f4f;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">ID:qcx97811</span><br><span style="color: #da70d6;">LANG:C</span><br><span style="color: #da70d6;">TASK:H</span><br><span style="color: #da70d6;">/</span><br><span style="color: #eeee00;">#include <stdio.h></stdio.h></span><br><span style="color: #eeee00;">#include <string.h></string.h></span><br><span style="color: #eeee00;">#include <stdlib.h></stdlib.h></span><br><span style="color: #eeee00;">#include <math.h></math.h></span><br><span style="color: #da70d6;">/<em>还有一个修改没加</em>/</span><br><span style="font-weight: bold; color: #b0c4de;">typedef</span> <span style="font-weight: bold; color: #b0c4de;">struct</span><span style="color: #da70d6;">//线段树的结构体 </span><br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//l表示左端点 r右端点 max表示这一段的最大值 min表示这一段的最小值</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">r</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">min</span><br><span style="color: #f5deb3;">}</span><span style="color: #f5deb3;">Tree</span><br><span style="color: #f5deb3;">Tree</span> <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">500006</span><span style="color: #f5deb3;"><em></em></span><span style="color: #add8e6;">4</span><span style="color: #f5deb3;">];</span><span style="color: #da70d6;">//4倍</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">init_node</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">_r</span>)<br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//初始化线段树</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">mid</span><br>    <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_l</span><span style="color: #da70d6;">//这里不管怎样都要赋值,确定边界</span><br>    <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">_r</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">_l</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">_r</span>)<br>        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//如果到了底层了直接返回</span><br>            <span style="font-weight: bold; color: #b0c4de;">return</span> ;<br>        <span style="color: #f5deb3;">}</span><br>    <span style="color: #f5deb3;">mid</span><span style="color: #f5deb3;">=</span>(<span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">_r</span>)<span style="color: #f5deb3;">&gt;&gt;</span><span style="color: #add8e6;">1</span>;<br>    <span style="color: #f5deb3;">init_node</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">mid</span>);<span style="color: #da70d6;">//初始化左子树</span><br>    <span style="color: #f5deb3;">init_node</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">mid</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_r</span>);<span style="color: #da70d6;">//初始化右子树</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">void</span> <span style="color: #ffffff;">insert</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">_r</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">val</span>)<br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//插入一个值</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">mid</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">l</span> <span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">_r</span><span style="color: #f5deb3;">&gt;=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">r</span>)<br>        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//如果区域覆盖这棵树就直接改变这棵树就行了 不改变子树的信息</span><br>            <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">val</span><br>            <span style="font-weight: bold; color: #b0c4de;">return</span> ;<br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">_r</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">r</span>)<br>        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//插入左子树 </span><br>            <span style="color: #f5deb3;">insert</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_r</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">val</span>);<br>            <span style="color: #da70d6;">//更新该区域的最大最小值</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span>)<br>                <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span>)<br>                <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span><br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">else</span><br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">&gt;=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">l</span>)<br>                <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//插入右子树</span><br>                    <span style="color: #f5deb3;">insert</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_r</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">val</span>);<br>                    <span style="color: #da70d6;">//更新该区域的最大最小值</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span>)<br>                        <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span>)<br>                        <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span><br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">else</span><br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #da70d6;">//插入左子树和右子树</span><br>                    <span style="color: #f5deb3;">insert</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">r</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">val</span>);<br>                    <span style="color: #f5deb3;">insert</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_r</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">val</span>);<br>                    <span style="color: #da70d6;">//更新该区域的最大最小值</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span>)<br>                        <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span>)<br>                        <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span>)<br>                        <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span><br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span>)<br>                        <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">query_max</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">_r</span>)<br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//求_l到_r区间的最大值</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">max1</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">l</span> <span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">_r</span><span style="color: #f5deb3;">&gt;=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">r</span>)<span style="color: #da70d6;">//如果覆盖这个区域 直接返回</span><br>        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">max</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">_r</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">r</span>)<br>        <span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//返回左子树的最大值</span><br>            <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">query_max</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_r</span>);<br>        <span style="color: #f5deb3;">}</span><br>    <span style="font-weight: bold; color: #b0c4de;">else</span><br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">&gt;=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">l</span>)<span style="color: #da70d6;">//返回右子树的最大值</span><br>                <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">query_max</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_r</span>);<br>            <span style="color: #da70d6;">//返回左子树和右子树中最大值的最大值</span><br>            <span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">query_max</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">r</span>);<br>            <span style="color: #f5deb3;">max1</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">query_max</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_r</span>);<br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">max</span><span style="color: #f5deb3;">&gt;</span><span style="color: #f5deb3;">max1</span>)<br>                <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">max</span><br>            <span style="font-weight: bold; color: #b0c4de;">else</span><br>                <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">max1</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #ffffff;">query_min</span>(<span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">_r</span>)<br><span style="color: #f5deb3;">{</span><span style="color: #da70d6;">//类似上面的query_max</span><br>    <span style="font-weight: bold; color: #98fb98;">int</span> <span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">min1</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">l</span> <span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">_r</span> <span style="color: #f5deb3;">&gt;=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">r</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">min</span><br>    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">_r</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">r</span>)<br>        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">query_min</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_r</span>);<br>    <span style="font-weight: bold; color: #b0c4de;">else</span><br>        <span style="color: #f5deb3;">{</span><br>            <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">&gt;=</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">l</span>)<br>                <span style="color: #f5deb3;">{</span><br>                    <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">query_min</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_r</span>);<br>                <span style="color: #f5deb3;">}</span><br>            <span style="font-weight: bold; color: #b0c4de;">else</span><br>                <span style="color: #f5deb3;">{</span><br>                    <span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">query_min</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">r</span>);<br>                    <span style="color: #f5deb3;">min1</span><span style="color: #f5deb3;">=</span><span style="color: #f5deb3;">query_min</span>(<span style="color: #add8e6;">2</span><span style="color: #f5deb3;"></span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">node</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">2</span><span style="color: #f5deb3;">*</span><span style="color: #f5deb3;">idx</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">_r</span>);<br>                    <span style="font-weight: bold; color: #b0c4de;">if</span>(<span style="color: #f5deb3;">min</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">min1</span>)<br>                        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">min</span><br>                    <span style="font-weight: bold; color: #b0c4de;">else</span><br>                        <span style="font-weight: bold; color: #b0c4de;">return</span> <span style="color: #f5deb3;">min1</span><br>                <span style="color: #f5deb3;">}</span><br>        <span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span></div>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -519,9 +518,9 @@ return 1;
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -545,13 +544,13 @@ return 1;
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -559,11 +558,11 @@ return 1;
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -573,15 +572,15 @@ return 1;
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -598,48 +597,48 @@ return 1;
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/memset/">memset<span>1</span></a></li>
+			<li><a href="/tags/metric-core/">metric-core<span>1</span></a></li>
 		
-			<li><a href="/tags/read/">read<span>3</span></a></li>
+			<li><a href="/tags/my-life/">my life<span>1</span></a></li>
 		
-			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
+			<li><a href="/tags/method/">method<span>1</span></a></li>
 		
-			<li><a href="/tags/sap/">sap<span>1</span></a></li>
+			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
 		
-			<li><a href="/tags/meituan/">meituan<span>1</span></a></li>
+			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
 		
-			<li><a href="/tags/book/">book<span>1</span></a></li>
+			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
 		
-			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
+			<li><a href="/tags/concrete-mathematics/">concrete-mathematics<span>2</span></a></li>
 		
-			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+		
+			<li><a href="/tags/乱码/">乱码<span>1</span></a></li>
 		
 			<li><a href="/tags/递归/">递归<span>1</span></a></li>
 		
-			<li><a href="/tags/apach/">apach<span>0</span></a></li>
+			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
 		
-			<li><a href="/tags/gdb/">gdb<span>2</span></a></li>
+			<li><a href="/tags/how/">how<span>1</span></a></li>
 		
-			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
+			<li><a href="/tags/DP/">DP<span>1</span></a></li>
 		
-			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
+			<li><a href="/tags/memset/">memset<span>1</span></a></li>
 		
-			<li><a href="/tags/算法/">算法<span>1</span></a></li>
+			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
 		
-			<li><a href="/tags/Source-Code/">Source_Code<span>1</span></a></li>
+			<li><a href="/tags/性能分析/">性能分析<span>1</span></a></li>
 		
-			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
+			<li><a href="/tags/stack/">stack<span>1</span></a></li>
 		
-			<li><a href="/tags/Scheduler/">Scheduler<span>1</span></a></li>
+			<li><a href="/tags/动态规划/">动态规划<span>1</span></a></li>
 		
-			<li><a href="/tags/linux/">linux<span>24</span></a></li>
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
 		
-			<li><a href="/tags/vim/">vim<span>2</span></a></li>
-		
-			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
+			<li><a href="/tags/pair/">pair<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>308</span></a></li>
+		   <li><a href="/tags">...<span>309</span></a></li>
 		 
 		</ul>
 	</div>
@@ -650,6 +649,10 @@ return 1;
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/" ><i class="fa fa-file-o"></i>一次 InputStream#read 使用不当导致的问题</a>
+      </li>
     
       <li>
         <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
@@ -665,10 +668,6 @@ return 1;
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
       </li>
     
   </ul>

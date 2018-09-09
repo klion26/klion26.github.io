@@ -119,6 +119,7 @@
 	  <h1 id="Info"><a href="#Info" class="headerlink" title="Info"></a>Info</h1><ul>
 <li>姓名: 邱从贤/klion26</li>
 <li>Gmail: qcx978132955</li>
+<li>Github: klion26</li>
 </ul>
 <h1 id="学习经历"><a href="#学习经历" class="headerlink" title="学习经历"></a>学习经历</h1><ul>
 <li>2008 - 2012 中南大学本科</li>
@@ -129,13 +130,13 @@
 <li>2015.7 - 2018.3 美团 数据平台</li>
 </ul>
 <h1 id="项目"><a href="#项目" class="headerlink" title="项目"></a>项目</h1><h2 id="美团"><a href="#美团" class="headerlink" title="美团"></a>美团</h2><ol>
-<li><p>ODS 数据实时拉去： 使用 Spark Streaming 将 ODS 数据实时同步进入数仓，数据可见性 15 分钟，单座也每天数据量最大 10T，拉取速度峰值 60W/s，数据一致性为恰好一次，实现 watermark 机制</p>
+<li><p>ODS 数据实时拉取： 使用 Spark Streaming 将 ODS 数据实时同步进入数仓，数据可见性 15 分钟，单作业每天最大数据量 10T，拉取速度峰值 60W/s，数据一致性为恰好一次，实现 watermark 机制</p>
 </li>
-<li><p>Spark Streaming 平台维护和改进：Spark Streaming 平台维护和改进，针对读取 kafka 进行一些定制（自动保存 offset，自适应 topic 扩容，纺织所有作业同一时间消费 kafka 等），在 Spark 1.6 上改进动态资源调整</p>
+<li><p>Spark Streaming 平台维护和改进：Spark Streaming 平台维护和改进，针对读取 kafka 进行一些定制（自动保存 offset，自适应 topic 扩容，防止所有作业同一时间消费 kafka 等），改进 Spark Streaming 1.6 的动态资源策略，能够更好的适应常驻作业</p>
 </li>
-<li><p>Rtdw 开发：为业务方提供一站式实时报表服务，从数据收集，到实时处理（Storm），以及最后的数据展示。</p>
+<li><p>Rtdw 开发：为业务方提供一站式实时报表服务，从数据收集，到实时处理（Storm），以及最后的数据展示</p>
 </li>
-<li><p>DimService&amp;StateService 开发维护：为 Storm 作业提供同一的 DimService 以及 StateService</p>
+<li><p>DimService&amp;StateService 开发维护：为 Storm 作业提供同一的 DimService 以及 StateService 服务</p>
 </li>
 <li><p>设备唯一 ID 服务开发维护：开发维护美团的设备唯一 ID 服务，服务可靠性 99.99%，90% 请求再 5ms 以内，设备 ID 一致性为 99.7%</p>
 </li>

@@ -121,6 +121,46 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2012-12-12 </div>
+			<div class="article-title"><a href="/2012/12/12/fedora-13-texlive2012-install-chinese-configure/" >Fedora 13 TexLive2012安装+中文配置</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><span style="color: #ff0000;">注：我博客里面所有类似风格的代码高亮都是由<span style="color: #0000ff;"><a href="http://fayaa.com/code" target="_blank" rel="external">代码发芽网</a></span>的代码高亮提供，特此说明</span></p>
+<p>由于各种原因，想在Fedora下装LaTeX软件，于是就有了这篇文章，这篇文章从安装到配置中文环境，中间遇到了各种蛋疼的问题。在这里记录下来，做个备份，也给后来人一份参考。</p>
+<p>首先，你可以去厦门大学的开源镜像下载TexLive2012 地址：<a href="http://mirrors.xmu.edu.cn/CTAN/systems/texlive/Images/" target="_blank" rel="external">http://mirrors.xmu.edu.cn/CTAN/systems/texlive/Images/</a><br>速度很给力的，一般都能在1M左右。</p>
+<p>下好之后，你需要安装，以下命令都是以root身份操作（如果你不知道命令到底需不需要root身份，那么就都用root身份吧）。</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">cd</span> ~/Downloads<br>mount -t iso9660 -o loop texlive2012-20120701.iso /mnt/<br><span style="color: #b0c4de; font-weight: bold;">cd</span> /mnt<br>./install-tl</div><br>其中Downloads是你ISO下载的地方。这样，你已经安装好了TeXLive2012了，你也可以用来排版英文的文献了。因为中文暂时还不支持。好下面我们就来说这蛋疼的中文了。</p>
+<p>网上主要有两种说法：</p>
+<p>第一种。从windows下copy一些字体，然后改一些配置文件，网上也有很多人说已经成功，不过由于本人用这种方法没有成功就不写了，这里给个<span style="color: #ff0000;"><a href="http://asc.2dark.org/node/129" target="_blank" rel="external"><span style="color: #ff0000;">链接</span></a></span>，也可以自己上网搜中文支持。</p>
+<p>第二种方法如下：</p>
+<p>首先你下载YueWang-zhfonts-final_1.01.tar.bz2包，地址在这里<a href="http://bj.soulinfo.com/%7Ehugang/tex/tex2007/YueWang-zhfonts-final_1.01.tar.bz2。" target="_blank" rel="external">http://bj.soulinfo.com/%7Ehugang/tex/tex2007/YueWang-zhfonts-final_1.01.tar.bz2。</a></p>
+<p>如果你RP够好的话，那么就能够在Linux下把这个动下下下来。好我们假定所有人的RP都想最近我的RP一样挫，那么你总是下到78%就下不下来了（也不知道为什么每次到这个点就下不动了，有人知道的话还请告知，在下不胜感激），而且每次在78%之前速度都是1000kb/s左右，然后一到78%，好见证你RP的时刻到了。不过就算RP再挫，我们也可以在windows下用迅雷把这个文件下下来，在这里我表示压力很大。</p>
+<p>到这里你应该已经把上面的压缩文件下下来了，如果还没有那请自行解决（就不说你RP为什么挫到这个地步了）。那么你来到下载的目录，然后解压缩这个文件，是不是解压缩完了之后，却没有发现它，ls也没有，图形化界面也没有？恩，你没有看错，是没有。因为作者把这个文件夹作成了隐藏文件，也就是文件夹名最前名有个点。然后你只要把texlive2007中的texmf-var文件夹copy到/usr/local/texlive下然后进行一系列操作就完成了。命令如下，都在root权限下进行的。</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">cp -rf texmf-var /usr/local/texlive<br><span style="color: #b0c4de; font-weight: bold;">cd</span> /usr/local/texlive<br>mv texmf-local texmf-local.backup<br>mv texmf-var texmf-local<br>texhash</div><br>上面的命令首先是把texmf-var文件夹copy到/usr/local/texlive下，然后对已有的texmf-local文件进行一个备份（对你不了解的文件进行操作时，你都应该这样做）。然后再把texmf-var改名为texmf-local。然后texhash是创建ls-R数据库，不懂就先照着做吧。好了，看也看累了，操作也操作烦了，那么下面就让我们来看看到底行不行了吧。</p>
+<p>用下面的tex文件进行测试下呗</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">\documentclass</span><span style="color: #ffffff;">[4pt]</span><span style="color: #b0c4de; font-weight: bold;">{</span>article<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\usepackage</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJKutf8<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\title</span><span style="color: #b0c4de; font-weight: bold;">{</span>Fuck-Chinese<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\author</span><span style="color: #b0c4de; font-weight: bold;">{</span>klion26<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\maketitle</span><br><span style="color: #b0c4de; font-weight: bold;">\begin</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJK<span style="color: #b0c4de; font-weight: bold;">}{</span>UTF8<span style="color: #b0c4de; font-weight: bold;">}{</span>kai<span style="color: #b0c4de; font-weight: bold;">}</span><br><del>~~Hello, 你好World</del>~~~<br>你好 Fuck Chinese<br><span style="color: #b0c4de; font-weight: bold;">\end</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJK<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\end</span><span style="color: #b0c4de; font-weight: bold;">{</span>document<span style="color: #b0c4de; font-weight: bold;">}</span></div><br>1.tex是上面这个tex文件的文件名</p>
+<p>然后用如下命令生成PDF或者PS格式的文件</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">latex 1.tex<br>dvipdfm 1.dvi</div><br>生成PDF文件</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">dvips 1.dvi</div><br>生成PS格式的。不过我系统上PS格式的文件乱码了。<br>另外要说的就是pdflatex不能用，貌似是说找不到字体，这个我暂时还不能解决，然后其他的应该都没啥问题了。</p>
+<p>到这里，你终于舒了一口气，TM的终于搞定了。恩，接下来你可以用tex来排版中文文献了。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2012-12-10 </div>
 			<div class="article-title"><a href="/2012/12/10/implicit-declaration-of-function-class-device-create/" >Implicit declaration of function class_device_create</a></div>						
 		</h3>
@@ -177,7 +217,7 @@
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#111;&#58;&#106;&#99;&#109;&#64;&#x6a;&#111;&#110;&#109;&#x61;&#115;&#x74;&#x65;&#x72;&#115;&#46;&#111;&#x72;&#x67;">&#106;&#99;&#109;&#64;&#x6a;&#111;&#110;&#109;&#x61;&#115;&#x74;&#x65;&#x72;&#115;&#46;&#111;&#x72;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#x6f;&#58;&#x6a;&#99;&#109;&#x40;&#x6a;&#111;&#110;&#x6d;&#x61;&#115;&#x74;&#101;&#x72;&#115;&#x2e;&#x6f;&#114;&#103;">&#x6a;&#99;&#109;&#x40;&#x6a;&#111;&#110;&#x6d;&#x61;&#115;&#x74;&#101;&#x72;&#115;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
@@ -453,32 +493,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-11-05 </div>
-			<div class="article-title"><a href="/2012/11/05/display-views-count-without-plugin/" >wordpress文章浏览量-非插件实现</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>刚开始弄我wordpress的时候，想加个浏览量的插件来着，同学推荐了一个叫WP-PostViews 的插件，装了一段时间之后就给卸载了，因为文章的浏览量会无辜增加好多，你刷新一下就可能发现文章的浏览量增加了几十甚至上百。这样就没什么意思了。最近实验室的同学也在弄wordpress,然后添加了一个浏览量的插件，然后突然想不用插件来实现这个，因为插件一多速度就不行了 。然后同学给了一个链接，可是加的代码一直出错，没办法，最后搜索出错信息的时候，发现了<a href="http://bacsoftwareconsulting.com/blog/index.php/wordpress-cat/how-to-track-and-display-post-views-count-in-wordpress-without-a-plugin/" target="_blank" rel="external">这篇文章</a>，刚好是不用插件实现这个功能的。然后就自己添加，而且这篇文章写的非常好，英文也很简单，我这里再简单说以下我添加的过程。首先我把上面那篇文章中的code-1的代码添加到functions.php的最后面，最好是先copy到本地的编辑器，然后确定没有全角符之类的，再复制到functions.php里面。然后再在single.php里面添加上文所说的CODE-2。至于所说的The-Loop其实就是那段处理每篇文章的代码，也就是说这段代码没篇文章都会用到，简单点就是你可以搜索文章作者，或者文章时间，然后查到相应的位置，接下来你在刚在搜索到地方加入CODE-2，就行了。</p>
-<p><span style="color: red;">——————————-追加——————–</span></p>
-<p><span style="color: red;">保存的PHP文件不能是UTF-8的，不然会出错，可以选择自己手动输入代码(别copy-paste)，或者下载下来，改完之后再传上去。</span></p>
-<p><span style="color: red;"><br><span style="color: #0000ff;">PS. 不同的主题可能会在不同的位置改这些东西，不过大致思路相同</span><br><span style="color: #0000ff;"> PSS. 不要再主页添加那段添加到single.php的代码，那样的话，你刷新主页也会把每一篇文章的浏览量加1，这一点可以自己参考CODE-1。你每次刷新文章界面也会增加浏览量</span><br><span style="color: #0000ff;"> PSSS.浏览量是从你添加代码才开始计算了，所以你很早以前的文章也会显示浏览量为0</span><br></span></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -531,9 +545,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -557,13 +571,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -571,11 +585,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -585,15 +599,15 @@
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -610,48 +624,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/select/">select<span>2</span></a></li>
+			<li><a href="/tags/git/">git<span>5</span></a></li>
 		
-			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
+			<li><a href="/tags/offset/">offset<span>1</span></a></li>
 		
-			<li><a href="/tags/django/">django<span>1</span></a></li>
+			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
 		
-			<li><a href="/tags/dag/">dag<span>1</span></a></li>
+			<li><a href="/tags/Task/">Task<span>1</span></a></li>
 		
-			<li><a href="/tags/protobuf/">protobuf<span>1</span></a></li>
+			<li><a href="/tags/scheme/">scheme<span>1</span></a></li>
 		
-			<li><a href="/tags/specify-timestamp/">specify_timestamp<span>1</span></a></li>
+			<li><a href="/tags/horn-formulas/">horn formulas<span>1</span></a></li>
 		
-			<li><a href="/tags/batchDuration/">batchDuration<span>1</span></a></li>
+			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
 		
-			<li><a href="/tags/github/">github<span>5</span></a></li>
-		
-			<li><a href="/tags/mathjax/">mathjax<span>1</span></a></li>
-		
-			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
+			<li><a href="/tags/JVM/">JVM<span>1</span></a></li>
 		
 			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
 		
-			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
+			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
 		
-			<li><a href="/tags/huffman-encoding/">huffman encoding<span>1</span></a></li>
+			<li><a href="/tags/question/">question<span>1</span></a></li>
 		
-			<li><a href="/tags/double-link-list/">double-link-list<span>1</span></a></li>
+			<li><a href="/tags/RecurringTimer/">RecurringTimer<span>1</span></a></li>
 		
-			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
+			<li><a href="/tags/chain-matrix-multiplication/">chain matrix multiplication<span>1</span></a></li>
 		
-			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
+			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
 		
-			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
 		
-			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
+			<li><a href="/tags/教师/">教师<span>1</span></a></li>
 		
-			<li><a href="/tags/插件/">插件<span>1</span></a></li>
+			<li><a href="/tags/tasksetmanager/">tasksetmanager<span>1</span></a></li>
 		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
+			<li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li>
+		
+			<li><a href="/tags/mapreduce/">mapreduce<span>1</span></a></li>
+		
+			<li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>308</span></a></li>
+		   <li><a href="/tags">...<span>309</span></a></li>
 		 
 		</ul>
 	</div>
@@ -662,6 +676,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/" ><i class="fa fa-file-o"></i>一次 InputStream#read 使用不当导致的问题</a>
+      </li>
     
       <li>
         <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
@@ -677,10 +695,6 @@
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
       </li>
     
   </ul>

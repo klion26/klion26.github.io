@@ -121,6 +121,31 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2013-12-25 </div>
+			<div class="article-title"><a href="/2013/12/25/string-to-integer-atoi/" >String to Integer (atoi) </a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>题目大意：给你一个字符串，需要把这个字符串转化成int值。<a href="http://oj.leetcode.com/problems/string-to-integer-atoi/" target="_blank" rel="external">链接在此</a></p>
+<p>思路：直接模拟即可，不过有很多坑，需要非常的仔细。首先要考虑正负号问题，一般来说大家习惯的处理负号，但是会忘掉正好，这个到也好改；然后接下来的问题是，可能字符串的一开始是一堆空格，需要跳过；接下来如果开始的字符不是数字的话，那么int值就置为0,然后直接退出，这个和接下来的同理；处理数字的过程中，如果遇到了<span style="color: #ff0000;">非数字字符</span>，那么就<span style="color: #ff0000;">直接退出</span>，因为int值已经确定了；然后接下来就是取值范围问题了，题目的要求是<span style="color: #ff0000;">超过int的</span>，<span style="color: #ff0000;">设置为INT_MAX</span>，<span style="color: #ff0000;">小于INT_MIN的设置为INT_MIN</span>，这样的话，我们可以用unsigned int来算中间结果，然后最后再把unsinged int转化为int，不过中间可能就超过了INT_MAX，比如字符串“1234567891234”，这个字符串转成int之后的值已经超过了INT_MAX，这就需要在处理的过程中进行判断了，我的判断方式是如果上一次的结果&gt;(INT_MAX/10)的话，那么将上一次的结果×10然后加上当前这个字符所代表的数，然后当作结果。当处理完之后，就只要把结果往int的范围内压缩就行了，然后再进行正负判断即可。思路挺简单的，不过坑不少。</p>
+<p><a href="https://github.com/klion26/LeetCode/blob/master/String-to-Integer(atoi" target="_blank" rel="external">代码在这里</a>.cpp)</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2013-12-22 </div>
 			<div class="article-title"><a href="/2013/12/22/spiral-matrix/" >Spiral Matrix</a></div>						
 		</h3>
@@ -605,50 +630,6 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2013-05-25 </div>
-			<div class="article-title"><a href="/2013/05/25/linux-command-shell-script-2/" >Linux命令行和Shell脚本编程2</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>接<a href="http://www.klion26.com/linux-command-shell-script.html" target="_blank" rel="external">上篇</a>，这篇主要写下这本书中有关结构化编程的一些东西。</p>
-<p>首先讲的是if条件判断，基本格式如下:</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">if </span><span style="color: #b0c4de; font-weight: bold;">command  #command表示测试性的语句</span><br><span style="color: #b0c4de; font-weight: bold;">then</span></div></p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">   commands   #需要执行的命令<br><span style="color: #b0c4de; font-weight: bold;">elif </span><span style="color: #b0c4de; font-weight: bold;">command</span><br>commands   #需要执行的命令<br><span style="color: #b0c4de; font-weight: bold;">else</span><br>commands   #需要执行的命令<br><span style="color: #b0c4de; font-weight: bold;">fi</span></div><br>不过我更喜欢的写法是在if command后面加上一个”;”然后把then写在第一行，这样主要是习惯问题</p>
-<p>判断的语句可以用一些命令来判断，如果命令执行成功的话就相当于判断成功，这里用的就是前面讲的命令执行后的退出码[成功的话会返回0，否则是一个1-255的值]。</p>
-<p>然后接下来就是所谓的test命令，test命令格式很简单</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">test </span>condition<br><span style="color: #f5deb3;">[</span> condition <span style="color: #f5deb3;">]</span></div><br>上面的两个都行，不过貌似大部分选的是第二种，但是第二种一定要注意，’[‘这condition之间，condition和’]’之间一定要有空格，不然会报错。</p>
-<p>然后数值比较有</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">n1 -eq n2    n1是否等于n2                     n1 -le n2   n1是否小于或等于n2<br>n1 -ge n2    n1是否大于或等于n2               n1 -lt n2   n1是否小于n2<br>n1 -gt n2    n1是否大于n2                     n1 -ne n2   n1是否不等于n2</div><br>字符串比较有</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #d8bfd8;">str1</span> <span style="color: #f5deb3;">=</span> str2  str1与str2是否相同        str1 &gt; str2  str1是否大于str2<br>str1 !<span style="color: #f5deb3;">=</span> str2 str1与str2是否不同      -n str1      str1的长度是否大于0<br>str1 &lt; str2  str1是否小于str2        -z str1      str1的长度是否为0</div><br>文件判断有</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">-d file  检查file是否存在并且是一个目录             -e file  检查file是否存在<br>-f file  检查file是否存在并且是一个文件             -r file  检查file是否存在并且可读<br>-s file  检查file是否存在并且不为空                 -w file  检查file是否存在并且可写<br>-x file  检查file是否存在并且可以执行               -O file  检查检查file是否存在并且被当前用户拥有<br>-G file  检查file是否存在并且默认组是否为当前用户组 file1-nt file2 检查file1是否比file2新<br>file1 -ot file2 检查file1是否比file2旧</div><br>不过需要注意一点的是，用’&gt;’比较的话，需要用反斜杠转义，不然会被当成重定向符号，比如下面的代码</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">[</span> <span style="color: #d8bfd8;">$var1</span> <span style="color: #7fffd4;">></span> <span style="color: #d8bfd8;">$var2</span> <span style="color: #f5deb3;">]</span>; <span style="color: #b0c4de; font-weight: bold;">then</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“$var1 is greater than $var2”</span><br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“$var1 is less than $var2”</span></div><br>如果在判读的时候不用转义的话，那么就会编程重定向到$var2</p>
-<p>接下来就是符合条件的检查了，也就是 AND和OR，格式如下</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">[</span> condition1 <span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">[</span> condition2 <span style="color: #f5deb3;">]</span><br><span style="color: #f5deb3;">[</span> condition1 <span style="color: #f5deb3;">]</span> || <span style="color: #f5deb3;">[</span> condition2 <span style="color: #f5deb3;">]</span></div><br>另外就是用双圆括号来使用高级数学公式，比如var++等。if (( $var ** 2 &gt; 90 )) 表示var的平方是否大于90。</p>
-<p>接下来就是case命令了，下面是格式</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">case </span>varable in<br>pattern1 | pattern2 ) commands1;  <span style="color: #da70d6;">#表示两个随便一个满足就行</span><br>pattern3) commands;               <span style="color: #da70d6;">#表示满足pattern3</span><br>*) default commands;              <span style="color: #da70d6;">#除了上面的情况之外的所有情况</span><br><span style="color: #b0c4de; font-weight: bold;">esac</span>                                <span style="color: #da70d6;">#一定要加这个结束表示</span></div><br>下面是for的介绍，基本格式为</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">for </span>var in list<br><span style="color: #b0c4de; font-weight: bold;">do</span><br>commands<br><span style="color: #b0c4de; font-weight: bold;">done</span></div><br>如果list中有单引号的话，那么要用转义字符把单引号给转义掉，或者使用双引号来包住整个list，例子如下</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">for </span><span style="color: #b0c4de; font-weight: bold;">test </span>in I don<span style="color: #7fffd4;">\’</span>t know <span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #7fffd4;">“this’ll”</span> work<br><span style="color: #b0c4de; font-weight: bold;">do</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“word:$test”</span><br><span style="color: #b0c4de; font-weight: bold;">done</span></div><br>还有如果list中有空格的话，也许要用双引号包起来。在bash中是把<strong>空格</strong>，<strong>制表符</strong>和<strong>换行符</strong>当成分隔符的<strong>，</strong>不过可以用IFS来设置，比如用”IFS=$’\n’”设置成只有换行符是分隔符，当然还可以使用通配符来生成list，比如”for file in /home/*”.接下来还可以使用和C风格类似的for语句，不过在shell里面写，会觉得很怪</p>
-<p>接下来是while的登场了，基本格式如下</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">while </span><span style="color: #b0c4de; font-weight: bold;">test command</span><br><span style="color: #b0c4de; font-weight: bold;">do</span><br>other commands<br><span style="color: #b0c4de; font-weight: bold;">done</span></div><br>还有就是until了，基本格式为</p>
-<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">until </span><span style="color: #b0c4de; font-weight: bold;">test </span>commands<br><span style="color: #b0c4de; font-weight: bold;">do</span><br>other commands<br><span style="color: #b0c4de; font-weight: bold;">done</span></div><br>接下来就是循环的嵌套和跳出了，嵌套没啥好讲的，跳出的话还可以比较给力的，主要是可以跳出多层循环，比如break 2就是跳出倒数第二层循环，continue 2会停止当前的循环，继续倒数第二层循环。</p>
-<p>最后可以在所有的结构化语句结束处用一个重定向语句就可以把这个结构里面的所有输出进行重定向。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -701,9 +682,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -727,13 +708,13 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -741,11 +722,11 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -755,15 +736,15 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -780,48 +761,48 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/greedy-algorithm/">greedy algorithm<span>1</span></a></li>
+			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
 		
-			<li><a href="/tags/成长/">成长<span>1</span></a></li>
+			<li><a href="/tags/job/">job<span>1</span></a></li>
 		
-			<li><a href="/tags/rename/">rename<span>1</span></a></li>
+			<li><a href="/tags/puzzle/">puzzle<span>1</span></a></li>
 		
-			<li><a href="/tags/fork/">fork<span>2</span></a></li>
+			<li><a href="/tags/text-plain/">text/plain<span>1</span></a></li>
 		
-			<li><a href="/tags/VMware/">VMware<span>3</span></a></li>
+			<li><a href="/tags/question/">question<span>1</span></a></li>
 		
-			<li><a href="/tags/math-expression/">math-expression<span>1</span></a></li>
+			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
 		
 			<li><a href="/tags/code-style/">code-style<span>1</span></a></li>
 		
-			<li><a href="/tags/算法/">算法<span>1</span></a></li>
+			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
 		
-			<li><a href="/tags/DIP/">DIP<span>1</span></a></li>
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
 		
-			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
+			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
 		
-			<li><a href="/tags/jekyll/">jekyll<span>1</span></a></li>
+			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
+		
+			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
 		
 			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
 		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+			<li><a href="/tags/Source-Code/">Source_Code<span>1</span></a></li>
 		
-			<li><a href="/tags/poll/">poll<span>1</span></a></li>
+			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
 		
-			<li><a href="/tags/horn-formulas/">horn formulas<span>1</span></a></li>
+			<li><a href="/tags/network/">network<span>1</span></a></li>
 		
-			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
+			<li><a href="/tags/how/">how<span>1</span></a></li>
 		
-			<li><a href="/tags/分析/">分析<span>1</span></a></li>
+			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
 		
-			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
+			<li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li>
 		
-			<li><a href="/tags/reservior/">reservior<span>1</span></a></li>
-		
-			<li><a href="/tags/gdb/">gdb<span>2</span></a></li>
+			<li><a href="/tags/hive/">hive<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>308</span></a></li>
+		   <li><a href="/tags">...<span>309</span></a></li>
 		 
 		</ul>
 	</div>
@@ -832,6 +813,10 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/" ><i class="fa fa-file-o"></i>一次 InputStream#read 使用不当导致的问题</a>
+      </li>
     
       <li>
         <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
@@ -847,10 +832,6 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
       </li>
     
   </ul>

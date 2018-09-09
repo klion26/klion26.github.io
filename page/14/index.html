@@ -121,6 +121,29 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-04-30 </div>
+			<div class="article-title"><a href="/2011/04/30/primitive-root-poj-1284/" >原根的个数 POJ_1284</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<div>首先e[m,a]表示使得a^e[m,a]=1(mod m)的最小的正整数.那么我们有e[m,a^k]=e[m,a]/gcd(e[m,a],k)(k&gt;0).证明如下:记x=e[m,a],x’=x/gcd(x,k);x’’=e[m,a^k];先证明x’|x’’.</div><br><div>由题意可知a^x=1(mod m)  (a^k)^x’’=1(mod m)</div><br><div>由性质又因为e[m,a]|k<em>x’’,所以 x’=(x/gcd(x,k)) | (k</em>x’’/(gcd(x,k)).又gcd(x/gcd(x,k),k/gcd(x,k))=1.所以x’|x’’.</div><br><div>再证明x’’|x’      </div><br><div>a^(k<em>x’)=(a^k)^x’=1(mod m)—&gt;x’’|x’</em></div><br><div>所以x’=x’’;</div><br><div>推论如果gcd(k,e[m,a])=1,e[m,a^k]=e[m,a];我们可以用这个来求原根的个数.假设一个数n存在原根,且最小的原根等于g.n的欧拉函数为phi[n].那么n的原根的个数就是phi[phi[n]].也就是g的t次方[gcd(t,phi[n])=1 1&lt;=t&lt;phi[n])也是一个原根,当然这里也包含了所有的原根[想想为什么?似乎只能说明原根数至少是phi[phi[n]]个?再好好想想就出来了.注意a^k != 1(mod m)(k&lt;e[m,a])]</div><br><div>那么1284就直接求一个数的欧拉函数了.代码如下:</div><br><div class="dp-highlighter"><br><br>1.  <span><span class="comment">/ </span> </span><br>2.  <span><span class="comment">ID:klion26 </span> </span><br>3.  <span><span class="comment">LANG:C </span> </span><br>4.  <span><span class="comment">TASK:POJ_1284 </span> </span><br>5.  <span><span class="comment"> <em>/</em></span><span>  </span></span><br>6.  <span> </span><span class="preprocessor">#include <stdio.h> </stdio.h></span><span>  </span><br>7.  <span class="preprocessor">#include <string.h> </string.h></span><span>  </span><br>8.  <span class="preprocessor">#include <stdlib.h> </stdlib.h></span><span>  </span><br>9.  <span class="preprocessor">#include <math.h> </math.h></span><span>  </span><br>10.  <span>  </span><br>11.  <span class="datatypes">int</span><span> eular[65540];   </span><br>12.  <span class="keyword">void</span><span> init()   </span><br>13.  <span>{   </span><br>14.  <span>    </span><span class="datatypes">int</span><span> i,j;   </span><br>15.  <span>    memset(eular,0,</span><span class="keyword">sizeof</span><span>(eular));   </span><br>16.  <span>    </span><span class="keyword">for</span><span>(i=2;i<65536;i++) <="" span=""><br>17.  <span>        {   </span><br>18.  <span>            </span><span class="keyword">if</span><span>(0 == eular[i])   </span><br>19.  <span>                {   </span><br>20.  <span>                    </span><span class="keyword">for</span><span>(j=i;j<65536;j+=i) <="" span=""><br>21.  <span>                        {   </span><br>22.  <span>                            </span><span class="keyword">if</span><span>(0 == eular[j])   </span><br>23.  <span>                                eular[j]=j;   </span><br>24.  <span>                            eular[j] /= i;   </span><br>25.  <span>                            eular[j] = (i-1);   </span><br>26.  <span>                        }   </span><br>27.  <span>                }   </span><br>28.  <span>        }   </span><br>29.  <span>}   </span><br>30.  <span class="datatypes">int</span><span> main(</span><span class="keyword">void</span><span>)   </span><br>31.  <span>{   </span><br>32.  <span>    </span><span class="datatypes">int</span><span> p;   </span><br>33.  <span>    init();   </span><br>34.  <span>    </span><span class="keyword">while</span><span>(EOF != scanf(</span><span class="string">“%d”</span><span>,p))   </span><br>35.  <span>        {   </span><br>36.  <span>            printf(</span><span class="string">“%d\n”</span><span>,eular[eular[p]]);   </span><br>37.  <span>        }   </span><br>38.  <span>    </span><span class="keyword">return</span><span> 0;   </span><br>39.  <span>}   </span><br></65536;j+=i)></span></65536;i++)></span></div>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-04-23 </div>
 			<div class="article-title"><a href="/2011/04/23/5th-csu-acm-competition/" >第五届中南大学校赛-klion26</a></div>						
 		</h3>
@@ -389,29 +412,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-04-09 </div>
-			<div class="article-title"><a href="/2011/04/09/pointers-on-c-advanced-point/" >C和指针13章 高级指针话题</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>本章的东西比较少,主要是关于指针的高级应用.对于指针的应用有一点就必须要注意了.运算符的顺序,比如怎么写是指针数组,怎么写是指向数组的指针.<br>1.int <em>f();//一个函数,返回值是int </em><br>    int (<em>f)();//一个函数指针,指向一个返回值是int的函数.<span style="color: #ff0000;">注意这里我省略了参数</span><br><span style="color: #ff0000;">   <span style="color: #000000;">int </span></span></em>(<em>f)();//一个函数指针,指向的函数的返回值是int </em><br><span style="color: #ff0000;"><span style="color: #000000;">   对于这些可以这么理解,int (<em>f)();把</em>f看成一个整体,是个函数,然后<em>f就变成了指向这个整体的一个指针.</em></span></span><br><span style="color: #ff0000;"><span style="color: #000000;"> int (<em>f[])();//f是一个数组,数组的每个元素是一个指针类型,指针指向返回值是int </em>的函数</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">在Unix系统中,可以用cdecl程序来帮助你解释这些声明.</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">2.函数指针的两个应用:I.回调函数,大致模板如下:int fun(int a,int (<em>com)(void const </em>a,void const <em>b));这里的com就是一个回调函数,也就是用户需要用fun函数的时候,需要传一个函数的指针过来,而指向的这个函数是由用户来编写的.这里可以参照qsort的cmp函数.</em></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">什么时候用回调函数:编写的函数必须能够在不同的时候执行不同类型的工作或者执行只能由函数调用者定义的工作,你都可以使用这个技巧。</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">注意:回调函数传过来的是一个函数指针,而不是函数本身.这个函数参数必须是void const .在函数里面你必须保证转换成正确的类型.如果想和系统的一些函数保持兼容的话,那么相等返回0.不相等返回1.这个主要好似字符串的时候,这样可以表示3种情况.0:相等,-1:第一个小.1(或者只是一个大于0的书):第一个大.</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">II.转移表:就是一个数组的每个元素都是函数指针.然后通过下标来访问对应的函数.double (<em>oper_func [])(double,double)={add,sub,mul,div};</em></span></span><br><span style="color: #ff0000;"><span style="color: #000000;">转移表要非常注意下标的溢出,一点溢出就可能非常难于调试.</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">3.main函数的两个参数.这个没什么讲的,argc表示参数个数,argv是参数指针.argv的第一个是文件名.</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">4.字符串常量,是一个指针常量.”abc”[2]的值是’c’.这里的[2]可以看成是指针+2.这样就很好理解了,下面的函数打印出的’‘随n的不同而不同</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">void mystery(int n)</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">{//n有范围限制</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">      n += 5;</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">     n /= 10;</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">    printf(“%s\n”,”<strong><strong>**</strong></strong>“+10-n);</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">}</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">本章编程提示总结:</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">1.如果并非必要,避免使用多层间接访问</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">2.cdecl程序可以帮助你分析复杂的声明</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">3.把void *强制转换为其他类型的指针时必须小心</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">4.使用转移表时,应该始终验证下标的有效性.[可以在调用函数的开始和结束输出一些有意义的话语]</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">5.破坏性的命令行参数处理方式使你以后无法再次进行处理</span></span><br><span style="color: #ff0000;"><span style="color: #000000;">6.不寻常的代码始终应该加上一条注释,描述它的目的和原理</span></span></p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -464,9 +464,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -490,13 +490,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -504,11 +504,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -518,15 +518,15 @@
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -543,48 +543,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/RocksDBStateBackend/">RocksDBStateBackend<span>1</span></a></li>
+			<li><a href="/tags/top排序/">top排序<span>2</span></a></li>
 		
-			<li><a href="/tags/hdfs/">hdfs<span>2</span></a></li>
+			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
 		
-			<li><a href="/tags/job/">job<span>1</span></a></li>
-		
-			<li><a href="/tags/traversal/">traversal<span>1</span></a></li>
-		
-			<li><a href="/tags/vi/">vi<span>2</span></a></li>
-		
-			<li><a href="/tags/6-824/">6.824<span>2</span></a></li>
-		
-			<li><a href="/tags/settings/">settings<span>1</span></a></li>
-		
-			<li><a href="/tags/spiral-matrix/">spiral-matrix<span>1</span></a></li>
-		
-			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
-		
-			<li><a href="/tags/gnome-tweak-tool/">gnome-tweak-tool<span>1</span></a></li>
-		
-			<li><a href="/tags/inside/">inside<span>1</span></a></li>
-		
-			<li><a href="/tags/proof/">proof<span>1</span></a></li>
-		
-			<li><a href="/tags/hash/">hash<span>1</span></a></li>
-		
-			<li><a href="/tags/ndbm/">ndbm<span>1</span></a></li>
-		
-			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
-		
-			<li><a href="/tags/lzo/">lzo<span>1</span></a></li>
-		
-			<li><a href="/tags/计算机安全/">计算机安全<span>1</span></a></li>
+			<li><a href="/tags/google-adsense/">google-adsense<span>1</span></a></li>
 		
 			<li><a href="/tags/hive/">hive<span>1</span></a></li>
 		
-			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
+			<li><a href="/tags/数据结构/">数据结构<span>1</span></a></li>
 		
-			<li><a href="/tags/tmux-tools/">tmux, tools<span>1</span></a></li>
+			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
+		
+			<li><a href="/tags/inside/">inside<span>1</span></a></li>
+		
+			<li><a href="/tags/MPI/">MPI<span>1</span></a></li>
+		
+			<li><a href="/tags/最坏情况/">最坏情况<span>1</span></a></li>
+		
+			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
+		
+			<li><a href="/tags/可能性/">可能性<span>1</span></a></li>
+		
+			<li><a href="/tags/rbtree/">rbtree<span>1</span></a></li>
+		
+			<li><a href="/tags/independent-sets-in-trees/">independent sets in trees<span>1</span></a></li>
+		
+			<li><a href="/tags/redis/">redis<span>1</span></a></li>
+		
+			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
+		
+			<li><a href="/tags/append/">append<span>2</span></a></li>
+		
+			<li><a href="/tags/The-Little-Scheme/">The Little Scheme<span>1</span></a></li>
+		
+			<li><a href="/tags/Task/">Task<span>1</span></a></li>
+		
+			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
+		
+			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>308</span></a></li>
+		   <li><a href="/tags">...<span>309</span></a></li>
 		 
 		</ul>
 	</div>
@@ -595,6 +595,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/" ><i class="fa fa-file-o"></i>一次 InputStream#read 使用不当导致的问题</a>
+      </li>
     
       <li>
         <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
@@ -610,10 +614,6 @@
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
       </li>
     
   </ul>

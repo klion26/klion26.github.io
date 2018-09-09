@@ -121,6 +121,34 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2011-11-27 </div>
+			<div class="article-title"><a href="/2011/11/27/fuzhou-a-hdu-4121/" >[模拟]HDU_4121</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="http://acm.hdu.edu.cn/showproblem.php?pid=4121" target="_blank" rel="external">地址</a></p>
+<p>福州赛区的A题,我们队因为没有过这个题导致最后的悲剧,废话不多说了，下面是简单的分析+代码.</p>
+<p>首先我们可以设置一个map[][]数组记录某个点有没有子,然后让将做四个方向，再判断是否会被吃掉，如果有一个方向不会被吃掉，那么就不是死棋，否则就是。</p>
+<p>判断是否会被吃掉的时候，如果是帅，就判断y坐标相等，且中间无子，车的判断类似。炮的判断可以变为炮和将中间有几个子，一个的话就ok，否则炮吃不了将。马的话，考虑不能走就行了。</p>
+<p>代码如下:</p>
+<div class="dp-highlighter"><br><br>1.  <span><span>#include <cstdio> </cstdio></span></span><br>2.  <span>#include <cstring> </cstring></span><br>3.  <span>#include <cstdlib> </cstdlib></span><br>4.  <span>#include <cmath> </cmath></span><br>5.  <span> </span><br>6.  <span> </span><span class="keyword">char</span><span> role[</span><span class="number">30</span><span>]; </span><br>7.  <span class="keyword">int</span><span> x[</span><span class="number">30</span><span>],y[</span><span class="number">30</span><span>]; </span><br>8.  <span class="keyword">int</span><span> dir[</span><span class="number">4</span><span>][</span><span class="number">2</span><span>]={{</span><span class="number">0</span><span>,</span><span class="number">1</span><span>},{</span><span class="number">1</span><span>,</span><span class="number">0</span><span>},{</span><span class="number">0</span><span>,-</span><span class="number">1</span><span>},{-</span><span class="number">1</span><span>,</span><span class="number">0</span><span> }} ; </span><br>9.  <span class="keyword">int</span><span> hdir[</span><span class="number">8</span><span>][</span><span class="number">2</span><span>]= {{ -</span><span class="number">1</span><span>,</span><span class="number">2</span><span>},{</span><span class="number">1</span><span>,</span><span class="number">2</span><span>},{</span><span class="number">2</span><span>,</span><span class="number">1</span><span>},{</span><span class="number">2</span><span>,-</span><span class="number">1</span><span>},{</span><span class="number">1</span><span>,-</span><span class="number">2</span><span>},{-</span><span class="number">1</span><span>,-</span><span class="number">2</span><span>},{-</span><span class="number">2</span><span>,-</span><span class="number">1</span><span>},{-</span><span class="number">2</span><span>,</span><span class="number">1</span><span> }} ; </span><br>10.  <span class="keyword">int</span><span> X,Y; </span><br>11.  <span class="keyword">int</span><span> n; </span><br>12.  <span>bool have[</span><span class="number">30</span><span>][</span><span class="number">30</span><span>]; </span><br>13.  <span> </span><br>14.  <span class="keyword">int</span><span> min(</span><span class="keyword">int</span><span> a,</span><span class="keyword">int</span><span> b) </span><br>15.  <span>{ </span><br>16.  <span> </span><span class="keyword">return</span><span> a<b?a:b; <="" span=""><br>17.  <span>} </span><br>18.  <span class="keyword">int</span><span> max(</span><span class="keyword">int</span><span> a,</span><span class="keyword">int</span><span> b) </span><br>19.  <span>{ </span><br>20.  <span> </span><span class="keyword">return</span><span> a&gt;b?a:b; </span><br>21.  <span>} </span><br>22.  <span> </span><br>23.  <span>bool can(</span><span class="keyword">int</span><span> X,</span><span class="keyword">int</span><span> Y) </span><br>24.  <span>{ </span><br>25.  <span> </span><span class="keyword">int</span><span> i,j; </span><br>26.  <span> </span><span class="keyword">int</span><span> cnt; </span><br>27.  <span> </span><span class="keyword">int</span><span> tx,ty; </span><br>28.  <span> </span><span class="keyword">for</span><span>(i=</span><span class="number">0</span><span>i<n;++i) <="" span=""><br>29.  <span> { </span><br>30.  <span> </span><span class="keyword">if</span><span>(!have[x[i]][y[i]]) </span><br>31.  <span> </span><span class="keyword">continue</span><span> </span><br>32.  <span> </span><span class="comment">//G </span><span> </span><br>33.  <span> </span><span class="keyword">if</span><span>(‘G’==role[i]) </span><br>34.  <span> { </span><br>35.  <span> </span><span class="keyword">if</span><span>(y[i]==Y) </span><br>36.  <span> { </span><br>37.  <span> </span><span class="keyword">for</span><span>(j=min(X,x[i])+</span><span class="number">1</span><span>j<max(x,x[i]);++j) <="" span=""><br>38.  <span> { </span><br>39.  <span> </span><span class="keyword">if</span><span>(have[j][Y]) </span><br>40.  <span> </span><span class="keyword">break</span><span> </span><br>41.  <span> } </span><br>42.  <span> </span><span class="keyword">if</span><span>(j==max(X,x[i])) </span><br>43.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>44.  <span> } </span><br>45.  <span> } </span><br>46.  <span> </span><span class="comment">//R </span><span> </span><br>47.  <span> </span><span class="keyword">if</span><span>(‘R’==role[i]) </span><br>48.  <span> { </span><br>49.  <span> </span><span class="keyword">if</span><span>(Y==y[i]) </span><br>50.  <span> { </span><br>51.  <span> </span><span class="keyword">for</span><span>(j=min(X,x[i])+</span><span class="number">1</span><span>j<max(x,x[i]);++j) <="" span=""><br>52.  <span> { </span><br>53.  <span> </span><span class="keyword">if</span><span>(have[j][Y]) </span><br>54.  <span> </span><span class="keyword">break</span><span> </span><br>55.  <span> } </span><br>56.  <span> </span><span class="keyword">if</span><span>(j==max(X,x[i])) </span><br>57.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>58.  <span> } </span><br>59.  <span> </span><span class="keyword">if</span><span>(X==x[i]) </span><br>60.  <span> { </span><br>61.  <span> </span><span class="keyword">for</span><span>(j=min(Y,y[i])+</span><span class="number">1</span><span>j<max(y,y[i]);++j) <="" span=""><br>62.  <span> </span><span class="keyword">if</span><span>(have[X][j]) </span><br>63.  <span> </span><span class="keyword">break</span><span> </span><br>64.  <span> </span><span class="keyword">if</span><span>(j==max(Y,y[i])) </span><br>65.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>66.  <span> } </span><br>67.  <span> } </span><br>68.  <span> </span><span class="comment">//C </span><span> </span><br>69.  <span> </span><span class="keyword">if</span><span>(‘C’==role[i]) </span><br>70.  <span> { </span><br>71.  <span> </span><span class="keyword">if</span><span>(X==x[i]) </span><br>72.  <span> { </span><br>73.  <span> cnt=</span><span class="number">0</span><span> </span><br>74.  <span> </span><span class="keyword">for</span><span>(j=min(Y,y[i])+</span><span class="number">1</span><span>j<max(y,y[i]);++j) <="" span=""><br>75.  <span> </span><span class="keyword">if</span><span>(have[X][j]) </span><br>76.  <span> ++cnt; </span><br>77.  <span> </span><span class="keyword">if</span><span>(</span><span class="number">1</span><span>==cnt) </span><br>78.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>79.  <span> } </span><br>80.  <span> </span><span class="keyword">if</span><span>(Y==y[i]) </span><br>81.  <span> { </span><br>82.  <span> cnt=</span><span class="number">0</span><span> </span><br>83.  <span> </span><span class="keyword">for</span><span>(j=min(X,x[i])+</span><span class="number">1</span><span>j<max(x,x[i]);++j) <="" span=""><br>84.  <span> </span><span class="keyword">if</span><span>(have[j][Y]) </span><br>85.  <span> ++cnt; </span><br>86.  <span> </span><span class="keyword">if</span><span>(</span><span class="number">1</span><span>==cnt) </span><br>87.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>88.  <span> } </span><br>89.  <span> } </span><br>90.  <span> </span><span class="comment">//H </span><span> </span><br>91.  <span> </span><span class="keyword">if</span><span>(‘H’==role[i]) </span><br>92.  <span> { </span><br>93.  <span> </span><span class="keyword">for</span><span>(j=</span><span class="number">0</span><span>j&lt;</span><span class="number">8</span><span>;++j) </span><br>94.  <span> { </span><br>95.  <span> tx = x[i]+hdir[j][</span><span class="number">0</span><span>]; </span><br>96.  <span> ty = y[i]+hdir[j][</span><span class="number">1</span><span>]; </span><br>97.  <span> </span><span class="keyword">if</span><span>(tx&lt;</span><span class="number">1</span><span>||tx&gt;</span><span class="number">10</span><span>||ty&lt;</span><span class="number">1</span><span>||ty&gt;</span><span class="number">9</span><span>) </span><br>98.  <span> </span><span class="keyword">continue</span><span> </span><br>99.  <span> </span><span class="keyword">int</span><span> sbx,sby; </span><br>100.  <span> sbx = x[i]+hdir[j][</span><span class="number">0</span><span>]/</span><span class="number">2</span><span> </span><br>101.  <span> sby = y[i]+hdir[j][</span><span class="number">1</span><span>]/</span><span class="number">2</span><span> </span><br>102.  <span> </span><span class="keyword">if</span><span>(have[sbx][sby]) </span><br>103.  <span> </span><span class="keyword">continue</span><span> </span><br>104.  <span> </span><span class="keyword">if</span><span>(tx==X&amp;ty==Y) </span><br>105.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">false</span><span> </span><br>106.  <span> } </span><br>107.  <span> } </span><br>108.  <span> } </span><br>109.  <span> </span><span class="keyword">return</span><span> </span><span class="keyword">true</span><span> </span><br>110.  <span>} </span><br>111.  <span> </span><br>112.  <span class="keyword">int</span><span> main(</span><span class="keyword">void</span><span>) </span><br>113.  <span>{ </span><br>114.  <span> #ifndef ONLINE_JUDGE </span><br>115.  <span> freopen(</span><span class="string">“1001.in”</span><span>,</span><span class="string">“r”</span><span>,stdin); </span><br>116.  <span> freopen(</span><span class="string">“1001.out”</span><span>,</span><span class="string">“w”</span><span>,stdout); </span><br>117.  <span> #endif </span><br>118.  <span> </span><span class="keyword">int</span><span> i; </span><br>119.  <span> </span><span class="keyword">int</span><span> tx,ty; </span><br>120.  <span> bool tmp; </span><br>121.  <span> </span><span class="keyword">char</span><span> ch; </span><br>122.  <span> </span><span class="keyword">while</span><span>(EOF!=scanf(</span><span class="string">“%d%d%d”</span><span>,n,&amp;X,&amp;Y)) </span><br>123.  <span> { </span><br>124.  <span> </span><span class="keyword">if</span><span>(</span><span class="number">0</span><span>==n&amp;</span><span class="number">0</span><span>==X&amp;&amp;</span><span class="number">0</span><span>==Y) </span><br>125.  <span> </span><span class="keyword">break</span><span> </span><br>126.  <span> </span><br>127.  <span> memset(have,</span><span class="keyword">false</span><span>,sizeof(have)); </span><br>128.  <span> </span><span class="keyword">for</span><span>(i=</span><span class="number">0</span><span>i<n;++i) <="" span=""><br>129.  <span> { </span><br>130.  <span> ch=getchar(); </span><br>131.  <span> </span><span class="keyword">while</span><span>(!(ch&gt;=’A’&amp;ch&lt;=’Z’)) </span><br>132.  <span> ch=getchar(); </span><br>133.  <span> role[i]=ch; </span><br>134.  <span> scanf(</span><span class="string">“%d%d”</span><span>,x[i],&amp;y[i]); </span><br>135.  <span> have[x[i]][y[i]]=</span><span class="keyword">true</span><span> </span><br>136.  <span> } </span><br>137.  <span> </span><span class="keyword">for</span><span>(i=</span><span class="number">0</span><span>i&lt;</span><span class="number">4</span><span>;++i) </span><br>138.  <span> { </span><br>139.  <span> tx = X+dir[i][</span><span class="number">0</span><span>]; </span><br>140.  <span> ty = Y+dir[i][</span><span class="number">1</span><span>]; </span><br>141.  <span> </span><span class="keyword">if</span><span>(tx&lt;</span><span class="number">1</span><span>||tx&gt;</span><span class="number">3</span><span>||ty&lt;</span><span class="number">4</span><span>||ty&gt;</span><span class="number">6</span><span>) </span><br>142.  <span> </span><span class="keyword">continue</span><span> </span><br>143.  <span> tmp = have[tx][ty]; </span><br>144.  <span> have[tx][ty]=</span><span class="keyword">false</span><span> </span><br>145.  <span> </span><span class="keyword">if</span><span>(can(tx,ty)) </span><br>146.  <span> { </span><br>147.  <span> </span><span class="keyword">break</span><span> </span><br>148.  <span> } </span><br>149.  <span> have[tx][ty]=tmp; </span><br>150.  <span> } </span><br>151.  <span> </span><br>152.  <span> </span><span class="keyword">if</span><span>(</span><span class="number">4</span><span>==i) </span><br>153.  <span> { </span><br>154.  <span> printf(</span><span class="string">“YES\n”</span><span>); </span><br>155.  <span> } </span><br>156.  <span> </span><span class="keyword">else</span><span> </span><br>157.  <span> { </span><br>158.  <span> printf(</span><span class="string">“NO\n”</span><span>); </span><br>159.  <span> } </span><br>160.  <span> } </span><br>161.  <span> </span><span class="keyword">return</span><span> </span><span class="number">0</span><span> </span><br>162.  <span>} </span><br></n;++i)></span></max(x,x[i]);++j)></span></max(y,y[i]);++j)></span></max(y,y[i]);++j)></span></max(x,x[i]);++j)></span></max(x,x[i]);++j)></span></n;++i)></span></b?a:b;></span></div>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2011-08-29 </div>
 			<div class="article-title"><a href="/2011/08/29/usaco-5-4-5-5/" >USACO 5.4&amp;5.5</a></div>						
 		</h3>
@@ -365,35 +393,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2011-05-23 </div>
-			<div class="article-title"><a href="/2011/05/23/mon-monsterkill-xiangtan-by-klion26/" >Mon-monsterkill湘潭行by klion26</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>===本来是去湖大校赛的,后来由于某些原因,我们就去了湘潭(当然我更倾向于去湘潭)===</p>
-<p>我们队应该说还是不成熟,个人(我)能力不行,团队配合不是很好,有时另外两个人根本听不懂剩下的那个人在说什么(或者说根本没在听),代码能力还有待加强.1A率不高.下面是流水账,按出题顺序来写.(由于湘潭周二还会挂网络赛,所以就不说算法了,等网络赛完了之后再补吧)</p>
-<p>A,水题,然后写了交上去,由于没加stdio ce了,FB没了.<br>B, 1A           C,1A               D, 1A                F, 3A(4A?)                 J. 1A</p>
-<p>E,两个人理解错题意,一开始想着随机水(因为过的人已经不少了),后来Azuki看题后,才发现其他两个人看错题了,囧啊.让后Gamor敲之,这期间其他两个人在邪恶的吃着中餐(香喷喷的鸡腿-_-||),这题由于一些细节问题TLE了一次,2A.</p>
-<p>接下来就成了垃圾时间了,其实这个时候,我们还是有优势的,不过后面差不多两个小时就没有一点作为,首先是Azuki的H,一直WA,然后三人一直搞这个,思路怎么想都没问题,数据也测了好多,居然没测出问题.然后这题最后也没过,赛后谢大说只错了小数据(他们还手算了我们出错的数据,太谢谢了),这个应该是实现问题了.还有一个G,由于H和G题题意不是很清楚的缘故,没敢上去写,其实给半个小时,G题应该没啥问题.然后郭嘉三国杀那题,确实没想到算法,最后一题Azuki说他会做,还有主要程序段的模板,可是他没看题,然后其他两个看过题的不懂算法= =||。然后就悲剧的收场了.然后没有拿到monsterkill</p>
-<p>比赛结束后我去湘大逛了一圈,不过时间太紧了,然后就回科大了,结果在科大还等了好久-_-||,然后就回来了,这次湘大之行郁闷的占6/10,高兴的占4/10吧,郁闷的是被再踩(这个还好),没有monsterkill.</p>
-<p>解题报告上给的是:<br>A&amp;&amp;B         C语言<br>C              想法题<br>D              GCD<br>E              想法<br>F              数学<br>G              模拟<br>H              DP<br>I               高斯消元<br>J               AC自动机/Trie图<br>K               插头DP</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -446,9 +445,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -472,13 +471,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -486,11 +485,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -500,15 +499,15 @@
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -525,48 +524,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
+			<li><a href="/tags/notes/">notes<span>0</span></a></li>
 		
-			<li><a href="/tags/specify-timestamp/">specify_timestamp<span>1</span></a></li>
+			<li><a href="/tags/rm/">rm<span>1</span></a></li>
 		
-			<li><a href="/tags/写作/">写作<span>1</span></a></li>
+			<li><a href="/tags/apache-storm/">apache-storm<span>2</span></a></li>
 		
-			<li><a href="/tags/风险/">风险<span>1</span></a></li>
+			<li><a href="/tags/exercise/">exercise<span>8</span></a></li>
 		
-			<li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li>
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
 		
-			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
+			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
 		
-			<li><a href="/tags/scala/">scala<span>1</span></a></li>
+			<li><a href="/tags/State/">State<span>1</span></a></li>
 		
-			<li><a href="/tags/binary-tree/">binary-tree<span>1</span></a></li>
+			<li><a href="/tags/积分/">积分<span>1</span></a></li>
 		
-			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
+			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
 		
-			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
+			<li><a href="/tags/标记-清除/">标记-清除<span>1</span></a></li>
 		
-			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
+			<li><a href="/tags/APUE/">APUE<span>4</span></a></li>
 		
-			<li><a href="/tags/horn-formulas/">horn formulas<span>1</span></a></li>
+			<li><a href="/tags/inside/">inside<span>1</span></a></li>
 		
-			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
+			<li><a href="/tags/scc/">scc<span>1</span></a></li>
 		
-			<li><a href="/tags/streaming/">streaming<span>1</span></a></li>
+			<li><a href="/tags/gcj/">gcj<span>1</span></a></li>
 		
-			<li><a href="/tags/成长/">成长<span>1</span></a></li>
+			<li><a href="/tags/reliability/">reliability<span>1</span></a></li>
 		
-			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+			<li><a href="/tags/QQ/">QQ<span>1</span></a></li>
 		
-			<li><a href="/tags/性能分析/">性能分析<span>1</span></a></li>
+			<li><a href="/tags/pqsort/">pqsort<span>1</span></a></li>
 		
-			<li><a href="/tags/gdb/">gdb<span>2</span></a></li>
+			<li><a href="/tags/competition/">competition<span>5</span></a></li>
 		
-			<li><a href="/tags/algorithms/">algorithms<span>1</span></a></li>
+			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
 		
-			<li><a href="/tags/svm/">svm<span>1</span></a></li>
+			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>308</span></a></li>
+		   <li><a href="/tags">...<span>309</span></a></li>
 		 
 		</ul>
 	</div>
@@ -577,6 +576,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/" ><i class="fa fa-file-o"></i>一次 InputStream#read 使用不当导致的问题</a>
+      </li>
     
       <li>
         <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
@@ -592,10 +595,6 @@
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
       </li>
     
   </ul>

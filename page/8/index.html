@@ -121,6 +121,50 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2013-05-25 </div>
+			<div class="article-title"><a href="/2013/05/25/linux-command-shell-script-2/" >Linux命令行和Shell脚本编程2</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>接<a href="http://www.klion26.com/linux-command-shell-script.html" target="_blank" rel="external">上篇</a>，这篇主要写下这本书中有关结构化编程的一些东西。</p>
+<p>首先讲的是if条件判断，基本格式如下:</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">if </span><span style="color: #b0c4de; font-weight: bold;">command  #command表示测试性的语句</span><br><span style="color: #b0c4de; font-weight: bold;">then</span></div></p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">   commands   #需要执行的命令<br><span style="color: #b0c4de; font-weight: bold;">elif </span><span style="color: #b0c4de; font-weight: bold;">command</span><br>commands   #需要执行的命令<br><span style="color: #b0c4de; font-weight: bold;">else</span><br>commands   #需要执行的命令<br><span style="color: #b0c4de; font-weight: bold;">fi</span></div><br>不过我更喜欢的写法是在if command后面加上一个”;”然后把then写在第一行，这样主要是习惯问题</p>
+<p>判断的语句可以用一些命令来判断，如果命令执行成功的话就相当于判断成功，这里用的就是前面讲的命令执行后的退出码[成功的话会返回0，否则是一个1-255的值]。</p>
+<p>然后接下来就是所谓的test命令，test命令格式很简单</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">test </span>condition<br><span style="color: #f5deb3;">[</span> condition <span style="color: #f5deb3;">]</span></div><br>上面的两个都行，不过貌似大部分选的是第二种，但是第二种一定要注意，’[‘这condition之间，condition和’]’之间一定要有空格，不然会报错。</p>
+<p>然后数值比较有</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">n1 -eq n2    n1是否等于n2                     n1 -le n2   n1是否小于或等于n2<br>n1 -ge n2    n1是否大于或等于n2               n1 -lt n2   n1是否小于n2<br>n1 -gt n2    n1是否大于n2                     n1 -ne n2   n1是否不等于n2</div><br>字符串比较有</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #d8bfd8;">str1</span> <span style="color: #f5deb3;">=</span> str2  str1与str2是否相同        str1 &gt; str2  str1是否大于str2<br>str1 !<span style="color: #f5deb3;">=</span> str2 str1与str2是否不同      -n str1      str1的长度是否大于0<br>str1 &lt; str2  str1是否小于str2        -z str1      str1的长度是否为0</div><br>文件判断有</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;">-d file  检查file是否存在并且是一个目录             -e file  检查file是否存在<br>-f file  检查file是否存在并且是一个文件             -r file  检查file是否存在并且可读<br>-s file  检查file是否存在并且不为空                 -w file  检查file是否存在并且可写<br>-x file  检查file是否存在并且可以执行               -O file  检查检查file是否存在并且被当前用户拥有<br>-G file  检查file是否存在并且默认组是否为当前用户组 file1-nt file2 检查file1是否比file2新<br>file1 -ot file2 检查file1是否比file2旧</div><br>不过需要注意一点的是，用’&gt;’比较的话，需要用反斜杠转义，不然会被当成重定向符号，比如下面的代码</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">[</span> <span style="color: #d8bfd8;">$var1</span> <span style="color: #7fffd4;">></span> <span style="color: #d8bfd8;">$var2</span> <span style="color: #f5deb3;">]</span>; <span style="color: #b0c4de; font-weight: bold;">then</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“$var1 is greater than $var2”</span><br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“$var1 is less than $var2”</span></div><br>如果在判读的时候不用转义的话，那么就会编程重定向到$var2</p>
+<p>接下来就是符合条件的检查了，也就是 AND和OR，格式如下</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">[</span> condition1 <span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&amp;</span> <span style="color: #f5deb3;">[</span> condition2 <span style="color: #f5deb3;">]</span><br><span style="color: #f5deb3;">[</span> condition1 <span style="color: #f5deb3;">]</span> || <span style="color: #f5deb3;">[</span> condition2 <span style="color: #f5deb3;">]</span></div><br>另外就是用双圆括号来使用高级数学公式，比如var++等。if (( $var ** 2 &gt; 90 )) 表示var的平方是否大于90。</p>
+<p>接下来就是case命令了，下面是格式</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">case </span>varable in<br>pattern1 | pattern2 ) commands1;  <span style="color: #da70d6;">#表示两个随便一个满足就行</span><br>pattern3) commands;               <span style="color: #da70d6;">#表示满足pattern3</span><br>*) default commands;              <span style="color: #da70d6;">#除了上面的情况之外的所有情况</span><br><span style="color: #b0c4de; font-weight: bold;">esac</span>                                <span style="color: #da70d6;">#一定要加这个结束表示</span></div><br>下面是for的介绍，基本格式为</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">for </span>var in list<br><span style="color: #b0c4de; font-weight: bold;">do</span><br>commands<br><span style="color: #b0c4de; font-weight: bold;">done</span></div><br>如果list中有单引号的话，那么要用转义字符把单引号给转义掉，或者使用双引号来包住整个list，例子如下</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">for </span><span style="color: #b0c4de; font-weight: bold;">test </span>in I don<span style="color: #7fffd4;">\’</span>t know <span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #7fffd4;">“this’ll”</span> work<br><span style="color: #b0c4de; font-weight: bold;">do</span><br><span style="color: #b0c4de; font-weight: bold;">echo</span> <span style="color: #7fffd4;">“word:$test”</span><br><span style="color: #b0c4de; font-weight: bold;">done</span></div><br>还有如果list中有空格的话，也许要用双引号包起来。在bash中是把<strong>空格</strong>，<strong>制表符</strong>和<strong>换行符</strong>当成分隔符的<strong>，</strong>不过可以用IFS来设置，比如用”IFS=$’\n’”设置成只有换行符是分隔符，当然还可以使用通配符来生成list，比如”for file in /home/*”.接下来还可以使用和C风格类似的for语句，不过在shell里面写，会觉得很怪</p>
+<p>接下来是while的登场了，基本格式如下</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">while </span><span style="color: #b0c4de; font-weight: bold;">test command</span><br><span style="color: #b0c4de; font-weight: bold;">do</span><br>other commands<br><span style="color: #b0c4de; font-weight: bold;">done</span></div><br>还有就是until了，基本格式为</p>
+<p><div class="source" style="font-family: 'Courier New', 'Lucida Console', Verdana; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">until </span><span style="color: #b0c4de; font-weight: bold;">test </span>commands<br><span style="color: #b0c4de; font-weight: bold;">do</span><br>other commands<br><span style="color: #b0c4de; font-weight: bold;">done</span></div><br>接下来就是循环的嵌套和跳出了，嵌套没啥好讲的，跳出的话还可以比较给力的，主要是可以跳出多层循环，比如break 2就是跳出倒数第二层循环，continue 2会停止当前的循环，继续倒数第二层循环。</p>
+<p>最后可以在所有的结构化语句结束处用一个重定向语句就可以把这个结构里面的所有输出进行重定向。</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2013-05-24 </div>
 			<div class="article-title"><a href="/2013/05/24/linux-command-shell-script/" >Linux命令行和shell脚本编程笔记</a></div>						
 		</h3>
@@ -402,46 +446,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2012-12-12 </div>
-			<div class="article-title"><a href="/2012/12/12/fedora-13-texlive2012-install-chinese-configure/" >Fedora 13 TexLive2012安装+中文配置</a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p><span style="color: #ff0000;">注：我博客里面所有类似风格的代码高亮都是由<span style="color: #0000ff;"><a href="http://fayaa.com/code" target="_blank" rel="external">代码发芽网</a></span>的代码高亮提供，特此说明</span></p>
-<p>由于各种原因，想在Fedora下装LaTeX软件，于是就有了这篇文章，这篇文章从安装到配置中文环境，中间遇到了各种蛋疼的问题。在这里记录下来，做个备份，也给后来人一份参考。</p>
-<p>首先，你可以去厦门大学的开源镜像下载TexLive2012 地址：<a href="http://mirrors.xmu.edu.cn/CTAN/systems/texlive/Images/" target="_blank" rel="external">http://mirrors.xmu.edu.cn/CTAN/systems/texlive/Images/</a><br>速度很给力的，一般都能在1M左右。</p>
-<p>下好之后，你需要安装，以下命令都是以root身份操作（如果你不知道命令到底需不需要root身份，那么就都用root身份吧）。</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">cd</span> ~/Downloads<br>mount -t iso9660 -o loop texlive2012-20120701.iso /mnt/<br><span style="color: #b0c4de; font-weight: bold;">cd</span> /mnt<br>./install-tl</div><br>其中Downloads是你ISO下载的地方。这样，你已经安装好了TeXLive2012了，你也可以用来排版英文的文献了。因为中文暂时还不支持。好下面我们就来说这蛋疼的中文了。</p>
-<p>网上主要有两种说法：</p>
-<p>第一种。从windows下copy一些字体，然后改一些配置文件，网上也有很多人说已经成功，不过由于本人用这种方法没有成功就不写了，这里给个<span style="color: #ff0000;"><a href="http://asc.2dark.org/node/129" target="_blank" rel="external"><span style="color: #ff0000;">链接</span></a></span>，也可以自己上网搜中文支持。</p>
-<p>第二种方法如下：</p>
-<p>首先你下载YueWang-zhfonts-final_1.01.tar.bz2包，地址在这里<a href="http://bj.soulinfo.com/%7Ehugang/tex/tex2007/YueWang-zhfonts-final_1.01.tar.bz2。" target="_blank" rel="external">http://bj.soulinfo.com/%7Ehugang/tex/tex2007/YueWang-zhfonts-final_1.01.tar.bz2。</a></p>
-<p>如果你RP够好的话，那么就能够在Linux下把这个动下下下来。好我们假定所有人的RP都想最近我的RP一样挫，那么你总是下到78%就下不下来了（也不知道为什么每次到这个点就下不动了，有人知道的话还请告知，在下不胜感激），而且每次在78%之前速度都是1000kb/s左右，然后一到78%，好见证你RP的时刻到了。不过就算RP再挫，我们也可以在windows下用迅雷把这个文件下下来，在这里我表示压力很大。</p>
-<p>到这里你应该已经把上面的压缩文件下下来了，如果还没有那请自行解决（就不说你RP为什么挫到这个地步了）。那么你来到下载的目录，然后解压缩这个文件，是不是解压缩完了之后，却没有发现它，ls也没有，图形化界面也没有？恩，你没有看错，是没有。因为作者把这个文件夹作成了隐藏文件，也就是文件夹名最前名有个点。然后你只要把texlive2007中的texmf-var文件夹copy到/usr/local/texlive下然后进行一系列操作就完成了。命令如下，都在root权限下进行的。</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">cp -rf texmf-var /usr/local/texlive<br><span style="color: #b0c4de; font-weight: bold;">cd</span> /usr/local/texlive<br>mv texmf-local texmf-local.backup<br>mv texmf-var texmf-local<br>texhash</div><br>上面的命令首先是把texmf-var文件夹copy到/usr/local/texlive下，然后对已有的texmf-local文件进行一个备份（对你不了解的文件进行操作时，你都应该这样做）。然后再把texmf-var改名为texmf-local。然后texhash是创建ls-R数据库，不懂就先照着做吧。好了，看也看累了，操作也操作烦了，那么下面就让我们来看看到底行不行了吧。</p>
-<p>用下面的tex文件进行测试下呗</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">\documentclass</span><span style="color: #ffffff;">[4pt]</span><span style="color: #b0c4de; font-weight: bold;">{</span>article<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\usepackage</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJKutf8<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\title</span><span style="color: #b0c4de; font-weight: bold;">{</span>Fuck-Chinese<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\author</span><span style="color: #b0c4de; font-weight: bold;">{</span>klion26<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\maketitle</span><br><span style="color: #b0c4de; font-weight: bold;">\begin</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJK<span style="color: #b0c4de; font-weight: bold;">}{</span>UTF8<span style="color: #b0c4de; font-weight: bold;">}{</span>kai<span style="color: #b0c4de; font-weight: bold;">}</span><br><del>~~Hello, 你好World</del>~~~<br>你好 Fuck Chinese<br><span style="color: #b0c4de; font-weight: bold;">\end</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJK<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\end</span><span style="color: #b0c4de; font-weight: bold;">{</span>document<span style="color: #b0c4de; font-weight: bold;">}</span></div><br>1.tex是上面这个tex文件的文件名</p>
-<p>然后用如下命令生成PDF或者PS格式的文件</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">latex 1.tex<br>dvipdfm 1.dvi</div><br>生成PDF文件</p>
-<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">dvips 1.dvi</div><br>生成PS格式的。不过我系统上PS格式的文件乱码了。<br>另外要说的就是pdflatex不能用，貌似是说找不到字体，这个我暂时还不能解决，然后其他的应该都没啥问题了。</p>
-<p>到这里，你终于舒了一口气，TM的终于搞定了。恩，接下来你可以用tex来排版中文文献了。</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -494,9 +498,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -520,13 +524,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -534,11 +538,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -548,15 +552,15 @@
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -573,48 +577,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/metric-core/">metric-core<span>1</span></a></li>
+			<li><a href="/tags/bit/">bit<span>0</span></a></li>
 		
-			<li><a href="/tags/mathcs/">mathcs<span>1</span></a></li>
+			<li><a href="/tags/spark/">spark<span>8</span></a></li>
 		
-			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
+			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
 		
-			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+			<li><a href="/tags/vundle/">vundle<span>1</span></a></li>
 		
-			<li><a href="/tags/zookeeper/">zookeeper<span>3</span></a></li>
+			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
 		
-			<li><a href="/tags/rpm/">rpm<span>1</span></a></li>
+			<li><a href="/tags/code/">code<span>2</span></a></li>
 		
-			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+			<li><a href="/tags/i-o/">i/o<span>1</span></a></li>
 		
-			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
+			<li><a href="/tags/I-O-HDFS-InputStream-read-problem-solving/">I/O, HDFS, InputStream, read, problem_solving<span>1</span></a></li>
 		
-			<li><a href="/tags/爱的能力/">爱的能力<span>1</span></a></li>
+			<li><a href="/tags/https/">https<span>1</span></a></li>
 		
-			<li><a href="/tags/topcoder/">topcoder<span>1</span></a></li>
+			<li><a href="/tags/class-destroy/">class_destroy<span>1</span></a></li>
 		
-			<li><a href="/tags/redis/">redis<span>1</span></a></li>
+			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
 		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
+			<li><a href="/tags/bomb/">bomb<span>1</span></a></li>
 		
-			<li><a href="/tags/real-time-computing/">real_time-computing<span>2</span></a></li>
+			<li><a href="/tags/fedora/">fedora<span>15</span></a></li>
 		
-			<li><a href="/tags/Task/">Task<span>1</span></a></li>
+			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
 		
-			<li><a href="/tags/tree/">tree<span>1</span></a></li>
+			<li><a href="/tags/plugin/">plugin<span>1</span></a></li>
 		
-			<li><a href="/tags/binlog/">binlog<span>1</span></a></li>
+			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
 		
-			<li><a href="/tags/C和指针/">C和指针<span>3</span></a></li>
+			<li><a href="/tags/计算几何/">计算几何<span>5</span></a></li>
 		
-			<li><a href="/tags/Java/">Java<span>3</span></a></li>
+			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
 		
-			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
+			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
 		
-			<li><a href="/tags/my-life/">my life<span>1</span></a></li>
+			<li><a href="/tags/pair/">pair<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>308</span></a></li>
+		   <li><a href="/tags">...<span>309</span></a></li>
 		 
 		</ul>
 	</div>
@@ -625,6 +629,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/" ><i class="fa fa-file-o"></i>一次 InputStream#read 使用不当导致的问题</a>
+      </li>
     
       <li>
         <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
@@ -640,10 +648,6 @@
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
       </li>
     
   </ul>

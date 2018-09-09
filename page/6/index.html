@@ -121,6 +121,68 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2014-07-08 </div>
+			<div class="article-title"><a href="/2014/07/08/select-and-poll/" >select &amp;&amp; poll 函数</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>select 和 poll 是在 Linux 下进行 I/O 复用时所使用的技术，当然现在有更高级的 epoll。I/O 复用典型使用场合如下：</p>
+<ul>
+<li>当客户端处理多个描述符时，必须使用 I/O 复用。</li>
+<li>一个客户同时处理多个套接字是可能的，不过比较少见。</li>
+<li>如果一个 TCP 服务器既要处理监听套接字，又要处理已连接套接字，一般就要使用 I/O 复用。</li>
+<li>如果一个服务器既要处理 TCP，又要处理 UDP，一般就使用 I/O 复用。</li>
+<li>如果一个服务器要处理多个服务或者多个协议，一般就要使用 I/O 复用。<br>1. select 函数介绍<br><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">select</span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">maxfdp1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd_set</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">readset</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd_set</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">writeset</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">fd_set</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">exceptset</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">const</span> <span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">timeval</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">timeout</span>);</div><br>其中第一个参数表示 select 每次轮询的时候需要检查多少个描述符，也就是你需要监听的所有描述符中值最大的再加上1（描述符从0开始的）；第二个，第三个，第四个参数分别表示需要监听的读事件，写事件，异常事件，且这三个参数都是 [值-结果] 型的，也就是说在调用过程中会更改，最后结果保存在这三个参数中，第五个参数表示等待的时间，有三种可能：永远等待下去，等待一段固定的时间，不等待。</li>
+</ul>
+<p>2. select 例子 一个 C/S 简单程序</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">========================================</span><span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">===========================</span><br><span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;">str_cli</span>(<span style="color: #98fb98; font-weight: bold;">FILE</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">fp</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">sockfd</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">maxfdp1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">stdineof</span><br><span style="color: #f5deb3;">fd_set</span> <span style="color: #f5deb3;">rset</span><br><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">MAXLINE</span><span style="color: #f5deb3;">];</span><br><span style="color: #98fb98; font-weight: bold;">int</span>n;<span style="color: #f5deb3;">stdineof</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">FD_ZERO</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rset</span>); //清空 reset<span style="color: #b0c4de; font-weight: bold;">for</span>( ; ; ) //无限循环<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">stdineof</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>)  //如果客户端没有关闭才把 fp 加入到监测集合中<br><span style="color: #f5deb3;">FD_SET</span>(<span style="color: #f5deb3;">fileno</span>(<span style="color: #f5deb3;">fp</span><span style="color: #f5deb3;">),</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rset</span>);<br><span style="color: #f5deb3;">FD_SET</span>(<span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rset</span>);  //把 sockfd 加入到监测中<br><span style="color: #f5deb3;">maxfdp1</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">max</span>(<span style="color: #f5deb3;">fileno</span>(<span style="color: #f5deb3;">fp</span><span style="color: #f5deb3;">),</span> <span style="color: #f5deb3;">sockfd</span>) <span style="color: #f5deb3;">+</span> <span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">select</span>(<span style="color: #f5deb3;">maxfdp1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rset</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span>);  //进行 select<br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">FD_ISSET</span>(<span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rset</span>)) <span style="color: #da70d6;">// socket is readable</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>( (n <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">read</span>(<span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">MAXLINE</span>)) <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">stdineof</span> <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">1</span>)<br><span style="color: #b0c4de; font-weight: bold;">return</span> ;     <span style="color: #da70d6;">/ normal termination <em>/</em></span><br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“str_cli: server terminated prematurely”</span>);<br><span style="color: #f5deb3;">}</span><br><span style="color: #da70d6;">//fputs(recvline, stdout);</span><br><span style="color: #f5deb3;">write</span>(<span style="color: #f5deb3;">fileno</span>(<span style="color: #f5deb3;">stdout</span><span style="color: #f5deb3;">),</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">,</span> n);<br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">FD_ISSET</span>(<span style="color: #f5deb3;">fileno</span>(<span style="color: #f5deb3;">fp</span><span style="color: #f5deb3;">),</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rset</span>)) <span style="color: #da70d6;">/ input is readable <em>/</em></span><br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>( (n <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">read</span>(<span style="color: #f5deb3;">fileno</span>(<span style="color: #f5deb3;">fp</span><span style="color: #f5deb3;">),</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">MAXLINE</span>)) <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">stdineof</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">shutdown</span>(<span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">SHUT_WR</span>);  <span style="color: #da70d6;">/ send FIN <em>/</em></span><br><span style="color: #f5deb3;">FD_CLR</span>(<span style="color: #f5deb3;">fileno</span>(<span style="color: #f5deb3;">fp</span><span style="color: #f5deb3;">),</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rset</span>);<br><span style="color: #b0c4de; font-weight: bold;">continue</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">write</span>(<span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">,</span> n);<br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">main</span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">argc</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">argv</span><span style="color: #f5deb3;">[])</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">5</span><span style="color: #f5deb3;">];</span><br><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">sockaddr_in</span> <span style="color: #f5deb3;">servaddr</span><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">argc</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">2</span>)<br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“usage: tcpcli <ipaddress>“</ipaddress></span>);</div></p>
+<p><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #add8e6;">5</span>; <span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">i</span>)//这里可以忽律为什么是5,这个是我做其他测试用的，实际上只需要一个就行<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">socket</span>(<span style="color: #f5deb3;">AF_INET</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">SOCK_STREAM</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>);</p>
+<p><span style="color: #f5deb3;">bzero</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">servaddr</span>));<br><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sin_family</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">AF_INET</span><br><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sin_port</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">htons</span>(<span style="color: #f5deb3;">SERV_PORT</span>);<br><span style="color: #f5deb3;">inet_pton</span>(<span style="color: #f5deb3;">AF_INET</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">argv</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">],</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sin_addr</span>);</p>
+<p><span style="color: #f5deb3;">connect</span>(<span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">],</span> (<span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">sockaddr</span> <span style="color: #f5deb3;">*</span>)<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">servaddr</span>));<br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">str_cli</span>(<span style="color: #f5deb3;">stdin</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">]);</span><br><span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">0</span>);<br><span style="color: #f5deb3;">}</span></p>
+<p><span style="color: #f5deb3;">==========================</span><span style="color: #f5deb3;">server</span><span style="color: #f5deb3;">===========================</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">main</span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">argc</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">*</span><span style="color: #f5deb3;">argv</span><span style="color: #f5deb3;">[])</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span>  <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">maxi</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">maxfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">listenfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">connfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">sockfd</span><br><span style="color: #98fb98; font-weight: bold;">int</span>  <span style="color: #f5deb3;">nready</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">FD_SETSIZE</span><span style="color: #f5deb3;">];</span><br><span style="color: #98fb98; font-weight: bold;">ssize_t</span> n;<br><span style="color: #f5deb3;">fd_set</span> <span style="color: #f5deb3;">rset</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">allset</span><br><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">MAXLINE</span><span style="color: #f5deb3;">];</span><br><span style="color: #f5deb3;">socklen_t</span> <span style="color: #f5deb3;">clilen</span><br><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">sockaddr_in</span> <span style="color: #f5deb3;">cliaddr</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">server</span></p>
+<p><span style="color: #f5deb3;">listenfd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">socket</span>(<span style="color: #f5deb3;">AF_INET</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">SOCK_STREAM</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>);</p>
+<p><span style="color: #f5deb3;">bzero</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">servaddr</span>));<br><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sin_family</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">AF_INET</span><br><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sin_addr</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">s_addr</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">htonl</span>(<span style="color: #f5deb3;">INADDR_ANY</span>);<br><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sin_port</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">htons</span>(<span style="color: #f5deb3;">SERV_PORT</span>);</p>
+<p><span style="color: #f5deb3;">bind</span>(<span style="color: #f5deb3;">listenfd</span><span style="color: #f5deb3;">,</span> (<span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">sockaddr</span> <span style="color: #f5deb3;">*</span>)<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">servaddr</span>));</p>
+<p><span style="color: #f5deb3;">listen</span>(<span style="color: #f5deb3;">listenfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">LISTENQ</span>);</p>
+<p><span style="color: #f5deb3;">maxfd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">listenfd</span><br><span style="color: #f5deb3;">maxi</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">FD_SETSIZE</span>; <span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">i</span>)<br><span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">FD_ZERO</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">allset</span>);<br><span style="color: #f5deb3;">FD_SET</span>(<span style="color: #f5deb3;">listenfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">allset</span>);</p>
+<p><span style="color: #b0c4de; font-weight: bold;">for</span>( ; ; )<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">rset</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">allset</span><br><span style="color: #f5deb3;">nready</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">select</span>(<span style="color: #f5deb3;">maxfd</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rset</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">NULL</span>);</p>
+<p><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">FD_ISSET</span>(<span style="color: #f5deb3;">listenfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rset</span>))  <span style="color: #da70d6;">/<em> new client connection </em>/</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">clilen</span> <span style="color: #f5deb3;">=</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">cliaddr</span>);<br><span style="color: #f5deb3;">connfd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">accept</span>(<span style="color: #f5deb3;">listenfd</span><span style="color: #f5deb3;">,</span> (<span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">sockaddr</span><span style="color: #f5deb3;">*</span>)<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">cliaddr</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">clilen</span>);</p>
+<p><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">FD_SETSIZE</span>; <span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">i</span>)<br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">connfd</span><br><span style="color: #b0c4de; font-weight: bold;">break</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">FD_SETSIZE</span>)<br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“too many clients”</span>);<br><span style="color: #f5deb3;">FD_SET</span>(<span style="color: #f5deb3;">connfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">allset</span>); <span style="color: #da70d6;">/<em> add new descriptor to set </em>/</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">connfd</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">maxfd</span>)<br><span style="color: #f5deb3;">maxfd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">connfd</span>     <span style="color: #da70d6;">/<em> for select </em>/</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">maxi</span>)<br><span style="color: #f5deb3;">maxi</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span>             <span style="color: #da70d6;">/<em> max index in client[] array </em>/</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">–</span><span style="color: #f5deb3;">nready</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #b0c4de; font-weight: bold;">continue</span>             <span style="color: #da70d6;">/<em> no more readable descriptors </em>/</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span> <span style="color: #f5deb3;">maxi</span>; <span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">i</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>( (<span style="color: #f5deb3;">sockfd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #b0c4de; font-weight: bold;">continue</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">FD_ISSET</span>(<span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">rset</span>))<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>( (n <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">read</span>(<span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">MAXLINE</span>)) <span style="color: #f5deb3;">==</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #da70d6;">/<em> connection closed by client </em>/</span><br><span style="color: #f5deb3;">close</span>(<span style="color: #f5deb3;">sockfd</span>);<br><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“closed by client </span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #f5deb3;">FD_CLR</span>(<span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">allset</span>);<br><span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">writen</span>(<span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">,</span> n);<br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">–</span><span style="color: #f5deb3;">nready</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #b0c4de; font-weight: bold;">break</span>             <span style="color: #da70d6;">/<em> no more readable descriptors </em>/</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span></p>
+<p><br>上面的程序能够基本说明 select 的大致运用，一定要注意的一点是 select 每次的 readset，writeset，exceptset 都会被 select 修改，所以每次都需要自己重新进行设定。</p>
+<p>3. poll 函数</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">poll</span>(<span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">pollfd</span> <span style="color: #f5deb3;"><em></em></span><span style="color: #f5deb3;">fdarray</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">unsigned</span> <span style="color: #98fb98; font-weight: bold;">long</span> <span style="color: #f5deb3;">nfds</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">timeout</span>);<br><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">pollfd</span><span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">fd</span>        <span style="color: #da70d6;">/ descriptor to check <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">short</span> <span style="color: #f5deb3;">events</span>    <span style="color: #da70d6;">/ events of interest on fd <em>/</em></span><br><span style="color: #98fb98; font-weight: bold;">short</span> <span style="color: #f5deb3;">revents</span><span style="color: #da70d6;">/ events that occurred on fd */</span></div><br>第一个参数是 struct pollfd 型的数组，第二个参数表示你需要监听第一个参数中的前多少个元素，第三个参数表示你愿意等待多久。下面是把上面用 select 实现的服务器用 poll 来实现一次，大致思路一致，我们已经不需要专门的 client 数组来保存连接的描述符了。</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #eeee00;">#define OPEN_MAX 1024</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">argc</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">*</span><span style="color: #f5deb3;">argv</span><span style="color: #f5deb3;">[])</span><br><span style="color: #f5deb3;">{</span><br><span style="color: #98fb98; font-weight: bold;">int</span>  <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">maxi</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">listenfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">connfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">sockfd</span><br><span style="color: #98fb98; font-weight: bold;">int</span>  <span style="color: #f5deb3;">nready</span><br><span style="color: #98fb98; font-weight: bold;">ssize_t</span> n;<br><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">MAXLINE</span><span style="color: #f5deb3;">];</span><br><span style="color: #f5deb3;">socklen_t</span> <span style="color: #f5deb3;">clilen</span><br><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">pollfd</span> <span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">OPEN_MAX</span><span style="color: #f5deb3;">];</span><br><span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">sockaddr_in</span> <span style="color: #f5deb3;">cliaddr</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">listenfd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">socket</span>(<span style="color: #f5deb3;">AF_INET</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">SOCK_STREAM</span><span style="color: #f5deb3;">,</span> <span style="color: #add8e6;">0</span>);</div></p>
+<p><span style="color: #f5deb3;">bzero</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">servaddr</span>));<br><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sin_family</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">AF_INET</span><br><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sin_addr</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">s_addr</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">htonl</span>(<span style="color: #f5deb3;">INADDR_ANY</span>);<br><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">sin_port</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">htons</span>(<span style="color: #f5deb3;">SERV_PORT</span>);</p>
+<p><span style="color: #f5deb3;">bind</span>(<span style="color: #f5deb3;">listenfd</span><span style="color: #f5deb3;">,</span> (<span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">sockaddr</span><span style="color: #f5deb3;">*</span>)<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">servaddr</span><span style="color: #f5deb3;">,</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">servaddr</span>));</p>
+<p><span style="color: #f5deb3;">listen</span>(<span style="color: #f5deb3;">listenfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">LISTENQ</span>);</p>
+<p><span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">fd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">listenfd</span><br><span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">events</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">POLLRDNORM</span><br><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">OPEN_MAX</span>; <span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">i</span>)<br><span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">fd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span>         <span style="color: #da70d6;">/<em> -1 indicates available entry </em>/</span><br><span style="color: #f5deb3;">maxi</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span></p>
+<p><span style="color: #b0c4de; font-weight: bold;">for</span>( ; ; )<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">nready</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">poll</span>(<span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">maxi</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">INFTIM</span>);</p>
+<p><span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“nready:%d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">nready</span>);<br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">0</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">revents</span> <span style="color: #f5deb3;"></span> <span style="color: #f5deb3;">POLLRDNORM</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">clilen</span> <span style="color: #f5deb3;">=</span> <span style="color: #b0c4de; font-weight: bold;">sizeof</span>(<span style="color: #f5deb3;">cliaddr</span>);<br><span style="color: #f5deb3;">connfd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">accept</span>(<span style="color: #f5deb3;">listenfd</span><span style="color: #f5deb3;">,</span> (<span style="color: #b0c4de; font-weight: bold;">struct</span> <span style="color: #f5deb3;">sockaddr</span><span style="color: #f5deb3;">*</span>)<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">cliaddr</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">&amp;</span><span style="color: #f5deb3;">clilen</span>);</p>
+<p><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">OPEN_MAX</span>; <span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">i</span>)<br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">fd</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">fd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">connfd</span><br><span style="color: #b0c4de; font-weight: bold;">break</span><br><span style="color: #f5deb3;">}</span></p>
+<p><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">OPEN_MAX</span>)<br><span style="color: #f5deb3;">err_quit</span>(<span style="color: #7fffd4;">“too many clients”</span>);</p>
+<p><span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">events</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">POLLRDNORM</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">maxi</span>)<br><span style="color: #f5deb3;">maxi</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span></p>
+<p><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">–</span><span style="color: #f5deb3;">nready</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #b0c4de; font-weight: bold;">continue</span><br><span style="color: #f5deb3;">}</span></p>
+<p><span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">1</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;=</span><span style="color: #f5deb3;">maxi</span>; <span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">i</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>( (<span style="color: #f5deb3;">sockfd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">fd</span>) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #b0c4de; font-weight: bold;">continue</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">revents</span> <span style="color: #f5deb3;"></span> (<span style="color: #f5deb3;">POLLRDNORM</span> | <span style="color: #f5deb3;">POLLERR</span>))<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>( (n <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">read</span>(<span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">MAXLINE</span>)) <span style="color: #f5deb3;">&lt;</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">errno</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">ECONNRESET</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">close</span>(<span style="color: #f5deb3;">sockfd</span>);<br><span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">fd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">err_sys</span>(<span style="color: #7fffd4;">“read error”</span>);<br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">else</span> <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> n)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">close</span>(<span style="color: #f5deb3;">sockfd</span>);<br><span style="color: #f5deb3;">client</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">].</span><span style="color: #f5deb3;">fd</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #f5deb3;">writen</span>(<span style="color: #f5deb3;">sockfd</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">buf</span><span style="color: #f5deb3;">,</span> n);</p>
+<p><span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">–</span><span style="color: #f5deb3;">nready</span> <span style="color: #f5deb3;">&lt;=</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #b0c4de; font-weight: bold;">break</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span><br><span style="color: #f5deb3;">}</span></p>
+<p><br>Reference</p>
+<p>Unix 网络编程 卷一 第六章</p>
+
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2014-06-20 </div>
 			<div class="article-title"><a href="/2014/06/20/nginx-http-filter-module/" >Nginx HTTP Filter 模块</a></div>						
 		</h3>
@@ -453,31 +515,6 @@
 
            
 		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2013-12-25 </div>
-			<div class="article-title"><a href="/2013/12/25/string-to-integer-atoi/" >String to Integer (atoi) </a></div>						
-		</h3>
-	
-
-
-			  <div class="entry">
-  <div class="row">
-	
-	
-		<p>题目大意：给你一个字符串，需要把这个字符串转化成int值。<a href="http://oj.leetcode.com/problems/string-to-integer-atoi/" target="_blank" rel="external">链接在此</a></p>
-<p>思路：直接模拟即可，不过有很多坑，需要非常的仔细。首先要考虑正负号问题，一般来说大家习惯的处理负号，但是会忘掉正好，这个到也好改；然后接下来的问题是，可能字符串的一开始是一堆空格，需要跳过；接下来如果开始的字符不是数字的话，那么int值就置为0,然后直接退出，这个和接下来的同理；处理数字的过程中，如果遇到了<span style="color: #ff0000;">非数字字符</span>，那么就<span style="color: #ff0000;">直接退出</span>，因为int值已经确定了；然后接下来就是取值范围问题了，题目的要求是<span style="color: #ff0000;">超过int的</span>，<span style="color: #ff0000;">设置为INT_MAX</span>，<span style="color: #ff0000;">小于INT_MIN的设置为INT_MIN</span>，这样的话，我们可以用unsigned int来算中间结果，然后最后再把unsinged int转化为int，不过中间可能就超过了INT_MAX，比如字符串“1234567891234”，这个字符串转成int之后的值已经超过了INT_MAX，这就需要在处理的过程中进行判断了，我的判断方式是如果上一次的结果&gt;(INT_MAX/10)的话，那么将上一次的结果×10然后加上当前这个字符所代表的数，然后当作结果。当处理完之后，就只要把结果往int的范围内压缩就行了，然后再进行正负判断即可。思路挺简单的，不过坑不少。</p>
-<p><a href="https://github.com/klion26/LeetCode/blob/master/String-to-Integer(atoi" target="_blank" rel="external">代码在这里</a>.cpp)</p>
-
-	
-	</div>
-</div>
-
-           
-		
 
 		</div>
 
@@ -530,9 +567,9 @@
 		
 			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
 		
-			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
-		
 			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
 		
@@ -556,13 +593,13 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
 		
-			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
 		
 			<li><a href="/categories/成长/">成长<span>3</span></a></li>
 		
@@ -570,11 +607,11 @@
 		
 			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
 		
-			<li><a href="/categories/数学/">数学<span>2</span></a></li>
-		
 			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
 		
 			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
 		
 			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
 		
@@ -584,15 +621,15 @@
 		
 			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
 		
-			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
 		
 			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
-			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -609,48 +646,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/lru/">lru<span>1</span></a></li>
+			<li><a href="/tags/gdb/">gdb<span>2</span></a></li>
 		
-			<li><a href="/tags/于娟/">于娟<span>1</span></a></li>
+			<li><a href="/tags/欧拉函数/">欧拉函数<span>3</span></a></li>
 		
-			<li><a href="/tags/reverse/">reverse<span>1</span></a></li>
+			<li><a href="/tags/paper/">paper<span>1</span></a></li>
 		
-			<li><a href="/tags/trident/">trident<span>1</span></a></li>
+			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
 		
-			<li><a href="/tags/xampp/">xampp<span>1</span></a></li>
+			<li><a href="/tags/grouping/">grouping<span>1</span></a></li>
 		
-			<li><a href="/tags/unix环境高级编程/">unix环境高级编程<span>2</span></a></li>
+			<li><a href="/tags/性能分析/">性能分析<span>1</span></a></li>
 		
-			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+			<li><a href="/tags/ssh/">ssh<span>1</span></a></li>
 		
-			<li><a href="/tags/网络流/">网络流<span>7</span></a></li>
+			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
 		
-			<li><a href="/tags/chrome/">chrome<span>1</span></a></li>
+			<li><a href="/tags/Java/">Java<span>3</span></a></li>
 		
-			<li><a href="/tags/位运算/">位运算<span>0</span></a></li>
+			<li><a href="/tags/风险/">风险<span>1</span></a></li>
 		
-			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
+			<li><a href="/tags/mapreduce/">mapreduce<span>1</span></a></li>
 		
-			<li><a href="/tags/dagscheduler/">dagscheduler<span>1</span></a></li>
-		
-			<li><a href="/tags/version-control/">version-control<span>0</span></a></li>
-		
-			<li><a href="/tags/settings/">settings<span>1</span></a></li>
+			<li><a href="/tags/knapsack/">knapsack<span>1</span></a></li>
 		
 			<li><a href="/tags/apach/">apach<span>0</span></a></li>
 		
-			<li><a href="/tags/concrete-mathematics/">concrete-mathematics<span>2</span></a></li>
+			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
 		
-			<li><a href="/tags/latex/">latex<span>1</span></a></li>
+			<li><a href="/tags/google-HSTS/">google-HSTS<span>1</span></a></li>
 		
-			<li><a href="/tags/内存/">内存<span>1</span></a></li>
+			<li><a href="/tags/go/">go<span>1</span></a></li>
 		
-			<li><a href="/tags/learning/">learning<span>1</span></a></li>
+			<li><a href="/tags/read/">read<span>3</span></a></li>
 		
-			<li><a href="/tags/马拉松/">马拉松<span>1</span></a></li>
+			<li><a href="/tags/stack/">stack<span>1</span></a></li>
+		
+			<li><a href="/tags/offset/">offset<span>1</span></a></li>
+		
+			<li><a href="/tags/recursion/">recursion<span>1</span></a></li>
 		
 		
-		   <li><a href="/tags">...<span>308</span></a></li>
+		   <li><a href="/tags">...<span>309</span></a></li>
 		 
 		</ul>
 	</div>
@@ -661,6 +698,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/" ><i class="fa fa-file-o"></i>一次 InputStream#read 使用不当导致的问题</a>
+      </li>
     
       <li>
         <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
@@ -676,10 +717,6 @@
     
       <li>
         <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
-      </li>
-    
-      <li>
-        <a href="/2017/12/22/millwheel/" ><i class="fa fa-file-o"></i>millwheel</a>
       </li>
     
   </ul>
