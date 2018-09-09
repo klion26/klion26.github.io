@@ -49,7 +49,15 @@
         
         <tags>
             
-            <tag> I/O, HDFS, InputStream, read, problem_solving </tag>
+            <tag> read </tag>
+            
+            <tag> I/O </tag>
+            
+            <tag> HDFS </tag>
+            
+            <tag> InputStream </tag>
+            
+            <tag> problem_solving </tag>
             
         </tags>
         
@@ -1831,11 +1839,11 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> spark </tag>
             
+            <tag> spark-streaming </tag>
+            
             <tag> append </tag>
             
             <tag> hdfs </tag>
-            
-            <tag> spark-streaming </tag>
             
         </tags>
         
@@ -3053,9 +3061,9 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
         
         <tags>
             
-            <tag> github </tag>
-            
             <tag> blog </tag>
+            
+            <tag> github </tag>
             
             <tag> math-expression </tag>
             
@@ -4836,9 +4844,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> fedora </tag>
             
-            <tag> github </tag>
-            
             <tag> blog </tag>
+            
+            <tag> github </tag>
             
             <tag> free </tag>
             
@@ -5140,7 +5148,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#x6f;&#58;&#x6a;&#99;&#109;&#x40;&#x6a;&#111;&#110;&#x6d;&#x61;&#115;&#x74;&#101;&#x72;&#115;&#x2e;&#x6f;&#114;&#103;">&#x6a;&#99;&#109;&#x40;&#x6a;&#111;&#110;&#x6d;&#x61;&#115;&#x74;&#101;&#x72;&#115;&#x2e;&#x6f;&#114;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#x69;&#108;&#116;&#111;&#x3a;&#x6a;&#99;&#109;&#64;&#x6a;&#x6f;&#x6e;&#109;&#x61;&#115;&#116;&#101;&#x72;&#x73;&#46;&#111;&#114;&#103;">&#x6a;&#99;&#109;&#64;&#x6a;&#x6f;&#x6e;&#109;&#x61;&#115;&#116;&#101;&#x72;&#x73;&#46;&#111;&#114;&#103;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>

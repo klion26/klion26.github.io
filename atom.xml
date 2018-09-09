@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-09-09T05:56:47.875Z</updated>
+  <updated>2018-09-09T06:01:58.595Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2018/09/09/%E4%B8%80%E6%AC%A1-InputStream-read-%E4%BD%BF%E7%94%A8%E4%B8%8D%E5%BD%93%E5%AF%BC%E8%87%B4%E7%9A%84%E9%97%AE%E9%A2%98/"/>
     <id>http://yoursite.com/2018/09/09/一次-InputStream-read-使用不当导致的问题/</id>
     <published>2018-09-09T05:38:19.000Z</published>
-    <updated>2018-09-09T05:56:47.875Z</updated>
+    <updated>2018-09-09T06:01:58.595Z</updated>
     
     <content type="html"><![CDATA[<p> 一句话总结：InputStream#read 对于当次能够读取多少字节不做保证，必须以该函数的返回值做为实际读取字节数的事实。<a id="more"></a></p>
 <p>#1. 问题<br>由于某些功能的需要，实现如下函数，从某个 InputStream copy 特定长度的数据到 OutputStream，其中 InputStream 为打开的某个 HDFS 文件流</p>
@@ -70,7 +70,15 @@
     </summary>
     
     
-      <category term="I/O, HDFS, InputStream, read, problem_solving" scheme="http://yoursite.com/tags/I-O-HDFS-InputStream-read-problem-solving/"/>
+      <category term="read" scheme="http://yoursite.com/tags/read/"/>
+    
+      <category term="I/O" scheme="http://yoursite.com/tags/I-O/"/>
+    
+      <category term="HDFS" scheme="http://yoursite.com/tags/HDFS/"/>
+    
+      <category term="InputStream" scheme="http://yoursite.com/tags/InputStream/"/>
+    
+      <category term="problem_solving" scheme="http://yoursite.com/tags/problem-solving/"/>
     
   </entry>
   
