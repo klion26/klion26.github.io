@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-09-09T06:01:58.595Z</updated>
+  <updated>2018-09-10T01:10:44.188Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2018/09/09/%E4%B8%80%E6%AC%A1-InputStream-read-%E4%BD%BF%E7%94%A8%E4%B8%8D%E5%BD%93%E5%AF%BC%E8%87%B4%E7%9A%84%E9%97%AE%E9%A2%98/"/>
     <id>http://yoursite.com/2018/09/09/一次-InputStream-read-使用不当导致的问题/</id>
     <published>2018-09-09T05:38:19.000Z</published>
-    <updated>2018-09-09T06:01:58.595Z</updated>
+    <updated>2018-09-10T01:10:44.188Z</updated>
     
     <content type="html"><![CDATA[<p> 一句话总结：InputStream#read 对于当次能够读取多少字节不做保证，必须以该函数的返回值做为实际读取字节数的事实。<a id="more"></a></p>
 <p>#1. 问题<br>由于某些功能的需要，实现如下函数，从某个 InputStream copy 特定长度的数据到 OutputStream，其中 InputStream 为打开的某个 HDFS 文件流</p>
@@ -61,6 +61,7 @@
 <li><p>导致第一步中的 read 读取不充分（实际读取的字节数比预期的少），导致 out.write(bytes) 的行为不符合预期</p>
 </li>
 </ol>
+<p>最后附上可以进行直观查看效果的 UT<br>当使用错误的 copySpecifiedLengthBytes 的时候，下面的测试会挂掉，注意挂掉的原因，当使用正确的测试的使用，则会通过<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">@Test</div><div class="line">public void testCopySpecifiedLengthBytes() throws IOException &#123;</div><div class="line">   int length = 4 * 1024 * 1024;</div><div class="line">   byte[] from = new byte[length];</div><div class="line"></div><div class="line">   Random rnd = new Random();</div><div class="line">   rnd.nextBytes(from);</div><div class="line"></div><div class="line">   InputStream fromStream = spy(new ByteArrayInputStream(from));</div><div class="line"></div><div class="line">   doAnswer(new Answer() &#123;</div><div class="line">       private int idx = 0;</div><div class="line">       @Override</div><div class="line">       public Object answer(InvocationOnMock invocation) throws Throwable &#123;</div><div class="line">           byte[] first = invocation.getArgumentAt(0, byte[].class);</div><div class="line">           int off = invocation.getArgumentAt(1, Integer.class);</div><div class="line">           int len = invocation.getArgumentAt(2, Integer.class);</div><div class="line"></div><div class="line">           int bytesReadThisTime = Math.min(100, len);</div><div class="line">           System.arraycopy(from, idx, first, off, bytesReadThisTime);</div><div class="line">           idx += bytesReadThisTime;</div><div class="line"></div><div class="line">           return bytesReadThisTime;</div><div class="line">       &#125;</div><div class="line">    &#125;).when(fromStream).read(any(byte[].class), anyInt(), anyInt());</div><div class="line"></div><div class="line">    ByteArrayOutputStream toStream = new ByteArrayOutputStream(length);</div><div class="line">    copySpecifiedLengthBytes(fromStream, toStream, length);</div><div class="line">    assertArrayEquals(from toStream.toByteArray());</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 ]]></content>
     
     <summary type="html">
@@ -733,9 +734,9 @@ ii. 虚拟机自身的代码导致的 CPU 过高，如堆内存不够导致的�
     
       <category term="Java" scheme="http://yoursite.com/tags/Java/"/>
     
-      <category term="线程堆栈" scheme="http://yoursite.com/tags/%E7%BA%BF%E7%A8%8B%E5%A0%86%E6%A0%88/"/>
-    
       <category term="JVM" scheme="http://yoursite.com/tags/JVM/"/>
+    
+      <category term="线程堆栈" scheme="http://yoursite.com/tags/%E7%BA%BF%E7%A8%8B%E5%A0%86%E6%A0%88/"/>
     
       <category term="分析" scheme="http://yoursite.com/tags/%E5%88%86%E6%9E%90/"/>
     

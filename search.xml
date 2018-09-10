@@ -44,6 +44,7 @@
 <li><p>导致第一步中的 read 读取不充分（实际读取的字节数比预期的少），导致 out.write(bytes) 的行为不符合预期</p>
 </li>
 </ol>
+<p>最后附上可以进行直观查看效果的 UT<br>当使用错误的 copySpecifiedLengthBytes 的时候，下面的测试会挂掉，注意挂掉的原因，当使用正确的测试的使用，则会通过<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">@Test</div><div class="line">public void testCopySpecifiedLengthBytes() throws IOException &#123;</div><div class="line">   int length = 4 * 1024 * 1024;</div><div class="line">   byte[] from = new byte[length];</div><div class="line"></div><div class="line">   Random rnd = new Random();</div><div class="line">   rnd.nextBytes(from);</div><div class="line"></div><div class="line">   InputStream fromStream = spy(new ByteArrayInputStream(from));</div><div class="line"></div><div class="line">   doAnswer(new Answer() &#123;</div><div class="line">       private int idx = 0;</div><div class="line">       @Override</div><div class="line">       public Object answer(InvocationOnMock invocation) throws Throwable &#123;</div><div class="line">           byte[] first = invocation.getArgumentAt(0, byte[].class);</div><div class="line">           int off = invocation.getArgumentAt(1, Integer.class);</div><div class="line">           int len = invocation.getArgumentAt(2, Integer.class);</div><div class="line"></div><div class="line">           int bytesReadThisTime = Math.min(100, len);</div><div class="line">           System.arraycopy(from, idx, first, off, bytesReadThisTime);</div><div class="line">           idx += bytesReadThisTime;</div><div class="line"></div><div class="line">           return bytesReadThisTime;</div><div class="line">       &#125;</div><div class="line">    &#125;).when(fromStream).read(any(byte[].class), anyInt(), anyInt());</div><div class="line"></div><div class="line">    ByteArrayOutputStream toStream = new ByteArrayOutputStream(length);</div><div class="line">    copySpecifiedLengthBytes(fromStream, toStream, length);</div><div class="line">    assertArrayEquals(from toStream.toByteArray());</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 ]]></content>
       
         
@@ -683,9 +684,9 @@ ii. 虚拟机自身的代码导致的 CPU 过高，如堆内存不够导致的�
             
             <tag> Java </tag>
             
-            <tag> 线程堆栈 </tag>
-            
             <tag> JVM </tag>
+            
+            <tag> 线程堆栈 </tag>
             
             <tag> 分析 </tag>
             
@@ -1839,11 +1840,11 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> spark </tag>
             
-            <tag> spark-streaming </tag>
-            
             <tag> append </tag>
             
             <tag> hdfs </tag>
+            
+            <tag> spark-streaming </tag>
             
         </tags>
         
@@ -2704,9 +2705,9 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> distributed-system </tag>
             
-            <tag> mit </tag>
-            
             <tag> kv </tag>
+            
+            <tag> mit </tag>
             
             <tag> viewservice </tag>
             
@@ -2758,11 +2759,11 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> distributed-system </tag>
             
+            <tag> mit </tag>
+            
             <tag> go </tag>
             
             <tag> mapreduce </tag>
-            
-            <tag> mit </tag>
             
         </tags>
         
@@ -3061,9 +3062,9 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
         
         <tags>
             
-            <tag> blog </tag>
-            
             <tag> github </tag>
+            
+            <tag> blog </tag>
             
             <tag> math-expression </tag>
             
@@ -3740,9 +3741,9 @@ private:
         
         <tags>
             
-            <tag> nginx </tag>
-            
             <tag> filter </tag>
+            
+            <tag> nginx </tag>
             
             <tag> text/plain </tag>
             
@@ -3785,11 +3786,11 @@ private:
         
         <tags>
             
+            <tag> nginx </tag>
+            
             <tag> array </tag>
             
             <tag> list </tag>
-            
-            <tag> nginx </tag>
             
             <tag> queue </tag>
             
@@ -4844,9 +4845,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> fedora </tag>
             
-            <tag> blog </tag>
-            
             <tag> github </tag>
+            
+            <tag> blog </tag>
             
             <tag> free </tag>
             
@@ -5148,7 +5149,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#x6d;&#97;&#x69;&#108;&#116;&#111;&#x3a;&#x6a;&#99;&#109;&#64;&#x6a;&#x6f;&#x6e;&#109;&#x61;&#115;&#116;&#101;&#x72;&#x73;&#46;&#111;&#114;&#103;">&#x6a;&#99;&#109;&#64;&#x6a;&#x6f;&#x6e;&#109;&#x61;&#115;&#116;&#101;&#x72;&#x73;&#46;&#111;&#114;&#103;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#x61;&#x69;&#108;&#x74;&#x6f;&#x3a;&#106;&#x63;&#x6d;&#x40;&#106;&#111;&#110;&#x6d;&#97;&#115;&#116;&#x65;&#114;&#115;&#46;&#111;&#114;&#x67;">&#106;&#x63;&#x6d;&#x40;&#106;&#111;&#110;&#x6d;&#97;&#115;&#116;&#x65;&#114;&#115;&#46;&#111;&#114;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>

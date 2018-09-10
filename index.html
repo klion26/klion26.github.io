@@ -517,7 +517,7 @@
 	
 		<p> 一句话总结：InputStream#read 对于当次能够读取多少字节不做保证，必须以该函数的返回值做为实际读取字节数的事实。
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/#more" class="btn btn-default more">Leia Mais</a>
+		<a type="button" href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -542,7 +542,7 @@
 		<p>Flink 中 State 用于保存 Task 的状态，Checkpoint 的时候，会将 State 保存到外存中。</p>
 <p>State 有两种，Keyed State 和 Operator State，每一种则可以有两种形式存在：Managed 和 Raw。其中 Keyed State 只能引用在 Keyed Stream 上，在 Flink 中使用 keyBy() 创建一个 keyed Stream. Flink 保证同一个 key 的 Tuple 会被发送到同一个 task 进行处理，Operator State 使用 ListState（用于 rescale），上层是一个 HashMap<string, partitionableliststate=""> Key 是 name，value 是一个封装了 list 的 class。</string,></p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2018/04/06/Flink-State/#more" class="btn btn-default more">Leia Mais</a>
+		<a type="button" href="/2018/04/06/Flink-State/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -566,7 +566,7 @@
 	
 		<h1 id="1-内存泄漏的背景知识"><a href="#1-内存泄漏的背景知识" class="headerlink" title="1 内存泄漏的背景知识"></a>1 内存泄漏的背景知识</h1><p>为了判断 Java 中是否有内存泄漏，我们首先必须了解 Java 是如何管理内存的。下面我们先给出一个简单的内存泄漏的例子，在这个例子中我们循环申请 Object 对象，并将所申请的对象放入一个 HashMap 中，如果我们仅仅释放引用本身，那么 HashMap 仍然引用该对象，所以这个对象对 GC 来说是不可回收的。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2018/03/14/Java-内存泄漏分析和对内存设置/#more" class="btn btn-default more">Leia Mais</a>
+		<a type="button" href="/2018/03/14/Java-内存泄漏分析和对内存设置/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -594,7 +594,7 @@
 <li>其他资源：比如连接数等。可以修改代码，尽量利用 CPU，可以获得极大的性能提升</li>
 </ul>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/#more" class="btn btn-default more">Leia Mais</a>
+		<a type="button" href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -618,7 +618,7 @@
 	
 		<p>本文为读书笔记，关于 Java 线程堆栈分析，在阅读并进行实验的基础上进行整理，如果有问题欢迎反馈<br>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2018/01/06/线程堆栈分析/#more" class="btn btn-default more">Leia Mais</a>
+		<a type="button" href="/2018/01/06/线程堆栈分析/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -642,7 +642,7 @@
 	
 		<p>本文属于 MillWheel 论文的阅读与翻译稿，部分地方使用自己的语言进行描述，部分地方进行翻译（附带原文）<br>讲述 MillWhell 的编程模型以及具体实现。MillWhell 的逻辑时间（logical time）使得开发基于时间的聚合应用更方便，从设计之初，MillWhell 就考虑了容错性以及扩展性。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/12/22/millwheel/#more" class="btn btn-default more">Leia Mais</a>
+		<a type="button" href="/2017/12/22/millwheel/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -667,7 +667,7 @@
 		<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">* Schedules the tasks within a single TaskSet in the TaskSchedulerImpl. This class keeps track of</div><div class="line">* each task, retries tasks if they fail (up to a limited number of times), and</div><div class="line">* handles locality-aware scheduling for this TaskSet via delay scheduling. The main interfaces</div><div class="line">* to it are resourceOffer, which asks the TaskSet whether it wants to run a task on one node,</div><div class="line">* and statusUpdate, which tells it that one of its tasks changed state (e.g. finished).</div><div class="line">*</div><div class="line">* THREADING: This class is designed to only be called from code with a lock on the</div><div class="line">* TaskScheduler (e.g. its event handlers). It should not be called from other threads.</div><div class="line">*</div><div class="line">* @param sched           the TaskSchedulerImpl associated with the TaskSetManager</div><div class="line">* @param taskSet         the TaskSet to manage scheduling for</div><div class="line">* @param maxTaskFailures if any particular task fails this number of times, the entire</div><div class="line">*                        task set will be aborted</div><div class="line">*/</div></pre></td></tr></table></figure>
 <p><code>TaskSetManager</code> 负责某个 TaskSet 的调度，对该 TaskSet 的所有 task 进行跟踪，如果有失败的 task，会负责重试（重试有上限），并且通过 delay scheduling（可以想想这个怎么实现的？） 实现 locality  locality-aware scheduling. 主要的接口有 <code>resourceOffer</code> – 用于判断一个 TaskSet 中的 task 是否需要运行到某个 node 上，<code>statusUpdate</code> – 用于跟踪 task 的状态变化。不是线程安全的。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/12/03/tasksetmanager/#more" class="btn btn-default more">Leia Mais</a>
+		<a type="button" href="/2017/12/03/tasksetmanager/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -695,7 +695,7 @@
 <p>与不同的后端调度器一起，进行 task 的调度（task 是 DAGScheduler 中划分的 Stage 中的具体任务），后端调度器包括 <code>LocalBackend</code>， <code>SparkDeploySchedulerBackend</code>，<code>MesosSchedulerBackend</code>，<code>YarnClientSchedulerBackend</code>， <code>YarnClusterSchedulerBackend</code>，<code>SimrSchedulerBackend</code>等</p>
 <p>整个 TaskSchedulerImpl 比较简单，复杂的地方在于和各种 后端调度器联合，以及具体 <code>TasksetManager</code> 进行联合</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/11/27/TaskScheduler/#more" class="btn btn-default more">Leia Mais</a>
+		<a type="button" href="/2017/11/27/TaskScheduler/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -722,7 +722,7 @@
 </blockquote>
 <h1 id="本文会讲什么"><a href="#本文会讲什么" class="headerlink" title="本文会讲什么"></a>本文会讲什么</h1><p>本文会换一个角度讲述 Git 怎么做的，给大家提供一个另外的视角，这个视角主要设计 Git 的存储，这样给大家一个更深的认识，在平时想了解的时候，也能有合适的渠道进行。</p>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/11/20/git-inside/#more" class="btn btn-default more">Leia Mais</a>
+		<a type="button" href="/2017/11/20/git-inside/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -753,7 +753,7 @@
 <li>文件数会很多，项目中管理会比较麻烦</li>
 </ol>
 		<!-- only display read_more button if there's more to display -->
-		<a type="button" href="/2017/11/09/django-configuration-in-action/#more" class="btn btn-default more">Leia Mais</a>
+		<a type="button" href="/2017/11/09/django-configuration-in-action/#more" class="btn btn-default more">Read More</a>
 	
 	</div>
 </div>
@@ -770,13 +770,13 @@
 <ul class="pagination">
 	 
 		
-          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Anterior</a></li>
+          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
         
 
         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
 
 		
-		   <li class="next"> <a href="/page/2/" class="alignright next">Próximo<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+		   <li class="next"> <a href="/page/2/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
         
 	
 </ul>
@@ -796,7 +796,7 @@
 			
   <div id="site_search">
    <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Busca" class="st-search-input st-default-search-input form-control"/>
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
    </div>  
   <div id="local-search-result"></div>
   </div>
@@ -805,7 +805,7 @@
 		
 			
 	<div class="widget">
-		<h4>Categorias</h4>
+		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
 			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
@@ -838,9 +838,9 @@
 		
 			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
 		
-			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
-		
 			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
 		
 			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
 		
@@ -872,9 +872,9 @@
 		
 			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
 		
-			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
-		
 			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
 		
 			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
 		
@@ -891,45 +891,45 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/reservior/">reservior<span>1</span></a></li>
+			<li><a href="/tags/SICP/">SICP<span>4</span></a></li>
 		
-			<li><a href="/tags/viewservice/">viewservice<span>1</span></a></li>
+			<li><a href="/tags/knapsack/">knapsack<span>1</span></a></li>
 		
-			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
+			<li><a href="/tags/algorithm/">algorithm<span>14</span></a></li>
 		
-			<li><a href="/tags/阅读/">阅读<span>1</span></a></li>
+			<li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li>
 		
-			<li><a href="/tags/fcitx/">fcitx<span>1</span></a></li>
+			<li><a href="/tags/ran-out-of-messages/">ran_out_of_messages<span>1</span></a></li>
 		
-			<li><a href="/tags/插件/">插件<span>1</span></a></li>
+			<li><a href="/tags/pair/">pair<span>1</span></a></li>
 		
-			<li><a href="/tags/leetcode/">leetcode<span>6</span></a></li>
+			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
 		
-			<li><a href="/tags/内存/">内存<span>1</span></a></li>
+			<li><a href="/tags/二零一四/">二零一四<span>1</span></a></li>
 		
-			<li><a href="/tags/filter/">filter<span>1</span></a></li>
+			<li><a href="/tags/shell/">shell<span>5</span></a></li>
 		
-			<li><a href="/tags/kruskal/">kruskal<span>1</span></a></li>
+			<li><a href="/tags/米聊/">米聊<span>1</span></a></li>
 		
-			<li><a href="/tags/于娟/">于娟<span>1</span></a></li>
+			<li><a href="/tags/dag/">dag<span>1</span></a></li>
 		
-			<li><a href="/tags/TaskScheduler/">TaskScheduler<span>1</span></a></li>
+			<li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li>
 		
-			<li><a href="/tags/USACO/">USACO<span>2</span></a></li>
+			<li><a href="/tags/stack/">stack<span>1</span></a></li>
 		
-			<li><a href="/tags/english/">english<span>1</span></a></li>
+			<li><a href="/tags/LVM/">LVM<span>1</span></a></li>
 		
-			<li><a href="/tags/rmvb/">rmvb<span>1</span></a></li>
+			<li><a href="/tags/opencv/">opencv<span>1</span></a></li>
 		
 			<li><a href="/tags/longest-increasing-subsequences/">longest increasing subsequences<span>1</span></a></li>
 		
-			<li><a href="/tags/huawei/">huawei<span>1</span></a></li>
+			<li><a href="/tags/gfw/">gfw<span>2</span></a></li>
 		
-			<li><a href="/tags/apache无法启动/">apache无法启动<span>1</span></a></li>
+			<li><a href="/tags/epoll/">epoll<span>1</span></a></li>
 		
-			<li><a href="/tags/no-recursive/">no-recursive<span>1</span></a></li>
+			<li><a href="/tags/dynamic-programming/">dynamic-programming<span>2</span></a></li>
 		
-			<li><a href="/tags/file-system/">file-system<span>1</span></a></li>
+			<li><a href="/tags/安全/">安全<span>1</span></a></li>
 		
 		
 		   <li><a href="/tags">...<span>312</span></a></li>
@@ -941,7 +941,7 @@
 		
 			
 <div class="widget">
-  <h4>Posts recentes</h4>
+  <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
     
       <li>
