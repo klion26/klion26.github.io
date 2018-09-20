@@ -153,7 +153,7 @@
 </li>
 <li><p>DFSInputStream 会读取 packet</p>
 </li>
-<li><p>DFSInputStream 读取 packet 的时候会对第一个 packet 进行部分字节的跳过</p>
+<li><p>DFSInputStream 读取 packet 的时候会对第一个 packet 进行部分字节的跳过, 这里是因为 HDFS 的读写最小单元是 packet，seek 的 offset 可能不是 packet 的开头，那么就会从 packet 的开头进行读取，然后实际读取的时候需要把前面一部分进行跳过。</p>
 </li>
 <li><p>导致第一步中的 read 读取不充分（实际读取的字节数比预期的少），导致 out.write(bytes) 的行为不符合预期</p>
 </li>

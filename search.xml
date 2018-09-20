@@ -39,7 +39,7 @@
 </li>
 <li><p>DFSInputStream 会读取 packet</p>
 </li>
-<li><p>DFSInputStream 读取 packet 的时候会对第一个 packet 进行部分字节的跳过</p>
+<li><p>DFSInputStream 读取 packet 的时候会对第一个 packet 进行部分字节的跳过, 这里是因为 HDFS 的读写最小单元是 packet，seek 的 offset 可能不是 packet 的开头，那么就会从 packet 的开头进行读取，然后实际读取的时候需要把前面一部分进行跳过。</p>
 </li>
 <li><p>导致第一步中的 read 读取不充分（实际读取的字节数比预期的少），导致 out.write(bytes) 的行为不符合预期</p>
 </li>
@@ -684,9 +684,9 @@ ii. 虚拟机自身的代码导致的 CPU 过高，如堆内存不够导致的�
             
             <tag> Java </tag>
             
-            <tag> JVM </tag>
-            
             <tag> 线程堆栈 </tag>
+            
+            <tag> JVM </tag>
             
             <tag> 分析 </tag>
             
@@ -1840,11 +1840,11 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> spark </tag>
             
+            <tag> spark-streaming </tag>
+            
             <tag> append </tag>
             
             <tag> hdfs </tag>
-            
-            <tag> spark-streaming </tag>
             
         </tags>
         
@@ -2705,9 +2705,9 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> distributed-system </tag>
             
-            <tag> kv </tag>
-            
             <tag> mit </tag>
+            
+            <tag> kv </tag>
             
             <tag> viewservice </tag>
             
@@ -2759,11 +2759,11 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
             
             <tag> distributed-system </tag>
             
-            <tag> mit </tag>
-            
             <tag> go </tag>
             
             <tag> mapreduce </tag>
+            
+            <tag> mit </tag>
             
         </tags>
         
@@ -3062,9 +3062,9 @@ val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  thresh
         
         <tags>
             
-            <tag> github </tag>
-            
             <tag> blog </tag>
+            
+            <tag> github </tag>
             
             <tag> math-expression </tag>
             
@@ -3741,9 +3741,9 @@ private:
         
         <tags>
             
-            <tag> filter </tag>
-            
             <tag> nginx </tag>
+            
+            <tag> filter </tag>
             
             <tag> text/plain </tag>
             
@@ -3786,11 +3786,11 @@ private:
         
         <tags>
             
-            <tag> nginx </tag>
-            
             <tag> array </tag>
             
             <tag> list </tag>
+            
+            <tag> nginx </tag>
             
             <tag> queue </tag>
             
@@ -4845,9 +4845,9 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
             
             <tag> fedora </tag>
             
-            <tag> github </tag>
-            
             <tag> blog </tag>
+            
+            <tag> github </tag>
             
             <tag> free </tag>
             
@@ -5149,7 +5149,7 @@ result(&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span>arraydblr <sp
 <li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
 <li><span>}   </span></li>
 <li><span>  </span></li>
-<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#x61;&#x69;&#108;&#x74;&#x6f;&#x3a;&#106;&#x63;&#x6d;&#x40;&#106;&#111;&#110;&#x6d;&#97;&#115;&#116;&#x65;&#114;&#115;&#46;&#111;&#114;&#x67;">&#106;&#x63;&#x6d;&#x40;&#106;&#111;&#110;&#x6d;&#97;&#115;&#116;&#x65;&#114;&#115;&#46;&#111;&#114;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#58;&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#x61;&#115;&#x74;&#x65;&#114;&#x73;&#x2e;&#111;&#x72;&#x67;">&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#x61;&#115;&#x74;&#x65;&#114;&#x73;&#x2e;&#111;&#x72;&#x67;</a>“</span><span>);   </span></li>
 <li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
 <li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
 <li><span>  </span></li>
