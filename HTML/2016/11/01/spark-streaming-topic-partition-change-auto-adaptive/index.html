@@ -1,0 +1,408 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Spark Streaming 自适应上游 kafka topic partition 数目变化 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Spark Streaming 自适应上游 kafka topic partition 数目变化"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Spark Streaming 自适应上游 kafka topic partition 数目变化</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Spark Streaming 作业在运行过程中，上游 topic 增加 partition 数目从 A 增加到 B，会造成作业丢失数据，因为该作业只从 topic 中读取了原来的 A 个 partition 的数据，新增的 B-A 个 partition 的数据会被忽略掉。</p>
+<a id="more"></a>
+<h2 id="思考过程"><a href="#思考过程" class="headerlink" title="思考过程"></a>思考过程</h2><p>为了作业能够长时间的运行，一开始遇到这种情况的时候，想到两种方案：</p>
+<ol>
+<li>感知上游 topic 的 partition 数目变化，然后发送报警，让用户重启</li>
+<li>直接在作业内部自适应上游 topic partition 的变化，完全不影响作业<br>方案 1 是简单直接，第一反应的结果，但是效果不好，需要用户人工介入，而且需要删除 checkpoint 文件</li>
+</ol>
+<p>方案 2 从根本上解决问题，用户不需要关心上游 partition 数目的变化，但是第一眼会觉得较难实现。</p>
+<p>方案 1 很快被 pass 掉，因为人工介入的成本太高，而且实现起来很别扭。接下来考虑方案 2.</p>
+<p>Spark Streaming 程序中使用 Kafka 的最原始方式为 <code>KafkaUtils.createDirectStream</code> 通过源码，我们找到调用链条大致是这样的</p>
+<p><span style="color: #0000ff;"><strong><code>KafkaUtils.createDirectStream</code></strong></span>   –&gt;   <strong><span style="color: #0000ff;"><code>new DirectKafkaInputDStream</code></span></strong> –&gt; 最终由 <code>DirectKafkaInputDStream#compute(validTime : Time)</code> 函数来生成 KafkaRDD。</p>
+<p>而 KafkaRDD 的 partition 数和 <strong><span style="color: #0000ff;">作业开始运行时</span></strong> topic 的 partition 数一致，topic 的 partition 数保存在 currentOffsets 变量中，currentOffsets 是一个 Map[TopicAndPartition, Long]类型的变量，保存每个 partition 当前消费的 offset 值，但是作业运行过程中 currentOffsets 不会增加 key，就是说不会增加 KafkaRDD 的 partition，这样导致每次生成 KafkaRDD 的时候都使用 <span style="color: #0000ff;"><strong>作业开始运行时</strong></span> topic 的 partition 数作为 KafkaRDD 的 partition 数，从而会造成数据的丢失。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>我们只需要在每次生成 KafkaRDD 的时候，将 currentOffsets 修正为正常的值（往里面增加对应的 partition 数，总共 B-A 个，以及每个增加的 partition 的当前 offset 从零开始）。</p>
+<ul>
+<li>第一个问题出现了，我们不能修改 Spark 的源代码，重新进行编译，因为这不是我们自己维护的。想到的一种方案是继承 DirectKafkaInputDStream。我们发现不能继承 DirectKafkaInputDStream 该类，因为这个类是使用 <code>private[streaming]</code> 修饰的。</li>
+<li>第二个问题出现了，怎么才能够继承 DirectKafkaInputDStream，这时我们只需要将希望继承 DirectKafkaInputDStream 的类放到一个单独的文件 F 中，文件 F 使用 <code>package org.apache.spark.streaming</code> 进行修饰即可，这样可以绕过不能继承 DirectKafkaInputDStream 的问题。这个问题解决后，我们还需要修改 <code>Object KafkaUtils</code>，让该 Object 内部调用我们修改后的 DirectKafkaInputDStream（我命名为 MTDirectKafkaInputDStream)</li>
+<li>第三个问题如何让 Spark 调用 MTDirectKafkaInputDStream，而不是 DirectKafkaInputDStream，这里我们使用简单粗暴的方式，将 KafkaUtils 的代码 copy 一份，然后将其中调用 DirectKafkaInputDStream 的部分都修改为 MTDirectKafkaInputDStream，这样就实现了我们的需要。当然该文件也需要使用 <code>package org.apache.spark.streaming</code> 进行修饰</li>
+<li>第二个和第三个问题的解决方案在  中国 Spark 技术峰会 2016  上，广点通的 林立伟 有提及，后续会进行尝试<br>总结下，我们需要做两件事</li>
+</ul>
+<ol>
+<li>修改 DirectKafkaInputDStream#compute 使得能够自适应 topic 的 partition 变更</li>
+<li>修改 KafkaUtils，使得我们能够调用修改过后的 DirectKafkaInputDStream</li>
+</ol>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div></pre></td><td class="code"><pre><div class="line">package org.apache.spark.streaming.kafka.mt</div><div class="line"></div><div class="line">import com.meituan.data.util.Constants</div><div class="line">import com.meituan.service.inf.kms.client.Kms</div><div class="line">import kafka.common.&#123;ErrorMapping, TopicAndPartition&#125;</div><div class="line">import kafka.javaapi.&#123;TopicMetadata, TopicMetadataRequest&#125;</div><div class="line">import kafka.javaapi.consumer.SimpleConsumer</div><div class="line">import kafka.message.MessageAndMetadata</div><div class="line">import kafka.serializer.Decoder</div><div class="line">import org.apache.spark.streaming.&#123;StreamingContext, Time&#125;</div><div class="line">import org.apache.spark.streaming.kafka.&#123;DirectKafkaInputDStream, KafkaRDD&#125;</div><div class="line"></div><div class="line">import scala.collection.JavaConverters._</div><div class="line">import scala.util.control.Breaks._</div><div class="line">import scala.reflect.ClassTag</div><div class="line"></div><div class="line">/**</div><div class="line">  * Created by qiucongxian on 10/27/16.</div><div class="line">  */</div><div class="line">class MTDirectKafkaInputDStream[</div><div class="line">  K: ClassTag,</div><div class="line">  V: ClassTag,</div><div class="line">  U &lt;: Decoder[K]: ClassTag,</div><div class="line">  T &lt;: Decoder[V]: ClassTag,</div><div class="line">  R: ClassTag](</div><div class="line">    @transient ssc_ : StreamingContext,</div><div class="line">    val MTkafkaParams: Map[String, String],</div><div class="line">    val MTfromOffsets: Map[TopicAndPartition, Long],</div><div class="line">    messageHandler: MessageAndMetadata[K, V] =&gt; R</div><div class="line">) extends DirectKafkaInputDStream[K, V, U, T, R](ssc_, MTkafkaParams , MTfromOffsets, messageHandler) &#123;</div><div class="line">    private val kafkaBrokerList : String = &quot;host1:port1,host2:port2,host3:port3&quot; //根据自己的情况自行修改</div><div class="line"></div><div class="line">    override def compute(validTime: Time) : Option[KafkaRDD[K, V, U, T, R]] = &#123;</div><div class="line">      /**</div><div class="line">        * 在这更新 currentOffsets 从而做到自适应上游 partition 数目变化</div><div class="line">        */</div><div class="line">        updateCurrentOffsetForKafkaPartitionChange()</div><div class="line">        super.compute(validTime)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private def updateCurrentOffsetForKafkaPartitionChange() : Unit = &#123;</div><div class="line">      val topic = currentOffsets.head._1.topic</div><div class="line">      val nextPartitions : Int = getTopicMeta(topic) match &#123;</div><div class="line">          case Some(x) =&gt; x.partitionsMetadata.size()</div><div class="line">          case _ =&gt; 0</div><div class="line">      &#125;</div><div class="line">      val currPartitions = currentOffsets.keySet.size</div><div class="line"></div><div class="line">      if (nextPartitions &gt; currPartitions) &#123;</div><div class="line">        var i = currPartitions</div><div class="line">        while (i &lt; nextPartitions) &#123;</div><div class="line">           currentOffsets = currentOffsets + (TopicAndPartition(topic, i) -&gt; 0)</div><div class="line">           i = i + 1</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      logInfo(s&quot;######### $&#123;nextPartitions&#125;  currentParttions $&#123;currentOffsets.keySet.size&#125; ########&quot;)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private def getTopicMeta(topic: String) : Option[TopicMetadata] = &#123;</div><div class="line">        var metaData : Option[TopicMetadata] = None</div><div class="line">        var consumer : Option[SimpleConsumer] = None</div><div class="line"></div><div class="line">        val topics = List[String](topic)</div><div class="line">        val brokerList = kafkaBrokerList.split(&quot;,&quot;)</div><div class="line">        brokerList.foreach(</div><div class="line">          item =&gt; &#123;</div><div class="line">            val hostPort = item.split(&quot;:&quot;)</div><div class="line">            try &#123;</div><div class="line">              breakable &#123;</div><div class="line">                  for (i &lt;- 0 to 3) &#123;</div><div class="line">                      consumer = Some(new SimpleConsumer(host = hostPort(0), port = hostPort(1).toInt,</div><div class="line">                                            soTimeout = 10000, bufferSize = 64 * 1024, clientId = &quot;leaderLookup&quot;))</div><div class="line">                      val req : TopicMetadataRequest = new TopicMetadataRequest(topics.asJava)</div><div class="line">                      val resp = consumer.get.send(req)</div><div class="line"></div><div class="line">                      metaData = Some(resp.topicsMetadata.get(0))</div><div class="line">                      if (metaData.get.errorCode == ErrorMapping.NoError) break()</div><div class="line">                  &#125;</div><div class="line">              &#125;</div><div class="line">            &#125; catch &#123;</div><div class="line">              case e =&gt; logInfo(s&quot; ###### Error in MTDirectKafkaInputDStream $&#123;e&#125; ######&quot;)</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">        )</div><div class="line">        metaData</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在修改过后的 KafkaUtils 文件中，将所有的 <code>DirectKafkaInputDStream</code> 都替换为 <code>MTDirectKafkaInputDStream</code> 即可</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2016/11/26/spark-streaming-e5-be-80-hdfs-e5-86-99-e6-96-87-e4-bb-b6-ef-bc-8c-e8-87-aa-e5-ae-9a-e4-b9-89-e6-96-87-e4-bb-b6-e5-90-8d/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2016/10/26/e8-a6-81-e5-a4-9a-e5-bf-ab-e6-89-8d-e8-83-bd-e8-b7-91-e5-ae-8c-e4-b8-80-e5-9c-ba-e9-a9-ac-e6-8b-89-e6-9d-be/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2016-11-01 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li> <li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/kafka/">kafka<span>10</span></a></li> <li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li> <li><a href="/tags/auto-adaptive/">auto-adaptive<span>1</span></a></li> <li><a href="/tags/partition/">partition<span>1</span></a></li> <li><a href="/tags/topic/">topic<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

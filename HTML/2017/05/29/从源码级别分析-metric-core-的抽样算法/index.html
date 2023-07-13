@@ -1,0 +1,395 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>从源码级别分析 metric-core 的抽样算法 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="从源码级别分析 metric-core 的抽样算法"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> 从源码级别分析 metric-core 的抽样算法</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><a href="http://metrics.dropwizard.io" target="_blank" rel="external">metric-core</a> 是一个 java metric 库，用于统计 JVM 层面以及 服务级别 的各种 metric 信息。其中 metric-core 是其核心模块，代码量不多，总共 44 个文件，5700 行左右代码（包括注释）。算是一个很小的开源项目了。由于 metric 在所有项目中都非常重要，因此选择通读该项目，本文分析 metrci-core 中的抽样算法。</p>
+<a id="more"></a>
+<h2 id="metric-core-中的抽样算法"><a href="#metric-core-中的抽样算法" class="headerlink" title="metric-core 中的抽样算法"></a>metric-core 中的抽样算法</h2><p>在 metric-core 中总共有四种抽样算法，分别是 <code>ExponentiallyDecayingReservoir</code>, <code>SlidingTimeWindowReservoir</code>, <code>SlidingWindowReservoir</code>, <code>UniformReservoir</code>，其中后面三个抽样算法比较常规，也通常能见到，第一个则出于一篇论文<code>Forward Decay: A Practical Time Decay Model for Streaming Systems</code>，本文会通过源码分析自己对于这种抽样算法的理解。本文暂时只分析后面三种抽样算法，对于第一种，我会单独用一篇文章进行分析。</p>
+<h3 id="UniformReservoir-算法"><a href="#UniformReservoir-算法" class="headerlink" title="UniformReservoir 算法"></a>UniformReservoir 算法</h3><p>该算法来自于论文<code>Random Sampling with a Reservoir</code>，讲述了一种随机抽样的方法，主要思想是使用一个固定的“蓄水池”装满需要数量的样本，如果当前“蓄水池”未满，将接下来的样本直接放入“蓄水池”，如果“蓄水池”已满，则随机从”蓄水池“中挑选一个样本进行替换（也可能不进行替换），这样在理论上能够保证所有的样本以同样的概率被选中。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public void update(long value) &#123;</div><div class="line">	final long c = count.incrementAndGet();//获得当前”蓄水池“的大小</div><div class="line">	if (c &lt;= values.length()) &#123; //如果”蓄水池“未满，直接将当前样本放入</div><div class="line">		values.set((int) c - 1, value);</div><div class="line">	&#125; else &#123;</div><div class="line">		final long r = nextLong(c);//随机挑选一个数据（这个随机挑选的数可能在&quot;蓄水池”中，也可能不在“蓄水池”中</div><div class="line">		if (r &lt; values.length()) &#123;//如果随机挑选的样本，在”蓄水池“中，则进行替换</div><div class="line">			values.set((int) r, value);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>为了能够更好的理解，先使用样例如下。假设现在总共来了 10 个数 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]，而“蓄水池“大小为 3. 那么”蓄水池”的 <strong>一种可能</strong> 变化如下（说是一种可能的变化，因为这里面牵涉到概率）</p>
+<ul>
+<li>[1]</li>
+<li>[1, 2]</li>
+<li>[1, 2, 3]</li>
+<li>[1, 2, 4]  # 当 4 来的时候，发现“蓄水池”已满，然后从中筛选一个进行替换掉，假设我们替换掉 3</li>
+<li>[1, 5, 4] # 当 5 来的时候，发现“蓄水池”已满，然后从中筛选一个进行替换掉，假设这次我们替换掉 2</li>
+<li>[1, 5, 4] # 当 6 来的时候，发现“蓄水池”已满，我们打算从之前的数字中筛选一个进行替换，这个时候假设我们得到的下标是 3 或者 4，发现下标为 3 和 4 的数字不在“蓄水池”中（“蓄水池”的最大下标为 2 – 从 0 开始），因此不进行替换，所以本次“蓄水池”不变</li>
+<li>[7, 5, 4] # 当 7 来的时候，发现“蓄水池”已满，随机一个下标，我们得到 0,那么将 7 放置到下标为 0 的位置</li>
+<li>[8, 5, 4] # 同上</li>
+<li>[8, 5, 9] # 同上</li>
+<li>[10, 5, 9] # 同上<h3 id="SlidingWindowReservoir-抽样算法"><a href="#SlidingWindowReservoir-抽样算法" class="headerlink" title="SlidingWindowReservoir 抽样算法"></a>SlidingWindowReservoir 抽样算法</h3><code>SlidingWindowReservoir</code> 抽样算法则以最近的 N 个样本作为整个数据集的子集，这样简单直接，对于数据波动不大，或者窗口大小 N 足够大的情况下，该算法会有较好的效果。代码如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public synchronized void update(long value) &#123;//加锁保证线程安全</div><div class="line">	        //每次替换掉最旧的数据，保证”蓄水池“中的数据是最近的 N 个样本</div><div class="line">	        measurements[(int) (count++ % measurements.length)] = value;</div><div class="line">			    &#125;</div></pre></td></tr></table></figure>
+<h3 id="SlidingTimeWindowReservoir-抽样算法"><a href="#SlidingTimeWindowReservoir-抽样算法" class="headerlink" title="SlidingTimeWindowReservoir 抽样算法"></a>SlidingTimeWindowReservoir 抽样算法</h3><p>该算法是上面移动窗口算法的变种，保留的是最近 N 时间单位（支持 TimeUnit 的所有时间单位）内的数据，而不是最近的 N 个数据。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">public void update(long value) &#123;</div><div class="line">//每 TRIM_THRESHOLD 次操作之后会进行一次 trim() 操作</div><div class="line">	if (count.incrementAndGet() % TRIM_THRESHOLD == 0) &#123;</div><div class="line">		trim();</div><div class="line">	&#125;</div><div class="line">			        //直接将该值加入到 ”蓄水池“ 中</div><div class="line">	measurements.put(getTick(), value);</div><div class="line">	&#125;</div><div class="line">//获得当前的时间</div><div class="line">private long getTick() &#123;</div><div class="line">	for (; ; ) &#123;</div><div class="line">		final long oldTick = lastTick.get();</div><div class="line">		final long tick = clock.getTick() * COLLISION_BUFFER;</div><div class="line">		// ensure the tick is strictly incrementing even if there are duplicate ticks</div><div class="line">		final long newTick = tick - oldTick &gt; 0 ? tick : oldTick + 1;</div><div class="line">		if (lastTick.compareAndSet(oldTick, newTick)) &#123;</div><div class="line">			return newTick;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void trim() &#123;</div><div class="line">	measurements.headMap(getTick() - window).clear();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这三种算法中，第二种和第三种是大家都很容易想到的，实现起来也很简单，第一种进行简单推导也不难，也算是一种现成的算法“蓄水池抽样”。</p>
+<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>如果某个系统每天会有 N 个人请求（N 不确定），需要从这些人中等概率的抽出 K 个中奖者，那么应该怎么做呢？是否可以使用上面抽样算法中的一种呢？</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2017-05-29 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/java/">java<span>2</span></a></li> <li><a href="/tags/code/">code<span>2</span></a></li> <li><a href="/tags/metric/">metric<span>1</span></a></li> <li><a href="/tags/reservior/">reservior<span>1</span></a></li> <li><a href="/tags/metric-core/">metric-core<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

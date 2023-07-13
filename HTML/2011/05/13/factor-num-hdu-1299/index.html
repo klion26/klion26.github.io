@@ -1,0 +1,385 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>因子个数_HDU_1299 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="因子个数_HDU_1299"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> 因子个数_HDU_1299</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>这题就是要求1/x+1/y=1/n,给出n,算出满足条件的x,y对(x&lt;=y).首先我们知道x和y都是大于n的,x&lt;=2<em>n,现在我们假设x=n+k(0&lt;k&lt;=n),那么y=n+n^2/k,我们知道y是整数,所以n^2一定是k的倍数,也就是k|n^2.这就要求我们求n^2的因子数了,OK,不过好像k还有限制条件- -|,其实我们可以先不考虑这个条件,因为x和y是对称的,所以算出总结过ans之后,ans’=(ans+1)&gt;&gt;1就是了.(加1是因为1/2n+1/2n=1/n这个式子只会出现一次).现在这题就变成了求一个数的因子数,我求因子数还是先分解素数做的,由于n^2实在太大,求sqrt(n^2)=n以内的素数也不可实现.其实我们只需要求出n的因子分解就行了,因为n^2=n</em>n,那么因子的次方就是n的因子分解之后每个素数次方的2倍.这样这题就解决了,下面是代码:</p>
+<div class="dp-highlighter"><br><br>1.  <span><span class="preprocessor">#include <stdio.h> </stdio.h></span><span>  </span></span><br>2.  <span> </span><span class="preprocessor">#include <string.h> </string.h></span><span>  </span><br>3.  <span class="preprocessor">#include <stdlib.h> </stdlib.h></span><span>  </span><br>4.  <span class="preprocessor">#include <math.h> </math.h></span><span>  </span><br>5.  <span class="keyword">const</span><span> </span><span class="datatypes">int</span><span> MAX_N=6666;   </span><br>6.  <span class="datatypes">int</span><span> prime[MAX_N],idx;   </span><br>7.  <span class="datatypes">int</span><span> n;   </span><br>8.  <span class="keyword">void</span><span> init_prime()   </span><br>9.  <span>{   </span><br>10.  <span>    </span><span class="datatypes">int</span><span> i,j;   </span><br>11.  <span>    </span><span class="datatypes">char</span><span> <em>p= (</em></span><span class="datatypes">char</span><span> )malloc(</span><span class="keyword">sizeof</span><span>(</span><span class="datatypes">char</span><span>)<em>65546);   </em></span><br>12.  <span>    memset(p,0,</span><span class="keyword">sizeof</span><span>(</span><span class="datatypes">char</span><span>)65546);   </span><br>13.  <span>    </span><span class="keyword">for</span><span>(i=2;i<65536;i+=2) <="" span=""><br>14.  <span>        p[i]=1;   </span><br>15.  <span>    prime[0]=2;   </span><br>16.  <span>    idx=1;   </span><br>17.  <span>    </span><span class="keyword">for</span><span>(i=3;i<65536;i+=2) <="" span=""><br>18.  <span>        {   </span><br>19.  <span>            </span><span class="keyword">if</span><span>(0 == p[i])   </span><br>20.  <span>                {   </span><br>21.  <span>                    prime[idx]=i;   </span><br>22.  <span>                    idx++;   </span><br>23.  <span>                    </span><span class="keyword">if</span><span>(i<257) <="" span=""><br>24.  <span>                        {</span><span class="comment">/<em>注意这里i</em>i可能会越界<em>/</em></span><span>  </span><br>25.  <span>                            </span><span class="keyword">for</span><span>(j=ii;j<65536;j +="2*i)" <="" span=""><br>26.  <span>                                {   </span><br>27.  <span>                                    p[j]=1;   </span><br>28.  <span>                                }   </span><br>29.  <span>                        }   </span><br>30.  <span>                }   </span><br>31.  <span>        }   </span><br>32.  <span>    free(p);   </span><br>33.  <span>}   </span><br>34.  <span class="keyword">void</span><span> work()   </span><br>35.  <span>{   </span><br>36.  <span>    </span><span class="datatypes">int</span><span> ans=1;   </span><br>37.  <span>    </span><span class="datatypes">int</span><span> i,j;   </span><br>38.  <span>    </span><span class="keyword">for</span><span>(i=0;i<idx;i++) <="" span=""><br>39.  <span>        {   </span><br>40.  <span>            </span><span class="keyword">if</span><span>(0 == (n%prime[i]))   </span><br>41.  <span>                {   </span><br>42.  <span>                    j = 0;   </span><br>43.  <span>                    </span><span class="keyword">while</span><span>(0 == (n%prime[i]))   </span><br>44.  <span>                        {   </span><br>45.  <span>                            j++;   </span><br>46.  <span>                            n /= prime[i];   </span><br>47.  <span>                        }   </span><br>48.  <span>                    ans <em>= (2</em>j+1);   </span><br>49.  <span>                }   </span><br>50.  <span>            </span><span class="keyword">if</span><span>(1 == n)   </span><br>51.  <span>                {   </span><br>52.  <span>                    </span><span class="keyword">break</span><span>   </span><br>53.  <span>                }   </span><br>54.  <span>        }   </span><br>55.  <span>    </span><span class="keyword">if</span><span>(n&gt;1)   </span><br>56.  <span>        {   </span><br>57.  <span>            ans *= 3;   </span><br>58.  <span>        }   </span><br>59.  <span>    ans = (ans+1)&gt;&gt;1;   </span><br>60.  <span>    printf(</span><span class="string">“%d\n\n”</span><span>,ans);   </span><br>61.  <span>}   </span><br>62.  <span class="datatypes">int</span><span> main(</span><span class="keyword">void</span><span>)   </span><br>63.  <span>{   </span><br>64.  <span>    </span><span class="datatypes">int</span><span> t,i;   </span><br>65.  <span>    init_prime();   </span><br>66.  <span>    scanf(</span><span class="string">“%d”</span><span>,t);   </span><br>67.  <span>    </span><span class="keyword">for</span><span>(i=1;i&lt;=t;i++)   </span><br>68.  <span>        {   </span><br>69.  <span>            scanf(</span><span class="string">“%d”</span><span>,n);   </span><br>70.  <span>            printf(</span><span class="string">“Scenario #%d:\n”</span><span>,i);   </span><br>71.  <span>            work();   </span><br>72.  <span>        }   </span><br>73.  <span>    </span><span class="keyword">return</span><span> 0;   </span><br>74.  <span>}   </span><br></idx;i++)></span></65536;j></span></257)></span></65536;i+=2)></span></65536;i+=2)></span></div>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2011/05/16/sg-function-hdu-2873/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2011/05/12/number-theory-poj-3358/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2011-05-13 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/数论/">数论<span>5</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

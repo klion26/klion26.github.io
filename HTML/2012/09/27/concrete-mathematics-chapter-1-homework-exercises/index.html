@@ -1,0 +1,397 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>具体数学第一章习题 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="具体数学第一章习题"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> 具体数学第一章习题</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>对于《具体数学》的所有问题，欢迎邮件联系讨论 Email:qcx978132955#gmail.com</p>
+<p>上一篇已经写了第一章大致的内容，这里写一下第一章的Homework Exercises的习题简单分析，有些是参考了后面的习题解答。</p>
+<p>8.可以自己推出Q[0],Q[1],Q[2],Q[3],Q[4],Q[5],Q[6],然后就可以看到循环了。</p>
+<p>9. a)直接把x[n]=(x[1]+…x[n-1])/(n-1)代入两边，然后化简之后就可以得到P[n-1]了</p>
+<p>b)x[1]<em>…</em>x[n]&lt;=((x[1]+…x[n])/n*(x[n+1]+…x[2n])/n)^2n<br>&lt;=((x[1]+…+x[2n])/2n)^2n         ====&gt;这里用到了P[2]</p>
+<p>c)不是很懂，<del>一开始以为不能用a)的那个式子，后来找了好多加看了习题解貌似是承认a)中的那个式子的</del>，对于a)中的那个其实是成立的，只不过a)中给出来，让我们更好证明一些(对于a中的证明，我们需要考虑的是x[1]*…x[n-1]&lt;=((x[1]+…+x[n-1]/(n-1))^(n-1)  首先我们知道P[n]是对x[n]为任意数成立的，那么我们就可以设x[n]=(x[1]+…+x[n-1])/(n-1)，然后就证明了)然后P[2]-&gt;P[4], P[4]-&gt;P[3],P[3]P[2]-&gt;P[5],依次类推，就可以知道所有的P[n]都成立。</p>
+<p>10.照着前面汉诺塔的模式推导就OK了</p>
+<p>11.a)假设最后所需的是T[n]，那么T[n]=T[n-1]+2+T[n-1]{首先把上面2n-2个放到第2个柱子上，然后把最下面两个放到第3个柱子上，因为不用考虑顺序，所以这样放就行了，最后把第2个柱子上的2n-2个移到第3个柱子上就行了}，最后得到T[n]=2^(n+1)+2<br>b)假设最后所需要的是S[n],首先我们从a)中可以知道如下一个结论，也就是在a)的规则中，最后只有最下面两个是互换顺寻的，上面的n-1对中，相同大小的Hanoi是没有换位置的(移了2次，第一次之后换了位置，然后第二次又换回来了).那么我们就可以的得到S[n]=T[n-1]+2+T[n-1]+2+S<a href="先把上面2n-2个移到第3个柱子上，然后把最下面的两个移到第2个柱子上，此时这两个的顺序是颠倒的，然后把上面2n-2个移会第1个柱子上，然后再把最下面的2个移到第3个柱子上，最后把上面2n-2个移到第3个柱子上">n-1</a>。</p>
+<p>12可以由11.a)扩展得到 如果所有的m[k]&gt;0,那么A(m[1],…m[n])=A(m[1],…,m[n-1])+m[n],另外如果最后顺序不能颠倒的话用B(m[1],…m[n])表示，那么最后B(m[1],…m[n])的表达式为<br>{                      A(m[1],….m[n])               if  m[n]=1<br>B(m[1],…m[n])       =    {                      2<em>m[n]-1                              if   n=1<br>{                      2</em>A(m[1],…m[n-1])+2*m[n]+B(m[1],…m[n-1])   if  n&gt;1 &amp; m[n]&gt;1</p>
+<p>13.照着书上给的那个射线的样子分析就行了，这里在ZZ[n-1]的情况下，然后考虑加入第n条ZZ线，可以知道只有让第n条ZZ线的3条”线”和前面的n-1条ZZ线都相交这样得到的区域最多，然后第n条ZZ线自己可以多出几个区域(因为是ZZ型的，注意拐角两边的区域是同一个区域，不要多算了)，这样就得到一个通式ZZ[n]=ZZ[n-1]+9*n-8</p>
+<p>14.这个最后得到1维是C(n,0)+C(n,1)  2维是C(n,0)+C(n,1)+C(n,2)   3维是C(n,0)+C(n,1)+C(n,2)+C(n,3)</p>
+<p>15.可以照着书上第15页那个展开式来写，这样的话只要考虑最后I[n]中n必须大于1，I(1)没有意义。另外可以按照书上Josephus Problem最开始的解法那样，写出递推式,然后可以解出来或者写出1-16(上限大一点好看规律，当然这也可以退出来)。然后可以得到最后的I(3<em>2^n+l)=2</em>l+1 其中m&gt;=0 &amp; 0&lt;=l&lt;3*2^m &amp;&amp; I(2) = 2</p>
+<p>16.由repertoire method我们可以假设g[n]=α<em>A[n]+β[0]</em>B[n]+β[1]<em>C[n]+γ</em>D[n].但是我一直只能找到两个式子，g[n]=1和g[n]=2这两个式子会得到  A[n]-2<em>B[n]-2</em>C[n]=1 &amp; A[n]+C[n]-D[n]=n，但是当我去解g[n]=n^2或者g[n]=1/n等其他的时候总是得到一些矛盾的东西，后来看了书后的解答，可以没有看出其中的奥秘，然后在网上各种搜题解，看到<a href="http://blog.wakatta.jp/blog/2012/01/14/concrete-mathematics-repertoire-method/" target="_blank" rel="external">这里</a>和<a href="http://ishare.iask.sina.com.cn/f/33662431.html" target="_blank" rel="external">这里</a>,才发现自己对那个repertoire method还是没有完全了解，照着上面给的两个链接我们可以得到最后的结果。</p>
+<p>继续加油，好好努力，天天向上。</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2012/10/08/scheme-and-the-little-scheme/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2012/09/26/concrete-mathmatics-chapter-1/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2012-09-27 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/chapter-1/">chapter-1<span>5</span></a></li> <li><a href="/tags/concrete-mathematics/">concrete-mathematics<span>2</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

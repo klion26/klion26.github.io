@@ -1,0 +1,384 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>How to think like a computer scientist(C++)笔记 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="How to think like a computer scientist(C++)笔记"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> How to think like a computer scientist(C++)笔记</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <div>1. The way of the program</div><br><div>      1.1 what’s a program language?</div><br><div>            high-level languages and low-level languages.</div><br><div>            2 ways to translate a program: interpreting or compiling.</div><br><div>      1.2 what is a program?</div><br><div>           input</div><br><div>           output</div><br><div>           math</div><br><div>           testing</div><br><div>           repeatition.</div><br><div>      1.3 what is debugging?</div><br><div>           1.3.1 compile-time errors</div><br><div>           1.3.2 run-time errors</div><br><div>           1.3.3 logic errors and semantics</div><br><div>           1.3.4 experimental debugging</div><br><div>      1.4 Formal and natural languages</div><br><div>           Programming languages are formal languages that have been designed to express computations.</div><br><div>           Differences between formal and natural languages:</div><br><div>                    ambiguity</div><br><div>                    redundancy</div><br><div>                    literalness</div><br><div>      1.5 The first program</div><br><div>      1.6 Glossary</div><br><div>2. Variables and types</div><br><div>      2.1 More output</div><br><div>     2.2 Values</div><br><div>     2.3 Variables</div><br><div>     2.4 Assignment</div><br><div>     2.5 Outputting variables</div><br><div>     2.6 Keywords</div><br><div>     2.7 Operators</div><br><div>           A possible alternative in integer division is to calculate a percentage rather than a fraction</div><br><div>      2.8 Order of operations</div><br><div>      2.9 Operators for characters</div><br><div>      2.10 Composition</div><br><div>      2.11 Glossary</div><br><div>3. Function</div><br><div>     3.1 Floating-point</div><br><div>     3.2 Converting from double to int</div><br><div>     3.3 Math functions</div><br><div>     3.4 Composition</div><br><div>     3.5 Adding new functions</div><br><div>          why is it worth the trouble to create all these new functions:</div><br><div>                a. Creating a new function gives you an opportunity to give a name to group of statements.</div><br><div>                b. Creating a new function can make a program smaller by eliminating repetitive code.</div><br><div>    3.6 Definitions and uses</div><br><div>    3.7 Programs with multiple functions</div><br><div>    3.8 Parameters and arguments</div><br><div>    3.9 Parameters and variables are local</div><br><div>    3.10 Functions with multiple parameters</div><br><div>    3.11 Functions with results</div><br><div>            Any time you have a question about what is legal or illegal in C++, a good way to find out is to ask the compiler.</div><br><div>    3.12 Glossary</div><br><div>4. Conditionals and recursion</div><br><div>    4.1 The modulus operator</div><br><div>    4.2 Conditional execution</div><br><div>    4.3 Alternative execution</div><br><div>    4.4 Chained conditionals</div><br><div>    4.5 Nested conditionals</div><br><div>    4.6 The return statement</div><br><div>    4.7 Recursion</div><br><div>    4.8 Infinite recursion</div><br><div>             If a recursion never reaches a base case, it will never terminate. This is known as infinite recursion.</div><br><div>    4.9 Stack diagrams for recursive functions</div><br><div>    4.10 Glossary</div><br><div>5. Fruitful functions</div><br><div>      5.1 Return values</div><br><div>              fruitful functions ==&gt; functions with return value</div><br><div>      5.2 Program development</div><br><div>              incremental development.</div><br><div>              The key aspects of the process are:</div><br><div>                         a. Start with a working program and make small, incremental changes. At any point, if there is an error, you will know exactly where it it.</div><br><div>                         b. Use temporary variables to hold intermediate values so you can output and check them.</div><br><div>                         c. Once the program is working, you might want to remove some of the scaffolding or consolidate multiple statements into compound expressions, but only if it does not make the program difficult to read.</div><br><div>        5.3 Composition</div><br><div>        5.4 Overloading</div><br><div>               Make sure that the version of the program you are looking at is the version of the program that is running!</div><br><div>         5.5 Boolean values</div><br><div>         5.6 Boolean variables</div><br><div>         5.7 Logical operators</div><br><div>         5.8 Bool functions</div><br><div>         5.9 Returning from main</div><br><div>         5.10 More recursion</div><br><div>         5.11 Leap of faith</div><br><div>         5.12 One more example</div><br><div>         5.13 Glossary</div><br><div>6. Iteration</div><br><div>         6.1 Multiple assignment</div><br><div>         6.2 Iteration</div><br><div>         6.3 The while statement</div><br><div>         6.4 Tables</div><br><div>         6.5 Two-dimensional tables</div><br><div>         6.6 Encapsulation and generalization</div><br><div>         6.7 Functions</div><br><div>                    Some of the reasons functions are useful:</div><br><div>                            a. By giving a name to a sequence of statements, you make your program easier to read and debug.</div><br><div>                            b. Dividing a long program into functions allows you to separate parts of the program, debug them in isolation, and then compose them into a whole.</div><br><div>                            c. Functions facilitate both recursion and iteration.</div><br><div>                            d. Well-designed functions are often useful for many programs. Once you write and debug one, you can reuse it.</div><br><div>         6.8 More encapsulation</div><br><div>         6.9 Local variables</div><br><div>         6.10 More generalization</div><br><div>         6.11 Glossary</div><br><div>7. Strings and things</div><br><div>         7.1 Containers for strings</div><br><div>         7.2 strings variables</div><br><div>         7.3 Extracting characters from a string</div><br><div>         7.4 Length</div><br><div>         7.5 Traversal</div><br><div>         7.6 A run-time error</div><br><div>          7.7 The find function</div><br><div>          7.8 Our own version of find</div><br><div>          7.9 Looping and counting</div><br><div>          7.10 Increment and decrement operators</div><br><div>          7.11 String concatenation</div><br><div>          7.12 strings are mutable</div><br><div>          7.13 strings are comparable</div><br><div>          7.14 Character classification</div><br><div>          7.15 Other string functions</div><br><div>          7.16 Glossary</div><br><div>8. Structures</div><br><div>          8.1 Compound values</div><br><div>                   structures</div><br><div>                   classes</div><br><div>          8.2 Point objects</div><br><div>          8.3 Accessing instance variables</div><br><div>          8.4 Operations on structures</div><br><div>          8.5 Structures as parameters</div><br><div>          8.6 Call by value</div><br><div>          8.7 Call by reference</div><br><div>          8.8 Rectangles</div><br><div>          8.9 Structures as return types</div><br><div>          8.10 Passing other types by reference</div><br><div>          8.11 Getting user input</div><br><div>          8.12 Glossary</div><br><div>9. More structures</div><br><div>          9.1 Time</div><br><div>          9.2 printTime</div><br><div>                   display the instance variables in a human-readable form.</div><br><div>          9.3 Functions for objects</div><br><div>          9.4 Pure functions</div><br><div>                    Takes objects and/or basic types as arguments but does not modify the objects.</div><br><div>          9.5 const parameters</div><br><div>          9.6 Modifiers</div><br><div>                Takes objects as parameters and modifies some or all of them.</div><br><div>          9.7 Fill-in functions</div><br><div>                One of the parameters is an “empty” object that gets filled in by the function.</div><br><div>          9.8 Which is best?</div><br><div>          9.9 Incremental development versus planning</div><br><div>          9.10 Generalization</div><br><div>          9.11 Algorithms</div><br><div>          9.12 Glossary</div><br><div>10. Vectors</div><br><div>          10.1 Accessing elements</div><br><div>          10.2 Copying vectors</div><br><div>          10.3 for loops</div><br><div>          10.4 Vector size</div><br><div>          10.5 Vector functions</div><br><div>          10.6 Random numbers</div><br><div>          10.7 Statistics</div><br><div>          10.8 Vector of random numbers</div><br><div>          10.9 Counting</div><br><div>          10.10 Checking the other values</div><br><div>          10.11 A histogram</div><br><div>          10.12 A single-pass solution</div><br><div>          10.13 Random seeds</div><br><div>          10.14 Glossary</div><br><div>11. Member functions</div><br><div>          11.1 Objects and functions</div><br><div>                  Member functions differ from the other functions we have written in two ways:</div><br><div>                         a. When we call the function, we invoke it on an object, rather than just call it.</div><br><div>                         b. The function is declared inside the struct or class definition, in order to make the relationship between the structure and the function explicit.</div><br><div>          11.2 print</div><br><div>          11.3 Implicit variable access</div><br><div>          11.4 Another example</div><br><div>          11.5 Yet another example</div><br><div>          11.6 A more complicated example</div><br><div>          11.7 Constructors</div><br><div>          11.8 Initialize or construct?</div><br><div>          11.9 One last example</div><br><div>          11.10 Header files</div><br><div>          11.11 Glossary</div><br><div>12. Vectors of Objects</div><br><div>          12.1 Composition</div><br><div>          12.2 Card objects</div><br><div>          12.3 The printCard function</div><br><div>          12.4 The equals function</div><br><div>          12.5 The isGreater function</div><br><div>          12.6 Vectors of cards</div><br><div>          12.7 The printDeck function</div><br><div>          12.8 Searching</div><br><div>          12.9 Bisection search</div><br><div>          12.10 Decks and subdecks</div><br><div>          12.11 Glossary</div><br><div>13. Objects of Vectors</div><br><div>         13.1 Enumerated types</div><br><div>         13.2 switch statement</div><br><div>         13.3 Decks</div><br><div>         13.4 Another constructor</div><br><div>         13.5 Deck member functions</div><br><div>         13.6 Shuffling</div><br><div>                 perfect shuffle</div><br><div>         13.7 Sorting</div><br><div>         13.8 Subdecks</div><br><div>         13.9 Shuffling and dealing</div><br><div>         13.10 Mergesort</div><br><div>         13.11 Glossary</div><br><div>14. Classes and invariants</div><br><div>         14.1 Private data and classes</div><br><div>         14.2 What is a class?</div><br><div>         14.3 Complex numbers</div><br><div>         14.4 Accessor functions</div><br><div>         14.5 Output</div><br><div>         14.6 A function on Complex numbers: add</div><br><div>         14.7 Another function on Complex numbers: mul</div><br><div>         14.8 Invariants</div><br><div>         14.9 Preconditions</div><br><div>         14.10 Private functions</div><br><div>         14.11 Glossary</div><br><div>15. File Input/Output and apmatrixes</div><br><div>          15.1 Streams</div><br><div>          15.2 File input</div><br><div>          15.3 File output</div><br><div>          15.4 Parsing input</div><br><div>          15.5 Parsing numbers</div><br><div>          15.6 The Set data structure</div><br><div>                  Ordering</div><br><div>                  Uniqueness</div><br><div>                  Arbitrary size</div><br><div>          15.7 apmatrix</div><br><div>          15.8 A distance matrix</div><br><div>          15.9 A proper distance matrix</div><br><div>          15.10 Glossary</div><br><div></div>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2014/05/02/linux-daemon/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2014/01/07/binary-tree-traversal-without-recursive/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2014-02-28 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/c/">c++<span>1</span></a></li> <li><a href="/tags/computer-scientist/">computer-scientist<span>1</span></a></li> <li><a href="/tags/method/">method<span>1</span></a></li> <li><a href="/tags/program/">program<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

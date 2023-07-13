@@ -1,0 +1,467 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Storm 的可靠性保证测试 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Storm 的可靠性保证测试"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Storm 的可靠性保证测试</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><span style="color: #ff0000;">文章首发于 <a href="http://tech.meituan.com/test-of-storms-reliability.html" target="_blank" rel="external">美团点评技术博客</a></span></p>
+<p><a href="http://storm.apache.org/" target="_blank" rel="external">Storm</a> 是一个分布式的实时计算框架，可以很方便地对流式数据进行实时处理和分析，能运用在实时分析、在线数据挖掘、持续计算以及分布式 RPC 等场景下。Storm 的实时性可以使得数据从收集到处理展示在秒级别内完成，从而为业务方决策提供实时的数据支持。</p>
+<p>在美团点评公司内部，实时计算主要应用场景包括实时日志解析、用户行为分析、实时消息推送、消费趋势展示、实时新客判断、实时活跃用户数统计等。这些数据提供给各事业群，并作为他们实时决策的有力依据，弥补了离线计算“T+1”的不足。</p>
+<p>在实时计算中，用户不仅仅关心时效性的问题，同时也关心消息处理的成功率。本文将通过实验验证 Storm 的消息可靠性保证机制，文章分为消息保证机制、测试目的、测试环境、测试场景以及总结等五节。</p>
+<h2 id="Storm-的消息保证机制"><a href="#Storm-的消息保证机制" class="headerlink" title="Storm 的消息保证机制"></a>Storm 的消息保证机制</h2><p>Storm 提供了三种不同层次的消息保证机制，分别是 At Most Once、At Least Once 以及 Exactly Once。消息保证机制依赖于消息是否被完全处理。</p>
+<h3 id="消息完全处理"><a href="#消息完全处理" class="headerlink" title="消息完全处理"></a>消息完全处理</h3><p>每个从 Spout（Storm 中数据源节点）发出的 Tuple（Storm 中的最小消息单元）可能会生成成千上万个新的 Tuple，形成一棵 Tuple 树，当整棵 Tuple 树的节点都被成功处理了，我们就说从 Spout 发出的 Tuple 被完全处理了。 我们可以通过下面的例子来更好地诠释消息被完全处理这个概念：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">TopologyBuilder builder = new TopologyBuilder();</div><div class="line">builder.setSpout(&quot;sentences&quot;, new KafkaSpout(spoutConfig), spoutNum);</div><div class="line">builder.setBolt(&quot;split&quot;, new SplitSentence(), 10)</div><div class="line">    .shuffleGrouping(&quot;sentences&quot;);</div><div class="line">builder.setBolt(&quot;count&quot;, new WordCount(), 20)</div><div class="line">    .fieldsGrouping(&quot;split&quot;, new Fields(&quot;word&quot;));</div></pre></td></tr></table></figure>
+<p>这个 Topology 从 Kafka（一个开源的分布式消息队列）读取信息发往下游，下游的 Bolt 将收到的句子分割成单独的单词，并进行计数。每一个从 Spout 发送出来的 Tuple 会衍生出多个新的 Tuple，从 Spout 发送出来的 Tuple 以及后续衍生出来的 Tuple 形成一棵 Tuple 树，下图是一棵 Tuple 树示例：</p>
+<p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/tuple_tree.png" alt="Tuple 树示例图"></p>
+<p>上图中所有的 Tuple 都被成功处理了，我们才认为 Spout 发出的 Tuple 被完全处理。如果在一个固定的时间内（这个时间可以配置，默认为 30 秒），有至少一个 Tuple 处理失败或超时，则认为整棵 Tuple 树处理失败，即从 Spout 发出的 Tuple 处理失败。</p>
+<h3 id="如何实现不同层次的消息保证机制"><a href="#如何实现不同层次的消息保证机制" class="headerlink" title="如何实现不同层次的消息保证机制"></a>如何实现不同层次的消息保证机制</h3><p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/spout_bolt_acker.png" alt="spout_bolt_acker"></p>
+<p>Tuple 的完全处理需要 Spout、Bolt 以及 Acker（Storm 中用来记录某棵 Tuple 树是否被完全处理的节点）协同完成，如上图所示。从 Spout 发送 Tuple 到下游，并把相应信息通知给 Acker，整棵 Tuple 树中某个 Tuple 被成功处理了都会通知 Acker，待整棵 Tuple 树都被处理完成之后，Acker 将成功处理信息返回给 Spout；如果某个 Tuple 处理失败，或者超时，Acker 将会给 Spout 发送一个处理失败的消息，Spout 根据 Acker 的返回信息以及用户对消息保证机制的选择判断是否需要进行消息重传。</p>
+<p>Storm 提供的三种不同消息保证机制中。利用 Spout、Bolt 以及 Acker 的组合我们可以实现 At Most Once 以及 At Least Once 语义，Storm 在 At Least Once 的基础上进行了一次封装（Trident），从而实现 Exactly Once 语义。</p>
+<p>Storm 的消息保证机制中，如果需要实现 At Most Once 语义，只需要满足下面任何一条即可：</p>
+<ul>
+<li>关闭 ACK 机制，即 Acker 数目设置为 0</li>
+<li><p>Spout 不实现可靠性传输</p>
+</li>
+<li><p>Spout 发送消息是使用不带 message ID 的 API</p>
+</li>
+<li>不实现 fail 函数</li>
+<li>Bolt 不把处理成功或失败的消息发送给 Acker</li>
+</ul>
+<p>如果需要实现 At Least Once 语义，则需要同时保证如下几条：</p>
+<ul>
+<li>开启 ACK 机制，即 Acker 数目大于 0</li>
+<li>Spout 实现可靠性传输保证</li>
+<li>Spout 发送消息时附带 message 的 ID</li>
+<li>如果收到 Acker 的处理失败反馈，需要进行消息重传，即实现 fail 函数</li>
+<li>Bolt 在处理成功或失败后需要调用相应的方法通知 Acker<br>实现 Exactly Once 语义，则需要在 At Least Once 的基础上进行状态的存储，用来防止重复发送的数据被重复处理，在 Storm 中使用 Trident API 实现。</li>
+</ul>
+<p>下图中，每种消息保证机制中左边的字母表示上游发送的消息，右边的字母表示下游接收到的消息。从图中可以知道，At Most Once 中，消息可能会丢失（上游发送了两个 A，下游只收到一个 A）；At Least Once 中，消息不会丢失，可能重复（上游只发送了一个 B ，下游收到两个 B）；Exactly Once 中，消息不丢失、不重复，因此需要在 At Least Once 的基础上保存相应的状态，表示上游的哪些消息已经成功发送到下游，防止同一条消息发送多次给下游的情况。</p>
+<p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/3_compare.png" alt="三种消息保证机制比较图"></p>
+<h2 id="测试目的"><a href="#测试目的" class="headerlink" title="测试目的"></a>测试目的</h2><p>Storm 官方提供 At Most Once、At Least Once 以及 Exactly Once 三种不同层次的消息保证机制，我们希望通过相关测试，达到如下目的：</p>
+<ul>
+<li>三种消息保证机制的表现，是否与官方的描述相符；</li>
+<li>At Most Once 语义下，消息的丢失率和什么有关系、关系如何；</li>
+<li>At Least Once 语义下，消息的重复率和什么有关系、关系如何。</li>
+</ul>
+<h2 id="测试环境"><a href="#测试环境" class="headerlink" title="测试环境"></a>测试环境</h2><p>本文的测试环境如下: 每个 worker（worker 为一个 物理 JVM 进程，用于运行实际的 Storm 作业）分配 1 CPU 以及 1.6G 内存。Spout、Bolt、Acker 分别跑在单独的 worker 上。并通过在程序中控制抛出异常以及人工 Kill Spout/Bolt/Acker 的方式来模拟实际情况中的异常情况。</p>
+<p>三种消息保证机制的测试均由 Spout 从 Kafka 读取测试数据，经由相应 Bolt 进行处理，然后发送到 Kafka，并将 Kafka 上的数据同步到 MySQL 方便最终结果的统计，如下图所示：</p>
+<p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/test-flow.png" alt="测试流程示意图"></p>
+<p>测试数据为 Kafka 上顺序保存的一系列纯数字，数据量分别有十万、五十万、一百万等，每个数字在每个测试样例中出现且仅出现一次。</p>
+<h2 id="测试场景"><a href="#测试场景" class="headerlink" title="测试场景"></a>测试场景</h2><p>对于三种不同的消息保证机制，我们分别设置了不同的测试场景，来进行充分的测试。其中为了保证 Spout/Bolt/Acker 发生异常的情况下不影响其他节点，在下面的测试中，所有的节点单独运行在独立的 Worker 上。</p>
+<h3 id="At-Most-Once"><a href="#At-Most-Once" class="headerlink" title="At Most Once"></a>At Most Once</h3><p>从背景中可以得知，如果希望实现 At Most Once 语义，将 Acker 的数目设置为 0 即可，本文的测试过程中通过把设置 Acker 为 0 来进行 At Most Once 的测试。</p>
+<h4 id="输入数据"><a href="#输入数据" class="headerlink" title="输入数据"></a>输入数据</h4><p>保存在 Kafka 上的一系列纯数字，数据量从十万到五百万不等，每个测试样例中，同一个数字在 Kafka 中出现且仅出现一次。</p>
+<h4 id="测试结果"><a href="#测试结果" class="headerlink" title="测试结果"></a>测试结果</h4><table><br><thead><br><tr><br><th>异常次数</th><br><th>测试数据总量</th><br><th>结果集中不同 Tuple 的总量</th><br><th>丢失的 Tuple 数据量</th><br><th>Tuple 的丢失百分比</th><br><th>Tuple 的重复量</th><br></tr><br></thead><br><tbody><br><tr><br><td>0</td><br><td>500000</td><br><td>500000</td><br><td>0</td><br><td>0%</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>1000000</td><br><td>1000000</td><br><td>0</td><br><td>0%</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>2000000</td><br><td>2000000</td><br><td>0</td><br><td>0%</td><br><td>0</td><br></tr><br><tr><br><td>0</td><br><td>3000000</td><br><td>3000000</td><br><td>0</td><br><td>0%</td><br><td>0</td><br></tr><br></tbody><br></table><br><table><br><thead><br><tr><br><th>异常次数</th><br><th>测试数据总量</th><br><th>结果集中不同 Tuple 的总量</th><br><th>丢失的 Tuple 数据量</th><br><th>Tuple 的丢失百分比</th><br><th>Tuple 的重复量</th><br></tr><br></thead><br><tbody><br><tr><br><td>1</td><br><td>3000000</td><br><td>2774940</td><br><td>225060</td><br><td>7.50%</td><br><td>0</td><br></tr><br><tr><br><td>2</td><br><td>3000000</td><br><td>2307087</td><br><td>692913</td><br><td>23.09%</td><br><td>0</td><br></tr><br><tr><br><td>3</td><br><td>3000000</td><br><td>2082823</td><br><td>917177</td><br><td>30.57%</td><br><td>0</td><br></tr><br><tr><br><td>4</td><br><td>3000000</td><br><td>1420725</td><br><td>1579275</td><br><td>52.64%</td><br><td>0</td><br></tr><br></tbody><br></table>
+
+<h4 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h4><p>不发生异常的情况下，消息能够不丢不重；Bolt 发生异常的情况下，消息会丢失，不会重复，其中消息的<strong>丢失数目</strong>与<strong>异常次数正相关</strong>。与官方文档描述相符，符合预期。</p>
+<h3 id="At-Least-Once"><a href="#At-Least-Once" class="headerlink" title="At Least Once"></a>At Least Once</h3><p>为了实现 At Least Once 语义，需要 Spout、Bolt、Acker 进行配合。我们使用 Kafka-Spout 并通过自己管理 offset 的方式来实现可靠的 Spout；Bolt 通过继承 BaseBasicBolt，自动帮我们建立 Tuple 树以及消息处理之后通知 Acker；将 Acker 的数目设置为 1，即打开 ACK 机制，这样整个 Topology 即可提供 At Least Once 的语义。</p>
+<h4 id="测试数据"><a href="#测试数据" class="headerlink" title="测试数据"></a>测试数据</h4><p>Kafka 上保存的十万到五十万不等的纯数字，其中每个测试样例中，每个数字在 Kafka 中出现且仅出现一次。</p>
+<h4 id="测试结果-1"><a href="#测试结果-1" class="headerlink" title="测试结果"></a>测试结果</h4><p>Acker 发生异常的情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常的次数</th><br>    <th>测试数据总量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数（&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    <th>最大积压量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>0</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    <td>2000（默认值）</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>200000</td><br>    <td>200000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>300000</td><br>    <td>300000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>400000</td><br>    <td>400000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    </tbody><br>    </table><br>    <table><br>    <thead><br>    <tr><br>    <th>异常的次数</th><br>    <th>测试数据总量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数（&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    <th>最大积压量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>2000</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>4001</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>3</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>6000</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    <tr><br>    <td>4</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>8000</td><br>    <td>0</td><br>    <td>2000</td><br>    </tr><br>    </tbody><br>    </table><br>    Spout 发生异常的情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常的次数</th><br>    <th>测试数据总量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数（&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>0</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>200000</td><br>    <td>200000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>300000</td><br>    <td>300000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>400000</td><br>    <td>400000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>    <table><br>    <thead><br>    <tr><br>    <th>异常的次数</th><br>    <th>测试数据总量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数（&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>2052</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>4414</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>4</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>9008</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>6</td><br>    <td>100000</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>9690</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td></td><br>    <td></td><br>    <td></td><br>    <td>3</td><br>    <td>1675</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>Bolt 发生异常的情况</p>
+<p>调用 emit 函数之前发生异常<br>    <table><br>    <thead><br>    <tr><br>    <th>异常次数</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数 (&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>0</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>200000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>300000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>400000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>    <table><br>    <thead><br>    <tr><br>    <th>异常次数</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数 (&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>4</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>8</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>10</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>    调用 emit 函数之后发生异常<br>    <table><br>    <thead><br>    <tr><br>    <th>异常次数</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数(&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>0</td><br>    <td>100000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>200000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>300000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>0</td><br>    <td>400000</td><br>    <td>-</td><br>    <td>-</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table><br>    <table><br>    <thead><br>    <tr><br>    <th>异常次数</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>数据重复的次数(&gt;1)</th><br>    <th>出现重复的 Tuple 数</th><br>    <th>数据丢失数量</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>2</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>3</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>4</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>5</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>8</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>9</td><br>    <td>0</td><br>    </tr><br>    <tr><br>    <td>10</td><br>    <td>100000</td><br>    <td>2</td><br>    <td>11</td><br>    <td>0</td><br>    </tr><br>    </tbody><br>    </table></p>
+<h4 id="结论-1"><a href="#结论-1" class="headerlink" title="结论"></a>结论</h4><p>从上面的表格中可以得到，消息不会丢失，可能发生重复，重复的数目与异常的情况相关。</p>
+<ul>
+<li>不发生任何异常的情况下，消息不会重复不会丢失。</li>
+<li>Spout 发生异常的情况下，消息的重复数目约等于 spout.max.pending(Spout 的配置项，每次可以发送的最多消息条数） * NumberOfException（异常次数）。</li>
+<li>Acker 发生异常的情况下，消息重复的数目等于 spout.max.pending * NumberOfException。</li>
+<li>Bolt 发生异常的情况：</li>
+<li>emit 之前发生异常，消息不会重复。</li>
+<li>emit 之后发生异常，消息重复的次数等于异常的次数。<br>结论与官方文档所述相符，每条消息至少发送一次，保证数据不会丢失，但可能重复，符合预期。</li>
+</ul>
+<h3 id="Exactly-Once"><a href="#Exactly-Once" class="headerlink" title="Exactly Once"></a>Exactly Once</h3><p>对于 Exactly Once 的语义，利用 Storm 中的 Trident 来实现。</p>
+<h4 id="测试数据-1"><a href="#测试数据-1" class="headerlink" title="测试数据"></a>测试数据</h4><p>Kafka 上保存的一万到一百万不等的数字，每个数字在每次测试样例中出现且仅出现一次。</p>
+<h4 id="测试结果-2"><a href="#测试结果-2" class="headerlink" title="测试结果"></a>测试结果</h4><p>Spout 发生异常情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常数</th><br>    <th>测试数据量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>结果集中所有 Tuple 的总和</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>3</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    </tbody><br>    </table><br>    Acker 发生异常的情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常数</th><br>    <th>测试数据量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>结果集中所有 Tuple 的总和</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>3</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    </tbody><br>    </table><br>    Bolt 发生异常的情况<br>    <table><br>    <thead><br>    <tr><br>    <th>异常数</th><br>    <th>测试数据量</th><br>    <th>结果集中不重复的 Tuple 数</th><br>    <th>结果集中所有 Tuple 的总和</th><br>    </tr><br>    </thead><br>    <tbody><br>    <tr><br>    <td>1</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>2</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    <tr><br>    <td>3</td><br>    <td>10000</td><br>    <td>10000</td><br>    <td>50005000</td><br>    </tr><br>    </tbody><br>    </table></p>
+<h4 id="结论-2"><a href="#结论-2" class="headerlink" title="结论"></a>结论</h4><p>在所有情况下，最终结果集中的消息不会丢失，不会重复，与官方文档中的描述相符，符合预期。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>对 Storm 提供的三种不同消息保证机制，用户可以根据自己的需求选择不同的消息保证机制。</p>
+<h3 id="不同消息可靠性保证的使用场景"><a href="#不同消息可靠性保证的使用场景" class="headerlink" title="不同消息可靠性保证的使用场景"></a>不同消息可靠性保证的使用场景</h3><p>对于 Storm 提供的三种消息可靠性保证，优缺点以及使用场景如下所示：</p>
+<table><br><thead><br><tr><br><th>可靠性保证层次</th><br><th>优点</th><br><th>缺点</th><br><th>使用场景</th><br></tr><br></thead><br>    <tbody><br>    <tr><br>    <td>At most once</td><br>    <td>处理速度快</td><br>    <td>数据可能丢失</td><br>    <td>都处理速度要求高，且对数据丢失容忍度高的场景</td><br>    </tr><br>    <tr><br>    <td>At least once</td><br>    <td>数据不会丢失</td><br>    <td>数据可能重复</td><br>    <td>不能容忍数据丢失，可以容忍数据重复的场景</td><br>    </tr><br>    <tr><br>    <td>Exactly once</td><br>    <td>数据不会丢失，不会重复</td><br>    <td>处理速度慢</td><br>    <td>对数据不丢不重性质要求非常高，且处理速度要求没那么高，比如支付金额</td><br>    </tr><br>    </tbody><br>    </table>
+
+<h3 id="如何实现不同层次的消息可靠性保证"><a href="#如何实现不同层次的消息可靠性保证" class="headerlink" title="如何实现不同层次的消息可靠性保证"></a>如何实现不同层次的消息可靠性保证</h3><p>对于 At Least Once 的保证需要做如下几步：</p>
+<ol>
+<li>需要开启 ACK 机制，即 Topology 中的 Acker 数量大于零；</li>
+<li>Spout 是可靠的。即 Spout 发送消息的时候需要附带 msgId，并且实现失败消息重传功能（fail 函数 ，可以参考下面的 Spout 代码）；</li>
+<li>Bolt 在发送消息时，需要调用 emit（inputTuple, outputTuple）进行建立 anchor 树（参考下面建立 anchor 树的代码），并且在成功处理之后调用 ack ，处理失败时调用 fail 函数，通知 Acker。</li>
+</ol>
+<p>不满足以上三条中任意一条的都只提供 At Most Once 的消息可靠性保证，如果希望得到 Exactly Once 的消息可靠性保证，可以使用 Trident 进行实现。</p>
+<h3 id="不同层次的可靠性保证如何实现"><a href="#不同层次的可靠性保证如何实现" class="headerlink" title="不同层次的可靠性保证如何实现"></a>不同层次的可靠性保证如何实现</h3><h4 id="如何实现可靠的-Spout"><a href="#如何实现可靠的-Spout" class="headerlink" title="如何实现可靠的 Spout"></a>如何实现可靠的 Spout</h4><p>实现可靠的 Spout 需要在 nextTuple 函数中发送消息时，调用带 msgID 的 emit 方法，然后实现失败消息的重传（fail 函数），参考如下示例:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">         * 想实现可靠的 Spout，需要实现如下两点</div><div class="line">         * 1\. 在 nextTuple 函数中调用 emit 函数时需要带一个     msgId，用来表示当前的消息（如果消息发送失败会用 msgId 作为参数回调 fail 函数）</div><div class="line">         * 2\. 自己实现 fail 函数，进行重发（注意，在 storm 中没有 msgId 和消息的对应关系，需要自己进行维护）</div><div class="line">         */</div><div class="line">    public void nextTuple() &#123;</div><div class="line">        //设置 msgId 和 Value 一样，方便 fail 之后重发</div><div class="line">        collector.emit(new Values(curNum + &quot;&quot;, round +     &quot;&quot;), curNum + &quot;:&quot; + round);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void fail(Object msgId) &#123;//消息发送失败时的回调函数</div><div class="line">    String tmp = (String)msgId;   //上面我们设置了 msgId 和消息相同，这里通过 msgId 解析出具体的消息</div><div class="line">    String[] args = tmp.split(&quot;:&quot;);</div><div class="line"></div><div class="line">    //消息进行重发</div><div class="line">    collector.emit(new Values(args[0], args[1]), msgId);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<h4 id="如何实现可靠的-Bolt"><a href="#如何实现可靠的-Bolt" class="headerlink" title="如何实现可靠的 Bolt"></a>如何实现可靠的 Bolt</h4><p>Storm 提供两种不同类型的 Bolt，分别是 BaseRichBolt 和 BaseBasicBolt，都可以实现可靠性消息传递，不过 BaseRichBolt 需要自己做很多周边的事情（建立 anchor 树，以及手动 ACK/FAIL 通知 Acker），使用场景更广泛，而 BaseBasicBolt 则由 Storm 帮忙实现了很多周边的事情，实现起来方便简单，但是使用场景单一。如何用这两个 Bolt 实现（不）可靠的消息传递如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div></pre></td><td class="code"><pre><div class="line">//BaseRichBolt 实现不可靠消息传递</div><div class="line">    public class SplitSentence extends BaseRichBolt &#123;//不建立 anchor 树的例子</div><div class="line">        OutputCollector _collector;</div><div class="line"></div><div class="line">        public void prepare(Map conf, TopologyContext context, OutputCollector collector) &#123;</div><div class="line">            _collector = collector;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void execute(Tuple tuple) &#123;</div><div class="line">            String sentence = tuple.getString(0);</div><div class="line">            for(String word: sentence.split(&quot; &quot;)) &#123;</div><div class="line">                _collector.emit(new Values(word));  // 不建立 anchor 树</div><div class="line">            &#125;</div><div class="line">            _collector.ack(tuple);          //手动 ack，如果不建立 anchor 树，是否 ack 是没有区别的，这句可以进行注释</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void declareOutputFields(OutputFieldsDeclarer declarer) &#123;</div><div class="line">            declarer.declare(new Fields(&quot;word&quot;));</div><div class="line">        &#125;      </div><div class="line">    &#125;</div><div class="line"></div><div class="line">    //BaseRichBolt 实现可靠的 Bolt</div><div class="line">    public class SplitSentence extends BaseRichBolt &#123;//建立 anchor 树以及手动 ack 的例子</div><div class="line">        OutputCollector _collector;</div><div class="line"></div><div class="line">        public void prepare(Map conf, TopologyContext context, OutputCollector collector) &#123;</div><div class="line">            _collector = collector;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void execute(Tuple tuple) &#123;</div><div class="line">            String sentence = tuple.getString(0);</div><div class="line">            for(String word: sentence.split(&quot; &quot;)) &#123;</div><div class="line">                _collector.emit(tuple, new Values(word));  // 建立 anchor 树</div><div class="line">            &#125;</div><div class="line">            _collector.ack(tuple);          //手动 ack，如果想让 Spout 重发该 Tuple，则调用 _collector.fail(tuple);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void declareOutputFields(OutputFieldsDeclarer declarer) &#123;</div><div class="line">            declarer.declare(new Fields(&quot;word&quot;));</div><div class="line">        &#125;      </div><div class="line">    &#125;</div><div class="line"></div><div class="line">    下面的示例会可以建立 Multi-anchoring</div><div class="line">    List&lt;Tuple&gt; anchors = new ArrayList&amp;lt;Tuple&amp;gt;();</div><div class="line">    anchors.add(tuple1);</div><div class="line">    anchors.add(tuple2);</div><div class="line">    _collector.emit(anchors, new Values(1, 2, 3));</div><div class="line"></div><div class="line">    //BaseBasicBolt 是吸纳可靠的消息传递</div><div class="line">    public class SplitSentence extends BaseBasicBolt &#123;//自动建立 anchor，自动 ack</div><div class="line">        public void execute(Tuple tuple, BasicOutputCollector collector) &#123;</div><div class="line">            String sentence = tuple.getString(0);</div><div class="line">            for(String word: sentence.split(&quot; &quot;)) &#123;</div><div class="line">                collector.emit(new Values(word));</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void declareOutputFields(OutputFieldsDeclarer declarer) &#123;</div><div class="line">            declarer.declare(new Fields(&quot;word&quot;));</div><div class="line">        &#125;      </div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<h4 id="Trident"><a href="#Trident" class="headerlink" title="Trident"></a>Trident</h4><p>在 Trident 中，Spout 和 State 分别有三种状态，如下图所示：</p>
+<p><img src="http://tech.meituan.com/img/test-of-storm&#39;s-reliability/spout-vs-state.png" alt="Trident Spout 和 State 的状态图"></p>
+<p>其中表格中的 Yes 表示相应的 Spout 和 State 组合可以实现 Exactly Once 语义，No 表示相应的 Spout 和 State 组合不保证 Exactly Once 语义。下面的代码是一个 Trident 示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">OpaqueTridentKafkaSpout spout = new OpaqueTridentKafkaSpout(spoutConf);   //Opaque Spout</div><div class="line">//TransactionalTridentKafkaSpout spout = new TransactionalTridentKafkaSpout(spoutConf);   //Transaction Spout</div><div class="line"></div><div class="line">TridentTopology topology = new TridentTopology();</div><div class="line">String spoutTxid = Utils.kafkaSpoutGroupIdBuilder(topologyConfig.kafkaSrcTopic, topologyConfig.topologyName);</div><div class="line">Stream stream = topology.newStream(spoutTxid, spout)</div><div class="line">        .name(&quot;new stream&quot;)</div><div class="line">        .parallelismHint(1);</div><div class="line"></div><div class="line">// kafka config</div><div class="line">KafkaProducerConfig kafkaProducerConfig = new KafkaProducerConfig();      //KafkaProducerConfig 仅对 kafka 相关配置进行了封装，具体可以参考 TridentKafkaStateFactory2(Map&lt;String, String&gt; config)</div><div class="line">Map&lt;String, String&gt; kafkaConfigs = kafkaProducerConfig.loadFromConfig(topologyConfig);</div><div class="line">TridentToKafkaMapper tridentToKafkaMapper = new TridentToKafkaMapper();  //TridentToKafkaMapper 继承自 TridentTupleToKafkaMapper&lt;String, String&gt;，实现 getMessageFromTuple 接口，该接口中返回 tridentTuple.getString(0);</div><div class="line"></div><div class="line">String  dstTopic = &quot;test__topic_for_all&quot;;</div><div class="line"></div><div class="line">TridentKafkaStateFactory2 stateFactory = new TridentKafkaStateFactory2(kafkaConfigs);</div><div class="line">stateFactory.withTridentTupleToKafkaMapper(tridentToKafkaMapper);</div><div class="line">stateFactory.withKafkaTopicSelector(new DefaultTopicSelector(dstTopic));</div><div class="line"></div><div class="line">stream.each(new Fields(&quot;bytes&quot;), new AddMarkFunction(), new Fields(&quot;word&quot;)) //从spout 出来数据是一个 bytes 类型的数据，第二个是参数是自己的处理函数，第三个参数是处理函数的输出字段</div><div class="line">        .name(&quot;write2kafka&quot;)</div><div class="line">        .partitionPersist(stateFactory         //将数据写入到 Kafka 中，可以保证写入到 Kafka 的数据是 exactly once 的</div><div class="line">                , new Fields(&quot;word&quot;)</div><div class="line">                , new TridentKafkaUpdater())</div><div class="line">        .parallelismHint(1);</div></pre></td></tr></table></figure></p>
+<p><strong>关注我们的官方微信公众号“美团点评技术团队”。现在就拿出手机，扫一扫：</strong></p>
+<p><img src="http://tech.meituan.com/img/qrcode_for_gh.jpg" alt="公众号二维码"></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2016/10/26/e8-a6-81-e5-a4-9a-e5-bf-ab-e6-89-8d-e8-83-bd-e8-b7-91-e5-ae-8c-e4-b8-80-e5-9c-ba-e9-a9-ac-e6-8b-89-e6-9d-be/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2016/09/26/e4-b8-80-e7-a7-8d-e5-8f-af-e8-a1-8c-e7-9a-84-e8-8b-b1-e8-af-ad-e9-98-85-e8-af-bb-e5-ad-a6-e4-b9-a0-e6-96-b9-e6-b3-95/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2016-10-22 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/storm/">storm<span>3</span></a></li> <li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li> <li><a href="/tags/exactly-once/">exactly-once<span>3</span></a></li> <li><a href="/tags/at-most-once/">at-most-once<span>1</span></a></li> <li><a href="/tags/reliability/">reliability<span>1</span></a></li> <li><a href="/tags/test/">test<span>1</span></a></li> <li><a href="/tags/trident/">trident<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

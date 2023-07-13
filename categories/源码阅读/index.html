@@ -1,0 +1,459 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>源码阅读 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+<!-- title -->
+<div class="page-header page-header-inverse ">
+  <h1 class="archive-title-category title title-inverse ">源码阅读</h1>
+</div>
+
+<div class="row page">
+  <!-- cols -->
+  
+  <div class="col-md-9">
+	
+
+	  <div id="top_search"></div>
+
+      
+
+      <div class="mypage">
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-07-26 </div>
+			<div class="article-title"><a href="/2015/07/26/redis-pqsort-c/" >Redis 中快排算法详解(pqsort.c)</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="https://github.com/klion26/redis-1.0-annotation/blob/master/pqsort.c" target="_blank" rel="external">Redis 中的快排</a>中的思想是一篇叫做“<a href="http://cs.fit.edu/~pkc/classes/writing/samples/bentley93engineering.pdf" target="_blank" rel="external">Engineering a Sort Function”</a>里面的思想。做到比标准库里面的快排<span style="color: #ff0000;">更快</span>，<span style="color: #ff0000;">更稳定</span>，（在自己电脑上做测试的时候，基本一样的时间），按照论文来说主要用到下面的优化：</p>
+<ol>
+<li>元素交换的时候更省时间</li>
+<li>在某些情况下使用了冒泡排序，以及插入排序</li>
+<li>选择一个接近中位数的数做 pivot<br>下面从上面三个方面入手分析代码</li>
+</ol>
+<p>对于元素交换方面，代码里面的做法首先会查看待排序的数组是否按机器字节对齐，以及每个元素所占的字节长度是否等于机器字节长度，代码如下：</p>
+<p><pre class="lang:c decode:true ">#define SWAPINIT(a, es) swaptype = ((char <em>)a - (char </em>)0) % sizeof(long) || \<br>    es % sizeof(long) ? 2 : es == sizeof(long)? 0 : 1;</pre><br><span style="color: #ff0000;">注意 || 的优先级比 ?: 的优先级要高</span>，不然这里会理解错误的。这里的 swaptype 就是用来确定交换时的类型的，有如下三种可能：</p>
+<ol>
+<li>数组首地址对齐，且数组元素占的字节数和 sizeof(long) 一样的。swaptype == 0</li>
+<li>数组首地址对齐，数组元素占的字节数是 sizeof(long) 的倍数的。swaptype == 1</li>
+<li>数组首地址不对齐；或者首地址对齐，但是数组元素所占的字节数不能整除 sizeof(long) 的。swaptype == 2<br>针对不能的情况，后面交换数据的时候分别有不同的选择。对于第一种和第二种，直接按照 long 类型来交换，其他的则按照 char 类型来交换。<br><pre class="lang:c decode:true">if (swaptype &lt;= 1)<br>swapcode(long, a, b, n)<br>else<br>swapcode(char, a, b, n)</pre><br>对于交换，本方法由于把数据分为了小于 pivot 的，大于 pivot 的和等于 pivot 的。因此还有数组的交换，将所有等于 pivot 的都换到中间。<br><pre class="lang:c decode:true ">#define vecswap(a, b, n) if ((n) &gt; 0) swapfunc((a), (b), (size_t)(n), swaptype)</pre><br>在进行完一次排序之后，数组内部的分布如下所示：</li>
+</ol>
+<p><span style="color: #ff0000;">|</span> pivot <span style="color: #ff0000;">|</span>  等于 pivot 的所有元素A <span style="color: #ff0000;">|</span>  小于 pivot 的所有元素  <span style="color: #ff0000;">|</span>大于 pivot 的所有元素 <span style="color: #ff0000;">|</span> 等于pivot 的所有元素B <span style="color: #ff0000;">|</span></p>
+<p>然后我们需要把小于 pivot 的所有元素换到数组的最左边，把原来数组最右边的等于 pivot 的所有元素B换到数组的中间。变成如下排列</p>
+<p><span style="color: #ff0000;">|</span> 小于 pivot 的所有元素  <span style="color: #ff0000;">|</span>  等于 pivot 的所有元素  <span style="color: #ff0000;">|</span>  大于 pivot 的所有元素 <span style="color: #ff0000;">|</span></p>
+<p>这里就需要用到上面的 vecswap，就是两段数之间的交换。将所有等于 pivot 的元素放到中间，所有小于 pivot 的元素放到左边，所有大于 pivot 的元素放到右边</p>
+<p>2. 利用冒泡和插入排序。</p>
+<p>在本方法中，对于少于7个元素的都利用冒泡排序解决（7 是一个 Magical number），然后对于接近已排好序的数组，利用插入排序，我们知道快速排序对于已排好序的数组进行排序复杂度是很高的，因此在内部采用了插入排序解决这一问题<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">if (swap_cnt == 0) &#123;  /* Switch to insertion sort */</div><div class="line">        /** &#123;a[0]&#125;  &#123;a[1]...a[k]&#125;  &#123;a[k+1]...a[n-1]&#125;</div><div class="line">         * a[i] &lt; a[0]  for 1&amp;lt;= i &amp;lt; k+1</div><div class="line">         * a[i] &gt; a[0]  for k+1 &lt;= i &amp;lt; n</div><div class="line">         **/</div><div class="line">		for (pm = (char *) a + es; pm &lt; (char *) a + n * es; pm += es)</div><div class="line">			for (pl = pm; pl &gt; (char *) a &amp;amp; cmp(pl - es, pl) &amp;gt; 0; </div><div class="line">			     pl -= es)</div><div class="line">				swap(pl, pl - es);</div><div class="line">		return;</div><div class="line">	&#125;</div></pre></td></tr></table></figure></p>
+<p>这段代码中的 swap_cnt 是记录了在第一次排序过程中是否进行过交换，等于零表示没有进行过交换。</p>
+<p>3. 找一个更合适的 pivot 这一点，本方法利用下面的方法来进行 pivot 的寻找，其中 pm 指向最终我们设定的 pivot</p>
+<p><pre class="lang:c decode:true">    pm = (char <em>) a + (n / 2) </em> es; /<strong> 首先用数组中间的那个元素做 pivot </strong>/<br>    if (n &gt; 7) { /<strong> 如果元素个数大于 7 </strong>/<br>        pl = (char <em>) a;/</em> 首元素 <em>/<br>        pn = (char </em>) a + (n - 1) <em> es; /</em> 末尾元素 <em>/<br>        if (n &gt; 40) { /<strong> 如果大于40个元素（40 也是一个 Magical Number） </strong>/<br>            d = (n / 8) </em> es; /<strong> 利用下面的 9 个数来近似整个数组的中位数 </strong>/<br>            pl = med3(pl, pl + d, pl + 2 <em> d, cmp); /</em> pl 这三个数里面的一个中位数 <em>/<br>            pm = med3(pm - d, pm, pm + d, cmp); /</em> pm 是这三个数的中位数 <em>/<br>            pn = med3(pn - 2 </em> d, pn - d, pn, cmp); /<em> pn 是这三个数的中位数 </em>/<br>        }<br>        pm = med3(pl, pm, pn, cmp); /<em> pm 是 pl pm pn 的中位数，近似整个数组的中位数 </em>/<br>    }</pre><br>这样找到的 pivot 不会偏向很严重，从而在快排的时候，不会导致某一边（大于 pivot 和小于 pivot 两边）的数据量比较大。</p>
+<p>另外在对数组的右半部分进行排序的时候，利用了 goto，而不是递归，这样可以节省栈空间。</p>
+<p>我在 Github 上存放了一份带所有注释的代码，地址如下：<a href="https://github.com/klion26/redis-1.0-annotation/blob/master/pqsort.c" target="_blank" rel="external">https://github.com/klion26/redis-1.0-annotation/blob/master/pqsort.c</a></p>
+<p>参考文章：</p>
+<ol>
+<li><a href="http://cs.fit.edu/~pkc/classes/writing/samples/bentley93engineering.pdf" target="_blank" rel="external">http://cs.fit.edu/~pkc/classes/writing/samples/bentley93engineering.pdf</a></li>
+</ol>
+<p>2. <a href="http://blog.csdn.net/guodongxiaren/article/details/45567291" target="_blank" rel="external">http://blog.csdn.net/guodongxiaren/article/details/45567291</a></p>
+
+	
+	</div>
+</div>
+
+	  
+      </div>
+	  <div>
+	    <center>
+	    <div class="pagination">
+<ul class="pagination">
+	 
+</ul>
+</div>
+
+        </center>
+	    </div>	
+      
+
+</div> <!-- col-md-9/col-md-12 -->
+
+
+<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+	<div class="widget">
+		<h4>Categories</h4>
+		<ul class="tag_box inline list-unstyled">
+		
+			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+		
+			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+		
+			<li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+		
+			<li><a href="/categories/Linux/TeX/">TeX<span>1</span></a></li>
+		
+			<li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+		
+			<li><a href="/categories/Uncategorized/">Uncategorized<span>3</span></a></li>
+		
+			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+		
+			<li><a href="/categories/实时计算/复盘/problem-solve/">problem_solve<span>1</span></a></li>
+		
+			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
+		
+			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li>
+		
+			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/成长/">成长<span>3</span></a></li>
+		
+			<li><a href="/categories/我的生活/">我的生活<span>9</span></a></li>
+		
+			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
+		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>2</span></a></li>
+		
+		</ul>
+	</div>
+
+		
+			
+	<div class="widget">
+		<h4>Tag Cloud</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/tencent/">tencent<span>1</span></a></li>
+		
+			<li><a href="/tags/competition/">competition<span>5</span></a></li>
+		
+			<li><a href="/tags/JobGenerator/">JobGenerator<span>1</span></a></li>
+		
+			<li><a href="/tags/horn-formulas/">horn formulas<span>1</span></a></li>
+		
+			<li><a href="/tags/at-least-once/">at-least-once<span>3</span></a></li>
+		
+			<li><a href="/tags/queue/">queue<span>1</span></a></li>
+		
+			<li><a href="/tags/非暴力沟通/">非暴力沟通<span>1</span></a></li>
+		
+			<li><a href="/tags/CSAPP/">CSAPP<span>1</span></a></li>
+		
+			<li><a href="/tags/pair/">pair<span>1</span></a></li>
+		
+			<li><a href="/tags/成长/">成长<span>1</span></a></li>
+		
+			<li><a href="/tags/network/">network<span>1</span></a></li>
+		
+			<li><a href="/tags/nginx/">nginx<span>3</span></a></li>
+		
+			<li><a href="/tags/metric/">metric<span>1</span></a></li>
+		
+			<li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li>
+		
+			<li><a href="/tags/SG函数/">SG函数<span>1</span></a></li>
+		
+			<li><a href="/tags/lzo/">lzo<span>1</span></a></li>
+		
+			<li><a href="/tags/MST/">MST<span>1</span></a></li>
+		
+			<li><a href="/tags/chinese/">chinese<span>1</span></a></li>
+		
+			<li><a href="/tags/Task/">Task<span>1</span></a></li>
+		
+			<li><a href="/tags/daemon/">daemon<span>1</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>312</span></a></li>
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>Recent Posts</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/" ><i class="fa fa-file-o"></i>一次 InputStream#read 使用不当导致的问题</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
+      </li>
+    
+      <li>
+        <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
+      </li>
+    
+      <li>
+        <a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" ><i class="fa fa-file-o"></i>通过 Java 线程堆栈进行性能瓶颈分析</a>
+      </li>
+    
+      <li>
+        <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>Links</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>
+	
+		<li><i class=""></i><a href="http://l34rner.github.io/" title="A blog focus on security!" target="_blank"]);">Debug0</a></li>
+	
+		<li><i class=""></i><a href="http://www.programlife.net/" title="程序人生" target="_blank"]);">代码疯子</a></li>
+	
+		<li><i class=""></i><a href="http://www.narutoacm.com/" title="NARUTOACM" target="_blank"]);">NARUTOACM</a></li>
+	
+		<li><i class=""></i><a href="http://www.tanglei.name/" title="tanglei 的 blog" target="_blank"]);">tanglei的blog</a></li>
+	
+		<li><i class=""></i><a href="http://www.microspaze.com/" title="微空间" target="_blank"]);">微空间</a></li>
+	
+		<li><i class=""></i><a href="http://www.toutian.org/" title="小昭的荒地" target="_blank"]);">小昭的荒地</a></li>
+	
+		<li><i class=""></i><a href="https://cosx.me/" title="异想天开" target="_blank"]);">异想天开</a></li>
+	
+		<li><i class=""></i><a href="http://xiaopengcheng.top/" title="远行" target="_blank"]);">远行</a></li>
+	
+		<li><i class=""></i><a href="http://www.zhangxc.com/" title="张学程" target="_blank"]);">张学程</a></li>
+	
+	</ul>
+</div>
+
+
+		
+			<!-- calendar widget -->
+
+  <script src="/js/calendar.js"></script>
+  <script src="/js/languages.js"></script>
+  <script type="text/javascript">
+    $(function() {
+    
+      $('#calendar').aCalendar('zh-CN',{single:undefined, root:'undefined'});
+    
+    });
+  </script>
+
+
+<div class="widget-wrap">
+  <h3 class="widget-title">日历云</h3>
+  <div class="widget">
+    <div id="calendar"></div>
+  </div>
+</div
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

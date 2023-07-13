@@ -1,0 +1,400 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Python 代码实践小结 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Python 代码实践小结"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Python 代码实践小结</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>最近写了较多的 Python 脚本，将最近自己写的脚本进行一个总结，其中有些是 Python 独有的，有些是所有程序设计中共有的：</p>
+<ol>
+<li>考虑使用 Logger（logger 怎么配置，需要输出哪些信息 – 可以反向考虑，自己看到这个 logger 的时候想了解什么信息）</li>
+<li>传递的数据结构如何考虑（是否对调用方有先验知识的要求，比如返回一个 Tuple，则需要用户了解 tuple 中元素的顺序，这样情况是否应该进行封装；），数据结构定义清楚了，很多东西也就清楚了。</li>
+<li>如何操作数据库（可以学习 sqlalchemy，包括 core 和 orm 两种 api）</li>
+<li>异常如何处理（异常应该分开捕获 – 可以清楚的知道什么情况下导致的，异常之后应该打印日志说明出现什么问题，如果情况恶劣需要进行异常再次抛出或者报警）</li>
+<li>所有获取资源的地方都应该做 check（a. 没有获取到会怎么办；b.获取到异常的怎么办）</li>
+<li>所有操作资源的地方都应该检查是否操作成功</li>
+<li>每个函数都应该简短，如果函数过长应该进行拆分（有个建议值，函数包含的行数应该在 20-30 行之间，具体按照这个规范做过一次之后就会发现这样真好）</li>
+<li>使用 class 之后，考虑重构 <code>__str__</code> 函数，用户打印输出，如果对象放到 collection 中之后，需要实现 <code>__repr__</code> 函数，用于打印整个 collection 的时候，直观显示（如果不实现 <code>__str__</code>，会调用 <code>__repr__</code>)</li>
+<li>如果有些资源会发生变化，可以单独抽取出来，做成函数，这样后续调用就可以不用改变了</li>
+</ol>
+<p>上述总结肯定有片面的地方，也有不全的地方，欢迎指出</p>
+<a id="more"></a>
+<p>附上一份 Python2.7 代码（将一些私有的东西进行了修改）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div></pre></td><td class="code"><pre><div class="line"># -*- coding:utf-8 -*-</div><div class="line"></div><div class="line">from sqlalchemy import create_engine</div><div class="line">import logging</div><div class="line">from logging.config import fileConfig</div><div class="line">import requests</div><div class="line">import Clinet # 私有的模块</div><div class="line"></div><div class="line">fileConfig(&quot;logging_config.ini&quot;)</div><div class="line">logger = logging.getLogger(&quot;killduplicatedjob&quot;)</div><div class="line"></div><div class="line">#配置可以单独放到一个模块中</div><div class="line">DB_USER = &quot;xxxxxxx&quot;</div><div class="line">DB_PASSWORD = &quot;xxxxxxxx&quot;</div><div class="line">DB_PORT = 111111</div><div class="line">DB_HOST_PORT = &quot;xxxxxxxxxx&quot;</div><div class="line">DB_DATA_BASE = &quot;xxxxxxxxxxx&quot;</div><div class="line"></div><div class="line">REST_API_URL = &quot;http://sample.com&quot;</div><div class="line"></div><div class="line">engine = create_engine(&quot;mysql://%s:%s@%s:%s/%s&quot; % (DB_USER, DB_PASSWORD, DB_HOST_PORT, DB_PORT, DB_DATA_BASE))</div><div class="line"></div><div class="line"></div><div class="line"># 这个 class 是为了在函数间传递时，不需要使用方了解属性的具体顺序而写的，也可以放到一个单独的模块中</div><div class="line">class DuplicatedJobs(object):</div><div class="line">    def __init__(self, app_id, app_name, user):</div><div class="line">        self.app_id = app_id</div><div class="line">        self.app_name = app_name</div><div class="line">        self.user = user</div><div class="line"></div><div class="line">     def __repr__(self):</div><div class="line">        return &apos;[appid:%s, app_name:%s, user:%s]&apos; % (self.app_id, self.app_name, self.user)</div><div class="line"></div><div class="line"></div><div class="line">	def find_duplicated_jobs():</div><div class="line">		logger.info(&quot;starting find duplicated jobs&quot;)</div><div class="line">		(running_apps, app_name_to_user) = get_all_running_jobs()</div><div class="line">		all_apps_on_yarn = get_apps_from_yarn_with_queue(get_resource_queue())</div><div class="line"></div><div class="line">		duplicated_jobs = []</div><div class="line">		for app in all_apps_on_yarn:</div><div class="line">			(app_id, app_name) = app</div><div class="line"></div><div class="line">			if app_id not in running_apps:</div><div class="line">				if not app_name.startswith(&quot;test&quot;):</div><div class="line">					logger.info(&quot;find a duplicated job, prefixed_name[%s] with appid[%s]&quot; % (app_name, app_id))</div><div class="line">					user = app_name_to_user[app_name]</div><div class="line">					duplicated_jobs.append(DuplicatedJobs(app_id, app_name, user))</div><div class="line">	            else:</div><div class="line">				    logger.info(&quot;Job[%s] is a test job, would not kill it&quot; % app_name)</div><div class="line"></div><div class="line">	logger.info(&quot;Find duplicated jobs [%s]&quot; % duplicated_jobs)</div><div class="line"></div><div class="line">    return duplicated_jobs</div><div class="line"></div><div class="line"></div><div class="line">def get_apps_from_yarn_with_queue(queue):</div><div class="line">	param = &#123;&quot;queue&quot;: queue&#125;</div><div class="line">	r = requests.get(REST_API_URL, params=param)</div><div class="line">	apps_on_yarn = []</div><div class="line">	try:</div><div class="line">		jobs = r.json().get(&quot;apps&quot;)</div><div class="line">		app_list = jobs.get(&quot;app&quot;, [])</div><div class="line">		for app in app_list:</div><div class="line">			app_id = app.get(&quot;id&quot;)</div><div class="line">			name = app.get(&quot;name&quot;)</div><div class="line">			apps_on_yarn.append((app_id, name))</div><div class="line"></div><div class="line">	 except Exception as e: #Exception 最好进行单独的分开，针对每一种 Exception 进行不同的处理</div><div class="line">		logger.error(&quot;Get apps from Yarn Error, message[%s]&quot; % e.message)</div><div class="line"></div><div class="line">	logger.info(&quot;Fetch all apps from Yarn [%s]&quot; % apps_on_yarn)</div><div class="line"></div><div class="line">	return apps_on_yarn</div><div class="line"></div><div class="line"></div><div class="line">def get_all_running_jobs():</div><div class="line">	job_infos = get_result_from_mysql(&quot;select * from xxxx where xx=yy&quot;)</div><div class="line"></div><div class="line">	app_ids = []</div><div class="line">	app_name_to_user = &#123;&#125;</div><div class="line">	for (topology_id, topology_name) in job_infos:</div><div class="line">		status_set = get_result_from_mysql(&quot;select * from xxxx where xx=yy&quot;)</div><div class="line">		application_id = status_set[0][0]</div><div class="line">		if &quot;&quot; != application_id:</div><div class="line">			configed_resource_queue = get_result_from_mysql(&quot;select * from xxxx where xx=yy&quot;)</div><div class="line">			app_ids.append(application_id)</div><div class="line">	        app_name_to_user[topology_name] = configed_resource_queue[0][0].split(&quot;.&quot;)[1]</div><div class="line"></div><div class="line">	logger.info(&quot;All running jobs appids[%s] topology_name2user[%s]&quot; % (app_ids, app_name_to_user))</div><div class="line">	return app_ids, app_name_to_user</div><div class="line"></div><div class="line"></div><div class="line">def kill_duplicated_jobs(duplicated_jobs):</div><div class="line">	for job in duplicated_jobs:</div><div class="line">	app_id = job.app_id</div><div class="line">	app_name = job.app_name</div><div class="line">	user = job.user</div><div class="line">	logger.info(&quot;try to kill job[%s] with appid[%s] for user[%s]&quot; % (app_name, app_id, user))</div><div class="line">	try:</div><div class="line">		Client.kill_job(app_id, user)</div><div class="line">		logger.info(&quot;Job[%s] with appid[%s] for user[%s] has been killed&quot; % (app_name, app_id, user))</div><div class="line">	except Exception as e:</div><div class="line">		logger.error(&quot;Can&apos;t kill job[%s] with appid[%s] for user[%s]&quot; % (app_name, app_id, user))</div><div class="line"></div><div class="line"></div><div class="line">def get_result_from_mysql(sql):</div><div class="line">	a = engine.execute(sql)</div><div class="line">	return a.fetchall() </div><div class="line"></div><div class="line"></div><div class="line"># 因为下面的资源可能发生变化，而且可能包含一些具体的逻辑，因此单独抽取出来，独立成一个函数</div><div class="line">def get_resource_queue():</div><div class="line">	return &quot;xxxxxxxxxxxxx&quot;</div><div class="line"></div><div class="line">if __name__ == &quot;__main__&quot;:</div><div class="line">	kill_duplicated_jobs(find_duplicated_jobs())</div></pre></td></tr></table></figure>
+<p>其中 logger 配置文件如下（对于 Python 的 logger，官方文档写的非常好，建议读一次，并且实践一次）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">[loggers]</div><div class="line">keys=root, simpleLogger</div><div class="line"></div><div class="line">[handlers]</div><div class="line">keys=consoleHandler, logger_handler</div><div class="line"></div><div class="line">[formatters]</div><div class="line">keys=formatter</div><div class="line"></div><div class="line">[logger_root]</div><div class="line">level=WARN</div><div class="line">handlers=consoleHandler</div><div class="line"></div><div class="line">[logger_simpleLogger]</div><div class="line">level=INFO</div><div class="line">handlers=logger_handler</div><div class="line">propagate=0</div><div class="line">qualname=killduplicatedjob</div><div class="line"></div><div class="line">[handler_consoleHandler]</div><div class="line">class=StreamHandler</div><div class="line">level=WARN</div><div class="line">formatter=formatter</div><div class="line">args=(sys.stdout,)</div><div class="line"></div><div class="line">[handler_logger_handler]</div><div class="line">class=logging.handlers.RotatingFileHandler</div><div class="line">level=INFO</div><div class="line">formatter=formatter</div><div class="line">args=(&quot;kill_duplicated_streaming.log&quot;, &quot;a&quot;, 52428800, 3,)</div><div class="line"></div><div class="line">[formatter_formatter]</div><div class="line">format=%(asctime)s %(name)-12s %(levelname)-5s %(message)s</div></pre></td></tr></table></figure></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2017/05/19/Streaming-中-Receiver-相关源码分析/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2017/04/15/从现在开始写作/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2017-05-10 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/语言学习/">语言学习<span>2</span></a></li> <li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/python/">python<span>2</span></a></li> <li><a href="/tags/code/">code<span>2</span></a></li> <li><a href="/tags/logger/">logger<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

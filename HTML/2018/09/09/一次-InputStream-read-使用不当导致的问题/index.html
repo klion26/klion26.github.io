@@ -1,0 +1,412 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>一次 InputStream#read 使用不当导致的问题 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="一次 InputStream#read 使用不当导致的问题"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> 一次 InputStream#read 使用不当导致的问题</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p> 一句话总结：InputStream#read 对于当次能够读取多少字节不做保证，必须以该函数的返回值做为实际读取字节数的事实。<a id="more"></a></p>
+<p>#1. 问题<br>由于某些功能的需要，实现如下函数，从某个 InputStream copy 特定长度的数据到 OutputStream，其中 InputStream 为打开的某个 HDFS 文件流</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">private void copySpecifiedLengthBytes(final InputStream in, final OutputStream out, final long size) &#123;</div><div class="line">    long current = 0;</div><div class="line">    byte[] bytes = new byte[BLOCKSIZE]; //BLOCKSIZE = 4096;</div><div class="line">    int bytesRead;</div><div class="line">    while (current + BLOCKSIZE &lt; size) &#123;</div><div class="line">        bytesRead = in.read(bytes);</div><div class="line">        current += bytesRead;</div><div class="line">        out.write(bytes);</div><div class="line">    &#125;</div><div class="line">    int byteLeftToRead = (int) (size - current);</div><div class="line">    bytesRead = in.read(bytes, 0, byteLeftToRead);</div><div class="line">    out.write(bytes, 0, bytesRead);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>看到上面的函数，可以先思考下会不会出现问题，如果可能出现问题，则会在哪个地方，以及问题的展现形式会是什么样的。<br>|<br>|<br>|<br>|<br>|<br>|<br>|<br>|<br>|<br>|<br>上面的代码在某些场景下会有问题，大致如下：OutputStream 的中间部分会多出来一些无关字节，导致整个 OutputStream 的内容是错误的。</p>
+<h1 id="2-定位分析"><a href="#2-定位分析" class="headerlink" title="2. 定位分析"></a>2. 定位分析</h1><blockquote>
+<p>当我们知道所有的来龙去脉之后，回过头来看发现其实并没有那么难，但是当我们只看到现象的时候，可能会有无数种解释，这个时候需要能够验证哪种解释才是合理的。</p>
+</blockquote>
+<p>看到 OutputStream 中的数据不对，怀疑如下两点 1) InputStream 中的数据是否准确; 2) 读取的起止位置是否准确;</p>
+<p>通过添加相关日志重现问题，初步确定 InputStream 中的数据是可信的，从 InputStream 中读取的起止位置也是准确的，但是 OutputStream 中得到的数据是非预期的。暂时不知道对不上的数据是怎么来的，但是基本能够定位问题在于上面的 copySpecifiedLengthBytes 函数。</p>
+<p>为了验证确实是这里的问题，将该函数进行了修改，改成如下所示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">private void copySpecifiedLengthBytes(final InputStream in, final OutputStream out, final long size) &#123;</div><div class="line">    byte[] bytes = new byte[BLOCKSIZE]; //BLOCKSIZE = 4096;</div><div class="line">    int bytesRead;</div><div class="line">    long byteLeft = size;</div><div class="line">    while (byteLeft &gt; 0) &#123;</div><div class="line">        bytesRead = in.read(bytes, 0, (int) Math.min(byteLeft, bytes.length));</div><div class="line">        byteLeft -= bytesRead;</div><div class="line">        out.write(bytes, 0, bytesRead);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后尝试进行复现该问题，发现没有再次复现（之前基本每次都能复现），基本确定问题在这里。但是留下几个问题不能完全解释清楚：</p>
+<ol>
+<li><p>把 HDFS 文件 copy 到本地，尝试复现的时候，发现无法复现，且得到的 OutputStream 是预期中的（正确的数据）</p>
+</li>
+<li><p>为什么从同一个 HDFS 多次复现的时候，得到的 OutputStream 结果是一致的（错的一致）</p>
+</li>
+</ol>
+<h1 id="3-原因"><a href="#3-原因" class="headerlink" title="3. 原因"></a>3. 原因</h1><p>上面遗留的第一个问题，从本地文件读取时不能复现，与实现有关，找了下源码，没有发现 read 函数有中间中断的情况，因此没有出现问题。</p>
+<p>第二个问题，看到的现象是从同一台机器上读取同一个文件，得到的 OutputStream 一致（错的一致），也就是说 InputStream#read 的行为在多次复现过程中完全一致，所以导致多次复现得到的 OutputStream 也错的一致。</p>
+<p>然后我们尝试在错误的 copySpecifiedLengthBytes 函数中添加日志，查看哪些地方出错，看到一个现象，在大致读取来 128K 的地方，InputStream#read 真正读取到的字节数少于 BLOCKSIZE，但是我们写出的数据量为 BLOCKSIZE，从而导致后面的 out.write(bytes) 多写出一些无关字节，至此我们基本能够解释上面的遗留问题来，但是又引发了另一个问题</p>
+<blockquote>
+<p>为什么每次都在 128K 左右的地方出错呢？而且每次执行 copySpecifiedLengthBytes 仅仅在第一个 128K 附近出错，后面的地方都没有出错呢？</p>
+</blockquote>
+<p>然后我们打开 hadoop-hdfs-client 的代码，从 DFSInputStream 开始跟踪，发现在 BlockReaderRemote.java 中有一段这样的代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">// First packet will include some data prior to the first byte</div><div class="line">// the user requested. Skip it.</div><div class="line">if (curHeader.getOffsetInBlock() &lt; startOffset) &#123;</div><div class="line">    int newPos = (int) (startOffset - curHeader.getOffsetInBlock());</div><div class="line">    curDataSlice.position(newPos);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这段代码表示读取的第一个 packet（HDFS 读写的最小单元） 头部会包含一些非法数据，需要跳过，但是后续的 packet 则不需要跳过，这个和我们看到的现象基本吻合。那到底是不是这里呢？</p>
+<p>通过准备环境，然后在 curDataSlice.position(newPos) 处添加断点，发现如预期的停在了断点处，也就是说问题的根源来自这里。至此所有的遗留问题都解决了。</p>
+<p>接下来梳理一下整个流程：</p>
+<ol>
+<li><p>使用 InputStream#read 进行读取</p>
+</li>
+<li><p>DFSInputStream 会读取 packet</p>
+</li>
+<li><p>DFSInputStream 读取 packet 的时候会对第一个 packet 进行部分字节的跳过, 这里是因为 HDFS 的读写最小单元是 packet，seek 的 offset 可能不是 packet 的开头，那么就会从 packet 的开头进行读取，然后实际读取的时候需要把前面一部分进行跳过。</p>
+</li>
+<li><p>导致第一步中的 read 读取不充分（实际读取的字节数比预期的少），导致 out.write(bytes) 的行为不符合预期</p>
+</li>
+</ol>
+<p>最后附上可以进行直观查看效果的 UT<br>当使用错误的 copySpecifiedLengthBytes 的时候，下面的测试会挂掉，注意挂掉的原因，当使用正确的测试的使用，则会通过<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">@Test</div><div class="line">public void testCopySpecifiedLengthBytes() throws IOException &#123;</div><div class="line">   int length = 4 * 1024 * 1024;</div><div class="line">   byte[] from = new byte[length];</div><div class="line"></div><div class="line">   Random rnd = new Random();</div><div class="line">   rnd.nextBytes(from);</div><div class="line"></div><div class="line">   InputStream fromStream = spy(new ByteArrayInputStream(from));</div><div class="line"></div><div class="line">   doAnswer(new Answer() &#123;</div><div class="line">       private int idx = 0;</div><div class="line">       @Override</div><div class="line">       public Object answer(InvocationOnMock invocation) throws Throwable &#123;</div><div class="line">           byte[] first = invocation.getArgumentAt(0, byte[].class);</div><div class="line">           int off = invocation.getArgumentAt(1, Integer.class);</div><div class="line">           int len = invocation.getArgumentAt(2, Integer.class);</div><div class="line"></div><div class="line">           int bytesReadThisTime = Math.min(100, len);</div><div class="line">           System.arraycopy(from, idx, first, off, bytesReadThisTime);</div><div class="line">           idx += bytesReadThisTime;</div><div class="line"></div><div class="line">           return bytesReadThisTime;</div><div class="line">       &#125;</div><div class="line">    &#125;).when(fromStream).read(any(byte[].class), anyInt(), anyInt());</div><div class="line"></div><div class="line">    ByteArrayOutputStream toStream = new ByteArrayOutputStream(length);</div><div class="line">    copySpecifiedLengthBytes(fromStream, toStream, length);</div><div class="line">    assertArrayEquals(from toStream.toByteArray());</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+		
+          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+        
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2018/04/06/Flink-State/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2018-09-09 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/read/">read<span>4</span></a></li> <li><a href="/tags/I-O/">I/O<span>1</span></a></li> <li><a href="/tags/HDFS/">HDFS<span>1</span></a></li> <li><a href="/tags/InputStream/">InputStream<span>1</span></a></li> <li><a href="/tags/problem-solving/">problem_solving<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

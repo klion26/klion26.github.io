@@ -1,0 +1,388 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>USACO 4-1-4Cryptcowgraphy | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="USACO 4-1-4Cryptcowgraphy"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> USACO 4-1-4Cryptcowgraphy</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p><a href="http://www.nocow.cn/index.php/Translate:USACO/cryptcow" target="_blank" rel="external">题意
+</a>这题如果硬搜是肯定过不了的,一开始我的做法是,先搜’C’再搜’O’最后’W’,然后中间判断一些,如果不可能到达目标状态[原字符串],就剪枝剪掉,我的剪枝方法很简单,一是开个大数组记录所有已经出现过的字符串,然后如果再搜到这里的话,就直接推出就行了,不用再往下搜了[因为前面已经搜过一次不行了],还有一个就是没两个相邻的编码字符[C,O,W]之间的字符串一定是目标串的字串也行[因为交换不会改变这些字符串的顺序].可是这样还是超时了,然后问了下czw.他说直接hash,先搜O,然后再处理C和W,我想这样的话,那么我的就只用把搜索顺序改一下就行了,不过由于代码已经很混乱了,所以就直接重写了,而且还借用了网上的一个字符串hash函数ELFHash,然后写出来之后发现非常之蛋疼.我的结果不对,找来分代码来匹配,基本一样的,只不过我没有加我上面那第二个优化,后来加上之后发现过了,这样看来是hash函数冲突了,但是我没处理.所以导致程序挂了.<br>那么这题的思路如下:<br>1首先搜索顺序是先O再C和W<br>2用字符串hash函数hash判重<br>3如果发现有两个相邻的编码字符之间的字符串不是目标串的字串的话,就剪枝<br>这样可以把所有的数据都1s内搞定<br><span style="color: #ff0000;">[此解法有一定的偶然性,原因是ELFHash造成的(当我把hash表开到100000,而且模的那个数也是100000的时候,第8个数据过不去).所以下面的也可以说是cheat过去的.正在看官方的,看懂后我会再发出来.</span></p>
+<p><span style="color: #ff0000;">官方的也是用到hash,不过hash的时候都是模一个大素数的,不然冲突的可能性会很大.还有第二种方法似乎没用到hash,<a href="http://u.115.com/file/f95b0cf7ce" target="_blank" rel="external">现传上官方报告</a>]</span></p>
+<p>代码如下:</p>
+<div class="source" style="background-color: #2f4f4f; font-family: 'Consolas','Lucida Console','Courier New'; color: #f5deb3;"><span style="color: #da70d6;">/<em></em></span><br><span style="color: #da70d6;">  2  ID:qcx97811</span><br><span style="color: #da70d6;">  3  LANG:C++</span><br><span style="color: #da70d6;">  4  TASK:cryptcow</span><br><span style="color: #da70d6;">  5 /</span><br>  <span style="color: #add8e6;">6</span><span style="color: #f5deb3;">#</span><span style="color: #f5deb3;">include</span> <span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">stdio</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><span style="color: #f5deb3;">&gt;</span><br>  <span style="color: #add8e6;">7</span><span style="color: #f5deb3;">#</span><span style="color: #f5deb3;">include</span> <span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">string</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><span style="color: #f5deb3;">&gt;</span><br>  <span style="color: #add8e6;">8</span><span style="color: #f5deb3;">#</span><span style="color: #f5deb3;">include</span> <span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">stdlib</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><span style="color: #f5deb3;">&gt;</span><br>  <span style="color: #add8e6;">9</span><span style="color: #f5deb3;">#</span><span style="color: #f5deb3;">include</span> <span style="color: #f5deb3;">&lt;</span><span style="color: #f5deb3;">math</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><span style="color: #f5deb3;">&gt;</span><br><span style="color: #add8e6;">10</span><br><span style="color: #add8e6;">11</span><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">ori_str</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #7fffd4;">“Begin the Escape execution at the Break of Dawn”</span>//原字符串<br><span style="color: #add8e6;">12</span><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">in_str</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">];//输入字符串</span><br><span style="color: #add8e6;">13</span><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">ii_c</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">ii_o</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">ii_w</span>//c o w的个数<br><span style="color: #add8e6;">14</span><span style="color: #98fb98; font-weight: bold;">bool</span> <span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">51071</span><span style="color: #f5deb3;">];//hash数组</span><br><span style="color: #add8e6;">15</span><span style="color: #98fb98; font-weight: bold;">unsigned</span> <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">ELFHash</span>( <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[])</span><br><span style="color: #add8e6;">16</span><span style="color: #f5deb3;">{//ELFHash函数</span><br><span style="color: #add8e6;">17</span>        <span style="color: #98fb98; font-weight: bold;">unsigned</span> <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">hash</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span> ;<br><span style="color: #add8e6;">18</span>        <span style="color: #98fb98; font-weight: bold;">unsigned</span> <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">x</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span> ;<br><span style="color: #add8e6;">19</span>        <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">len</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">strlen</span>(<span style="color: #f5deb3;">str</span>);<br><span style="color: #add8e6;">20</span>        <span style="color: #b0c4de; font-weight: bold;">for</span>( <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">=</span><span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">len</span>; <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span> ) <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">21</span>            <span style="color: #f5deb3;">hash</span> <span style="color: #f5deb3;">=</span> ( <span style="color: #f5deb3;">hash</span> <span style="color: #f5deb3;">&lt;&lt;</span> <span style="color: #add8e6;">4</span> ) <span style="color: #f5deb3;">+</span> ( <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> ) ;<br><span style="color: #add8e6;">22</span>            <span style="color: #b0c4de; font-weight: bold;">if</span>( ( <span style="color: #f5deb3;">x</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">hash</span> <span style="color: #f5deb3;"></span> <span style="color: #add8e6;">0xF0000000L</span> ) <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">0</span> ) <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">23</span>                    <span style="color: #f5deb3;">hash</span> <span style="color: #f5deb3;">^=</span> ( <span style="color: #f5deb3;">x</span> <span style="color: #f5deb3;">&gt;&gt;</span> <span style="color: #add8e6;">24</span> ) ;<br><span style="color: #add8e6;">24</span>                    <span style="color: #f5deb3;">hash</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">~</span><span style="color: #f5deb3;">x</span> ;<br><span style="color: #add8e6;">25</span>                <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">26</span>        <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">27</span><br><span style="color: #add8e6;">28</span>        <span style="color: #b0c4de; font-weight: bold;">return</span>  (<span style="color: #f5deb3;">hash</span> <span style="color: #f5deb3;"></span> <span style="color: #add8e6;">0x7FFFFFFF</span>);<br><span style="color: #add8e6;">29</span><span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">30</span><br><span style="color: #add8e6;">31</span><span style="color: #98fb98; font-weight: bold;">bool</span> <span style="color: #f5deb3;">could</span>(<span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[])</span><br><span style="color: #add8e6;">32</span><span style="color: #f5deb3;">{//看str是否能通过解码到达原串,也就是判断每两个编码字符中间的字串是不是原串的字串</span><br><span style="color: #add8e6;">33</span>    <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">len</span><br><span style="color: #add8e6;">34</span>    <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">];</span><br><span style="color: #add8e6;">35</span>    <span style="color: #f5deb3;">len</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">strlen</span>(<span style="color: #f5deb3;">str</span>);<br><span style="color: #add8e6;">36</span>    <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">len</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #add8e6;">37</span>      <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">38</span>          <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #7fffd4;">‘C’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> || <span style="color: #7fffd4;">‘W’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> || <span style="color: #7fffd4;">‘O’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br><span style="color: #add8e6;">39</span>            <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">40</span>                <span style="color: #b0c4de; font-weight: bold;">continue</span><br><span style="color: #add8e6;">41</span>            <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">42</span>          <span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><br><span style="color: #add8e6;">43</span>          <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">len</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #add8e6;">44</span>            <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">45</span>               <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #7fffd4;">‘C’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> || <span style="color: #7fffd4;">‘W’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">]</span> || <span style="color: #7fffd4;">‘O’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">])</span><br><span style="color: #add8e6;">46</span>                <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">47</span>                    <span style="color: #b0c4de; font-weight: bold;">break</span><br><span style="color: #add8e6;">48</span>                <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">49</span>            <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">50</span>          <span style="color: #f5deb3;">strncpy</span>(<span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">+</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">i</span>);<br><span style="color: #add8e6;">51</span>          <span style="color: #f5deb3;">tmp</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">‘\0’</span><br><span style="color: #add8e6;">52</span>          <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #b0c4de; font-weight: bold;">NULL</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">strstr</span>(<span style="color: #f5deb3;">ori_str</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">tmp</span>))<br><span style="color: #add8e6;">53</span>            <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #b0c4de; font-weight: bold;">false</span><br><span style="color: #add8e6;">54</span>          <span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">j</span><br><span style="color: #add8e6;">55</span>      <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">56</span>    <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #b0c4de; font-weight: bold;">true</span><br><span style="color: #add8e6;">57</span><span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">58</span><span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;">tran</span>(<span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[],</span><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">,</span><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">o</span><span style="color: #f5deb3;">,</span><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">,</span><span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">des</span><span style="color: #f5deb3;">[])</span><br><span style="color: #add8e6;">59</span><span style="color: #f5deb3;">{//解码过程</span><br><span style="color: #add8e6;">60</span>    <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">len</span><br><span style="color: #add8e6;">61</span>    <span style="color: #f5deb3;">len</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">strlen</span>(<span style="color: #f5deb3;">str</span>);<br><span style="color: #add8e6;">62</span>    <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">c</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #add8e6;">63</span>      <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">64</span>          <span style="color: #f5deb3;">des</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">];</span><br><span style="color: #add8e6;">65</span>      <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">66</span>    <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">o</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">w</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #add8e6;">67</span>      <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">68</span>          <span style="color: #f5deb3;">des</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">];</span><br><span style="color: #add8e6;">69</span>      <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">70</span>    <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">o</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #add8e6;">71</span>      <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">72</span>          <span style="color: #f5deb3;">des</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">];</span><br><span style="color: #add8e6;">73</span>      <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">74</span>    <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">+</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">j</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">len</span>;<span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">++</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #add8e6;">75</span>      <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">76</span>          <span style="color: #f5deb3;">des</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">j</span><span style="color: #f5deb3;">];</span><br><span style="color: #add8e6;">77</span>      <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">78</span>    <span style="color: #f5deb3;">des</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #7fffd4;">‘\0’</span><br><span style="color: #add8e6;">79</span>    <span style="color: #b0c4de; font-weight: bold;">return</span> ;<br><span style="color: #add8e6;">80</span><span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">81</span><span style="color: #98fb98; font-weight: bold;">bool</span> <span style="color: #f5deb3;">work</span>(<span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[])</span><br><span style="color: #add8e6;">82</span><span style="color: #f5deb3;">{//深搜</span><br><span style="color: #add8e6;">83</span>     <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">o</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">w</span><br><span style="color: #add8e6;">84</span>     <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;">str_tmp</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">100</span><span style="color: #f5deb3;">];</span><br><span style="color: #add8e6;">85</span>     <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">hs</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">len</span><br><span style="color: #add8e6;">86</span>     <span style="color: #f5deb3;">hs</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ELFHash</span>(<span style="color: #f5deb3;">str</span>)<span style="color: #f5deb3;">%</span><span style="color: #add8e6;">51071</span><br><span style="color: #add8e6;">87</span>     <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">hs</span><span style="color: #f5deb3;">])//已找过</span><br><span style="color: #add8e6;">88</span>        <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #b0c4de; font-weight: bold;">false</span><br><span style="color: #add8e6;">89</span>     <span style="color: #f5deb3;">hash</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">hs</span><span style="color: #f5deb3;">]</span> <span style="color: #f5deb3;">=</span> <span style="color: #b0c4de; font-weight: bold;">true</span><br><span style="color: #add8e6;">90</span>     <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #b0c4de; font-weight: bold;">false</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">could</span>(<span style="color: #f5deb3;">str</span>))<span style="color: #da70d6;">//不加这句会错,应该是hash冲突了,而我没处理冲突 </span><br><span style="color: #add8e6;">91</span>        <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #b0c4de; font-weight: bold;">false</span><br><span style="color: #add8e6;">92</span>     <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #add8e6;">0</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">strcmp</span>(<span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">ori_str</span>))<br><span style="color: #add8e6;">93</span>        <span style="color: #f5deb3;">{//已找到</span><br><span style="color: #add8e6;">94</span>            <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #b0c4de; font-weight: bold;">true</span><br><span style="color: #add8e6;">95</span>        <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">96</span>     <span style="color: #f5deb3;">len</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">strlen</span>(<span style="color: #f5deb3;">str</span>);<br><span style="color: #add8e6;">97</span>     <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">o</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">1</span><span style="color: #f5deb3;">o</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">len</span>;<span style="color: #f5deb3;">o</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #add8e6;">98</span>        <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">99</span>            <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #7fffd4;">‘O’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">o</span><span style="color: #f5deb3;">])</span><br><span style="color: #add8e6;">100</span>              <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">101</span>                 <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">c</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">c</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">o</span>;<span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #add8e6;">102</span>                   <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">103</span>                       <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #7fffd4;">‘C’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">])</span><br><span style="color: #add8e6;">104</span>                         <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">105</span>                             <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">w</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">len</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">w</span> <span style="color: #f5deb3;">&gt;;</span> <span style="color: #f5deb3;">o</span>;<span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">–</span>)<br><span style="color: #add8e6;">106</span>                                <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">107</span>                                    <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #7fffd4;">‘W’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">])</span><br><span style="color: #add8e6;">108</span>                                      <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">109</span>                                        <span style="color: #f5deb3;">tran</span>(<span style="color: #f5deb3;">str</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">c</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">o</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">w</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">str_tmp</span>);<br><span style="color: #add8e6;">110</span>                                        <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">work</span>(<span style="color: #f5deb3;">str_tmp</span>))<br><span style="color: #add8e6;">111</span>                                          <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #b0c4de; font-weight: bold;">true</span><br><span style="color: #add8e6;">112</span>                                      <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">113</span>                                <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">114</span>                         <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">115</span>                   <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">116</span>              <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">117</span>        <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">118</span>    <span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #b0c4de; font-weight: bold;">false</span><br><span style="color: #add8e6;">119</span><span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">120</span><span style="color: #98fb98; font-weight: bold;">void</span> <span style="color: #f5deb3;">input</span>()<br><span style="color: #add8e6;">121</span><span style="color: #f5deb3;">{//读入</span><br><span style="color: #add8e6;">122</span>     <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“cryptcow.in”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“r”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdin</span>);<br><span style="color: #add8e6;">123</span>        <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">i</span><br><span style="color: #add8e6;">124</span>        <span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">len</span><br><span style="color: #add8e6;">125</span>        <span style="color: #f5deb3;">gets</span>(<span style="color: #f5deb3;">in_str</span>);<br><span style="color: #add8e6;">126</span>        <span style="color: #f5deb3;">len</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">strlen</span>(<span style="color: #f5deb3;">in_str</span>);<br><span style="color: #add8e6;">127</span>        <span style="color: #f5deb3;">ii_c</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ii_o</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">ii_w</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #add8e6;">128</span>        <span style="color: #b0c4de; font-weight: bold;">for</span>(<span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">i</span> <span style="color: #f5deb3;">&lt;</span> <span style="color: #f5deb3;">len</span>;<span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">++</span>)<br><span style="color: #add8e6;">129</span>            <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">130</span>                <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #7fffd4;">‘C’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">in_str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br><span style="color: #add8e6;">131</span>                  <span style="color: #f5deb3;">ii_c</span><span style="color: #f5deb3;">++</span><br><span style="color: #add8e6;">132</span>                <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #7fffd4;">‘O’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">in_str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br><span style="color: #add8e6;">133</span>                  <span style="color: #f5deb3;">ii_o</span><span style="color: #f5deb3;">++</span><br><span style="color: #add8e6;">134</span>                <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #7fffd4;">‘W’</span> <span style="color: #f5deb3;">==</span> <span style="color: #f5deb3;">in_str</span><span style="color: #f5deb3;">[</span><span style="color: #f5deb3;">i</span><span style="color: #f5deb3;">])</span><br><span style="color: #add8e6;">135</span>                  <span style="color: #f5deb3;">ii_w</span><span style="color: #f5deb3;">++</span><br><span style="color: #add8e6;">136</span>            <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">137</span>        <span style="color: #b0c4de; font-weight: bold;">if</span>((<span style="color: #f5deb3;">len</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">47</span>)<span style="color: #f5deb3;">%</span><span style="color: #add8e6;">3</span> <span style="color: #f5deb3;">!=</span> <span style="color: #add8e6;">0</span>)<br><span style="color: #add8e6;">138</span>          <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">139</span>             <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“0 0</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #add8e6;">140</span>             <span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">0</span>);<br><span style="color: #add8e6;">141</span>          <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">142</span>        <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">ii_c</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">ii_o</span> || <span style="color: #f5deb3;">ii_o</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">ii_w</span> || <span style="color: #f5deb3;">ii_w</span> <span style="color: #f5deb3;">!=</span> <span style="color: #f5deb3;">ii_c</span>)<br><span style="color: #add8e6;">143</span>            <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">144</span>                <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“0 0</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #add8e6;">145</span>                <span style="color: #f5deb3;">exit</span>(<span style="color: #add8e6;">0</span>);<br><span style="color: #add8e6;">146</span>            <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">147</span><span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">148</span><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">main</span>(<span style="color: #98fb98; font-weight: bold;">void</span>)<br><span style="color: #add8e6;">149</span><span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">150</span>    <span style="color: #f5deb3;">input</span>();<br><span style="color: #add8e6;">151</span>    <span style="color: #f5deb3;">freopen</span>(<span style="color: #7fffd4;">“cryptcow.out”</span><span style="color: #f5deb3;">,</span><span style="color: #7fffd4;">“w”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">stdout</span>);<br><span style="color: #add8e6;">152</span>    <span style="color: #b0c4de; font-weight: bold;">if</span>(<span style="color: #f5deb3;">work</span>(<span style="color: #f5deb3;">in_str</span>))<br><span style="color: #add8e6;">153</span>      <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“1 %d</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">ii_c</span>);<br><span style="color: #add8e6;">154</span>    <span style="color: #b0c4de; font-weight: bold;">else</span><br><span style="color: #add8e6;">155</span>      <span style="color: #f5deb3;">{</span><br><span style="color: #add8e6;">156</span>        <span style="color: #f5deb3;">printf</span>(<span style="color: #7fffd4;">“0 0</span><span style="color: #7fffd4;">\n</span><span style="color: #7fffd4;">“</span>);<br><span style="color: #add8e6;">157</span>      <span style="color: #f5deb3;">}</span><br><span style="color: #add8e6;">158</span><span style="color: #f5deb3;">}</span></div>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2010/12/14/linux-rename/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2010/12/09/hello-world-1/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2010-12-12 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/USACO/">USACO<span>2</span></a></li> <li><a href="/tags/搜索/">搜索<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

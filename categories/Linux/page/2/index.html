@@ -1,0 +1,732 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Page 2 | Linux | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+<!-- title -->
+<div class="page-header page-header-inverse ">
+  <h1 class="archive-title-category title title-inverse ">Linux</h1>
+</div>
+
+<div class="row page">
+  <!-- cols -->
+  
+  <div class="col-md-9">
+	
+
+	  <div id="top_search"></div>
+
+      
+
+      <div class="mypage">
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2013-01-02 </div>
+			<div class="article-title"><a href="/2013/01/02/fedora-15-install-opencv-2-4/" >Fedora 15安装配置OpenCV 2.4</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>在Fedora 15下安装配置OpenCV 2.4的过程和配置。</p>
+<p>首先我想安装OpenCV 2.0或这2.2.可是在Fedora 15上编译2.2的时候，一直会出现错误，然后照着网上的解决方案，还是会出现一些问题，于是就下了2.4的版本，编译的时候，没有出现问题（貌似平台不一样，安装的时候也不一样），网上最多的教程就是Ubuntu下安装。其实可以直接通过yum install opencv在Fedora 15下安装，不过安装了之后，貌似我的还是出现点问题，就直接卸载掉了。下面说说编译OpenCV 2.4的过程和出现的问题，以及处理方法。</p>
+<p>1.下载OpenCV 2.4，地址<a href="http://sourceforge.net/projects/opencvlibrary/files/" target="_blank" rel="external">http://sourceforge.net/projects/opencvlibrary/files/</a><br>2.解压下下来的文件，假设你在$HOME/Desktop下解压的。<br>3。进入OpenCV 2.4的目录<br>4.mkdir release                  #建立目录，用来存cmake命令处理之后的一些文件<br>5.cd release<br>6.cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_PYTHON_SUPPORT=ON ..<br>7.make<br>8.sudo make install</p>
+<p>到这里就安装好了，如果上面的任何一部出现Error的话，可以自行上网解决，编译2.2的时候，出现的错误主要是undefined reference to `cvCreateCameraCapture_V4L(int)’ 类似的问题，网上对这类问题的讨论也不少，可以自行google。假设你现在已经安装好OpenCV 2.4了。那么测试下吧。现在你需要在/etc/ld.so.conf文件中添加一行代码，如下：/usr/local/lib/pkgconfig。在/etc/ld.so.conf.d/opencv.conf文件中添加一句代码如下：/usr/local/lib.注意如果没有此文件，则自己新建就行。然后运行ldconfig命令[需要root权限]设置环境变量export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH</p>
+<p>进入OpenCV 2.4/sample/c目录下，运行build_all.sh文件[可以通过sh build_all.sh来运行]，然后可以通过运行</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">./facedetect –cascade<span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“/usr/local/share/opencv/haarcascades/haarcascade_frontalface_alt.xml”</span> –scale<span style="color: #f5deb3;">=</span>1.5 lena.jpg</div><br>看到一张检测人脸的图像，那么就表示你的OpenCV配置成功了。下面自己写一个简单的程序再测试下呗。</p>
+<p>好的，我们用如下的C程序来检测：</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #eeee00;">#include “opencv2/highgui/highgui_c.h”</span><br><span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #ffffff;">main</span>(<span style="color: #98fb98; font-weight: bold;">int</span> <span style="color: #f5deb3;">argc</span><span style="color: #f5deb3;">,</span> <span style="color: #98fb98; font-weight: bold;">char</span> <span style="color: #f5deb3;"><em>*</em></span><span style="color: #f5deb3;">argv</span>)<br><span style="color: #f5deb3;">{</span><br><span style="color: #f5deb3;">IplImage</span> <span style="color: #f5deb3;"></span><span style="color: #f5deb3;">img</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">cvLoadImage</span>(<span style="color: #f5deb3;">argv</span><span style="color: #f5deb3;">[</span><span style="color: #add8e6;">1</span><span style="color: #f5deb3;">],</span><span style="color: #add8e6;">1</span>);<br><span style="color: #da70d6;">/<em>cvNamedWindow(“Example”,CV_WINDOW_AUTOSIZE);</em>/</span><br><span style="color: #f5deb3;">cvShowImage</span>(<span style="color: #7fffd4;">“Image”</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">img</span>);<br><span style="color: #f5deb3;">cvWaitKey</span>(<span style="color: #add8e6;">0</span>);<br><span style="color: #f5deb3;">cvReleaseImage</span>(<span style="color: #f5deb3;"></span><span style="color: #f5deb3;">img</span>);<br><span style="color: #f5deb3;">cvDestroyWindow</span>(<span style="color: #7fffd4;">“Example”</span>);<br><span style="color: #b0c4de; font-weight: bold;">return</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">}</span></div><br>用命令</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gcc  <span style="color: #7fffd4;"><code>&lt;/span&gt;pkg-config --cflags --libs  opencv&lt;span style=&quot;color: #7fffd4;&quot;&gt;</code></span> -o cv cv.c</div><br>来编译，发现出错了，说什么undefined reference to symbol ‘lrint@@GLIBC_2.1’。上网找了下，说要加一些什么编译的动态库之类的，一开始不知道需要添加什么库，后来在突然实验下发现需要用到math库，也就是<span style="color: #ff0000;">需要在编译命令的最后面加上 -lm才行</span>。不过如果改成C++文件，头文件用的highgui.hpp的话，不需要加-lm也可以通过编译且运行良好，编译好了之后，用如下命令：</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">./cv ex.bmp</div><br>来测试刚编译好的文件，ex.bmp是当前目录下的一张bmp图片。如果显示了该图片，就表示成功了。接下来就可以用OpenCV 写自己的其他代码了。</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-12-28 </div>
+			<div class="article-title"><a href="/2012/12/28/vi-basic-command/" >VI的一些基本命令之一</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>在Fedora下虽然写C/C++代码可以用Code::blocks，但是还是用VI来的顺手，尤其是VI用熟了之后，发现真是太好用了，如果想自己好好的学习下有关VI的一些命令的话，那么最好还是从网上下一个Tutorial，英文中文版随便，英文版的也很好懂的。下面记录下我看Tutorial时记下的命令，比如移动光标这样的命令，这里就没有了，所以如果想找一篇入门的文章的话，或许这里不适合你。</p>
+<p>na<em><esc>命令会输入n个</esc></em>,这句命令可以理解为，首先是a*,然后前面的n表示执行n次，然后&lt;ESC&gt;是退到normal模式。<br>s    和x的功能差不多，不过是删除当前字符之后进入到Insert模式，另外c命令和d命令的区别就类似与s和x的区别<br>^    跳到当前行的第一个非空字符<br>fx   从当前字符开始，在当前行查找第一次出现x字符的位置，并跳到x所在的地方，比如你有文本abcdefg。当前光标位置在a处，那么fe，则会把光标跳到e所在的位置，可以在f前面加上数字表示查找第多少个。相同功能的还有F,t,T，其中F是从后往前找，t/T是找到x所在位置前面的一个字符。这样还可以和d，y等命令结合使用<br>CTRL-U/CTRL-D/CTRL-B/CTRL-F   向上滚半屏，向下滚半屏，向上滚一屏，向下滚一屏<br>. 执行最后一次删除或者修改命令操作<br>J     把当前行和接下来的行合并在一起，nJ表示合并n行（包括当前行）n》=2<br>r     表示修改一个字符，nr [表示任意你想换成的字符]，表示替换从当前字符开始的n个字符，并都替换成。<br>～   改变当前字符的大小写 ，当然你也可以在前面加上数字，这条命令，在你不小心按下了Caps键的时候还是很有用的<br>可以用q来录制宏，然后保存在某一个字母所对应的宏区里面，以后可以用。比如你的C 语言头文件有如下一些</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">stdio</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><br><span style="color: #f5deb3;">fcntl</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><br><span style="color: #f5deb3;">unistd</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span><br><span style="color: #f5deb3;">stdlib</span><span style="color: #f5deb3;">.</span><span style="color: #f5deb3;">h</span></div><br>那么你可以通过如下的命令来快速的完成头文件的录入，首先我们可以把每行都相同的东西不录入（这就是宏的好处，待会可以一次性录入）。然后先录入所有的不同出，也就是先录入如下的几行</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">stdio</span><br><span style="color: #f5deb3;">fcntl</span><br><span style="color: #f5deb3;">unistd</span><br><span style="color: #f5deb3;">stdlib</span></div><br>然后把光标移动到第一行，也就是stdio所在的行，然后退出到Normal模式，接下来就是录制宏了。按下qa，表示把接下来的宏录制在a所对应的宏区。然后依次输入I#include &lt;&lt;ESC&gt;A.h&gt;&lt;ESC&gt;jq,解释下这条命令吧，首先I表示进入Insert模式，而且是从行头开始，然后依次输入#include &lt;这些字符，&lt;ESC&gt;表示退出到Normal模式，然后A表示进入插入模式，不过是从行末开始，然后输入.h&gt;表示头文件的后面几个字符，然后&lt;ESC&gt;表示退出到Normal模式，接下来的j表示移到下一行，q表示宏录制结束。到这里你的宏已经录制在a里面了，接下来就是使用了，把光标移动到fcntl所在的行，然后退出到Normal模式，接下来按下3@a.发现接下来的3行也全部写好了吧，是不是简化了很多工作呢？这里的3表示需要调用3次。</p>
+<p>在VI中如果需要输入一些特殊字符怎么办呢？当然可以解决的啦，可以通过命令(在Normal模式下)输入:digraphs来得到对应的命令，然后在Insert模式下用CTRL-K+刚才得到的两个字符来完成特殊字符的输入</p>
+<p>VI中如果用搜索的话，那么.*[]^%/\?~$这些字符是有特殊意义的，也就是不代表自己本身的，是转意字符，如果想搜这些转意字符，需要在他们前面加上反斜线\来去掉他们的转意性质。另外，搜索模式是有历史记录的，你可以通过在Normal模式输入/进入搜索模式然后通过上下按键来选择历史命令。</p>
+<p>一般搜索到的字符都是高亮的，但是我第二次打开其他的文件也是会高亮上一次搜索的字符，如果我不想高亮怎么办，首先可以通过搜索一个本文件没有的字符或者词来解决，还有就是可以通过命令:set nohlsearch设置不显示高亮，当然:set hlsearch表示显示高亮<br>如果我想在我输入每一个字符的同时，VI自动匹配我已经输入的字符，怎么办，用命令设置:set incsearch.这样VI就会在你输入每一个字符的时候，匹配当前已经输入的字符。<br>ma       在当前位置添加一个名为a的标志<br>`a         跳到名字万为a的mark位置<br>‘a          跳到名字为a的mark的行首<br>:marks         会列出所有的mark 另外mark可以和d，y等命令一起组合使用，另外，每次打开文件的时候，会自动有一些mark。<br>!!command           用command命令的执行结果代替当前行，这个在加入日期什么的还是很方便的<br>set autowrite/noautowrite      设置自动保存和不自动保存的，默认是不自动保存的<br>v/V/CTRL-v        进入Visual模式，v是可以单个字符的，然后V是整行整行的，CTRL-v是矩形形式的。这个对于改变一大片文字什么的也是很有用的<br><span style="color: #ff0000;">由于我这也是记录式的，顺便加上一些自己操作之后的感想，所以很多东西建议读者看Tutorial，那才是王道，下一篇《VI的基本命令之二》会接着这篇写</span></p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-12-27 </div>
+			<div class="article-title"><a href="/2012/12/27/too-many-levels-of-symbolic-links/" >Too many levels of symbolic links</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>说是用Linux，可是一直在X-window下用，基本命令很多都不会用，得慢慢学命令啊。Linux下命令才是王道。</p>
+<p>“Too many levels of symbolic links”这个错误是我用ln -s创建了一个软链接时发生的。比如我一开始的命令是</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">ln -s /usr/bin/vuze vuze   <span style="color: #da70d6;">#我在vuze所在的目录下操作这条语句，另外需要root权限</span></div><br>原因是因为我创建链接的时候用的是相对路径，而不是绝对路径造成了，用了绝对路径之后，就解决了。命令如下</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">ln -s /usr/bin/vuze ～/vuze/vuze</div><br>另外，Linux下一直没找到什么好的下载软件，下载速度一直上不去，现在都是用Firfox的Downthemall和chrome的下载功能。感觉文件一大就不给力啊，<span style="color: #ff0000;">要是有什么推荐的话，还请告知，不胜感激啊</span></p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-12-26 </div>
+			<div class="article-title"><a href="/2012/12/26/fedora-13-update-to-fedora-15/" >Fedora13 升级到Fedora 15</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>在开学的时候装了Fedora 13,然后一直用着，感觉也还可以，虽然现在Fedora都出18了。前两天不知道那根神经一短路然后就想着升级Fedora，一开始想升级到16的（担心17,18还不那么稳定，到时出了问题找不到解决方案）。然后就用下面的命令执行呗 。</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">sudo yum install preupgrade<br>preupgrade</div><br>执行preupgrade需要输入root命令，照着做就行了，然后就可以选择你想升级到的版本，有14,15,16,17，当然你还可以列出那些unstable版本。选择之后，就一直下一步就行了，然后等着下载所需要的软件包吧（时间根据你的网速不同而不同，我大概用了20分钟左右）。我一开始选择的版本是16,然后下完之后，提醒需要reboot来完成升级，好，那就reboot呗。</p>
+<p>reboot之后，你会发现屏幕一直是一个光标在那跳动，啥也不可以做，这个时候你只需要等待就行了，应该是在配置些啥东西吧。别重启了，实在没事干就出喝杯咖啡吧，等好了之后，结果发现提示说Fedora 16只能通过14,15升级而来，也就是不能跨太多的版本升级。好吧。那就重启升级到15再说吧。然后照着做之后，发现尼妈居然又是自动升级到16,然后一顿折腾之后，我把/var/cache/yum/下面所有和preupgrade有关的文件夹全都删掉了（其实应该做个备份更好，万一删错了还可以还原）。然后继续升级到Fedora 15.然后就可以了，没出现啥问题，刚好装Fedora 15的时候老师叫开会，然后开会回来之后发现已经装好了。而且还不错。</p>
+<p>现在你已经装好了Fedora 15了，当然还是可以访问Fedora 13的。然后说说接下来你需要做的事情吧。或许你可以在网上搜一篇叫做《Fedora 15安装之后需要做的×件事》，不过很多你可能不需要，我这里大致写下我做的一些事情吧</p>
+<p>1.安装gnome-tweak-tool，因为现在你的桌面是没有任何东西的，而且右击也没用，装这个东西就是解决这些事的，装好之后，用命令gnome-tweak-tool执行出来一个配置界面，选中File Manager。把右边的“Have file manager handle the desktop该陈ON就行了，现在你的桌面有东西了，而且可以右击了。</p>
+<p>2.在上一步中的Tweak tool中打开选中左边的Shell栏目，然后把右边的Arrangement of buttons on the titlebar选项改为All，这样尼会看到你的cmd窗口上面有最小化，最大化和关闭按钮了，默认的是只有关闭按钮的。</p>
+<p>3.解决按下Del不能删除文件的事情，首先用命令</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gsettings <span style="color: #b0c4de; font-weight: bold;">set </span>org.gnome.desktop.interface can-change-accels <span style="color: #b0c4de; font-weight: bold;">true</span></div><br>设置可以改变相应的快捷方式映射</p>
+<p>然后打开一个文件夹，选中随便一个文件然后点击菜单Edit，把鼠标放到“Move to Trash”上，然后按<span style="color: #ff0000;">两次<span style="color: #000000;">Del键就行了，接下来你可以用命令</span></span></p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">gsettings <span style="color: #b0c4de; font-weight: bold;">set </span>org.gnome.desktop.interface can-change-accels <span style="color: #b0c4de; font-weight: bold;">false</span></div><br>来关闭快捷方式的映射。</p>
+<p>4.中文输入法的问题，由于我是由Fedora 13升级来的，系统没有自动安装ibus输入法，还是保留了我在13上安装的fcitx，可是奇怪的事情发生了，fcitx输入法只能在浏览器下使用，其他任何地方都不能使用。这个也太坑爹了。然后google，百度结果没有发现什么解决办法，又说是gnome3的问题，又说是配置的问题， 有说直接换ibus的。可是换了ibus结果还是用不了，不知为何（应该不是和fcitx冲突的问题，我在装ibus之前卸载了fcitx）。然后最后发现有个帖子的配置和其他人的配置有个小小的区别，那就是试试吧，结果就TM可以了。我一开始的配置是（下面语句放在～/.bashrc文件中）</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">XMODIFIERS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“@im=fcitx”</span><br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">QT_IM_MODULE</span><span style="color: #f5deb3;">=</span>xim<br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">GTK_IM_MODULE</span><span style="color: #f5deb3;">=</span>xim</div><br>然后另外那个人的配置是把两个xim改成了fcitx也就是</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">XMODIFIERS</span><span style="color: #f5deb3;">=</span><span style="color: #7fffd4;">“@im=fcitx”</span><br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">QT_IM_MODULE</span><span style="color: #f5deb3;">=</span>fcitx<br><span style="color: #b0c4de; font-weight: bold;">export </span><span style="color: #d8bfd8;">GTK_IM_MODULE</span><span style="color: #f5deb3;">=</span>fcitx</div><br>然后奇迹发生了，重登录之后结果就可以了，这中间我各种重装，反正都不知道是为什么，<span style="color: #ff0000;">如果你也遇到了这样的问题，但是上面的方案没有帮到你的话，我只能说声遗憾了，因为我也不知道是为什么了。</span></p>
+<p>最后再吐嘈下Fedora 15的界面，感觉用起来总是没有13那么爽，gnome3或许炫一点，但是现在打开软件的方式有点不爽，也没有下面的任务栏了，而且最上面的panel也没了，现在变成了“Your favorites”，反正就是现在暂时还不适应这种界面，接下来慢慢适应吧。</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-12-12 </div>
+			<div class="article-title"><a href="/2012/12/12/fedora-13-texlive2012-install-chinese-configure/" >Fedora 13 TexLive2012安装+中文配置</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p><span style="color: #ff0000;">注：我博客里面所有类似风格的代码高亮都是由<span style="color: #0000ff;"><a href="http://fayaa.com/code" target="_blank" rel="external">代码发芽网</a></span>的代码高亮提供，特此说明</span></p>
+<p>由于各种原因，想在Fedora下装LaTeX软件，于是就有了这篇文章，这篇文章从安装到配置中文环境，中间遇到了各种蛋疼的问题。在这里记录下来，做个备份，也给后来人一份参考。</p>
+<p>首先，你可以去厦门大学的开源镜像下载TexLive2012 地址：<a href="http://mirrors.xmu.edu.cn/CTAN/systems/texlive/Images/" target="_blank" rel="external">http://mirrors.xmu.edu.cn/CTAN/systems/texlive/Images/</a><br>速度很给力的，一般都能在1M左右。</p>
+<p>下好之后，你需要安装，以下命令都是以root身份操作（如果你不知道命令到底需不需要root身份，那么就都用root身份吧）。</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">cd</span> ~/Downloads<br>mount -t iso9660 -o loop texlive2012-20120701.iso /mnt/<br><span style="color: #b0c4de; font-weight: bold;">cd</span> /mnt<br>./install-tl</div><br>其中Downloads是你ISO下载的地方。这样，你已经安装好了TeXLive2012了，你也可以用来排版英文的文献了。因为中文暂时还不支持。好下面我们就来说这蛋疼的中文了。</p>
+<p>网上主要有两种说法：</p>
+<p>第一种。从windows下copy一些字体，然后改一些配置文件，网上也有很多人说已经成功，不过由于本人用这种方法没有成功就不写了，这里给个<span style="color: #ff0000;"><a href="http://asc.2dark.org/node/129" target="_blank" rel="external"><span style="color: #ff0000;">链接</span></a></span>，也可以自己上网搜中文支持。</p>
+<p>第二种方法如下：</p>
+<p>首先你下载YueWang-zhfonts-final_1.01.tar.bz2包，地址在这里<a href="http://bj.soulinfo.com/%7Ehugang/tex/tex2007/YueWang-zhfonts-final_1.01.tar.bz2。" target="_blank" rel="external">http://bj.soulinfo.com/%7Ehugang/tex/tex2007/YueWang-zhfonts-final_1.01.tar.bz2。</a></p>
+<p>如果你RP够好的话，那么就能够在Linux下把这个动下下下来。好我们假定所有人的RP都想最近我的RP一样挫，那么你总是下到78%就下不下来了（也不知道为什么每次到这个点就下不动了，有人知道的话还请告知，在下不胜感激），而且每次在78%之前速度都是1000kb/s左右，然后一到78%，好见证你RP的时刻到了。不过就算RP再挫，我们也可以在windows下用迅雷把这个文件下下来，在这里我表示压力很大。</p>
+<p>到这里你应该已经把上面的压缩文件下下来了，如果还没有那请自行解决（就不说你RP为什么挫到这个地步了）。那么你来到下载的目录，然后解压缩这个文件，是不是解压缩完了之后，却没有发现它，ls也没有，图形化界面也没有？恩，你没有看错，是没有。因为作者把这个文件夹作成了隐藏文件，也就是文件夹名最前名有个点。然后你只要把texlive2007中的texmf-var文件夹copy到/usr/local/texlive下然后进行一系列操作就完成了。命令如下，都在root权限下进行的。</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">cp -rf texmf-var /usr/local/texlive<br><span style="color: #b0c4de; font-weight: bold;">cd</span> /usr/local/texlive<br>mv texmf-local texmf-local.backup<br>mv texmf-var texmf-local<br>texhash</div><br>上面的命令首先是把texmf-var文件夹copy到/usr/local/texlive下，然后对已有的texmf-local文件进行一个备份（对你不了解的文件进行操作时，你都应该这样做）。然后再把texmf-var改名为texmf-local。然后texhash是创建ls-R数据库，不懂就先照着做吧。好了，看也看累了，操作也操作烦了，那么下面就让我们来看看到底行不行了吧。</p>
+<p>用下面的tex文件进行测试下呗</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #b0c4de; font-weight: bold;">\documentclass</span><span style="color: #ffffff;">[4pt]</span><span style="color: #b0c4de; font-weight: bold;">{</span>article<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\usepackage</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJKutf8<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\title</span><span style="color: #b0c4de; font-weight: bold;">{</span>Fuck-Chinese<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\author</span><span style="color: #b0c4de; font-weight: bold;">{</span>klion26<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\maketitle</span><br><span style="color: #b0c4de; font-weight: bold;">\begin</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJK<span style="color: #b0c4de; font-weight: bold;">}{</span>UTF8<span style="color: #b0c4de; font-weight: bold;">}{</span>kai<span style="color: #b0c4de; font-weight: bold;">}</span><br><del>~~Hello, 你好World</del>~~~<br>你好 Fuck Chinese<br><span style="color: #b0c4de; font-weight: bold;">\end</span><span style="color: #b0c4de; font-weight: bold;">{</span>CJK<span style="color: #b0c4de; font-weight: bold;">}</span><br><span style="color: #b0c4de; font-weight: bold;">\end</span><span style="color: #b0c4de; font-weight: bold;">{</span>document<span style="color: #b0c4de; font-weight: bold;">}</span></div><br>1.tex是上面这个tex文件的文件名</p>
+<p>然后用如下命令生成PDF或者PS格式的文件</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">latex 1.tex<br>dvipdfm 1.dvi</div><br>生成PDF文件</p>
+<p><div class="source" style="font-family: '[object HTMLOptionElement]', Consolas, 'Lucida Console', 'Courier New'; color: #f5deb3; background-color: #2f4f4f;">dvips 1.dvi</div><br>生成PS格式的。不过我系统上PS格式的文件乱码了。<br>另外要说的就是pdflatex不能用，貌似是说找不到字体，这个我暂时还不能解决，然后其他的应该都没啥问题了。</p>
+<p>到这里，你终于舒了一口气，TM的终于搞定了。恩，接下来你可以用tex来排版中文文献了。</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-12-10 </div>
+			<div class="article-title"><a href="/2012/12/10/implicit-declaration-of-function-class-device-create/" >Implicit declaration of function class_device_create</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>在学习PLP的时候，编译Linux驱动时遇到上述错误，查了下发现是函数名已经变了。</p>
+<p>从2.6就开始不用class_device_create和class_device_destroy，取而代之的是下面两个函数</p>
+<p>device_create和device_destroy.改过来之后就没问题了，不过在新内核下编译好多现象都不一样，虽然都实现了相同的功能。</p>
+<p>另外Implicit declaration of function的warning有可能是因为你没有包含头文件所致。比如你用了memset，但是没有包含string.h头文件。另外如果你把函数写错的话也有可能出现上述错误的。比如我在用class_destroy的时候，写成了class_destory，然后找了十多分钟，一直未果。最后突然发现这个，原来敲错函数名了。</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-12-03 </div>
+			<div class="article-title"><a href="/2012/12/03/first-linux-module-lvm/" >第一个Linux可装载模块</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>照着《Professional Linux Programming》上的来写的。然后过程中遇到一系列问题，在这里记录下来。</p>
+<p>我的系统是VMware下装的Fedora 16。</p>
+<p>代码如下</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span>#include <linux module.h="">   </linux></span></span></li>
+<li><span>#include <linux init.h="">   </linux></span></li>
+<li><span>  </span></li>
+<li><span class="keyword">int</span><span> __int hello_init(</span><span class="keyword">void</span><span>)   </span></li>
+<li><span>{   </span></li>
+<li><span>    printk(</span><span class="string">“plp: hello reader!\n”</span><span>);   </span></li>
+<li><span>    </span><span class="keyword">return</span><span> </span><span class="number">0</span><span>   </span></li>
+<li><span>}   </span></li>
+<li><span>  </span></li>
+<li><span class="keyword">void</span><span> __exit hello_exit(</span><span class="keyword">void</span><span>)   </span></li>
+<li><span>{   </span></li>
+<li><span>    printk(</span><span class="string">“plp: thanks for all the fish!\n”</span><span>);   </span></li>
+<li><span>}   </span></li>
+<li><span>  </span></li>
+<li><span>MODULE_AUTHOR(</span><span class="string">“Jon Masters <a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#58;&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#x61;&#115;&#x74;&#x65;&#114;&#x73;&#x2e;&#111;&#x72;&#x67;">&#x6a;&#99;&#x6d;&#x40;&#106;&#x6f;&#x6e;&#109;&#x61;&#115;&#x74;&#x65;&#114;&#x73;&#x2e;&#111;&#x72;&#x67;</a>“</span><span>);   </span></li>
+<li><span>MODULE_DESCRIPTION(</span><span class="string">“PLP example”</span><span>);   </span></li>
+<li><span>MODULE_LICENSE(</span><span class="string">“GPL”</span><span>);   </span></li>
+<li><span>  </span></li>
+<li><span>module_init(hello_init);   </span></li>
+<li><span>module_exit(hello_exit);  </span><br></li></ol></div><br>然后你可以用 make -C /usr/src/linux-3.6.8 modules M=$PWD来编译这个可装载模块，在当前文件夹下需要一个Makefile文件，里面写上obj-m  := plp.o
+
+<p>解释下这条语句。-C 后面的参数 是你当前系统的代码所在的位置，貌似需要先编译下系统，可以下载最新版的内核来编译。 modules 应该是告诉make这是要编译啥 然后M=$PWD是参数 表示当前可装载模块在哪。当然你可以把这些放到一个Makefile文件里面。效果是一样的。如果你看到有CC [M] …..这样的那应该就是好了。</p>
+<p>然后编译好了之后你就可以用/sbin/modinfo plp.ko来查看这个可装载模块的相关信息了。这里面可以看到是什么版本的内核。也就是前面你所指定的内核目录相对应的内核版本。</p>
+<p>最后你可以用/sbin/insmod plp.ko和/sbin/rmmod plp来装载这个模块和删除这个模块。</p>
+<p>本来到这里就结束了。不过这里再记录下我所遇到的错误。</p>
+<p>1.make的时候出错。原因是没有写Makefile文件，Makefile文件里面只需要写上obj-m := plp.o就行了。</p>
+<p>2./sbin/insmod plp.ko的时候出现Operation not permitted，这里是因为没有权限，需要用root执行。</p>
+<p>3.用root执行上述命令的时候，出现“Invalid module format”错误。这个是因为内核版本不一致。我编译了3.6.8的内核之后，进入的系统内核版本是3.1的。所以会报错。</p>
+<p>4.printk没有输出。这个是因为输出等级的原因，所以不会输出在控制台。但是你可以用dmesg来查看。一般来说就是最后几条。或者你也可以查看/var/log/messages里面的信息，也是最后几条。貌似可以改输出等级。使得输出在控制台。这个和printk函数有关。printk和printf的用法差不多，不过是用在内核输出，printf用在用户态。</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-11-26 </div>
+			<div class="article-title"><a href="/2012/11/26/fedora-13-movie-mkv-mp4-rmvb-rm-song/" >Fedora13 下看视频，听歌</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>一开始没想在Linux下装视频，不过四宝在fedora-17下装了个视频之后，我也想装了。而且如果想只用Linux的话，那么视频这东西肯定需要的。然后上网搜了下，搜到<a href="http://www.cxybase.com/201104/fedora-13%E5%AE%89%E8%A3%85%E6%92%AD%E6%94%BE%E5%99%A8%E6%92%AD%E6%94%BEmp4%E8%A7%86%E9%A2%91/" target="_blank" rel="external">一篇文章</a>，说怎么安装文件使的可以打开mp4.rmvb，mkv等文件。然后我照着做的时候发现居然要求系统版本在15以上，fuck。。对于一直用fedora-13的我来说，压力很大。就想着去这个<a href="http://download1.rpmfusion.org/free/fedora/这里查看下，然后发现这个网页直接列出来的，系统版本最低要求是14.但是有一个release文件夹。点进去有一个文件夹13的文件夹。然后在里面找到一个文件[rpmfusion-free-release-13-2.noarch.rpm](http://download1.rpmfusion.org/free/fedora/releases/13/Everything/x86_64/os/rpmfusion-free-release-13-2.noarch.rpm)，然后在rpm" target="_blank" rel="external">http://download1.rpmfusion.org/free/fedora/这里查看下，然后发现这个网页直接列出来的，系统版本最低要求是14.但是有一个release文件夹。点进去有一个文件夹13的文件夹。然后在里面找到一个文件[rpmfusion-free-release-13-2.noarch.rpm](http://download1.rpmfusion.org/free/fedora/releases/13/Everything/x86_64/os/rpmfusion-free-release-13-2.noarch.rpm)，然后在rpm</a> -ivh 后面的地址改成这个文件的地址OK了。即就可以添加文件源了。然后yum install gstreamer-plugins-bad gstreamer-ffmpeg gstreamer-plugins-ugly 就行了。这两句需要用sudo来执行。接下来你就可以用Movie Player打开mp4,mkv，rmvb等文件。不过不知道为什么用QQ影音截取的一段rmvb文件却不可以播放。如果知道的还希望告知一声。</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-11-21 </div>
+			<div class="article-title"><a href="/2012/11/21/apue-chapter-3-excise-3-2/" >UNIX环境高级编程第3章的一些问题和习题3.2</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>APUE第3章讲的是文件IO，需要了解一些Linux底层的东西，不然看起来好费劲（我现在就这样- -|）。</p>
+<p>首先，讲了文件描述符，文件描述符简单的说就是一个非负整数，你可以通过这个整数来找到打开的文件，比如我们用open函数时返回的是一个整数，这就是open所打开的这个文件的文件描述符，文件描述符是内核向进程返回的。另外shell中的标准输入的文件描述符是0,标准输出是1,错误输出是2,这个是默认这么做的，与内核无关。但是不遵照这个惯例的话，那么很多系统应用程序就不能正常工作。文件描述符的范围是0~OPEN_MAX(每个进程的最大打开文件数)，早期的上限是19（即允许每个进程打开20个文件），现在很多系统则增至63.</p>
+<p>讲了一个文件空洞的东西，就是如果你现在的文件长度是n，然后你用lseek把文件指针位置定位到了一个大于n的位置，接下来你写一些东西，那么就形成了一个文件空洞，中间那一部分就是文件空洞，文件空洞是不占空间的，你可以用两个同样长度的文件，然后比较他们的文件大小，还有没有写过的字节读出来通通为0</p>
+<p>dup和dup2函数，都包含在unistd.h文件中。看到这两个函数的时候，不怎么懂，现在也不保证很懂(-_-|).</p>
+<p>dup的原型是int dup(int filedes) ;//传入参数是已打开的文件描述符，返回一个未用的最小的文件描述符。</p>
+<p>dup2的原型是int dup2(int oldfiledes,int newfiledes);//返回oldfiledes的一个文件描述符copy，然后返回的文件描述符是newfiledes。如果newfiledes已经打开，就先关闭，如果oldfiledes和newfiledes相等，那么就返回newfiledes，而不关闭它。这些返回的新文件描述符和原来的文件描述符（dup中的filedes和dup2中的oldfiledes）共享一个文件表项。如果出错返回-1,比如dup中的参数filedes是一个未打开的文件描述符</p>
+<p>当然这两个函数都可以由fcntl函数来替代，虽然可能不完全等效。比如原子性。</p>
+<p>fcntl原型int fcntl(int filedes,int cmd, … /<em> int arg </em>/ );</p>
+<p>fcntl可以复制文件描述符[cmd=F_DUPFD]，可以获得/设置文件描述符[cmd=F_GETFD/F_SETFD]，可以获得/设置文件状态标志[cmd=F_GETFL/F_SETFL]，可以获得/设置异步I/O所有权[cmd=F_GETOWN/F_SETOWN]，可以获得/设置记录锁[cmd=F_GETLK / F_SETLK / F_SETLKW]。出错返回-1.</p>
+<p>习题3.2需要自己不用fcntl来实现一个dup2函数，有出错提示。一开始脑袋一团浆糊，网上搜到一篇写这个的，用dup函数实现，出错信息要考虑齐全，另外，就是从0到newfiledes这些描述符中，看是否打开，每个都需要试，最后如果所有条件都符合，就可以返回newfiledes，不过刚开始的童鞋可以先照着网上那份写，再自己慢慢揣摩。</p>
+<p>习题3-4中给出，很多程序中都包含下面一段代码：<br>dup2(fd,0);<br>dup2(fd,1);<br>dup2(fd,2);<br>if(fd &gt; 2)<br>close(fd);<br>问为啥要关闭，也就是最后的if意义和在，还需要画出fd=1和fd=3时每次调用dup2时3个描述符项及相应的文件表项的变化情况。</p>
+<p>首先，前面3句就是相当于重定向，所有的标准输入，标准输出和错误输出都会写道fd所指的文件中去。那么如果fd&gt;2的话，执行那3句之后就有4个文件描述符指向同一个文件表项了。但是如果fd&lt;3的话，就只有3个。所以需要手动的把fd关闭掉</p>
+
+	
+	</div>
+</div>
+
+	  
+	    	
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2012-11-15 </div>
+			<div class="article-title"><a href="/2012/11/15/advanced-programming-in-the-unix-environment-apue-h/" >Unix环境高级编程中大apue.h问题</a></div>						
+		</h3>
+	
+
+
+	    	<div class="entry">
+  <div class="row">
+	
+	
+		<p>看《Unix环境高级编程》第一章的时候，遇到的第一个问题就是书中的第一个例子找不到”apue.h”头文件，这个文件是作者编写的，处理的办法是：</p>
+<p>1.从<a href="http://www.apuebook.com/apue2e.html" target="_blank" rel="external">这里</a>下载所需要的文件。</p>
+<p>2.把src.tar.gz解压缩到你的home目录下（当然随便解压到哪都是一样的，这里只是为了方便描述）。</p>
+<p>3.进入到刚解压大apue.2e目录下，修改Make.defines.linux中的WKDIR，改成/home/user/apue.2e  [其中user是你的用户名]，然后把/apue.2e/std/中的linux.mk文件中大所有nawk改为awk</p>
+<p>4.把/home/user/apue.2e/include/apue.h和/home/user/apue.2e/lib/error.c两个文件都copy到/usr/include目录下,这一步需要root权限</p>
+<p>5.修改/usr/include/apue.h文件，在最后一行#endif的前面一行加上一句#include “error.c”然后就完工了，编译通过！</p>
+<p>好好学习，天天向上！</p>
+
+	
+	</div>
+</div>
+
+	  
+      </div>
+	  <div>
+	    <center>
+	    <div class="pagination">
+<ul class="pagination">
+	 
+		
+    	<li class="prev"><a href="/categories/Linux/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> Prev</a></li>
+  		
+
+        <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+
+		
+		   <li class="next"> <a href="/categories/Linux/page/3/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+        
+	
+</ul>
+</div>
+
+        </center>
+	    </div>	
+      
+
+</div> <!-- col-md-9/col-md-12 -->
+
+
+<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+	<div class="widget">
+		<h4>Categories</h4>
+		<ul class="tag_box inline list-unstyled">
+		
+			<li><a href="/categories/ACM/">ACM<span>16</span></a></li>
+		
+			<li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+		
+			<li><a href="/categories/ACM/HDU/">HDU<span>1</span></a></li>
+		
+			<li><a href="/categories/HDU/">HDU<span>9</span></a></li>
+		
+			<li><a href="/categories/Linux/">Linux<span>32</span></a></li>
+		
+			<li><a href="/categories/POJ/">POJ<span>6</span></a></li>
+		
+			<li><a href="/categories/Linux/TeX/">TeX<span>1</span></a></li>
+		
+			<li><a href="/categories/USACO/">USACO<span>21</span></a></li>
+		
+			<li><a href="/categories/Uncategorized/">Uncategorized<span>3</span></a></li>
+		
+			<li><a href="/categories/Visual-C/">Visual C++<span>1</span></a></li>
+		
+			<li><a href="/categories/实时计算/复盘/problem-solve/">problem_solve<span>1</span></a></li>
+		
+			<li><a href="/categories/wordpress/">wordpress<span>8</span></a></li>
+		
+			<li><a href="/categories/具体数学/">具体数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li>
+		
+			<li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li>
+		
+			<li><a href="/categories/实时计算/">实时计算<span>7</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+		
+			<li><a href="/categories/想清楚/">想清楚<span>2</span></a></li>
+		
+			<li><a href="/categories/我的生活/想清楚/">想清楚<span>1</span></a></li>
+		
+			<li><a href="/categories/成长/">成长<span>3</span></a></li>
+		
+			<li><a href="/categories/我的生活/">我的生活<span>9</span></a></li>
+		
+			<li><a href="/categories/所谓开源/">所谓开源<span>3</span></a></li>
+		
+			<li><a href="/categories/Algorithm/数学/">数学<span>1</span></a></li>
+		
+			<li><a href="/categories/POJ/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/数学/">数学<span>2</span></a></li>
+		
+			<li><a href="/categories/分布式系统/实时计算/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/源码阅读/">源码阅读<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机图形学图像处理/">计算机图形学图像处理<span>1</span></a></li>
+		
+			<li><a href="/categories/所谓开源/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Algorithm/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/Linux/计算机基础/">计算机基础<span>2</span></a></li>
+		
+			<li><a href="/categories/计算机基础/">计算机基础<span>22</span></a></li>
+		
+			<li><a href="/categories/语言学习/计算机基础/">计算机基础<span>1</span></a></li>
+		
+			<li><a href="/categories/计算机安全/">计算机安全<span>3</span></a></li>
+		
+			<li><a href="/categories/计算机基础/语言学习/">语言学习<span>1</span></a></li>
+		
+			<li><a href="/categories/语言学习/">语言学习<span>2</span></a></li>
+		
+		</ul>
+	</div>
+
+		
+			
+	<div class="widget">
+		<h4>Tag Cloud</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/critical/">critical<span>1</span></a></li>
+		
+			<li><a href="/tags/wordpress/">wordpress<span>2</span></a></li>
+		
+			<li><a href="/tags/验证码/">验证码<span>1</span></a></li>
+		
+			<li><a href="/tags/edit-distance/">edit distance<span>1</span></a></li>
+		
+			<li><a href="/tags/libsvm/">libsvm<span>1</span></a></li>
+		
+			<li><a href="/tags/zookeeper/">zookeeper<span>3</span></a></li>
+		
+			<li><a href="/tags/mkv/">mkv<span>1</span></a></li>
+		
+			<li><a href="/tags/mp4/">mp4<span>1</span></a></li>
+		
+			<li><a href="/tags/模拟/">模拟<span>2</span></a></li>
+		
+			<li><a href="/tags/source-code/">source-code<span>1</span></a></li>
+		
+			<li><a href="/tags/github/">github<span>5</span></a></li>
+		
+			<li><a href="/tags/metric/">metric<span>1</span></a></li>
+		
+			<li><a href="/tags/exception/">exception<span>1</span></a></li>
+		
+			<li><a href="/tags/CListCtrl/">CListCtrl<span>1</span></a></li>
+		
+			<li><a href="/tags/learn-algorithm-from-scratch/">learn algorithm from scratch<span>3</span></a></li>
+		
+			<li><a href="/tags/gdb/">gdb<span>2</span></a></li>
+		
+			<li><a href="/tags/最慢速度/">最慢速度<span>1</span></a></li>
+		
+			<li><a href="/tags/Red-Hat9/">Red Hat9<span>5</span></a></li>
+		
+			<li><a href="/tags/java/">java<span>2</span></a></li>
+		
+			<li><a href="/tags/写作/">写作<span>1</span></a></li>
+		
+		
+		   <li><a href="/tags">...<span>312</span></a></li>
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>Recent Posts</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2018/09/09/一次-InputStream-read-使用不当导致的问题/" ><i class="fa fa-file-o"></i>一次 InputStream#read 使用不当导致的问题</a>
+      </li>
+    
+      <li>
+        <a href="/2018/04/06/Flink-State/" ><i class="fa fa-file-o"></i>Flink-State</a>
+      </li>
+    
+      <li>
+        <a href="/2018/03/14/Java-内存泄漏分析和对内存设置/" ><i class="fa fa-file-o"></i>Java 内存泄漏分析和对内存设置</a>
+      </li>
+    
+      <li>
+        <a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" ><i class="fa fa-file-o"></i>通过 Java 线程堆栈进行性能瓶颈分析</a>
+      </li>
+    
+      <li>
+        <a href="/2018/01/06/线程堆栈分析/" ><i class="fa fa-file-o"></i>线程堆栈分析</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>Links</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>
+	
+		<li><i class=""></i><a href="http://l34rner.github.io/" title="A blog focus on security!" target="_blank"]);">Debug0</a></li>
+	
+		<li><i class=""></i><a href="http://www.programlife.net/" title="程序人生" target="_blank"]);">代码疯子</a></li>
+	
+		<li><i class=""></i><a href="http://www.narutoacm.com/" title="NARUTOACM" target="_blank"]);">NARUTOACM</a></li>
+	
+		<li><i class=""></i><a href="http://www.tanglei.name/" title="tanglei 的 blog" target="_blank"]);">tanglei的blog</a></li>
+	
+		<li><i class=""></i><a href="http://www.microspaze.com/" title="微空间" target="_blank"]);">微空间</a></li>
+	
+		<li><i class=""></i><a href="http://www.toutian.org/" title="小昭的荒地" target="_blank"]);">小昭的荒地</a></li>
+	
+		<li><i class=""></i><a href="https://cosx.me/" title="异想天开" target="_blank"]);">异想天开</a></li>
+	
+		<li><i class=""></i><a href="http://xiaopengcheng.top/" title="远行" target="_blank"]);">远行</a></li>
+	
+		<li><i class=""></i><a href="http://www.zhangxc.com/" title="张学程" target="_blank"]);">张学程</a></li>
+	
+	</ul>
+</div>
+
+
+		
+			<!-- calendar widget -->
+
+  <script src="/js/calendar.js"></script>
+  <script src="/js/languages.js"></script>
+  <script type="text/javascript">
+    $(function() {
+    
+      $('#calendar').aCalendar('zh-CN',{single:undefined, root:'undefined'});
+    
+    });
+  </script>
+
+
+<div class="widget-wrap">
+  <h3 class="widget-title">日历云</h3>
+  <div class="widget">
+    <div id="calendar"></div>
+  </div>
+</div
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

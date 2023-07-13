@@ -1,0 +1,415 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Algorithms第4章及少量习题 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Algorithms第4章及少量习题"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Algorithms第4章及少量习题</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>这一章的题目叫做Paths in graphs。讲的是图之间的最短路问题。主要讲了BFS,Dijkstra[普通实现，Binary heap实现，d-ary heap实现，fibonacci heap实现]和Bell-Ford算法。这本书上引出这些算法的例子我觉得用的很好。</p>
+<p>首先是通过DFS引出BFS，给出一个简单图，如果你进行一次BFS的话，那么得到的那些pre和post值是不能反应源点到其他点的距离的。下面的图分别是DFS-tree和S 到各点的距离图</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2013/07/dfs.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/07/dfs-300x112.jpg" alt="" title="dfs"></a></p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2013/07/bfs.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/07/bfs-300x101.jpg" alt="" title="bfs"></a></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>由上面的图可知，DFS是不能很好的得到S到其他点之间的最短距离的。很明显在DFS-tree中S和C的距离很远，但实际上他们之间的距离却很短。这样就引出了BFS，如下面代码所示</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">procedure</span> <span style="color: #f5deb3;">bfs</span>(<span style="color: #f5deb3;">G</span><span style="color: #f5deb3;">,</span> s)<br><span style="color: #4682b4; font-weight: bold;">Input:</span>    <span style="color: #f5deb3;">Graph</span> <span style="color: #f5deb3;">G</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">V</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">E</span><span style="color: #f5deb3;">),</span> <span style="color: #f5deb3;">directed</span> <span style="color: #f5deb3;">or</span> <span style="color: #f5deb3;">undirected</span> <span style="color: #f5deb3;">vertex</span> s <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">V</span><br><span style="color: #4682b4; font-weight: bold;">Output:</span>   <span style="color: #f5deb3;">For</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">vertices</span> <span style="color: #f5deb3;">u</span> <span style="color: #f5deb3;">reachable</span> <span style="color: #f5deb3;">from</span> s<span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">u</span>) <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">set</span> <span style="color: #f5deb3;">to</span><br><span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">distance</span> <span style="color: #f5deb3;">from</span> s <span style="color: #f5deb3;">to</span> <span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">.</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">u</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">V</span><br><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">u</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">inf</span><span style="color: #f5deb3;">dist</span>(s) <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">Q</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">[</span>s<span style="color: #f5deb3;">]</span>   (<span style="color: #f5deb3;">queue</span> <span style="color: #f5deb3;">containing</span> <span style="color: #f5deb3;">just</span> s)<br><span style="color: #b0c4de; font-weight: bold;">while</span> <span style="color: #f5deb3;">Q</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">not</span> <span style="color: #4682b4; font-weight: bold;">empty:</span><br><span style="color: #f5deb3;">u</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">eject</span>(<span style="color: #f5deb3;">Q</span>)<br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">edges</span> (<span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">v</span>) <span style="color: #f5deb3;">in</span> <span style="color: #4682b4; font-weight: bold;">E:</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">v</span>) <span style="color: #f5deb3;">=</span> <span style="color: #4682b4; font-weight: bold;">inf:</span><br><span style="color: #f5deb3;">inject</span>(<span style="color: #f5deb3;">Q</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">v</span>)<br><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">v</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">u</span>) <span style="color: #f5deb3;">+</span> <span style="color: #add8e6;">1</span></div><br>实际上就是每一次把和所处理的点相邻的所有点都放进队列里面，利用队列先进先出的性质，可以做到依次得到所有点离源点的距离。</p>
+<p>不过BFS在实际应用中有一个约束，也就是说需要<span style="color: #ff0000;">所有的边长都是1</span>,但这个在实际应用中是很难做到的。那么我们可以考虑在相邻的两个点之间插入一系列的辅助点，也就是说变长为L的话，那么我们就插入L-1个辅助点，这样的话，所有的边都变成了变长为1，就可以用BFS来处理了，但是这里有一个问题，如果有两个点之间的距离非常长的话，那么我们就会在插入辅助点这一点上做很多“无用功”，而且我们不关心某个点到这些辅助点之间的距离，那么我们就可以想到这样，如果有下面一种类似“alarm clock”的算法的话，我们还是在每两个点之间插入相应的辅助点，但是只有当计算机访问到实际点的时候，clock才会响，这样哦我们就知道了，这个点离源点有多远了[clock响的时间就是需要的距离]那么我们就可以在图上进行BFS了</p>
+<p>1.把源点s的alarm clock设置为0,也就是说在第0时刻，源点所在的clock会响<br>2.执行下面的操作，直到不需要再设置alarm clock为止<br>//我们说如果一个clokc在T时刻响了，那么源点到这个点的距离就是T，对所有的顶点u<br>源点s到u的距离是T<br>对所有u的邻接点v<br>如果v还没有被设置alarm clock，那么就把v处的alarm clock设置为T+len[u,v]<br>如果v处的alarm clock被设置得被T+len[u,v]晚，那么就把它更新为T+len[u,v]</p>
+<p>这样的话我们就得到了这个Dijkstra算法的大致实现了，这里我们只需要用到一个priority queue来实现如下的一系列操作就可以完成Dijkstra算法了<br>Insert：  把一个新的元素加到集合里面<br>Decrease-key： 更新集合里面某个元素的值[这里是减小]<br>Delete-min： 删掉并返回集合中的最小值<br>Make-queue：利用一系列的给定值建立一个priority queue。</p>
+<p>前两个操作可以让我们实现设置alarm clock的操作，第三个则会告诉我们接下来哪个alarm clock会响，把这些放在一起就得到了Dijkstra算法了，伪代码如下：</p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">procedure</span> <span style="color: #f5deb3;">dijkstra</span>(<span style="color: #f5deb3;">G</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">,</span> s)<br><span style="color: #4682b4; font-weight: bold;">Input:</span>    <span style="color: #f5deb3;">Graph</span> <span style="color: #f5deb3;">G</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">V</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">E</span><span style="color: #f5deb3;">),</span> <span style="color: #f5deb3;">directed</span> <span style="color: #f5deb3;">or</span> <span style="color: #f5deb3;">undirected</span><br><span style="color: #f5deb3;">positive</span> <span style="color: #f5deb3;">edge</span> <span style="color: #f5deb3;">lengths</span> <span style="color: #f5deb3;">e</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">E</span> <span style="color: #f5deb3;">vertex</span> s <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">V</span><br><span style="color: #4682b4; font-weight: bold;">Output:</span>   <span style="color: #f5deb3;">For</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">vertices</span> <span style="color: #f5deb3;">u</span> <span style="color: #f5deb3;">reachable</span> <span style="color: #f5deb3;">from</span> s<span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">u</span>)<br><span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">set</span> <span style="color: #f5deb3;">to</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">distance</span> <span style="color: #f5deb3;">from</span> s <span style="color: #f5deb3;">to</span> <span style="color: #f5deb3;">u</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">u</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">V</span><br><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">u</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">inf</span><br><span style="color: #f5deb3;">pre</span>(<span style="color: #f5deb3;">u</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">nil</span><span style="color: #f5deb3;">dist</span>(s) <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><span style="color: #f5deb3;">H</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">makequeue</span>(<span style="color: #f5deb3;">V</span>)      (<span style="color: #b0c4de; font-weight: bold;">using</span> <span style="color: #f5deb3;">dist</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">values</span> <span style="color: #f5deb3;">as</span> <span style="color: #f5deb3;">keys</span>)<br><span style="color: #b0c4de; font-weight: bold;">while</span> <span style="color: #f5deb3;">H</span> <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">not</span> <span style="color: #4682b4; font-weight: bold;">empty:</span><br><span style="color: #f5deb3;">u</span> <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">deletemin</span>(<span style="color: #f5deb3;">H</span>)<br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">edges</span> (<span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">v</span>) <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">E</span><br><span style="color: #b0c4de; font-weight: bold;">if</span> <span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">v</span>) <span style="color: #f5deb3;">&gt;</span> <span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">u</span>) <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">l</span>(<span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">v</span>)<br><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">v</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">u</span>) <span style="color: #f5deb3;">+</span> <span style="color: #f5deb3;">l</span>(<span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">,</span><span style="color: #f5deb3;">v</span>)<br><span style="color: #f5deb3;">pre</span>(<span style="color: #f5deb3;">v</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">u</span><br><span style="color: #f5deb3;">decreasekey</span>(<span style="color: #f5deb3;">H</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">v</span>)</div><br>Dijkstra算法要求所有的边都是正的，这是因为要保证已经deletemin的点的最短距离不会改变，如果有负边的话，那么就会变成后面的Bellman-Ford算法，后面会说。其中的priority queue一般有几种实现。一个是直接用数组存，这样的话deletemin的时间是O(V)，insert/decreasekey的时间是O(1)，所有总时间为V<em>deletemin+(V+E)</em>insert[可以由上面的伪代码得到]。总时间是V^2.同样Binary heap实现的话可以得到的时间复杂度为O((V+E)logV)，Binary heap的deletemin和insert/decreasekey都是logV的。还有d-ary heap的话，时间复杂度为O((V<em>d+E)</em>logV/logd).Fibonacci heap的时间复杂度为O(VlogV+E)但是Fibonacci heap实现太麻烦，所以基本是用的数组或者Binary heap。还有到底数组和Binary heap的实现，谁更快呢？就要看图是否稀疏了，稀疏的话，Binary heap的会好些，也就是E&lt;V^2/logV的时候，E超过这个之后，数组实现的反而会好一些。</p>
+<p>接下来就是如果图中的边有负的话，那么用Dijkstra算法会怎样呢？会失败。如下图</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2013/07/bad-dijk.jpg" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2013/07/bad-dijk-300x93.jpg" alt="" title="bad-dijk"></a></p>
+<p>这样的话，A点的距离确定之后是不会再次改变的，但是实际上是需要改变的。这样就引出了Bellman-Ford算法了，也就是说每个点的距离算出来之后，但是不把它设为不可更改的，而是可以在下次更改，这样的话，一条路径最多包含V个点，那么我们只需要进行V-1次边的松弛操作就行了，松弛操作就是说对于所有的边<u,v>，如果dist(v)&gt;dist(u)+len[u,v]那么dist(v)=dist(u)+len[u,v]，这样进行松弛操作之后，最后一定能得到相应的最短路。Bellman-Ford算法的伪代码如下：</u,v></p>
+<p><div class="source" style="font-family: 'Courier New', Consolas, 'Lucida Console'; color: #f5deb3; background-color: #2f4f4f;"><span style="color: #f5deb3;">procedure</span> <span style="color: #f5deb3;">Bellman</span><span style="color: #f5deb3;">-</span><span style="color: #f5deb3;">Ford</span>(<span style="color: #f5deb3;">G</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">l</span><span style="color: #f5deb3;">,</span> s)<br><span style="color: #4682b4; font-weight: bold;">Input:</span>      <span style="color: #f5deb3;">Directed</span> <span style="color: #f5deb3;">graph</span> <span style="color: #f5deb3;">G</span> <span style="color: #f5deb3;">=</span> (<span style="color: #f5deb3;">V</span><span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">E</span>);<br><span style="color: #f5deb3;">edge</span> <span style="color: #f5deb3;">lengths</span> <span style="color: #f5deb3;">e</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">E</span> <span style="color: #f5deb3;">with</span> <span style="color: #f5deb3;">no</span> <span style="color: #f5deb3;">negative</span> <span style="color: #f5deb3;">cycles</span><br><span style="color: #f5deb3;">vertex</span>  s <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">V</span><br><span style="color: #4682b4; font-weight: bold;">Output:</span>     <span style="color: #f5deb3;">For</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">vertices</span> <span style="color: #f5deb3;">u</span> <span style="color: #f5deb3;">reachable</span> <span style="color: #f5deb3;">from</span> s<span style="color: #f5deb3;">,</span> <span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">u</span>) <span style="color: #f5deb3;">is</span> <span style="color: #f5deb3;">set</span><br><span style="color: #f5deb3;">to</span> <span style="color: #f5deb3;">the</span> <span style="color: #f5deb3;">distance</span> <span style="color: #f5deb3;">from</span> s <span style="color: #f5deb3;">to</span> <span style="color: #f5deb3;">u</span><span style="color: #f5deb3;">.</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">u</span> <span style="color: #f5deb3;">in</span> <span style="color: #f5deb3;">V</span><br><span style="color: #f5deb3;">dist</span>(<span style="color: #f5deb3;">u</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">inf</span><br><span style="color: #f5deb3;">pre</span>(<span style="color: #f5deb3;">u</span>) <span style="color: #f5deb3;">=</span> <span style="color: #f5deb3;">nil</span><span style="color: #f5deb3;">dist</span>(s) <span style="color: #f5deb3;">=</span> <span style="color: #add8e6;">0</span><br><span style="color: #f5deb3;">repeat</span> <span style="color: #f5deb3;">V</span><span style="color: #f5deb3;">-</span><span style="color: #add8e6;">1</span> <span style="color: #4682b4; font-weight: bold;">times:</span><br><span style="color: #b0c4de; font-weight: bold;">for</span> <span style="color: #f5deb3;">all</span> <span style="color: #f5deb3;">e</span> <span style="color: #f5deb3;">in</span> <span style="color: #4682b4; font-weight: bold;">E:</span><br><span style="color: #f5deb3;">update</span>(<span style="color: #f5deb3;">e</span>)  <span style="color: #da70d6;">//松弛操作</span></div><br>这样的话，对于图中没有负环的情况下，我们已经能够很好的处理了，如果有负环呢？那么我们可以在Bellman-Ford的repeat之后再对所有边进行一次松弛操作，如果有边的dist变了，那么就一定有负环，否则就没有负环。</p>
+<p>接下来是部分习题和解答：</p>
+<p>4.3 给一个无向图，需要给一个V^3的算法，判断是否存在一个长为4的simple cycle[a cycle doesn’t intersect itself].</p>
+<p>可以跑BFS，如果在将要访问一个点的时候，这个点已经被访问过了，而且两次的长度和为4的话，就可以了。这样需要枚举所有点，把枚举的点当成环中的一个点，BFS的时间复杂度为V+E，枚举是V，所以最多是V^3。</p>
+<p>4.6 给一个无向图，需要用线性时间计算出给定两点u和v之间有多少条不同的最短路。</p>
+<p>我们只需要记录一个数组p[i].存的是u到i有多少条不同的最短路径就行了。接下来就是用BFS跑一次就可以了。更新的时候，if(dist(i)+len[i,j]&lt;dist[j])的话dist[j]=dist[i]+len[i,j],p[j] = p[i].如果dist[i]+len[i,j] == dist[j]的话，那么p[j]=p[j]+[[i].</p>
+<p>4.8对于有负边的图，可以不可以通过把每条边都加一个很大的数变成正的之后，然后跑Dijkstra算法。</p>
+<p>不可以，因为这样会改变原图中的最短路径。比如A-&gt;B长为-2.A-&gt;C长为3,B-&gt;C长为4.在为加之前A到C的最短路径为A-&gt;B-&gt;C，但是每条边都加上2或一个更大的值之后，就变成了A-&gt;C</p>
+<p>4.9对于只有一条负边，且这条负边是从源点出去的图，能不能用Dijkstra算法。</p>
+<p>能，因为符合Dijkstra的条件，某个点的距离一旦确定之后，就不会改变，已经确定的点的距离比为确定的点的距离要小。</p>
+<p>4.15给定一个无向图，所有的边都是正的，问能不能在O((V+E)logV)的时间内，确定源点到其他任意点的最短路径是否唯一</p>
+<p>这个问题其实和上面的4.6是同一个问题，这里O((V+E)logV)其实就是Binary heap实现的Dijkstra算法的时间复杂度。在图上跑一次Dijkstra算法就可以了。上面的p数组记录的是源点到这个点的最短路径是不是唯一就行了</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2013/09/11/algorithms-chapter-5/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2013/07/20/algorithms-chapter-3-homework-sol/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2013-07-28 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/algorithm/">algorithm<span>14</span></a></li> <li><a href="/tags/algorithms/">algorithms<span>1</span></a></li> <li><a href="/tags/bellman-ford/">bellman-ford<span>1</span></a></li> <li><a href="/tags/bfs/">bfs<span>1</span></a></li> <li><a href="/tags/dijkstra/">dijkstra<span>1</span></a></li> <li><a href="/tags/exercise/">exercise<span>8</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

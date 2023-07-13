@@ -1,0 +1,409 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>MIT 6.824 2015 Lab 1 记录 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="MIT 6.824 2015 Lab 1 记录"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> MIT 6.824 2015 Lab 1 记录</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>===========<span style="color: #0000ff;">本文需要有 Go 的基础，并且知道 6.824 Lab 的相关内容作为预备知识</span>===========</p>
+<p>最开始做这个 Lab 是去年，所以使用的是 2015 年的（现在已经有 2016 年的了），地址<a href="http://nil.csail.mit.edu/6.824/2015/" target="_blank" rel="external">Distributed System</a></p>
+<p>第一个 Lab 是阅读 MapReduce 的论文，然后在提供的框架下实现一个简单版的 MapReduce 程序，论文地址：<a href="http://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf" target="_blank" rel="external">MapReduce</a></p>
+<p>Part I</p>
+<p>在提供的框架下，自己实现 Map 和 Reduce 函数，从而实现单机版的 MapReduce 程序，用来统计单词的数据，类似分布式程序的 Hello World。</p>
+<p>根据提供的代码，以及我们在 Part I 执行的语句可知，在 wc.go 中我们找到如下的语句</p>
+<p><pre class="theme:github lang:go decode:true ">mapreduce.RunSingle(5, 3, os.Args[2], Map, Reduce)</pre><br>我们最终执行的是 mapreduce.RunSingle 这个函数，在 RunSingle 函数中，可以分为如下几步</p>
+<ol>
+<li>InitMapReduce</li>
+<li>Split</li>
+<li>DoMap</li>
+<li>DoReduce<br>其中 InitMapReduce，初始化一个 mapreduce 结构体，在后面使用，Split 则将输入的文件进行，然后顺序调用 DoMap，这里面会调用我们写的 map 函数，DoMap 都做完之后，再继续执行 DoReduce，这个函数会调用我们写的 reduce 函数。然后根据论文中的伪代码，差不多就可以完成这两个函数了<br><pre class="theme:github lang:go decode:true">map(String key, String value):<br>// key: document name<br>// value: document contents<br>for each word w in value:<br>EmitIntermediate(w, “1”);<br>reduce(String key, Iterator values):<br>// key: a word<br>// values: a list of counts<br>int result = 0;<br>for each v in values:<br>result += ParseInt(v);<br>Emit(AsString(result));</pre><br>Part IIIII</li>
+</ol>
+<p>首先查看 test_test.go 中的所有的 test 函数，看是如何实现测试的，大致顺序会形成一张如下的图，从上到下形成调用间的层次，同一层次间的函数执行顺序是从左往右顺序执行，其中绿色的表示是通过 go func()(另起一个线程)来执行的，我们只需要完成 mapreduce.go#RunMaster 函数即可。</p>
+<p><a href="http://www.klion26.com/wp-content/uploads/2016/03/part2.png" target="_blank" rel="external"><img src="http://www.klion26.com/wp-content/uploads/2016/03/part2.png" alt="part2"></a></p>
+<p>从 test 中的代码以及 Part I 中相关代码可以得知，我们需要写的代码（RunMaster 函数），实际上就是把所有的任务（map 或者 reduce）分配给具体的 worker 来执行。</p>
+<p>首先，如果我们不考虑 worker 这个概念，那么怎么实现 RunMaster 函数呢，我们只需要把  Part I 中 RunSingle 中的两个 for 循环改成 goroutine 的，也就是在函数 DoMap 和 DoReduce 之前加关键字 go 即可，当然到这里我们还需要考虑，如何做到所有的 map 都完成之后才处理 reduce？reduce 都处理完成才算 RunMaster 函数处理完成？这就变成了 goroutine 的的同步问题了，可以参考 <a href="https://gobyexample.com/channel-buffering" target="_blank" rel="external">channel buffering。</a></p>
+<p>到这里，如果我们不考虑 worker 的话，所有的 test case 都可以通过了，但是发现 TestBasic 函数的起的 worker 我们根本没有用到（后面几个 test case 还有 worker fail 的情况），那么就变成了，如何将我们上面的代码改写为，使用 worker 来执行，而不是直接通过 go DoMap() 以及 go DoReduce 来执行，通过阅读 worker.go 发现有一个 RPC 接口 DoJob，刚好满足我们的需要，阅读整个项目的其他代码（mapreduce.go#CleanupRegistration())，发现通过调用 common.go#call() 来统一进行 RPC 调用.</p>
+<p>这里我们需要知道，从哪知道一个 worker 准备就绪，以及如何知道一个 woker 从忙状态（处理任务）—&gt; 闲状态（任务处理完成），我们可以看到在 worker.go#RunWoker 里面有一句</p>
+<p><pre class="theme:github lang:go decode:true">Register(MasterAddress, me)</pre><br>我们发现 Register 函数如下</p>
+<p><pre class="theme:github lang:go mark:6 decode:true">// Tell the master we exist and ready to work<br>func Register(master string, me string) {<br>    args := RegisterArgs{}<br>    args.Worker = me<br>    var reply RegisterReply<br>    ok := call(master, “MapReduce.Register”, args, reply)<br>    if ok == false {<br>        fmt.Printf(“Register: RPC %s register error\n”, master)<br>    }<br>}</pre><br>其中第6行调用 MapReduce.Register 这个 RPC 接口，继续看，发现 mapreduce.go#Register 这个函数中有下面一句话</p>
+<p><pre class="theme:github lang:go decode:true">mr.registerChannel &lt;- args.Worker</pre><br>发现 registerChannel 是 mapreduce 这个结构体中的一个 channel，也就是在 RunWorker 的时候，我们能从 mr.registerChannel 得到一个标识 worker 的字符串（可以理解为这个 worker 的名字），而这个字符串，后续我们传给 common.go#call 函数，调用相关的 RPC 接口。</p>
+<p>好，至少我们知道什么时候会得到通知有 worker 注册了，那么如何知道 worker 从忙变成闲呢，通过上面的流程，我们可以复用 registerChannel，也就是如果一个 worker 处理完任务的时候，我们也往这个 channel 发送 args.Worker 这个字段，这里就需要更改 registerChannel 的定义，因为我们不知道注册 worker 和分配任务给 worker 谁先谁后，在这里我们只需要把 registerChannel 变成带 buffer 的就行了。最终需要处理 worker 中途挂掉的情况，只需要在外层起一个死循环，直到 call 这个 函数返回 true 的时候才退出即可。</p>
+<p>总结：</p>
+<p>梳理一下：我们在 RunMaster 中需要并行的执行 Map，所有 Map 操作执行完成之后，并行的执行 Reduce 操作，这些操作需要通过分配给 worker 来执行，通过 channel 可以知道什么时候有空闲的 worker（注册或者由忙变闲），然后在调用 Worker.DoJob 的外层用死循环包装一层，知道 RPC 返回成功才退出即可</p>
+<p>&nbsp;</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2016/03/30/mit-6-824-lab-2-part-a/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2016/01/20/how-to-read-a-book/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2016-03-23 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/6-824/">6.824<span>2</span></a></li> <li><a href="/tags/distributed-system/">distributed-system<span>2</span></a></li> <li><a href="/tags/go/">go<span>1</span></a></li> <li><a href="/tags/mapreduce/">mapreduce<span>1</span></a></li> <li><a href="/tags/mit/">mit<span>2</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>
