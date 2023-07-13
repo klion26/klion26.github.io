@@ -1,0 +1,456 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Algorithms第3章及少量习题 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Algorithms第3章及少量习题"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Algorithms第3章及少量习题</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>第三章的主要思想就是DFS。讲了图上的DFS操作，然后讲了各种应用。这章默认图都是用邻接矩阵存的。</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span>procedure explore(G, v)   </span></span></li>
+<li><span>Input:        G = (V, E) is a graph;   </span></li>
+<li><span>Output:       visited(u) is set to </span><span class="keyword">true</span><span> </span><span class="keyword">for</span><span> all nodes u reachable from v   </span></li>
+<li><span>  </span></li>
+<li><span>visited(v) = </span><span class="keyword">true</span><span>  </span></li>
+<li><span>previstit(v)   </span></li>
+<li><span class="keyword">for</span><span> each edge(v,u) in E:   </span></li>
+<li><span>    </span><span class="keyword">if</span><span> not visited(u);   explore(u)   </span></li>
+<li><span>postvisit(v)   </span></li>
+<li><span>  </span></li>
+<li><span>procedure dfs(G)   </span></li>
+<li><span class="keyword">for</span><span> all v in V   </span></li>
+<li><span>    visited(v)  = </span><span class="keyword">false</span><span>  </span></li>
+<li><span class="keyword">for</span><span> all v in V   </span></li>
+<li><span>    </span><span class="keyword">if</span><span> not visited(v) explore(v)   </span></li>
+<li><span>  </span></li>
+<li><span>  </span></li>
+<li><span>procedure previsit(v)   </span></li>
+<li><span>pre[v] = clock   </span></li>
+<li><span>clock = clock+</span><span class="number">1</span><span>  </span></li>
+<li><span>  </span></li>
+<li><span>procedure postvisit(v)   </span></li>
+<li><span>post[v] = clock   </span></li>
+<li><span>clock = clock+</span><span class="number">1</span><span>  </span><br></li></ol></div><br>上面的代码就是这章里面所用到的所有代码了，也是DFS的整个代码，首先对于每个点，如果没有被访问过，那么就从这个点开始进行DFS，也就是explore过程，explore过程中，会访问和当前点相连的所有点[即当前点的可达点]，previst和postvisit过程只是记录每个点的pre值和post值，这个值在某些方面还是很有用的，后面会说到。这整个DFS的时间复杂度是O(V+E)的，每个点和每条边都只访问一次。
+
+<p>在有向图中，对边进行了一些其他的定义<br>Tree edges: 指向儿子节点的边<br>Forward edges：从一个点指向非儿子后继节点的边<br>Back edges：  从一个点指向其祖先节点的边<br>Cross edges： 既不指向后继节点也不指向祖先节点的边</p>
+<p>对于不同的边，这些点的pre值和post值的关系如下所示<br>pre/post ordering for(u,v)                                                  Edge type<br>pre[u]           pre[v]               post[v]              post[u]        tree/forward<br>pre[v]           pre[u]               post[u]              post[v]        back<br>pre[v]           post[v]             pre[u]                post[u]        cross</p>
+<p>接下来将的是DAG[directed acyclic graphs]也就是有向无环图。在DAG中，每个点的后继节点的post值都会比当前节点的小，每个DAG至少有一个源点，一个汇点。DAG延伸出来的就是强联通分量了。</p>
+<p>对于有向图，对所有的<u,v>对 in V，都有从u到v的路径，那么就是强联通图，这里&lt;1,2&gt;和&lt;2,1&gt;表示不同的顶点对。如果我们从一个有向图的汇联通分量中的某个点开始进行DFS搜索的话，那么最后会且仅会把整个汇联通分量的点都找出来。这样的话我们如果知道某个汇联通分量里面的一个点，那么就可以知道整个汇联通分量，现在的问题是(I)怎么知道汇联通分量里面的一个点，和(II)求得一个汇联通分量之后要怎么做？</u,v></p>
+<p>我们知道对于汇点[把联通分量缩成一个点]来说，我们没有好的方法可以容易，轻松的求得，但是对于源点我们就有比较简单的方法可以得到。首先我们可以知道，如果一个点的post值最高的话，那么这个点一定是源点，这个可以从两方面来证明，如果C和C’是图的两个联通分量，且有一条从C到C‘的边，那么C中的所有点的post值的最大值一定回比C’中所有点的post值的最大值要大。因为，如果我们的DFS是从C中开始的话，那么开始的那个点的post值比C‘中所有点的post值都要大；如果是从C’中开始搜索的话，那么先搜索完整个C‘联通分量，然后再搜索C联通分量，这样的话，所有在C中的点的post值比在C’中的点的post值都要大。到此得证。知道这个之后，我们就可以解决问题(I)了，我们可以把有向图反向之后，进行一次DFS，这样的话，post值最大的一定是反向之后的源点，也就是原图的汇点了。对于问题(II)那么我们可以先把找出来的联通分量去掉，然后再在剩余的点中找post值最大的，这个点一定是剩下的图中的汇点，上面的证明可以保证这一点。</p>
+<p>所以对于寻找一个图的强联通分量来说，我们只需要对图反向，然后在反向图中进行一次DFS，得到所有点的post值，然后根据post值从大到小的顺序在原图上进行一次DFS，这样就可以得到整个图的所有联通分量了。总时间还是线性的，就相当于2次DFS所用的时间。</p>
+<p>接下来是后面几个习题，这几个习题是在这本书的网站上找的几个习题，并不是书中所有的习题。</p>
+<p>1.给出一个图，要标出每个点的pre/post值。<br>这个只需要细心一点就行来</p>
+<p>2.对于一个给定的图，用线性的方法把图进行反向。<br>这个可以循环所有点v，对<v,u> in E把v加到u的出边就行了，这样我们只需要循环每个点，每条边1次，所以是线性的</v,u></p>
+<p>3.证明，无向图中，所有点的度数和是边数的2倍<br>每条边对两个点共享来度数，总的来说就变成来所有点的度数和是边数的2倍</p>
+<p>4.在无向图中，计算每个点的邻接点的数目<br>这个直接循环所有点就行来，对于边<u,v>那么u点的邻接点和v点的邻接点都+1就行来。</u,v></p>
+<p>5.用非递归的方法实现explore</p>
+<div class="dp-highlighter">
+
+<ol>
+<li><span><span>procedure explore(G, u)   </span></span></li>
+<li><span>  </span></li>
+<li><span>S = (empty stack)   </span></li>
+<li><span>push(S, u)   </span></li>
+<li><span class="keyword">while</span><span> S is not empty:   </span></li>
+<li><span>     v = top(S)   </span></li>
+<li><span>     </span><span class="keyword">if</span><span> not visited[v]:   </span></li>
+<li><span>        visited[v] = </span><span class="keyword">true</span><span>   </span></li>
+<li><span>        previsit(v)   </span></li>
+<li><span>     </span><span class="keyword">if</span><span> there is an edge (v, w) in E with visited[w] = </span><span class="keyword">false</span><span>:   </span></li>
+<li><span>        push(S, w)   </span></li>
+<li><span>     </span><span class="keyword">else</span><span>:    (we’re done with v, the node at the top of the stack)   </span></li>
+<li><span>          pop(S)   </span></li>
+<li><p><span>          postvisited(v)  </span><br></p></li></ol></div><br>6.某学校需要对课表进行安排，某些课必须在另外一些课的前面上。每个学生每学期选多少门课都没关系，问对于给定的所有课之间的关系，同一个人至少需要多少个学期，才能把所有的课修完。<br>首先我们可以用线性时间计算出每个点的入度，并把入度为0 的点加到队列currL中。然后利用如下过程可以处理剩下的问题，下面的过程中in表示每个点的入度，currL表示当前入度为0的点<p></p>
+<div class="dp-highlighter">
+
+<li><p><span><span>time = </span><span class="number">0</span><span>  </span></span></p>
+</li>
+<li><span>repeat until currL is empty:   </span></li>
+<li><span>    time = time + </span><span class="number">1</span><span>  </span></li>
+<li><span>    nextL = empty list   </span></li>
+<li><span>    </span><span class="keyword">for</span><span> all u in currL:   </span></li>
+<li><span>       </span><span class="keyword">for</span><span> all (u, w) in E   </span></li>
+<li><span>          in[w] = in[w] - </span><span class="number">1</span><span>  </span></li>
+<li><span>          </span><span class="keyword">if</span><span>(in[w] is </span><span class="number">0</span><span>)   </span></li>
+<li><span>             add w to nextL   </span></li>
+<li><span>    currL = nextL   </span></li>
+<li><span>output time  </span><br></li></div><br>这样，我们得到的还是线性的时间复杂度。<br>另外还想了一种为经过验证的方法[私以为是正确的]，先对图跑一次DFS，然后把所有点然post值降序排列起来，然后，对排好序的点进行扫描，如果相邻的两个点u,v之间有一条边u-&gt;v的话，那么学期数就需要加1[初始化为1]，这样的话，最后的数目就是所有的学期数了。
+
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2013/07/28/algorithms-chapter-4-and-some-exercises/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2013/06/21/linux-command-shell-scripts-3/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2013-07-20 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/Algorithm/">Algorithm<span>14</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/algorithm/">algorithm<span>14</span></a></li> <li><a href="/tags/dag/">dag<span>1</span></a></li> <li><a href="/tags/DFS/">DFS<span>2</span></a></li> <li><a href="/tags/scc/">scc<span>1</span></a></li> <li><a href="/tags/top排序/">top排序<span>2</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

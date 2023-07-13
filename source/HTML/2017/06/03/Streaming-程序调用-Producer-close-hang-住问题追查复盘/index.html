@@ -1,0 +1,417 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Streaming 程序调用 Producer.close hang 住问题追查复盘 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Streaming 程序调用 Producer.close hang 住问题追查复盘"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Streaming 程序调用 Producer.close hang 住问题追查复盘</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>本文作为一个问题追查过程的复盘记录，主要希望找出自己在解决问题中可以优化改进的地方。以后遇到问题，能够快速的进行定位，解决。</p>
+<a id="more"></a>
+<h2 id="问题现象"><a href="#问题现象" class="headerlink" title="问题现象"></a>问题现象</h2><p>一个 Spark Streaming 作业从 Kafka 消费数据，写往 ES，在 Spark Streaming 作业中会采集一些 metric 指标发往一个特定的 topic A。每次往 A 发送完数据后会调用 <code>producer.close()</code> 方法，看到的现象为：作业启动一段时间之后 hang 住，类似下图</p>
+<img src="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/hang_job.jpg" alt="hang_job.jpg" title="">
+<h2 id="排查问题的过程"><a href="#排查问题的过程" class="headerlink" title="排查问题的过程"></a>排查问题的过程</h2><ol>
+<li>看到现象后，知道作业 hang 住了，希望能找到为什么 hang 住。找到该作业的 executor 地址（如下图所示）</li>
+</ol>
+<img src="/2017/06/03/Streaming-程序调用-Producer-close-hang-住问题追查复盘/executor.jpg" alt="executor.jpg" title="">
+<p>然后登录到机器上，通过 lsof 查看对应的进程，再通过 jstack dump 出具体的线程栈信息。由于第一次解决线程 hang 住的问题，得到栈信息后，暂时无从下手，然后 google <code>jvm 线程 hang 住</code> 等关键词，检查死锁 – 发现没有。</p>
+<p>发现线程有 <code>RUNNABLE</code>，<code>WAITING</code>，<code>TIMED_WAITING</code> 等状态，然后一个个查看这些状态分别代表啥意思。到这就不知道怎么继续了 – 中间在 Spark Streaming 微信群里请教各路大神，有人说遇到链接关不掉的情况 – 多次重复查看 jstack 出来的信息，发现有一个 WAITING 线程在等待锁，具体如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">java.lang.Thread.State: WAITING (on object monitor)</div><div class="line">        at java.lang.Object.wait(Native Method)</div><div class="line">        - waiting on &lt;0x00000000c52cfba0&gt; (a org.apache.kafka.common.utils.KafkaThread)</div><div class="line">        at java.lang.Thread.join(Thread.java:1281)</div><div class="line">        - locked &lt;0x00000000c52cfba0&gt; (a org.apache.kafka.common.utils.KafkaThread)</div><div class="line">        at java.lang.Thread.join(Thread.java:1355)</div><div class="line">        at org.apache.kafka.clients.producer.KafkaProducer.close(KafkaProducer.java:422)</div><div class="line">        at org.elasticsearch.hadoop.rest.KafkaProducer.close(DSLKafkaProducer.java:60)</div></pre></td></tr></table></figure>
+<p>然后对照到代码，在 Producer.close() 中有一句代码如下 <code>ioThread.join()</code>，猜测是 ioThread 一直没有执行完毕导致的。</p>
+<ol>
+<li><p>注释掉 producer.close() 这一句代码之后，重新上线运行 Spark Streaming 作业，发现没有再次出现问题。大致确定问题出在 <code>producer.close()</code> 这里。但是不确定更深层次的问题是啥。期间猜测是由于 producer 发送数据的时候需要有 leader 确认（配置有关），然后将这个配置修改为无需 leader 确认立即返回，但是依然会导致作业 hang 住。然后阅读源码，发现 <code>producer.close()</code> 方法做了两件事：1）将还未发送出去的数据发送出去，2）等待正在发送的数据完成。暂时没有找到造成 <code>ioThread</code> 线程 hang 住的原因。暂时不知道具体 hang 住的地方在哪，至此暂时告一段落。</p>
+</li>
+<li><p>再次跟进该问题，尝试找出造成线程 hang 住的原因，尝试 jdb attach 到具体的线程。得到如下信息：</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&gt; thread 0x1</div><div class="line">kafka-producer-network-thread | producer-12[1] where</div><div class="line">	  [1] sun.nio.ch.EPollArrayWrapper.epollWait (native method)</div><div class="line">	  [2] sun.nio.ch.EPollArrayWrapper.poll (EPollArrayWrapper.java:269)</div><div class="line">	  [3] sun.nio.ch.EPollSelectorImpl.doSelect (EPollSelectorImpl.java:79)</div><div class="line">	  [4] sun.nio.ch.SelectorImpl.lockAndDoSelect (SelectorImpl.java:87)</div><div class="line">	  [5] sun.nio.ch.SelectorImpl.select (SelectorImpl.java:98)</div><div class="line">	  [6] org.apache.kafka.common.network.Selector.select (Selector.java:328)</div><div class="line">	  [7] org.apache.kafka.common.network.Selector.poll (Selector.java:218)</div><div class="line">	  [8] org.apache.kafka.clients.NetworkClient.poll (NetworkClient.java:192)</div><div class="line">	  [9] org.apache.kafka.clients.producer.internals.Sender.run (Sender.java:191)</div><div class="line">	  [10] org.apache.kafka.clients.producer.internals.Sender.run (Sender.java:135)</div><div class="line">	  [11] java.lang.Thread.run (Thread.java:745)</div></pre></td></tr></table></figure>
+<p>到这里暂时不知道该怎么继续往下查了，知道在这里 hang 住了，但是暂时不知道怎么继续往下查，看着屏幕发呆，然后想着这个问题或许别人也遇到过，就从上面的 栈信息 中抽取一部分关键词进行 google，得到信息在 kafka 0.8.2.1 中 producer.close() 在某些情况下会 hang 住，详情参考 <a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-19+-+Add+a+request+timeout+to+NetworkClient" target="_blank" rel="external">KIP-19</a>，在 kafka 0.9.0.0 中提供一个带超时的 close 方法进行修复。</p>
+<h2 id="问题复盘"><a href="#问题复盘" class="headerlink" title="问题复盘"></a>问题复盘</h2><ol>
+<li><p>在知道作业 hang 住的情况，又不了解相应调试的情况下，能否快速了解定位问题的方法，能否询问其他人快速的定位问题，或者如何通过搜索引擎快速的获取自己需要的知识。这里自己有个小私心 – 觉得这是测试的作业，想保留现场，通过自己的努力完全把问题解决，好提升自己的能力。另外自己如何在平时积累一些查问题的经验（这次发现官方文档真是个好东西）</p>
+</li>
+<li><p>通过微信群询问是一个方法，但是提问需要有技巧，要能够提炼出自己的问题，以及自己进行了哪些尝试，有什么思考，而不是做伸手党。</p>
+</li>
+<li>为什么到最后才想着 Google 相关信息，而不是在知道 producer.close() 导致作业 hang 住的时候就 Google 相关信息。</li>
+<li>对 Java 排查问题的工具非常不熟练，在平时需要自己模拟各种 case 进行练手。jstack, jvisualvm, jdb 等都是第一次使用，这些工具需要在平时进行熟练。</li>
+<li>对常见的库或通用的写法要有一定的了解，比如看到 <code>org.apache.kafka.common.network.Selector.poll</code> 是否能想到没有超时而导致一直 hang 住，这些平时需要积累（思考这个怎么积累？）</li>
+</ol>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2017/06/20/风险不仅仅是事件发生的概率/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2017/06/01/如何在不重启-Spark-Streaming-作业的情况下，增加消费的-topic/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2017-06-03 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/实时计算/">实时计算<span>7</span></a></li> <li><a href="/categories/实时计算/复盘/">复盘<span>1</span></a></li> <li><a href="/categories/实时计算/复盘/problem-solve/">problem_solve<span>1</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/spark/">spark<span>8</span></a></li> <li><a href="/tags/spark-streaming/">spark_streaming<span>5</span></a></li> <li><a href="/tags/kafka/">kafka<span>10</span></a></li> <li><a href="/tags/thinking/">thinking<span>2</span></a></li> <li><a href="/tags/problem-solve/">problem_solve<span>2</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	   <a data-toggle="collapse" data-target="#toc"><i class="fa fa-bars"></i></a>
+	   <div id="toc" class="toc collapse in">
+			<ol class="toc-article"><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#问题现象"><span class="toc-article-text">问题现象</span></a></li><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#排查问题的过程"><span class="toc-article-text">排查问题的过程</span></a></li><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#问题复盘"><span class="toc-article-text">问题复盘</span></a></li></ol>
+		</div>
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>
