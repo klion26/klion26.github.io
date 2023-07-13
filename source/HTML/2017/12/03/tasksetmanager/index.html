@@ -1,0 +1,414 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>tasksetmanager | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="tasksetmanager"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> tasksetmanager</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">* Schedules the tasks within a single TaskSet in the TaskSchedulerImpl. This class keeps track of</div><div class="line">* each task, retries tasks if they fail (up to a limited number of times), and</div><div class="line">* handles locality-aware scheduling for this TaskSet via delay scheduling. The main interfaces</div><div class="line">* to it are resourceOffer, which asks the TaskSet whether it wants to run a task on one node,</div><div class="line">* and statusUpdate, which tells it that one of its tasks changed state (e.g. finished).</div><div class="line">*</div><div class="line">* THREADING: This class is designed to only be called from code with a lock on the</div><div class="line">* TaskScheduler (e.g. its event handlers). It should not be called from other threads.</div><div class="line">*</div><div class="line">* @param sched           the TaskSchedulerImpl associated with the TaskSetManager</div><div class="line">* @param taskSet         the TaskSet to manage scheduling for</div><div class="line">* @param maxTaskFailures if any particular task fails this number of times, the entire</div><div class="line">*                        task set will be aborted</div><div class="line">*/</div></pre></td></tr></table></figure>
+<p><code>TaskSetManager</code> 负责某个 TaskSet 的调度，对该 TaskSet 的所有 task 进行跟踪，如果有失败的 task，会负责重试（重试有上限），并且通过 delay scheduling（可以想想这个怎么实现的？） 实现 locality  locality-aware scheduling. 主要的接口有 <code>resourceOffer</code> – 用于判断一个 TaskSet 中的 task 是否需要运行到某个 node 上，<code>statusUpdate</code> – 用于跟踪 task 的状态变化。不是线程安全的。</p>
+<a id="more"></a>
+<p><code>dequeeTaskFromList(execId: String, list: ArrayBuffer[Int]): Option[Int]</code> 负责从对应的 list 中删除返回一个 pending Task，如果没有合适的 Task 就返回 None，该 function 中会将那些已经运行的 task 进行删除，会跳过所有的不能在对应 execId 上运行的 task（通过 executorIsBlacklisted(execId, index) 进行判断）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">while (indexOffset &gt; 0) &#123;</div><div class="line">	indexOffset -= 1</div><div class="line">	val index = list(indexOffset)</div><div class="line">	if (!executorIsBlacklisted(execId, index)) &#123;</div><div class="line">		// This should almost always be list.trimEnd(1) to remove tail</div><div class="line">		list.remove(indexOffset)</div><div class="line">		if (copiesRunning(index) == 0 &amp;&amp; !successful(index)) &#123;</div><div class="line">			return Some(index)</div><div class="line">	    &#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>dequeueTask(execId: String, host: String, maxLocality: TaskLocality.Value): Option[(Int, TaskLocality.Value, Boolean)])</code> 删除并返回一个可执行的 task，只返回符合 locality 约束的 task。首先逐个 locality 进行查找，如果有符合的 task 直接返回，否则返回一个合适的 推测执行的 task</p>
+<p><code>executorIsBlacklisted(execId: String, taskId: Int): Boolean</code> 进行判断某个 execId 上能否运行对应的 task（如果之前这个 taskId 在这个 execId 上运行失败了，而且当前时间和之间失败的时间差小于阈值 <code>EXECUTOR_TASK_BLACKLIST_TIMEOUT</code>）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">def executorIsBlacklisted(execId: String, taskId: Int): Boolean = &#123;</div><div class="line">	if (failedExecutors.contains(taskId)) &#123;</div><div class="line">		val failed = failedExecutors.get(taskId).get</div><div class="line"></div><div class="line">		return failed.contains(execId) &amp;&amp;</div><div class="line">		clock.getTimeMillis() - failed.get(execId).get &lt; EXECUTOR_TASK_BLACKLIST_TIMEOUT</div><div class="line">	&#125;</div><div class="line"></div><div class="line">    false</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>dequeueSpeculativeTask(execId: String, host: String, locality: TaskLocality.Value): Option[(Int, TaskLocality.Value)]</code> 负责删除并返回一个 推测执行的 task，如果没有合适的就返回 None。逻辑就是遍历所有 task，然后看 task 是否能运行在特定的 TaskLocality 上，如果可以就返回，并且将该 task 从推测执行的 task list 中删除。TaskLocality 的顺序为 <code>{PROCESS_LOCAL, NODE_LOCAL, NO_PREF, RACK_LOCAL, ANY}</code></p>
+<p>如何实施推测执行，逻辑在 <code>checkSpeculatableTasks</code> 函数中，</p>
+<ol>
+<li>如果该 TaskSetManager 变为 zoombie 了，或者只包含一个 task，就不推测执行（为什么一个 task 就不推测执行）</li>
+<li>如果完成的 task 数大于等于 <code>minFinishedForSpeculation = (SPECULATION_QUANTILE * numTasks).floor.toInt</code>（其中 <code>SPECULATION_QUANTILE</code> 默认 0.75，可以通过 <code>spark.speculation.quantile</code> 设置）且有 task 成功执行过，则执行下面的步骤</li>
+<li>将所有执行成功的 task 的执行时间进行排序，取第 <code>val medianDuration = durations(min((0.5 * tasksSuccessful).round.toInt, durations.size - 1))
+val threshold = max(SPECULATION_MULTIPLIER * medianDuration, 100)</code>  threshold 作为临界值，对每个 task 进行检测。</li>
+<li>如果该 task 还没有运行成功，运行时间超过 <code>threshold</code>，只有一个实例在跑，而且没有推测执行过，就进行推测执行</li>
+<li>推测执行保证同一个 task 的不同实例不会调度到同一台主机上，且不会调度到以及被加进黑名单的主机中</li>
+</ol>
+<p><code>resourceOffer（execId: String,host: String,maxLocality:TaskLocality.TaskLocality): Option[TaskDescription]</code> 负责资源的实际分配，如果当前 taskSetManager 不是 zoombie 状态才进行处理。首先找出当前时间可以被调度到的最高 Locality，然后使用 <code>dequeuTask</code> 删除并找到一个符合条件的 task，如果找到就更新相关的状态数据（包括，更新现在正在运行的 task 有哪些，更新当前的 locality，然后将 task 所需要的文件等序列化，附加到一个 TaskDescription 结构中并且返回），并且通知 DAGScheduler 该 task 已经开始运行。如果序列化有问题，则直接抛异常。</p>
+<p><code>getAllowedLocalityLevel(curTime: Long): TaskLocality.TaskLocality</code> 获取当前时间对应的一个 TaskLocality, 这里面会有时间等待（等待的时间就是每个 TaskLocality 的等待时间，默认 3s，可以配置）</p>
+<p><code>handleTaskGettingResult</code> 主要进行状态标记，然后通知 DAGScheduler<br><code>canFetchMoreResults(size: Long): Boolean</code> 检测是否还能 fetch size 字节大小已经序列化后的数据，如果不能，就将该 taskSetManger 标记为 zoombie，并且通知 DAGScheduler 该 TaskSet 为失败</p>
+<p><code>handleSuccessfulTask(tid: Long, result: DirectTaskResult[_]): Unit</code> 负责将一个 task 标记为成功，并且如果当前 TaskSet 所有 task 都运行完成，就标记为 zoombie 状态，并且通知 DAGScheduler。</p>
+<p><code>handleFailedTask(tid: Long, state: TaskState, reason: TaskEndReason)</code> 将task 标记为失败，并且重新添加到 pendingTask 队列中，然后通知 DAGScheduler。根据失败的信息不同，做不同的处理：</p>
+<ol>
+<li>FetchFailure：直接想当前的 <code>tasksetManager</code> 标记为 zoombie，然后做一定的清理工作，就把当前的 <code>tasksetManager</code> 标记为成功</li>
+<li>ExceptionFailure：如果是 <code>NotSerializableException</code> 就直接退出，否则会打印相应异常，然后进行重试</li>
+<li>其他的异常，打印日志</li>
+</ol>
+<p><code>executorLost(execId: String, host: String, reason: ExecutorLossReason)</code> 负责处理 executorLost 的情况，由 taskSchedulerImp 调用。逻辑如下</p>
+<ul>
+<li>如果是 <code>ShufflleMapTask</code> 且没有开启 <code>externalShuffleServiceEnabled</code> 就进行如下操作：如果 task 以及成功了，就将这些 task 标记为失败，且进行重试（因为后续的 task 需要从这些 task 中获取数据）</li>
+<li>如果是其他的，就直接调用 <code>handleFailedTask</code> 进行处理，然后重新计算 <code>locality</code></li>
+</ul>
+<p><code>getLocalityWait(level: TaskLocality.TaskLocality): Long =</code> 用于获取 locality, 代码如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">val defaultWait = conf.get(&quot;spark.locality.wait&quot;, &quot;3s&quot;)</div><div class="line">val localityWaitKey = level match &#123;</div><div class="line">	case TaskLocality.PROCESS_LOCAL =&gt; &quot;spark.locality.wait.process&quot;</div><div class="line">	case TaskLocality.NODE_LOCAL =&gt; &quot;spark.locality.wait.node&quot;</div><div class="line">	case TaskLocality.RACK_LOCAL =&gt; &quot;spark.locality.wait.rack&quot;</div><div class="line">	case _ =&gt; null</div><div class="line">&#125;</div><div class="line"></div><div class="line">if (localityWaitKey != null) &#123;</div><div class="line">	conf.getTimeAsMs(localityWaitKey, defaultWait)</div><div class="line">&#125; else &#123;</div><div class="line">	0L</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="疑问："><a href="#疑问：" class="headerlink" title="疑问："></a>疑问：</h3><ol>
+<li>推测执行的时候，为什么 TaskSet 只有 1 个 task 的话就不推测执行</li>
+<li>推测执行对每个 task 只会进行一次？<br> a. 可以被 推测执行多次，只执行一次的逻辑是使用 <code>speculatableTasks</code> 做检测的，当运行一个 推测执行的 task 后，该 task 就会从 <code>speculatableTasks</code> 进行删除，然后就可以进行推测执行了。严格的说法是，只运行同一个 task 的一个实例在“排队等待被推测执行”</li>
+<li>每个 task 的 <code>preferredLocations</code> 怎么得到的？根据什么规则？每一个的含义又是什么，总共有 <code>{PROCESS_LOCAL, NODE_LOCAL, NO_PREF, RACK_LOCAL, ANY}</code> 这些可选项</li>
+<li>每个 TaskSet 的所有 task 都是一样的 locality？</li>
+<li>推测执行的时候，如果最后执行成功多个 task，会对结果有影响吗？怎么规避这种影响的</li>
+</ol>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2017/12/22/millwheel/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2017/11/27/TaskScheduler/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2017-12-03 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/spark/">spark<span>8</span></a></li> <li><a href="/tags/source-code/">source_code<span>3</span></a></li> <li><a href="/tags/tasksetmanager/">tasksetmanager<span>1</span></a></li> <li><a href="/tags/task/">task<span>1</span></a></li> <li><a href="/tags/stage/">stage<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

@@ -1,0 +1,88 @@
+<html>
+<head>
+   <meta charset="UTF-8" />
+   <title>State Benchmark Result</title>
+   <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+   <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+<div id="container" style="width: 550px; height: 400px; margin: 0 auto"></div>
+<script language="JavaScript">
+$(document).ready(function() {
+   var title = {
+      text: 'List Benchmark'   
+   };
+   var subtitle = {
+      text: 'Source: JMH benchmark'
+   };
+   var xAxis = {
+      title: {
+        text: 'statename length'
+      },
+      categories: ['0', '1', '2', '5', '10', '15', '20']
+   };
+   var yAxis = {
+      title: {
+         text: 'score'
+      },
+      plotLines: [{
+         value: 0,
+         width: 1,
+         color: '#808080'
+      }]
+   };   
+
+   var tooltip = {
+   }
+
+   var legend = {
+      layout: 'vertical',
+      align: 'right',
+      verticalAlign: 'middle',
+      borderWidth: 0
+   };
+
+   var series =  [
+      {
+         name: 'listAdd',
+         data: [512, 497, 484, 491, 479, 463, 453]
+      }, 
+      {
+         name: 'listAddAll',
+         data: [279, 254, 241, 228, 229, 222, 223]
+      },
+      {
+         name: 'listAppend',
+         data: [489, 476, 485.22, 467, 447, 445, 443]
+      },
+	   {
+         name: 'listGet',
+         data: [130, 114, 113.13, 111, 99, 90.25, 88.89]
+      },
+	   {
+         name: 'listGetAndIterate',
+         data: [130.15, 112.71, 112.84, 109.06, 97.80, 88.92, 88.99]
+      },
+	   {
+         name: 'listUpdate',
+         data: [511.61, 514.49, 478.06, 491.85, 464.62, 463.49, 456.33]
+      },
+   ];
+
+   var json = {};
+
+   json.title = title;
+   json.subtitle = subtitle;
+   json.xAxis = xAxis;
+   json.yAxis = yAxis;
+   json.tooltip = tooltip;
+   json.legend = legend;
+   json.series = series;
+
+   $('#container').highcharts(json);
+   $('#container').highcharts(json);
+});
+</script>
+</body>
+</html>
+

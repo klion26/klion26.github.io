@@ -1,0 +1,510 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java 内存泄漏分析和对内存设置 | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Java 内存泄漏分析和对内存设置"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Java 内存泄漏分析和对内存设置</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <h1 id="1-内存泄漏的背景知识"><a href="#1-内存泄漏的背景知识" class="headerlink" title="1 内存泄漏的背景知识"></a>1 内存泄漏的背景知识</h1><p>为了判断 Java 中是否有内存泄漏，我们首先必须了解 Java 是如何管理内存的。下面我们先给出一个简单的内存泄漏的例子，在这个例子中我们循环申请 Object 对象，并将所申请的对象放入一个 HashMap 中，如果我们仅仅释放引用本身，那么 HashMap 仍然引用该对象，所以这个对象对 GC 来说是不可回收的。</p>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">HashMap mapObj = new HashMap()</div><div class="line">	  </div><div class="line">	public void myfun() &#123;</div><div class="line">		String obj1 = new String(&quot;abcd&quot;);</div><div class="line">		mapObj.put(obj1, obj1);</div><div class="line">		...</div><div class="line">		obj1 = null;   //此时 obj1 指向的物理内存没有释放，因为 hashmap 引用该地址</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>JVM 可以自动回收垃圾，但它只能回收满足条件的垃圾，有时需要们确保条件的满足。如果程序中，存在越来越多不在影响程序未来执行的对象（也就是不再需要的对象），而且这些对象和根对象之间存在引用路径，那么就发生了内存泄漏。</p>
+<p>内存泄漏常发生在如下场景：</p>
+<ul>
+<li>全局容器类，对象不再需要时，忘记从容器中 remove</li>
+<li>像 Runnable 对象等被 Java 虚拟机自身管理的对象，没有正确的释放渠道。Runnable 对象必须交给一个 Thread 去 run，否则该对象就永远不会消亡</li>
+</ul>
+<h2 id="1-1-Java-对象的-Size"><a href="#1-1-Java-对象的-Size" class="headerlink" title="1.1 Java 对象的 Size"></a>1.1 Java 对象的 Size</h2><p>在 64 位的平台上，Java 对象的占用内存如下</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>大小</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Object</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Float</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>24</td>
+</tr>
+<tr>
+<td>Integer</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>24</td>
+</tr>
+</tbody>
+</table>
+<h2 id="1-2-对象及其引用"><a href="#1-2-对象及其引用" class="headerlink" title="1.2 对象及其引用"></a>1.2 对象及其引用</h2><p>为了说明对象和引用，我们先定义一个简单的类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">class Person &#123;</div><div class="line">	String name;</div><div class="line">	int age;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Person p1 = new Person() 包含如下几个动作</p>
+<ol>
+<li>右边的 new Person 在堆空间分配一块内存，创建一个 Person 类对象</li>
+<li>末尾的 () 意味着创建对象之后，立即调用构造函数，进行初始化</li>
+<li>左边的 Person p1 创建了一个引用变量，所谓引用变量，就是后来用于指向 Person 类示例的引用</li>
+<li>= 符号使刚刚创建的对象引用指向刚刚创建的对象<br>上面的代码如下所示：</li>
+</ol>
+<img src="/2018/03/14/Java-内存泄漏分析和对内存设置/image1.png" alt="image1.png" title="">
+<p>如果再将对象赋值给 p2 的话，变成下面这样的</p>
+<img src="/2018/03/14/Java-内存泄漏分析和对内存设置/image2.png" alt="image2.png" title="">
+<p>执行 p2 = new Person() 之后变成</p>
+<img src="/2018/03/14/Java-内存泄漏分析和对内存设置/image3.png" alt="image3.png" title="">
+<h2 id="1-3-虚拟机垃圾自动回收机制"><a href="#1-3-虚拟机垃圾自动回收机制" class="headerlink" title="1.3 虚拟机垃圾自动回收机制"></a>1.3 虚拟机垃圾自动回收机制</h2><p>垃圾自动回收做两件事情：</p>
+<ol>
+<li>标记垃圾</li>
+<li>清除垃圾</li>
+</ol>
+<p>标记过程现在主要使用 根可达性 分析（还有引用计数法等），清除之后可能会有一些小的内存快，所有还有压缩的过程。</p>
+<p>下图中的灰色对象表示可以被回收的对象（根不可达）</p>
+<img src="/2018/03/14/Java-内存泄漏分析和对内存设置/image4.png" alt="image4.png" title="">
+<p>哪些对象可以成为 根 呢？ <a href="http://help.eclipse.org/luna/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fgcroots.html&amp;cp=37_2_3" target="_blank" rel="external">http://help.eclipse.org/luna/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fgcroots.html&amp;cp=37_2_3</a></p>
+<ul>
+<li>没有被任何外部对象引用的栈上的对象</li>
+<li>静态变量</li>
+<li>JNI handler 包括全局和局部</li>
+<li>系统 Class</li>
+<li>存活着的监视器</li>
+</ul>
+<h1 id="2-内存泄漏的症状"><a href="#2-内存泄漏的症状" class="headerlink" title="2 内存泄漏的症状"></a>2 内存泄漏的症状</h1><h2 id="2-1-为什么会发生-OOM-问题？"><a href="#2-1-为什么会发生-OOM-问题？" class="headerlink" title="2.1 为什么会发生 OOM 问题？"></a>2.1 为什么会发生 OOM 问题？</h2><p>内存不足会有三种情况：</p>
+<ul>
+<li>对内存不足</li>
+<li>本地内存不足</li>
+<li>Perm 内存不足</li>
+</ul>
+<p>发生 OOM 的时候，可以检查如下几个方面：</p>
+<ul>
+<li>应用程序的缓存功能</li>
+<li>大量长期活动对象</li>
+<li>对内存泄漏</li>
+<li>本地内存泄漏</li>
+</ul>
+<h2 id="2-2-内存泄漏的症状"><a href="#2-2-内存泄漏的症状" class="headerlink" title="2.2 内存泄漏的症状"></a>2.2 内存泄漏的症状</h2><p>内存泄漏一般会有如下几个症状：</p>
+<ul>
+<li>系统越来越慢，并且有 CPU 使用率过高</li>
+<li>运行一段时间后，OOM</li>
+<li>虚拟机 core dump</li>
+</ul>
+<h1 id="3-内存泄漏的定位和分析"><a href="#3-内存泄漏的定位和分析" class="headerlink" title="3 内存泄漏的定位和分析"></a>3 内存泄漏的定位和分析</h1><p>内存泄漏的分析并不复杂，但需要耐心，一般内存泄漏只能事后分析，而重现问题需要耐心。</p>
+<h2 id="3-1-对内存泄漏定位"><a href="#3-1-对内存泄漏定位" class="headerlink" title="3.1 对内存泄漏定位"></a>3.1 对内存泄漏定位</h2><p>当出现 java.lang.OutOfMemoryError: Java Heap Space 异常，就表示堆内存不足了。堆内存不足的原因有如下几种：</p>
+<ul>
+<li>堆内存设置太小</li>
+<li>内存泄漏</li>
+<li>设计不足，缓存了多余的数据</li>
+<li>如果怀疑有内存泄漏，可以添加 -verbose:gc 参数后重现启动 Java 进程，输出大致如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">8190.813: [GC 164675K-&gt;251016K(1277056K), 0.0117749 secs] #8190.813 表示垃圾回收的时间点，秒为单位。GC/Full GC 表示垃圾回收的类型</div><div class="line">8190.825: [Full GC 251016K-&gt;164654K(1277056K), 0.8142190 secs]   # 251016K表示回收前占用的内存大小，164654K 表示回收后占用的内存大小，1277056K 表示当前对内存总大小，0.8142190 表示回收耗时</div><div class="line">8191.644: [GC 164678K-&gt;251214K(1277248K), 0.0123627 secs]</div><div class="line">8191.657: [Full GC 251214K-&gt;164661K(1277248K), 0.8135393 secs]</div><div class="line">8192.478: [GC 164700K-&gt;251285K(1277376K), 0.0130357 secs]</div><div class="line">8192.491: [Full GC 251285K-&gt;164670K(1277376K), 0.8118171 secs]</div><div class="line">8193.311: [GC 164726K-&gt;251182K(1277568K), 0.0121369 secs]</div><div class="line">8193.323 : [Full GC 251182K-&gt;164644K(1277568K), 0.8186925 secs]</div><div class="line">8194.156: [GC 164766K-&gt;251028K(1277760K), 0.0123415 secs]</div><div class="line">8194.169: [Full GC 251028K-&gt;164660K(1277760K), 0.8144430 secs]</div></pre></td></tr></table></figure>
+<p>怀疑内存泄漏后，我们通过 Full GC 日志进一步确认，检查 Full GC  后的可用内存是否持续增大。步骤如下：</p>
+<ul>
+<li>获取系统稳定后的 GC 日志（不稳定的日志不可靠）</li>
+<li>过滤 FullGC 日志，可能会有如下两种情况<ul>
+<li>FullGC 后内存使用量持续增长，一直到设置的堆内存最大值，基本可以确定内存泄漏</li>
+<li>内存使用量增长后又回落，出于一个动态平衡区间，基本排除内存泄漏</li>
+</ul>
+</li>
+</ul>
+<p>GC 日志只能帮忙找到是否有泄漏，找出内存泄漏的地方，需要依赖一些其他的工具</p>
+<ul>
+<li>JProfile</li>
+<li>OptimizedIt</li>
+<li>JProbe</li>
+<li>JConsole</li>
+<li>-Xrunhprof </li>
+</ul>
+<h2 id="3-2-本地内存泄漏的定位"><a href="#3-2-本地内存泄漏的定位" class="headerlink" title="3.2 本地内存泄漏的定位"></a>3.2 本地内存泄漏的定位</h2><p>GC 日志无异常，但 Java 进程使用内存逐渐增大，并且无停止上涨的趋势。本地内存泄漏的原因有如下几个：</p>
+<ul>
+<li>JNI 调用中出现内存泄漏(JNI 调用出现内存泄漏，可以使用 C/C++ 内存泄漏分析方法定位)</li>
+<li>JDK bug</li>
+<li>操作系统问题</li>
+</ul>
+<p>本地内存泄漏可能伴有如下异常<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">java.lang.OutOfMemoryError: unable to create new native thread , Exception in thread &quot;main&quot; java.lang.OutOfMemoryError: unable to create new native thread</div><div class="line">      at java.lang.Thread.start0(Native Method)</div><div class="line">      at java.lang.Thread.start(Thread.java:574)</div><div class="line">      at TestThread.main(TestThread.java:34)</div></pre></td></tr></table></figure></p>
+<p>上面这个异常可能的原因有：</p>
+<ul>
+<li>创建的线程过多，可打印总线程数查看</li>
+<li>swap 分区不足</li>
+<li>堆内存过大，本地内存不足</li>
+</ul>
+<h2 id="3-3-Perm-区内存不足定位"><a href="#3-3-Perm-区内存不足定位" class="headerlink" title="3.3 Perm 区内存不足定位"></a>3.3 Perm 区内存不足定位</h2><p>出现 java.lang.OutOfMemoryError: PermGen space Perm ，说明 Perm 区内存不足</p>
+<ul>
+<li>依赖注入，没有卸载</li>
+<li>Perm 区太小</li>
+</ul>
+<h2 id="3-4-分析方法"><a href="#3-4-分析方法" class="headerlink" title="3.4 分析方法"></a>3.4 分析方法</h2><ol>
+<li>jmap -histo <java pid=""> &gt; objhist.log,  </java></li>
+<li>如果系统已经 OutOfMemory，可以使用  jmap-heap:format=b<javapid> 获取内存信息</javapid></li>
+<li>添加参数 -XX:+HeapDumpOnOutOfMemoryError-XX:HeapDumpPath=”$PATH” 当发生 OOM 时会收集相应信息</li>
+</ol>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2018/04/06/Flink-State/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2018/02/28/通过-Java-线程堆栈进行性能瓶颈分析/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2018-03-14 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/Java/">Java<span>3</span></a></li> <li><a href="/tags/内存/">内存<span>1</span></a></li> <li><a href="/tags/内存泄漏/">内存泄漏<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>
