@@ -1,0 +1,416 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Spark Streaming 从 Kafka 读取 binlog 转换成 Json | klion26</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="个人博客，记录自己成长的点点滴滴">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Spark Streaming 从 Kafka 读取 binlog 转换成 Json"/>
+  <meta property="og:site_name" content="klion26"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="klion26" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/bootstrap.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">klion26</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/resume" title="Resume">
+			  <i class=""></i>Resume
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Spark Streaming 从 Kafka 读取 binlog 转换成 Json</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>在开发 Spark Streaming 的公共组件过程中，需要将 binlog 的数据(Array[Byte])转换为 Json 格式，供用户使用，本文提供一种转换的思路。另外我们会用到几个辅助类，为了行文流畅，我们将辅助类的定义放在文章的最后面。如果</p>
+<p>如果本文有讲述不详细，或者错误指出，肯请指出，谢谢</p>
+<p>对于 binlog 数据，每一次操作(INSERT/UPDATE/DELETE 等）都会作为一条记录写入 binlog 文件，但是同一条记录可能包含数据库中的几行数据（这里比较绕，可以看一个具体的例子）</p>
+<p>在数据库中，有 id, name，age 三个字段，其中 id 为主键，name 随意, age 随意。有两行数据如下</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>age</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>john</td>
+<td>30</td>
+</tr>
+<tr>
+<td>2</td>
+<td>john</td>
+<td>40</td>
+</tr>
+</tbody>
+</table>
+<p>那么你进行操作</p>
+<p><pre class="lang:tsql decode:true  ">update table set age = 50 where name = “john”</pre><br>的时候，就会将两行的数据都进行更改，这两行更改的数据会在同一个 binlog 记录中，这一点会在后面的实现中有体现。</p>
+<p>下面，我们给出具体的代码，然后对代码进行分析</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">def desirializeByte(b: (String, Array[Byte])) : (String, String) = &#123; </div><div class="line">  val binlogEntry = BinlogEntryUtil.serializeToBean(b._2)   //将 Array[Byte] 数据转换成 com.meituan.data.binlog.BinlogEntry 类，相关类定义参考附录</div><div class="line"></div><div class="line">  val pkeys = binlogEntry.getPrimaryKeys.asScala   //获取主键，这里的 asScala 将 Java 的 List 转换为 Scala 的 List</div><div class="line">  val rowDatas : List[BinlogRow] = binlogEntry.getRowDatas.asScala.toList  //获取具体的信息</div><div class="line">  val strRowDatas = rowDatas.map(a =&gt; &#123;            //将获取到的具体信息进行转换，这里主要是将没一条信息的内容，转换 [(K1:V1,K2:V2...Kn:Vn)] 的形式，方面后面进行 Json 化</div><div class="line">    val b = a.getBeforeColumns.asScala    //获取 beforColumns</div><div class="line">    val c = a.getAfterColumns.asScala     //获取 afterColumns</div><div class="line">    val mb = b.map(d =&gt; (d._1, d._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值</div><div class="line">    val mc = c.map(c =&gt; (c._1, c._2.getValue))  //去掉所有不需要的信息，只保留每个字段的值</div><div class="line">    (mb, mc) //返回转换后的 beforeColumns 和 afterColumns</div><div class="line">  &#125;)</div><div class="line">  //下面利用 json4s 进行 Json 化</div><div class="line">  (binlogEntry.getEventType, compact(&quot;rowdata&quot; -&gt; strRowDatas.map&#123;</div><div class="line">    w =&gt; List(&quot;row_data&quot; -&amp;gt; (&quot;before&quot; -&amp;gt; w._1.toMap) ~ (&quot;after&quot; -&amp;gt; w._2.toMap))  //这里的两个 toMap 是必要的，不然里层会变成 List，这个地方比较疑惑的是，</div><div class="line">                                                                                 //w._1 按理是 Map类型，为什么还需要强制转换成 Map</div><div class="line">                                                                              //而且用 strRowDatas.foreach(x =&gt; println(s&quot;$&#123;x._1&#125;  $&#123;x._2&#125;&quot;)打印的结果表名是 Map</div><div class="line">  &#125;))&lt;/pre&gt;</div><div class="line">desirializeByte 函数传入 topic 中的一条记录，返回参数自己确定，我这里为了测试，返回一个 (String, String) 的 Tuple，第一个字段表示该条记录的 EventType（Insert/Update/Delete 等），第二个字段为 Json 化后的数据。</div><div class="line"></div><div class="line">BinlogEntryUtil.serilizeToBean 是一个辅助类，将 binlog 数据转化为一个 Java bean 类。</div><div class="line"></div><div class="line">第 4 行，我们得到表对应的主键，第 5 行获得具体的数据</div><div class="line"></div><div class="line">第 6 行到第 12 行是 Json 化之前的辅助工作，将所有不需要的东西给剔除掉，只留下字段，以及字段对应的值。</div><div class="line"></div><div class="line">第 14， 15 行就是具体的 Json 工作了（使用了 json4s 包进行 Json 化）</div><div class="line"></div><div class="line">这个过程中有一点需要注意的是，在 Json 化的时候，记得为 w._1 和 w._2 加 toMap 操作，不然会变成 List（很奇怪，我将 w._1 和 w._2 打印出来看，都是 Map 类型）或者你可以在第 7，8 行的末尾加上 .toMap 操作。这个我查了 API，进行了实验，暂时怀疑是在和 json4s 组合的时候，出现了问题，有待验证。</div><div class="line"></div><div class="line">利用上述代码，我们可以得到下面这样 Json 化之后的字符串(我进行了排版，程序返回的 Json 串是不换行的）</div><div class="line">&lt;pre class=&quot;font-size:8 lang:default decode:true&quot;&gt;&#123;&quot;rowdata&quot;:</div><div class="line">   [&#123;&quot;row_data&quot;:</div><div class="line">       &#123;&quot;before&quot;:&#123;&quot;param_name&quot;:&quot;creator&quot;,&quot;param_value&quot;:&quot;chenqiang05&quot;,&quot;horigindb_etl_id&quot;:&quot;2532&quot;,&quot;utime&quot;:&quot;2016-07-26 15:07:16&quot;,&quot;id&quot;:&quot;15122&quot;,&quot;status&quot;:&quot;0&quot;,&quot;ctime&quot;:&quot;2016-07-25 17:06:01&quot;&#125;,</div><div class="line">        &quot;after&quot;:&#123;&quot;param_name&quot;:&quot;creator&quot;,&quot;param_value&quot;:&quot;chendayao&quot;,&quot;horigindb_etl_id&quot;:&quot;2532&quot;,&quot;utime&quot;:&quot;2016-08-01 10:32:01&quot;,&quot;id&quot;:&quot;15122&quot;,&quot;status&quot;:&quot;0&quot;,&quot;ctime&quot;:&quot;2016-07-25 17:06:01&quot;&#125;</div><div class="line">       &#125;</div><div class="line">    &#125;]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>到这里，基本就完成了一种将 binlog 数据 Json 化的代码。</p>
+<p>附录代码，由于这些代码是从其他工程里面抠出来的，可能读起来会不顺畅，还请见谅。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div></pre></td><td class="code"><pre><div class="line">public static BinlogEntry serializeToBean(byte[] input) &#123;</div><div class="line">      BinlogEntry binlogEntry = null;</div><div class="line">      Entry entry = deserializeFromProtoBuf(input);//从 protobuf 反序列化</div><div class="line">      if(entry != null) &#123;</div><div class="line">         binlogEntry = serializeToBean(entry);</div><div class="line">      &#125;</div><div class="line">      return binlogEntry;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public static Entry deserializeFromProtoBuf(byte[] input) &#123;</div><div class="line">        Entry entry = null;</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            entry = Entry.parseFrom(input);</div><div class="line">//com.alibaba.otter.canal.protocol.CanalEntry#Entry 类的方法，由 protobuf 生成</div><div class="line">        &#125; catch (InvalidProtocolBufferException var3) &#123;</div><div class="line">            logger.error(&quot;Exception:&quot; + var3);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return entry;</div><div class="line">    &#125;</div><div class="line">//将 Entry 解析为一个 bean 类</div><div class="line">public static BinlogEntry serializeToBean(Entry entry) &#123;</div><div class="line">        RowChange rowChange = null;</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            rowChange = RowChange.parseFrom(entry.getStoreValue());</div><div class="line">        &#125; catch (Exception var8) &#123;</div><div class="line">            throw new RuntimeException(&quot;parse event has an error , data:&quot; + entry.toString(), var8);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        BinlogEntry binlogEntry = new BinlogEntry();</div><div class="line">        String[] logFileNames = entry.getHeader().getLogfileName().split(&quot;\\.&quot;);</div><div class="line">        String logFileNo = &quot;000000&quot;;</div><div class="line">        if(logFileNames.length &gt; 1) &#123;</div><div class="line">            logFileNo = logFileNames[1];</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        binlogEntry.setBinlogFileName(logFileNo);</div><div class="line">        binlogEntry.setBinlogOffset(entry.getHeader().getLogfileOffset());</div><div class="line">        binlogEntry.setExecuteTime(entry.getHeader().getExecuteTime());</div><div class="line">        binlogEntry.setTableName(entry.getHeader().getTableName());</div><div class="line">        binlogEntry.setEventType(entry.getHeader().getEventType().toString());</div><div class="line">        Iterator primaryKeysList = rowChange.getRowDatasList().iterator();</div><div class="line"></div><div class="line">        while(primaryKeysList.hasNext()) &#123;</div><div class="line">            RowData rowData = (RowData)primaryKeysList.next();</div><div class="line">            BinlogRow row = new BinlogRow(binlogEntry.getEventType());</div><div class="line">            row.setBeforeColumns(getColumnInfo(rowData.getBeforeColumnsList()));</div><div class="line">            row.setAfterColumns(getColumnInfo(rowData.getAfterColumnsList()));</div><div class="line">            binlogEntry.addRowData(row);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        if(binlogEntry.getRowDatas().size() &gt;= 1) &#123;</div><div class="line">            BinlogRow primaryKeysList1 = (BinlogRow)binlogEntry.getRowDatas().get(0);</div><div class="line">            binlogEntry.setPrimaryKeys(getPrimaryKeys(primaryKeysList1));</div><div class="line">        &#125; else &#123;</div><div class="line">            ArrayList primaryKeysList2 = new ArrayList();</div><div class="line">            binlogEntry.setPrimaryKeys(primaryKeysList2);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return binlogEntry;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">public class BinlogEntry implements Serializable &#123;</div><div class="line">    private String binlogFileName;</div><div class="line">    private long binlogOffset;</div><div class="line">    private long executeTime;</div><div class="line">    private String tableName;</div><div class="line">    private String eventType;</div><div class="line">    private List&lt;String&gt; primaryKeys;</div><div class="line">    private List&lt;BinlogRow&gt; rowDatas = new ArrayList();</div><div class="line">&#125;</div><div class="line">public class BinlogRow implements Serializable &#123;</div><div class="line">    public static final String EVENT_TYPE_INSERT = &quot;INSERT&quot;;</div><div class="line">    public static final String EVENT_TYPE_UPDATE = &quot;UPDATE&quot;;</div><div class="line">    public static final String EVENT_TYPE_DELETE = &quot;DELETE&quot;;</div><div class="line">    private String eventType;</div><div class="line">    private Map&lt;String, BinlogColumn&gt; beforeColumns;</div><div class="line">    private Map&lt;String, BinlogColumn&gt; afterColumns;</div><div class="line">&#125;</div><div class="line">public class BinlogColumn implements Serializable &#123;</div><div class="line">    private int index;</div><div class="line">    private String mysqlType;</div><div class="line">    private String name;</div><div class="line">    private boolean isKey;</div><div class="line">    private boolean updated;</div><div class="line">    private boolean isNull;</div><div class="line">    private String value;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&nbsp;</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2016/09/26/e4-b8-80-e7-a7-8d-e5-8f-af-e8-a1-8c-e7-9a-84-e8-8b-b1-e8-af-ad-e9-98-85-e8-af-bb-e5-ad-a6-e4-b9-a0-e6-96-b9-e6-b3-95/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2016/07/15/spark-streaming-saving-offset-in-zookeeper-2/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+    
+	
+		<!-- donate -->
+	
+	
+	<!-- css -->
+  <style type="text/css">
+      .center {
+          text-align: center;
+      }
+      .hidden {
+          display: none;
+      }
+    .donate_bar a.btn_donate{
+      display: inline-block;
+      width: 82px;
+      height: 82px;
+      background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+      _background: url("https://c1.staticflickr.com/5/4165/34650023915_0a51fa7b03.jpg") no-repeat;
+
+      <!-- http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif
+           因为本 hexo 生成的博客所用的 theme 的 a:hover 带动画效果，
+         为了在让赞赏按钮显示效果正常 而 添加了以下几行 css，
+         嵌入其它博客时不一定要它们。 -->
+      -webkit-transition: background 0s;
+      -moz-transition: background 0s;
+      -o-transition: background 0s;
+      -ms-transition: background 0s;
+      transition: background 0s;
+      <!-- /让赞赏按钮的效果显示正常 而 添加的几行 css 到此结束 -->
+    }
+
+    .donate_bar a.btn_donate:hover{ background-position: 0px -82px;}
+    .donate_bar .donate_txt {
+      display: block;
+      color: #9d9d9d;
+      font: 14px/2 "Microsoft Yahei";
+    }
+    .bold{ font-weight: bold; }
+  </style>
+  <!-- /css -->
+
+    <!-- Donate Module -->
+    <div id="donate_module">
+
+  <!-- btn_donate & tips -->
+  <div id="donate_board" class="donate_bar center">
+  
+    <a id="btn_donate" class="btn_donate" target="_self" href="javascript:;" title="Donate 赞赏"></a>
+    <span class="donate_txt">
+      Enjoy it ? Donate me ! 欣赏此文？支持一下呗
+    </span>
+      
+    
+  </div>
+  <!-- /btn_donate & tips -->
+
+  <!-- donate guide -->
+    
+  <div id="donate_guide" class="donate_bar center hidden">
+	<div class="row center">
+    <a href="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="用微信扫一扫哦~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4223/34996145761_303b9fd14d_h.jpg" title="微信赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+        &nbsp;
+    <a href="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="用支付宝扫一扫即可~" class="fancybox">
+      <img src="https://c1.staticflickr.com/5/4272/34962434512_71429ff937_b.jpg" title="支付宝赞赏 klion26" height="164px" width="164px" style="display:inherit;"/>
+    </a>
+	</div>
+	
+    <span class="donate_txt">
+      Use App <span class="bold"><a href="http://global.alipay.com/ospay/home.htm">Alipay</a> / <a href="http://www.wechat.com/en/">WeChat</a></span>
+			to scan QRCode~ Thx for your support.<br/>
+			用手机 <span class="bold"><a href="https://mobile.alipay.com/index.htm">支付宝钱包</a> / <a href="http://weixin.qq.com/">微信</a></span>，
+			扫一扫即可~ 谢谢您的鼓励。<br/>
+    </span>
+
+  </div>
+  <!-- /donate guide -->
+  
+    <!-- donate script -->
+  <script type="text/javascript">
+    document.getElementById('btn_donate').onclick = function() {
+      $('#donate_board').addClass('hidden');
+      $('#donate_guide').removeClass('hidden');
+    }
+
+    function donate_on_web(){
+      $('#donate').submit();
+        }
+
+    var original_window_onload = window.onload;
+        window.onload = function () {
+            if (original_window_onload) {
+                original_window_onload();
+            }
+            //document.getElementById('donate_board_wdg').className = 'hidden';
+    }
+  </script>
+  <!-- /donate script -->
+</div>
+<!-- /Donate Module -->
+   
+  
+
+
+			
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2016-08-27 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/分布式系统/">分布式系统<span>9</span></a></li> <li><a href="/categories/分布式系统/实时计算/">实时计算<span>5</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/kafka/">kafka<span>10</span></a></li> <li><a href="/tags/spark-streaming/">spark-streaming<span>7</span></a></li> <li><a href="/tags/binlog/">binlog<span>1</span></a></li> <li><a href="/tags/json/">json<span>1</span></a></li> <li><a href="/tags/protobuf/">protobuf<span>1</span></a></li> <li><a href="/tags/scala/">scala<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  &copy; 2018 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>
