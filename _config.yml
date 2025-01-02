@@ -104,7 +104,10 @@ theme: freemind
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
+  type: 'git'
+  repo: git@github.com:klion26/klion26.github.io.git
+  branch: master
+  message: "update blog: {{ now('YYYY-MM-DD HH:mm:ss') }}"
 
 # math
 mathjax:
