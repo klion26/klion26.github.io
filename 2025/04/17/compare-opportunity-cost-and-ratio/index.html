@@ -147,13 +147,13 @@
 <p>下图中通过点击标题，可以展示/隐藏不同情况下的曲线</p>
 </blockquote>
 
-<div id="echarts2969" style="width: 85%;height:400px;margin: 0 auto"></div>
+<div id="echarts4680" style="width: 85%;height:400px;margin: 0 auto"></div>
 <script src="https://unpkg.com/echarts@5.6.0/dist/echarts.min.js" ></script>
 <script >
-  if (window.eChartecharts2969ResizeHandler) {
-    window.removeEventListener("resize", eChartecharts2969ResizeHandler);
+  if (window.eChartecharts4680ResizeHandler) {
+    window.removeEventListener("resize", eChartecharts4680ResizeHandler);
   }
-  var optionecharts2969 = {
+  var optionecharts4680 = {
   legend: {
     data: ['2', '5', '8', '8(-2)', '10', '15', '15(-2)', '20', '25', '-2', '-5', '-8', '-10']
   },
@@ -252,12 +252,12 @@
   ]
 };
   if (window.echarts !== undefined) {
-    var eChartecharts2969 = echarts.init(document.getElementById('echarts2969'));
-    eChartecharts2969.setOption(optionecharts2969);
-    var eChartecharts2969ResizeHandler = function() {
-      eChartecharts2969.resize();
+    var eChartecharts4680 = echarts.init(document.getElementById('echarts4680'));
+    eChartecharts4680.setOption(optionecharts4680);
+    var eChartecharts4680ResizeHandler = function() {
+      eChartecharts4680.resize();
     };
-    window.addEventListener("resize", eChartecharts2969ResizeHandler);
+    window.addEventListener("resize", eChartecharts4680ResizeHandler);
   }
 </script>
 <p>我们可以大致对比几组上面的情况：</p>
@@ -400,9 +400,9 @@
 	<div class="pagination">
 <ul class="pagination">
 	 
-		
-          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
-        
+				
+		<li class="prev"><a href="/2025/04/26/differentiation/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
 
         <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
 
