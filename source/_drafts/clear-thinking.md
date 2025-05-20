@@ -20,3 +20,26 @@
 <clear thinking> 的读书笔记，这本书讲了 xxx
 
 
+往往有一个误区：只有那些重大策略会改变自己的生活，实际上不是的，自己平时的选择也会改变自己的生活，而且重大决策可能也以不起眼的形式出现。
+
+如果 clear thinking 不是那么好理清楚的话，那么首先来看看 clear thinking 的对立面，clear thinkinkg 的对立面会让我们看不清自己正在经历什么，以及让自己的生活更有挑战。
+
+
+每个决策会让自己变的更好，或者更差 -- 生活更容易或者更难。clear thinking 则是让生活更容易，或者不变的更难。
+
+> You don't need to be smarter than others to outperform them if you can out-position them
+如果位置更好的话，不需要更聪明就能有更好的产出。
+
+> Time is the friend of someone who is properly positioned and the enemy of someone poorly positioned.
+
+需要给自己留 buffer
+
+> What a lot of people miss is that ordinary moments determine your position, and your position determines your options.
+平时的决策决定 position，position 决定了自己的选项
+
+> It doesn't matter what position you find yourself in right now. What matters is wheter you improve your position today.
+重点不是现在，还是未来是不是更好。
+
+
+第一部分
+The enemies of clear thinking

@@ -1,0 +1,988 @@
+> 本文介绍 IcebergSummit 2025 的内容，内容以官方提供视频为主，有时间的可以自行阅读。
+
+首先是 <V3 and Beyond Iceberg's ongoing evolution> 这个开篇介绍 Iceberg 未来走向的。在这里主要介绍了 Iceberg 的一些现状，正在做的事情，以及一些未来的走向。
+
+Iceberg upgrades data lakes to perform and act like data warehouses
+- Warehouse behavior
+  - Built for productivity
+  - ACID transactions
+  - FUll schema evolution
+  - Declarative
+- Shared storage
+  - Query directly with Spark, Python, FLink, ...
+  - Eliminate copy and sync headaches
+  - Simple governance
+- New capabilities
+  - Time travel and rollback
+  - Branching enables better engineering patterns
+  - Tag important versions
+
+Iceberg 整体的使用非常广泛，生态也很繁荣。
+
+另外有提了几个重大特性：
+- Geo type 的支持，更好的支持地图数据
+- Variant type 的支持，可以支持半结构化数据（这个另外一个 talk 单独有讲）
+- 全表加密（data 和 metadata）
+- deletion vector  -- 更好的 position deletes（有另外一个 talk 单独讲），在性能、文件数量以及维护成本做了一个均衡
+- row lineage，主要方便增量消费以及数据的校验等
+
+另外也在考虑后续 metadata 的走向，尝试解决一些使用过程中暴露出来的痛点
+- manifest 相关
+  - 文件可能会比较多：先生成 manifest 然后是 manifest list；manifest 会重写最后删除
+  - 现在对小表不太友好（实际中有很多小表）：scan 需要走 manifest list 然后顺序的访问每个 manifest 文件
+  - manifest 文件太多：metadata 需要周期性合并
+- 故障恢复比较困难: file replication  不够恢复整张表；metadata 需要重写（主要是绝对路径）
+- 列信息是二进制的：对 geo/variant 等不友好，no alternative sort orders
+- plan 性能可以更好: 需要读取所有列信息（不在 filter 中的列信息也需要读取）
+- Metadata skipping 需要分区信息：数据倾斜处理不好；无法和 geo 数据很好的结合；容易过度分区
+
+针对各种问题，也有一些相对规划，后续整体大概是 adaptive tree structure，加上 RestCatalog 以及 adaptive tree structure 更像 DB 了。
+
+adaptive tree structure 大致如下
+![](https://raw.githubusercontent.com/klion26/ImageRepo/master/20250512145432.png)
+
+另外支持
+- Relative paths：更容易故障恢复
+- Columnar metadata: 更方便跳过不需要的 column stat；typed lower/upper bounds/alternative sort orders
+- Adaptive metadata tree: one-file commits/small talbe friendly/no metadata compaction needed/cache friendly
+- Unified manifests: lower/upper bounds for data metadata files(geo friendly)/data and deletes in the root/DVs to avoid rewrites
+
+另外会整体从如下几方面描述下自己观看后的情况。
+- Manifest/Index：表元数据相关的一些
+- Catalog: Catalog 相关的事情
+- Management(Optimiztion&Service): 表管理相关的
+- File format: file format 相关的
+- Streaming: 流式入湖
+- Ecosystem(&migration): 生态以及迁移到 Iceberg 的事情
+
+# Manifest/Index
+主要介绍 Iceberg 表中 Manifest/Index 相关的 talk，Manifest/Index 是 Iceberg 的元数据层，会涉及到所有的流程，也会影响整个流程。
+
+除了开场的 V3 表的情况，本次 Iceberg Summit 还有一些其他 talk 有介绍到 manifest/index 相关的。
+
+比如 
+# Catalog
+Catalog 主要负责表层面的元数据，以及事物等控制。为了更好对表进行控制，有不同类型的 Catalog
+
+# Management
+Iceberg 表需要进行管控，以及周期性的优化，因此不同公司/社区有提供不同的管控和优化方案。
+
+# File format
+为了满足不同的场景（尤其是 ML&AI），有不同的 file format 出来，如何结合新型 file format 和 iceberg 的能力是一个正在做的事情
+
+# Streaming
+不同公司也在尝试实时入湖的事情，如何做到时效性、管理成本等的平衡是一个难点。
+
+# Ecosystem(&migration)
+Iceberg 相关生态，以及从其他方案迁移到 Iceberg 的事情
+
+
+# Building Bloomberg's First Incremental Alternative Data Product
+[04:11]
+Aspects of ALternative Data
+- Large TB+ scale datasets
+- Extremely messy
+- Late arriving data
+- Historical data restatements are standard
+restatement = Revising previously provided data to account for new information received or to correct errors
+
+
+(catalog)
+Catalog considered
+- Hive
+  - Easiest to utilize, as we were already using the ApacheHive Metastore
+  - Scale and performance challenges
+- AWS Glue
+  - Managed Service
+  - Vendor lock-in
+  - Access control limited throgh AWS primitives
+- JDBC
+  - Easy and familiar to manage and connect to a database
+  - Access control limited through AWS or DB primitives
+- Rest
+  - Gave use the most flexibility to support the Iceberg Spec and additional custom features
+  - Flexible integration with different query engines
+  - Backed by a PostgreSQL database
+  - Provided the most flexibility on access control and multi-tenancy
+
+(usecase)
+Before Iceberg
+- Full daily restatements of 7TB+
+- High ingestion overhead
+- Slow processing and costly storage
+- Hard to diagnose and debug data quality
+After Iceberg
+- Incremental daily revision between 5~10 GB(<1% of total table)
+- Streamlined ingestion and processing
+- Efficiency gains in storage and compute
+- Easier to diagnose and debug data quality
+
+
+# Adopting Apache Iceberg at Slack
+Categories of data
+- Static data -> Hive
+- Append Only -> Hive
+- Append Only -> Iceberg
+- Update + Delete -> Iceberg
+
+(spark)
+Using storage Partitioned join to avoid shuffles during MERGE process
+
+# IceHouse at Airbnb: The journey to Iceberg
+- v1: 2016-2018   Hive on HDFS
+- v2: 2019-2020   Hive on S3
+- v3: 2021 - today  Iceberg on S3
+
+总共 100PB
+每月 S3 上管理的 26B objects
+
+(efficiency)(result)
+- 70% reduction of consumed resources
+- 7+% Additional compression rate from Gzip (to zstd)
+- 95%: max read wall time reduction on reads
+
+(usecase)
+- Enabled different cadence of data
+- Simplified streaming ingestion
+- Enabled dynmic workflows vs static
+
+- Mutations
+- Streaming
+- INtraday
+- Wide-table
+
+(optimization)(storage)
+- Partition evolution(re-partition)
+- Indexing
+- Compaction strategies
+- Caching
+
+
+Hive -> Iceberg
+- Challenges
+  - S3 storage
+  - Compute engines
+  - Airflow Compatibility
+  - Data Governance Lifecycle
+  - Migration Strategy: Ensure a safe and transparent migration as much as possible
+  - Remove Hive assumptions: Ongoing effort to enable users to simplify accesing data wighout Hive-specific knowledge particularly on partitioning tables or direct access to Hive Metastore.
+
+(migration)
+25:20
+image 暂时看不太清楚，需要再一起听听
+
+# Apache Iceberg as Unified Storage stack to Power Batch and Stream Processing at Pinterest
+
+platform support
+- Engines
+  - Spark
+  - Trino
+  - Flink
+- APIs
+  - SQL
+  - Java
+  - Python
+- Maintenances:
+  - snapshot expiration
+  - data deletion
+- Catalogs
+  - Hive metastore
+  - Rest
+
+Data Ingestion and processing Architecture since 2022
+[upstream] -> kafka -> flink -> Iceberg -> [flink/spark]
+
+Incremental DB Dump（类似 MixedIceberg Amoro 中的）
+- Tables
+  - CDC table(v1 format)
+  - Main table(v2 format, MOR)
+- Processing
+  - Bootstrap (once)
+  - Merge CDC changes into Main table
+  - Compaction: rewrite data files, position delete files
+
+# Apache Iceberg powering Open data lakehouse at scale
+Why Open Lakehouse
+- Legacy Analytics Stack
+  - Data lakes(flxible but messy)
+  - Data warehouse(fast but rigid)
+- Problems
+  - Difficult scaling
+  - poor governance
+  - slow queries
+  - vendor lock-in
+
+Challenges at scale
+- Metadata growth
+- Mixed workloads
+- Consistent Query performance
+- Storage Throttling and write skew
+
+Intelligent feedback loop
+- Capture insights about SQL Queries
+- Correlate with Cluster Usage
+- Recommendations for Table Layout
+- Tune Cluster Configurations
+
+(best practice)
+Best Practice - Read
+- NDV Stats(Puffin)
+- Aggregate Pushdown(16:49)
+- Metadata/Data Caching
+- Materialized Views(22:15)
+  - Trino Native MVs on Iceberg Tables
+  - Incremtal Refresh
+  - Base Iceberg Table is abstracted
+  - Improve Query Performance
+- Right thread pool sizing
+
+(best practice)
+Best practice - Write(主要是 trino 相关的）
+- Rate limiting writes [ write_max_task]
+- Partition data and entropy
+- Dedicated connection poll planning/delete
+  - iceberg.worker.num-threads
+  - iceberg.worker.delete-num-threads
+
+# Bringing Apache Iceberg to Low latency workloads: Rapid Queries through Iceberg-Rust with Cheetah
+Iceberg rust
+
+# Bringing the power of BigQuery to Apache Iceberg
+Bigquery
+# Build an Enterprise-Grade Real-Time Data Lakehouse Using Ursa and Apache Iceberg
+StreamNative 的产品 Ursa 介绍
+
+## Building a batch-stream-unified Lakehouse on Apache Iceberg in Tencent Cloud
+腾讯云的，主要使用 Amoro 以及 Amoro 中的mixed iceberg 来做实时处理
+
+(ecosystem)
+mixed iceberg 分成两个 iceberg table，一个 main 一个 delta
+
+支持不同的合并策略（partial update）
+
+##  CDC Implementations on Apache Iceberg and where are we headed
+需要继续看一下
+snowflake 将 CDC for Iceberg 的事情
+- Definies
+  - No-Incremental Processing
+    - No-Incremental systems process input datasets in their entirety to produc e new output datasets in their entirety.
+  - Incremental Processing
+    - Incremental systems process the changes to input datasets over time to incrementally evolve their corresponding outputs over time
+
+- Snapshot Differentitation
+  - REcord the sequence of point in time snapshots of the table
+  - Compute the minimum set of changes between two snapshots
+- Change logs
+  - Record each individual change to the relation
+
+SnapshotDiff
+12:01 -> INSERT INTO people VALUES(1, 'Stephen'), (2, 'John'), (3, 'Albert');
+12:02 -> UPDATE people SET name ='Michael' WHERE id = 2;
+12:03 -> DELETE from people where id = 3
+12:04 -> update people set name = 'Walter' where id = 2;
+12:05 -> select * from changes(from=12:01, to=12:04)
+
+(1, 'Stephen'; 2, 'John'; 3, 'Albert') -> (1, 'Stephen'; 2, 'Waller')
+
+snapshot diff
+| id | name | change |
+| -- | -- | -- |
+| 2 | 'John' | 'update_before'|
+| 2 | 'Waller' | 'update_after' |
+| 3 | 'Albert' | 'delete' |
+
+Changelog diff
+| id | name | change |
+| -- | -- | -- |
+| 2 | John | delete |
+| 2 | Michael | insert |
+| 3 | Albert | delete |
+| 2 | Michael | delete |
+| 2 | Waller | insert |
+
+people
+
+| id | name |               | id | name |
+| 1 | Stephen |     ->      | _1_ | _Stephen_ |
+| 2 | John |                | 2 | John |
+                            | 3 | Walter |
+
+phone
+
+| id | phone |              | id | phone |
+| 1 | Galaxy |     ->       | 1  | Galaxy |
+| 3 | iPhone |              | 2  | Pixel  |
+                            | 3  | iPhone |
+
+select .. from people JOIN phone ON ppl.id = phone.id
+
+| id | name | phone |            | id | name | phone |
+| 1  | Stephen | Galaxy |  ->    | _1_ | _Stephen_ | _Galaxy_ |
+                                 | 2   | John | Pixel |
+                                 | 3   | Walter | iPhone |
+- Building Blocks
+  - Table Version Store(Manifest/Catalog)
+     怎么处理多表查询的情况(Multi-Table Transactions)，需要一个 global timeline
+  - Unique and Immutable Row identifiers
+     
+  - Change Computattion Engine
+    Full change log(audit log)
+    Minimum set of changes
+    Insert only changes
+- Spark: changelog_views
+  - Table version store - manifest
+    - only supports single table
+  - Unique and immutable row identifiers
+    - user specified identifiers
+      - identifier-field-ids as part of the table schema
+      - as parameter
+    - if not specified -> the whole row(all columns) is the identified 
+  - change computation engine with multiple semantics
+    - net changes
+    - compute_updates(pre/post update images)
+    - copy-on-write rows: SELECT * FROM spark_catalog.db.tbl.changes;
+  - The ouptut contains CDC metadata columns
+    - _change_type: the type of change. It has one of the following values: INSERT, DELETE, UPDATE_BEFORE, UPDATE_AFTER
+    - _change_ordinal: the order of changes
+    - _commit_snapshot_id: the snapshot ID where the change occured
+- Snowflake: Managed Iceberg
+  - read-write for snowflake
+  - read-only for other engines
+  - change consolidation
+    - matching identical INSERT and DELETE rows to filter out non-change
+  - Change computation
+    - Specific operator incrementalization
+    - Algebraic Equivalences (\delta(L * R) => (\delta(L) * R_from) union (L_to * \delta(R)))
+- Snowflake: Unmanaged Iceberg
+- Spec V3: Row Lineage
+
+##  Customer - Facing Analytics Without Data Governance Nightmare
+介绍 StarRocks
+
+## Decoupling Metadata: Leveraging Queryable Iceberg Tables for Scalable, Cross-Engine Innovation
+把 Iceberg 当成存储 Metadata 的 Table？ 把元数据保存成 Iceberg 表，更方便分析
+将 Iceberg 的 metadata 暴露成一张 Iceberg 表
+
+What is this talk about
+- Standardizing the interface to query metadata across systems
+- Enabling cross-engine innovation through a unified metadata layer
+- exploring benefits of a standardized, queryable metadata interface
+- Proposing a community-driven standard
+
+有尝试过将 Iceberg/Delta 的 meta 保存到 PG 中，但是 PG 遇到了写瓶颈（量大的时候），查询性能等
+
+# Deep Dive into Iceberg Optimizations and Best Practices for a Scalable and Performant Lakehouse
+(best practice)
+
+增大 row-group-size 减小 target-file-size
+- write.target-file-size-bytes defaults to 512MB
+  - Difficlt to achive, especially with near RT input
+  - with min-file-size-bytes at 75% of target size, you'll always be compacting
+  - 10MB - 64MB is ideal for majority of cases
+- write.parquet.row-group-size-bytes default to 128MB
+  - way too big for most workloads, often leads to a single RG per file
+  - limits read parallelism
+  - limits ability to skip RGs based on column stats
+  - 2MB is ideal for majority of cases
+
+但是 row group size 调小之后，会增大整体的文件大小（？） 06:30 有测试数据
+- 因为每个 row group 都有元数据，会导致元数据膨胀
+- 文件大小的比较
+  - 2MB row-group size
+    - unsorted 764MB
+    - num_columns: 21
+    - num_rows: 391844
+    - num_row_groups: 33
+    - serialized_size: 94736
+  - 128MB row-group size
+    - unsorted 702MB
+    - num_columns: 21
+    - num_rows: 391844
+    - num_row_groups: 1
+    - serialized_size: 4824
+  - 2MB row gorup size
+    - sorted 896MB
+    - num_columns: 21
+    - num_rows_1794155
+    - num_row_groups: 150
+    - serialized_size: 424318
+  - 128MB row group size
+    - sorted 687MB
+    - num_columns: 21
+    - num_rows: 656682
+    - serialized_size: 4799
+
+[08:50]
+- unsorted 2MB vs 128MB row-group size，性能提升 15%（测试了 Spark 和 Duckdb）
+- sorted 2MB vs 128MB row-group size, 性能提升 198%/177%（Spark，duckdb，trino）
+
+# Efficiently Managing Table With Thousands of Columns Using Iceberg in Tencent
+> Tencent TEG 主要介绍大宽表的实践
+正对 ML/DL 广告等场景
+
+Problems and characteristics
+- Talbe is too large, petabytes for a single table
+  - With default configurations, there are tens of millions of datafiles and thousands of manifest files
+  - poor task planning performances
+  - batch writing needs many memory and OOM
+- Column mangement for leaner storage
+  - Not all columns have the same valuable
+  - Columns are added/removed frequency
+
+Reduce metadata file count
+- Disable metrics for unnecessary columns(write.metadata.metrics.column.xxx), Still large since *value_count* can not be disabled.
+- Increase the manifest target size(commit.manifest.target-size-bytes)
+  - **Caution: CHange it carefully**
+    - Temporarily disable `commit.manifest-merge.enabled`
+    - Increase the manifest target size
+    - Call RewriteManifests action/procedure
+    - Enable `commit.manifest-merge.enabeld`
+- Use zstd for manifest file compression
+
+Commit bye manifest
+- Stage received data file into manifest files, and commit by manifest file
+- Less memory requiremenets
+
+在写入端控制单次 commit 时文件的数量
+- 会对 task/partition 等提前进行校验
+
+通过 column scan metrics 查看那些高频/低频 的列，有些列基本不读，但是每次写（合并）需要花的时间是一样的
+
+
+合并的时候，可以直接合并 parquet 的 page
+- group rowgroups in a task
+- merge rowgroups by pages
+Not applicable to 
+ - Has datatype evolution
+ - enabled bloomfilter
+
+合并的时候，直接 columnar read，columnar write，不过计算
+- TPC  Snappy -> Snappy 1.7x 提升
+- TPC  Snappy -> ZSTD  1.6x 提升
+- 线上
+
+
+# Extending the One Trillion Row Challenge to Iceberg V2 Tables
+主要介绍 Impala 怎么更高效的处理 update，比如说 delete 只读一次，然后进行 broadcast 与 data file 进行 join
+
+![](https://raw.githubusercontent.com/klion26/ImageRepo/master/20250506182959.png)
+
+> 这个怎么区分哪些是无 delete 的 datafile 呢？
+
+IMPALA-11619  Impala implemented an Iceberg Position Delete specific operator
+IMPALA-12308 minimize network transfers with query scheduling information
+
+# Eliminating redundancies in ETL with Iceberg tables on Snowflake
+Bigquery/snowflake/dbt
+需要从 Bigquery 导出来，然后再传到下路，中间会有 JSON export 和 JSON unpack，这部分是浪费的，然后存储也是浪费的
+
+可以将数据整体放到 Iceberg 中，因此不需要中间的 raw data 做中转。
+
+# Every second counts: Scaling Real-time data ingestion into Apache Iceberg for Optimized Analytics
+
+Flink 入湖，希望能够做到更实时  etleap table 的宣传
+
+#  From zero to one: Building a petabyte-scale data analytics platform with Apache Iceberg
+TRM Labs 是区块链的智能分析平台，
+StarRocks + BigQuery + Iceberg
+
+Blue/Green Namespacing Ensures Consistent Data： 两个 namespace，某个时刻，将某个 namespace 的切过去（然后用新的 catalog），然后自动切换过去
+
+(iceberg-pro)
+使用 Iceberg 之前使用 PG 和 BigQuery
+之前
+ - 大查询经常超时
+ - increasing SSD costs to store ever increasing volumes of data
+ - 存算一体（耦合）
+ - Hourly and daily data loads frequently resulted in SLO misses
+ - 无法很容易的换计算引擎
+ - 数据太大需要从 PG 切到 BigQuery，无法在 on-premise 环境
+后来
+ - 查询耗时大规模减少  P95 2.976s  Avg 1.65s
+ - 数据可以 offload 到 object storage
+ - 存算分离（可以单独扩展）
+ - 存储只需要在一个地方就行
+ - 可以使用多引擎查询
+
+# Hive Tables to Apache Iceberg: A Step by step Migration Blueprint
+
+Migration roadmap
+- Assessment: Inventory&Workload analysis
+  - Inventory & Workload Analysis
+  - Current Pain Points
+  - Environment & Compatibility Check
+  - Data Quality & Schema Audit
+  - Storage Layer Review
+  - Stakeholder Alignment
+- Design: Planning & Snapshot
+  - Identify Tables
+  - Can they be paused
+- Execution: Migrate & CTAS
+- Post-Migration: Verification Steps
+
+流程图参考 39:07
+
+
+# Iceberg Geo Type: Transforming Geospatial Data Management at Scale
+
+Iceberg 支持 Geo 数据（点，线，区域等）
+在 Iceberg 中支持
+- 相当于是有个标准，所有引擎都通用的标准
+- 可以做 pushdown 过滤
+
+Iceberg 中支持一个类型需要
+- file format 支持 encode/decode
+- metadata 定义 lower/upper bound 等指标
+
+
+# Iceberg I/O Optimizations in Compute Engines
+bodo.ai 使用 python 和 sql 做计算引擎
+
+Filter Pushdown is the gold standard of I/O optimizations
+
+Not all filters can be pushed down
+- Filters are only useful if they eliminate entire partitions or data files
+- Limited set of statistics to evaluate with
+  - Lower and upper bounds
+  - Null, NAN, Value Counts
+  - Partition Values
+  - Not as useful for non-numberic cols
+- Complex filters contain compute functions
+  - Iceberg transforms are only a subset
+
+Rewriting expresss to push down
+
+| Before | After(completely pushable) |
+| -- | -- |
+| coalese(date, TODAY) <= TODAY | date is null or date <= TODAY |
+| zip_code in (12345, 54321, 31524) | zip_code = 12345 or zip_code = 54321 or zip_code = 31524 |
+| size / 2.0 > PARAM | size > PARAM * 2.0 |
+| username LIKE 'bill%' | STARTSWITH(username, 'bill'); |
+| tag ILIKE 'A' | tag = 'A' or tag = 'a' |
+
+Partial filter pushdown
+| original | runtime filter | file-level filter |
+| -- | -- | -- |
+| url like 'http://%.com% | startswith(url, 'http://') and contains(url, '.com') | startswith(url, 'http://')|
+| lower(name) = 'adam' (name ilike 'adam') | lower(name) = 'adam') | name = 'ADAM' and name ='adam'|
+| qyt INT > 100 | qty INT > 100 | qty is NOT null|
+
+
+runtime join filters
+- Pushed to IO
+  - Min/Max
+  - Dictionary lookup(less than 5 unique values)
+- Not Pushed to IO
+  - Bloom filter
+  - Input Dictionary lookup
+
+RTJF Improvements
+- Disable filters if selectivity is slow
+- keep multiple "spans" of min and max
+  - (10 < col < 100 | 500 < col < 600) vs 10 < col < 600
+- store bloom filters in puffin filters, apply at runtime
+
+Bodo parquet reader
+- given a foler or glob, get the list of all Parquet files paths to read
+- evenly distribute the files across all processes
+- For each Parquet file
+  - Fetch the file metadata
+  - Validate the schema against the compile-time infered schema
+  - partially apply a filter to estimate the # fo rows that will be read
+  - or whether to completely skip the file entirely
+- Collect the information on process 0, and redistribute the files
+  - Aiming for all processes to approximately end up reading the same # of rows
+- Start reading data
+
+转换到 Iceberg 后通过 metadata 以及 table schema 等解决了
+
+
+(future want)
+- Methods to store additional metadata for more effective file pruning
+
+# Iceberg Resilience: Building a DR Strategy for the Data Lake
+
+Objectives
+- Minimize downtime
+- Business continuity  ensure all data dependencies are met in secondary region
+- Support Cloud and Data Center environments
+- Scale
+
+Key Challenges
+- Maintaining consistency and integrity(with replication)
+- Availability of dependent data sets
+- Performance
+
+基于 Commit 的复制，可以做增量复制（每个 commit 后将当前 commit 的数据进行复制）
+
+Commit Based Replication
+- Initiate data replication after successful commits
+- Replicate in batches - think snapshots
+- Ensure continuous data integrity at the secondary
+
+# Iceberg with Flink at DoorDash
+Peak > 30 million messages/sec, high volume events produce ~ 5GB/sec
+
+Storage
+- 25-49% storage cost reduction compared to native Snowflake using default ztsd compression
+Compute
+- 40 - 70% compute cost reduction compared to using Delta format for Flink
+
+(future-request)
+Dynamic Schemas for flink sink
+
+(best practices)
+Checkpoint Issues: failover reset checkpoint id to 
+
+# Implement Iceberg for Improved Data Management at Autodesk
+
+(migration)
+Challenges with Hive
+- Limited and costly rewrites
+- Partitioning not available, supported by partitioning service
+- Limited support for ACID transactions
+- Monolithic metadata management - Hive Metastore
+- Slower query performance
+- Compatible with limited engines
+- Overhead of Infrastructure maintenance
+
+其他的看情况继续看一下
+
+# Learning from running large-scale Apache Iceberg Table Management Service
+
+policy store    -
+                 |- Table management service(events/workload managerment/ monitoring/orchestrator)
+
+openhouse(?)
+
+Challenges(09:30)
+- Multi-tenancy
+- Efficient resource utilization
+ - Share spark jobs within a tenant
+ - Spark Job T-shirt sizing(按作业大小进行拆分）
+ - Workload priorities（按照优先级进行拆分） 
+- Scaling
+ - Push based
+ - Scaling spark jobs(based on queue size)
+ - Scaling executors within a spark job(Dynamic Resource Allocation)
+- Observability users
+ - Workload store(workload lifecycle of every workload is sotred in a database)
+ - Audit(schedule changes)
+ - Notification(usually notifying on consecutive failures is sufficient)
+- Observability - service
+ - Service lever
+   - workload failure stats
+   - compaction stats
+   - orphan removal stats - storage savings
+ - additional service information
+   - scaling decions
+   - spark job utilization statistics
+
+#  Leveraging Apache Iceberg to Build Xiaomi’s Unified Lakehouse Paltform
+100PB data, users' first choice
+
+Why Iceberg
+- Open table format
+- Cloud native design
+- Advanced metadata filtering
+- ACID, schema evolution
+- Hidden partitioning
+- RIch engine ecosystem(suitable for various computing needs)
+
+# Leveraging Iceberg for AI/BI workload RedNote
+100+PB history, 3+PB daily increased
+table: 1K+ acitive for prod(HiveCatalog + S3FileIO + Parquet)
+Integrations: Flink/Spark/StarRocks/PyIceberg
+Hybrid Cloud: AWS/Aliyun/Tencent
+
+Learnings from CK
+- Query varies as time goes, index miss leads to poor performance
+- Join is limited supported
+- Data silos: duplicated data
+
+(practice)
+Zorder strategies
+- Enable on table?
+  - table frequent queried
+  - #files per partition > 10
+- Which columns?
+  - Top 3 frequent filtered
+  - NDV > 15
+
+# Navigating the AI&Data Lakehouse Revolution: What’s Changing and  What’s Not 
+
+
+Data needs to be in one place to answer questions
+Avoid re-extracting your data
+Especially for big data (iceberg)
+
+What changes when agents consume data?
+- Programmatic data source / schema discovery
+- Programmatic metadata / lineage / documentation
+- More low latency use cases
+
+Summary
+- If AI takes over, then none of this relevant
+- Else ELT and data lakes are even more important than before.
+
+
+# Optimising MOdel Training and Data Management
+- Datasets was usually stored in the user managed path in HDFS
+- Disadvantages
+  - Hard to do data governance
+  - It leads to data silos
+  - Data lineage tracking and audit difficulties
+  - Limited version control
+  - Users easily forget the paths
+
+Need for indexes, other wise, data will be stored in iceberg and other palce, => high cost due to redundant data storage.
+
+Inverted Index Search
+- When user ingest the data, we also write the index file along with the data file
+- During the query, we use the index file to find the row indices
+- The row indices are passed to parquet reader which uses page index tofilter and read data efficiently.
+
+# Optimizing Iceberg Table layouts at Scale: A Multi-Objective Approach
+openhouse 介绍
+
+# The Rest Revolution in APache Iceberg
+介绍 RestCatalog
+
+Hive Catalog 的问题
+- 锁/并发粒度太粗
+- FileNotFoundException for metadata json
+
+Catalog Requirements
+- Reliable and low-latency commits
+- Better conflict resolution
+- Easy client implementation
+- Data governance
+
+RestCatalog
+- Shift Client responsibilities to server
+- Improved decision making at commit time
+  - Better Conflicts resolution
+    - DDL vs DML, don't failed appedn when it conflicts with an unrelated DDL
+    - Compaction vs ingestion
+  - Multiple table transactions
+- Easier client implementation
+  - Less responsibilities means simpler clients, such as compute engiens, any other system
+  - better support for multiple language clients, such as Python, Rust, Go
+
+# Postgres meets Iceberg
+PG 查询 Iceberg 外表，复用 PG 和 Iceberg 的能力. 公司： crunchy data
+
+Bridging Postgres and Iceberg
+- Extensibility
+- Simplicity
+- OLAP Performance
+- Practical Guide
+
+# Pups on Ice Lessons learned adopting iceberg at datadog
+主要使用 GO
+
+Lessons learned
+- The java implementation is the reference implementation
+- The JDBC Catalog is an easy way to get started with the basics
+- You need more than a catalog to make it work
+- Query engines differ in the features they support
+
+# Scalable Lakehouse Architecture with Iceberg&Polaris
+更多的介绍如何使用 Polaris
+
+# Scaling Iceberg Adoption at Pinterest with Gravtino
+
+Use cases
+- Streaming ingestion
+- Online databases near real time replication
+- Row level data deletion for user/adertiser data deletion
+- ML training, ETL, feature backfills
+- Reporting, dashboarding, other ETL use cases
+
+Challenges - Performance
+- Partition listing is slow
+  - Compared to SHOW PARTITIONS for Hive table
+  - Runtime required to be seconds level for PB level table(UI browsing use case)
+- Lacking of easy to use tools for performance monitoring
+  - Data read and write performance
+  - Change notification
+- Engines specific perforamnce issues
+  - Trino long query planning time
+  - Spark partition filter is not pushed down issue
+  - or any other uncaught wrong data access
+
+Leveraging IRC to solve performance challenges
+- Partition listing is slow
+  - Implemented custom partition metadata for partitions
+    - Every write will produce a changed partition in snapshot metadata(delta)
+    - Periodically materialize partition for a given snapshot
+    - Final partition list = metarialized partition + delta
+  - Reduced runtime from houses to <10s(table of 10+PB, 30K manifests, 100M objects)
+  - To evaluate IRC side caching for future speedup
+  - Related to OSS partition stats work
+
+# Securing Apache Iceberg tables across engines with open standards
+介绍基于 OAuth 2.0  对的鉴权和认证等
+
+# Supercharging Apache Iceberg Strategies for Harnessing Partition Stats
+
+Query => logical plan => list of operators
+
+Cost Based Optimizer
+cost of each operator
+- I/O cost: dist reads/writes
+- CPU cost: Computation and memory usage
+- Network cost: Data movement between nodes in distributed systems
+
+Use cases
+- In real world, most of the lables are partitioned and  queries will have filters on these partition columns
+  - Avoid reading all the manifest files(tables can have ton of manifests)
+    - Pinterest mentioned that they have a use case to list all partition of a table within 10 seconds in the UI
+  - Estimate parallelism during query planning(for autoscaling)
+    - Based on the filter value, need to know how many files are required to be read
+  - Choose better query planning (join reordering, IO operators)
+  - Run table maintenance only if the partition that is involved in the query has affected by latest snapshots
+  - Refresh the pipe lines that affects the latest modified partitions
+    - two sigma mentioned that they cannot expire snapshots today because they read all manifest and find the last modified snapshot time by inner joining manifest and snapshots of the table. Table metadata bloats up.
+
+# Superchargin wise data lake with apache iceberg
+
+(feature-request)
+first-row/last-row for merge options
+
+#  The ‘Streamhouse’: Extending Redpanda into a fully managed, Iceberg-backed realtime data lakehouse
+
+Iceberg topic from redpanda
+
+# Turbocharge Queries on Iceberg with Next-Gen File Formats
+
+为 Iceberg 增加不同的 fileformat
+
+lance 和 vortex
+
+新的 file-format 优点
+- workload diversity
+- flexibility & interop
+- accelerated computing
+
+
+Design for ML workloads
+- AI&ML workloads have wide columns
+- AI&ML workloads need both scan & search
+- AI&ML workloads grow horizontally(wide schema)
+
+
+Designing for Hardware Accelerators
+- AI&ML workloads are not just(or even primarily) run on CPUs
+- Accelerators like GPU & FPGA are embarrassingly parallel
+- Common bottlenecks
+    - CPU
+    - Copying to device memory
+- IDEA: Load compressed data, decompress on-device
+
+Requirements are essentially equivalent for
+- Decompression via GPU SIMT
+- Decompression via CPU SIMD
+- Random access on compressed data
+
+Vortex: Goal
+- Performance
+    - 200x faster random access
+    - 2-10x faster scans
+    - 0-50% faster writes
+    - Comparable size to moder parquet
+- Extensible&Future-profff
+- Interoperable
+- 
+Lance:Goal
+- A file format&table format for AI&ML workloads 
+
+# Understanding Deletion Vectors in Apache Iceberg 
+
+1
+- file-level pos delete file
+- partition-level pos delete file
+
+要么太大，要么太小，太大过滤不太好，太小，文件数太多
+Position Delete
+- Partition scoped deletes are assigned by partitoin
+- File -scoped are assigned by referece data file location
+Shortcomings
+- Fewer files on disk(partition scope) vs targeted deletes(file scope)
+- Different in-memory and on-disk representations
+- External maintenance for consistent performance
+
+Deletion Vectors
+- Identify deleted rows by a position in bitmap
+- Roaring bitmaps persisted as binary blobs in puffin files
+- At most one delete vector per data file in a snapshot
+- Compatible with delta lake
+
+
+# Unleashing the power of Iceberg ingestion 100GB/s and beyond
+
+实时入湖的压测
+
+入湖速度，以及compaction 的影响，会有一个对应关系图（11:59)
+当 parallelism 增大到阈值之前（不影响 compaction 的），再增大的时候，就有影响了，然后希望找到一个平衡点
+
+也就是 Flink 入湖的 Dynamic load coordination 这样，并发足够多（够快），文件数也不是太多（对 compaction 的影响还好）
+
+Iceberg  Commit coordination 类似 RestCatalog
+
+错误配置的提前预判等
+- Error detection
+- classification
+- notification
+
+# Unlocking the power of the variant data type in Apache Iceberg
+
+What is the variant data type?
+- Designed to store semi-structured data
+- Schema evolution friendly
+- Nested and heterogeneous data support
+- Optimized storage
+
+Use  cases
+- Log and event data
+- Semi-structured data ingestion
+- Data variety in analytics
+- IoT and Telemetry data
+
+Why Introduce the variant to Iceberg?
+- Growing interest in standardizing variant data type encoding
+- Enabling iceberg to support a wider range of semi-structured data
+- Unified structured + semi-structured analytics
+
+Variant shredding is the process of extracting fields from a variant-type column into separate fields, which are stored independently as distinct columns.
+Shredding benefits:
+- File pruning : Efficiently eliminate unnecessary files early using field metadata.
+- Reduced Data Access: 
+- Optimized Storage
+
+Shredding process
+- Variant data: For a variant column to be written in a file
+- Select fields for shredding: Engines select the fields to be shredded. E.g., top 10 frequent fields. Determinie the shredding type. E.g., most common type for a field
+- Extract Field Values into Fields: Type matches: shred to typed column. Residuals are encoded in untyped colmumn
+
+
+Shredding Arrays
+- Supports heterogeneous element types
+- Handles nested objects and arrays
+- Determines the element type to shred to.
+# TableFormat
+## Current and Future
+## Catalog
+## Meta/Index
+## File Format
+# Optimization
+# Ecosystem
+## Migration
+
+# 设计到的组件
+- Spark/Trino/StarRocks/Flink/BigQuery
+- Iceberg 
+
+# 生态
+
+# 场景
