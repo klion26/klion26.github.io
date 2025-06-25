@@ -1,6 +1,7 @@
 ---
 title: iceberg summit 2025 notes
-date: 2025-05-20 16:53:32
+date: 2025-05-20 16:03:32
+author: klion26
 tags:
     - iceberg-summit
     - notes
