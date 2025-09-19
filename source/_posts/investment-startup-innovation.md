@@ -1,4 +1,12 @@
-投资，创业与创新
+---
+title: 投资、创业与创新
+date: 2025-09-19 20:45:32
+tags:
+    - investment
+    - startup
+    - innovation
+toc: true
+---
 
 > 尝试记录一个思想快照，供后续 review 使用。
 
