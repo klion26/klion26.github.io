@@ -1,0 +1,368 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Arrow 中一次代码性能优化的记录 | Hexo</title>
+  <meta name="author" content="klion26">
+  
+  <meta name="description" content="本文记录 Arrow-RS 中一次性能优化的情况。
+
+背景最近尝试在 Arrow-rs 中做一些贡献来更好的学习了解下 Arrow 和 Rust。本文的事情则是在为 Arrow-rs 支持 parquet variant 中的一个修改。当前实现的过程中，Object 和 List 会创建临时 buffer，然后在最终 copy，这样会有一定的性能损失（主要在于临时 buffer 的创建以及拷贝），希望有一种方案能够直接写入到目标的 buffer 而不需要进行拷贝，也就是 ARROW-RS-7977 所记录的事情。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Arrow 中一次代码性能优化的记录"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/cerulean.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight-default.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/comment.css" media="screen" type="text/css">
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.9/es5-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-sham.min.js"></script>
+  <![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+  
+    <script src="/js/marked.js"></script>
+    <script src="/js/comment.js"></script>
+    <script src="/js/timeago.min.js"></script>
+    <script src="/js/highlight.min.js"></script>
+	<script src="/js/spin.min.js"></script>
+  
+  
+  <!-- analytics -->
+  
+
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">Hexo</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+    <div class="content">
+      
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Arrow 中一次代码性能优化的记录</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <blockquote>
+<p>本文记录 Arrow-RS 中一次性能优化的情况。</p>
+</blockquote>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>最近尝试在 Arrow-rs 中做一些贡献来更好的学习了解下 Arrow 和 Rust。本文的事情则是在为 Arrow-rs 支持 parquet variant 中的一个修改。当前实现的过程中，Object 和 List 会创建临时 buffer，然后在最终 copy，这样会有一定的性能损失（主要在于临时 buffer 的创建以及拷贝），希望有一种方案能够直接写入到目标的 buffer 而不需要进行拷贝，也就是 <a target="_blank" rel="noopener" href="https://github.com/apache/arrow-rs/issues/7977">ARROW-RS-7977</a> 所记录的事情。</p>
+<span id="more"></span>
+<h1 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h1><p>由于之前在 ARROW-RS#7899 中做过一个 Object 相关的，这个是类似的，因此觉得应该会是一个相对比较容易的事情。不过整个过程还是可以记录下</p>
+<p>首先我给了一个最初的版本，这个版本中我写了四份代码，分别是</p>
+<ol>
+<li>使用 <code>PackedU32Iterator</code> 的<a target="_blank" rel="noopener" href="https://github.com/apache/arrow-rs/pull/7987/commits/e4603c1d9b885c2f15871eddc87d1de45beb998e">方案</a></li>
+<li>纯粹使用 Iterator 的<a target="_blank" rel="noopener" href="https://github.com/klion26/arrow-rs/blob/1d594b3b4a461a44ad72ecac730cbdfc537767d4/parquet-variant/src/builder.rs#L1220-L1240">方案</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/klion26/arrow-rs/blob/7179a56258429d8431273d525ced836dd706e3e4/parquet-variant/src/builder.rs#L1220-L1241">该方案</a>在 2 的方式下，进行一次 iterator 的 collect，然后进行 splice</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/klion26/arrow-rs/blob/9cc1b04a007c54274db81059d317747b2512e169/parquet-variant/src/builder.rs#L1265-L1285">该方案</a>直接生成一个临时的 buffer，然后逐步填充 header 后进行 splice</li>
+</ol>
+<p>记录下 scovich 给的一些反馈<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; 2. Splice with Iterator</span><br><span class="line">This one will perform poorly because the chained iterator doesn&#x27;t infer an accurate lower bound, so `Vec::splice` has to shift bytes twice (once to fit the lower bound, and again to fix the remainder).</span><br><span class="line">&gt; 3. Collect the header with iterator before splice</span><br><span class="line">一定比 2 差，因为多一次 collect</span><br><span class="line">&gt; Splice with actual header bytes</span><br><span class="line">This is still iterator-based like 1, but with all the unsafety of indexing into a pre-allocated temp buffer(and the overhead of allocating said temp buffer).</span><br></pre></td></tr></table></figure><br>针对这几个方案，给出了两外两个建议</p>
+<p>第 5 种方案<br><code>A fifth approach would be to use the packed u32 iterator from 1/, and splice in a pre-populated temp buffer like 5/, but to populate the temp buffer by push+extend calls instead of chain+collect:</code></p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">bytes_to_splice</span> = <span class="built_in">vec!</span>[header];</span><br><span class="line">  ...</span><br><span class="line">bytes_to_splice.<span class="title function_ invoke__">extend</span>(num_elements_bytes);</span><br><span class="line">  ...</span><br><span class="line">bytes_to_splice.<span class="title function_ invoke__">extend</span>(offsets);</span><br><span class="line">  ...</span><br><span class="line">bytes_to_splice.<span class="title function_ invoke__">extend</span>(data_size_bytes);</span><br><span class="line">buffer</span><br><span class="line">    .<span class="title function_ invoke__">inner_mut</span>()</span><br><span class="line">    .<span class="title function_ invoke__">splice</span>(starting_offset..starting_offset, bytes_to_splice);</span><br></pre></td></tr></table></figure>
+<p>以及第六种，主要是优化了原来的 <code>PackedU32Iterator</code><br><code>A sixth approach would also use a pre-populated temp buffer, but ditch the packed u32 iterator from 1/ and just directly append the bytes:</code></p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fn</span> <span class="title function_">append_packed_u32</span>(dest: &amp;<span class="keyword">mut</span> <span class="type">Vec</span>&lt;<span class="type">u8</span>&gt;, value: <span class="type">u32</span>, value_bytes: <span class="type">usize</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">n</span> = dest.<span class="title function_ invoke__">len</span>() + value_bytes;</span><br><span class="line">    dest.<span class="title function_ invoke__">extend</span>(value.<span class="title function_ invoke__">to_le_bytes</span>());</span><br><span class="line">    dest.<span class="title function_ invoke__">truncate</span>(n);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Calculated header size becomes a hint; being wrong only risks extra allocations.</span></span><br><span class="line"><span class="comment">// Make sure to reserve enough capacity to handle the extra bytes we&#x27;ll truncate.</span></span><br><span class="line"><span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">bytes_to_splice</span> = <span class="type">Vec</span>::<span class="title function_ invoke__">with_capacity</span>(header_size + <span class="number">3</span>);</span><br><span class="line">bytes_to_splice.<span class="title function_ invoke__">push</span>(header);</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">append_packed_u32</span>(&amp;<span class="keyword">mut</span> bytes_to_splice, num_elements, <span class="keyword">if</span> is_large &#123; <span class="number">4</span> &#125; <span class="keyword">else</span> &#123; <span class="number">1</span> &#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> <span class="variable">offset</span> <span class="keyword">in</span> std::mem::<span class="title function_ invoke__">take</span>(<span class="keyword">self</span>.offsets) &#123;</span><br><span class="line">    <span class="title function_ invoke__">append_packed_u32</span>(&amp;<span class="keyword">mut</span> bytes_to_splice, offset <span class="keyword">as</span> <span class="type">u32</span>, offset_size <span class="keyword">as</span> <span class="type">usize</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">append_packed_u32</span>(&amp;<span class="keyword">mut</span> bytes_to_splice, data_size <span class="keyword">as</span> <span class="type">u32</span>, offset_size <span class="keyword">as</span> <span class="type">usize</span>);</span><br><span class="line"></span><br><span class="line">buffer</span><br><span class="line">    .<span class="title function_ invoke__">inner_mut</span>()</span><br><span class="line">    .<span class="title function_ invoke__">splice</span>(starting_offset..starting_offset, bytes_to_splice);</span><br></pre></td></tr></table></figure>
+<p>然后进行了 benchmark 的测试，发现第六种在所有的方案中会更好</p>
+<p>这里有一些性能的点</p>
+<ul>
+<li><code>Vec::splice</code> 需要 <code>Iterator</code> 的 lower-bound 来进行预测，不然可能会耗时更多，可以通过自定义的 Iterator 来提供</li>
+<li>使用 extend 这些可能会性能更好（？）</li>
+<li>可以通过对 U32 进行处理，直接完成 PackedU32 相关的事情，其中 U32 可以当成是 4 个 U8 然后 <code>to_le_bytes()</code> 就是按照顺序来排列的，这样的话，可以使用 <code>truncate</code>来轻量级的处理只需要 U32 部分 byte 的情况</li>
+<li>另外在 Rust 中 <code>into_iter()</code> 和 <code>iter()</code> 这些还需要继续学习了解下。</li>
+</ul>
+<p>整体看 Rust 中是可以获得更好的性能，这些需要对相对更低层的知识有更好的了解（或者这里更多的是对 API 有更好的了解），这些如果仅仅通过学习是比较难了解到的，通过实际的项目则可以更好/直观的看到不同实现的差异。</p>
+	  
+	</div>
+
+	<!-- recommended posts -->
+	
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+		<li class="prev"><a href="/2025/09/19/investment-startup-innovation/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+          <li class="next"><a href="/2025/07/05/maotai-price-decreasing/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+    	 
+	 <div id="comment-thread"></div>
+	 <div id="loading-spin"></div>
+	 <script type="text/javascript">
+	   getComments({
+           type: "github" ? "github" : "github",       
+	       user: "klion26",
+	       repo: "klion26.github.io",
+		   client_id: "",
+           client_secret: "",
+		   no_comment: "No comments yet. Press the button and go to comment now!",
+		   go_to_comment: "Go to comment",
+		   no_issue: "no_issue",
+		   issue_title: "Arrow 中一次代码性能优化的记录",
+		   issue_id: "",
+		   btn_class: "btn btn-primary",
+		   comments_target: "#comment-thread",
+		   loading_target: "#loading_spin"
+		   });
+	 </script>
+  
+</section>
+
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2025-07-29 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/arrow/">arrow<span>1</span></a></li> <li><a href="/tags/variant/">variant<span>1</span></a></li> <li><a href="/tags/parquet/">parquet<span>1</span></a></li> <li><a href="/tags/rust/">rust<span>1</span></a></li> <li><a href="/tags/optimization/">optimization<span>1</span></a></li>
+
+    </ul>
+	</div>
+	
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	   <a data-toggle="collapse" data-target="#toc"><i class="fa fa-bars"></i></a>
+	   <div id="toc" class="toc collapse in">
+			<ol class="toc-article"><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-article-text">背景</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#%E8%BF%87%E7%A8%8B"><span class="toc-article-text">过程</span></a></li></ol>
+		</div>
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+
+
+
+    </div>
+  </div>
+  <div class="container-narrow">
+    <footer> <p>
+  &copy; 2025 klion26
+  
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a target="_blank" rel="noopener" href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+<!-- syntax highlighting -->
+
+  <script>
+  marked.setOptions({
+    highlight: function (code, lang) {
+        return hljs.highlightAuto(code).value;
+    }
+  });
+  function Highlighting(){
+    var markdowns = document.getElementsByClassName('markdown');
+    for(var i=0;i<markdowns.length;i++){
+        if(markdowns[i].innerHTML) markdowns[i].innerHTML =marked(markdowns[i].innerHTML);
+    }
+  }
+  window.addEventListener('DOMContentLoaded', Highlighting, false);
+  window.addEventListener('load', Highlighting, false);
+  </script>
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+</body>
+</html>
