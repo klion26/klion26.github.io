@@ -7,10 +7,18 @@ BigQuery
 - Vortex: A Stream-oriented Storage Engine For Big Data Analytics
 - BigLake: BigQuery's Evolution toward a Multi-Cloud Lakehouse
 - SQL Has Problems. We Can Fix Them: Pipe Syntax in SQL
-- 
+- Procella: Unifying serving and analytical data at YouTube
+  - [Insights from paper procella unifying serving and analytical data at youtube](https://bytegoblin.io/blog/insights-from-paper-procella-unifying-serving-and-analytical-data-at-youtube.mdx)
 
+文章说偏结论性的东西（自己理解），不要说太多细节
+- 细节别人可能不是太感兴趣
+- 纯细节不太能体现自己的东西
+- 可以在最后附加参考文献
 
+计算引擎的 execution plan 能否动态更新（根据数据的不同，动态的变动）
+- Procella
 
+Procella 的 meta 是树形结构，而且不仅仅保存叶子节
 
 从上到下，结合 fdap（或者类似想法），就是组建做标准，系统搭积木
 
