@@ -1,5 +1,8 @@
 多模态数据湖可以是啥样的？
 
+参考 FDAP 以及 [voltrondata](https://voltrondata.com/codex/accelerated-hardware) 的模型
+
+
 BigQuery
 
 - Napa: Powering Scalable Data Warehousing with Robust Query Performance at Google
@@ -7,6 +10,7 @@ BigQuery
 - Vortex: A Stream-oriented Storage Engine For Big Data Analytics
 - BigLake: BigQuery's Evolution toward a Multi-Cloud Lakehouse
 - SQL Has Problems. We Can Fix Them: Pipe Syntax in SQL
+  - 这个还是挺好的，也有开源的实现可以参考
 - Procella: Unifying serving and analytical data at YouTube
   - [Insights from paper procella unifying serving and analytical data at youtube](https://bytegoblin.io/blog/insights-from-paper-procella-unifying-serving-and-analytical-data-at-youtube.mdx)
 
@@ -48,6 +52,10 @@ table format
 -     非结构化数据
 -     新硬件
 - 
+
+还需要能够支持非结构化数据
+- 现在有多种开源的 table/file format，其中 lance 由于国内字节在推，所以被知道的比较多。这里可以分为：1）better parquet，2）原生支持非结构化数据。其中第一个就是 parquet 现在支持不太好的情况（比如 list/map 等，这些在推荐等会有需要），点查（这个可以在 parquet 上用二级索引支持 -- 参考 datafusion 的博客），当然 lance 的二维拆分会是一个更高效的处理方式（尤其是模型处理的时候加维度）；第二个就是支持非结构化数据，这个有点类似高效支持 blob 数据，然后支持索引。
+
 
 management（类似 amoro）
 - 主要是各种service（file layout 重排，索引生成，event trigger 生成 view 等）
