@@ -26,6 +26,10 @@ Procella 的 meta 是树形结构，而且不仅仅保存叶子节
 
 从上到下，结合 fdap（或者类似想法），就是组建做标准，系统搭积木
 
+parquet 可以有不错的性能（比如 Influxdata 的优化，以及 LiquidCache 的做法等），新的 FileFormat 需要的整体工作量还挺大的
+- 首先需要知道 parquet 的瓶颈（可以看新的 fileformat 的 PR 稿）
+- parquet 的 ML 讨论（https://lists.apache.org/thread/8xmxc76nd00624qqps6s1qw6lhv1qwv5）/Influxdata 博客（https://www.influxdata.com/blog/how-good-parquet-wide-tables/）
+
 引擎 bigquery
 - 用户端
 -    sql（可以优化 sql，包括 pipelined sql）
