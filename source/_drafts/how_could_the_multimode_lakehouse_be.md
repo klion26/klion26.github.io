@@ -76,7 +76,139 @@ Napa's approach for robust query performance includes the aggressive use of amte
 
 权衡三角：Data freshness, Resource costs, Query performance 三者之间做权衡
 
+A key design choice in Napa is to rely on materialized views for predicatable and high query performance.
+
+Napa's high-level architecture consists of three main components as shown in the figure above.
+- Napa's ingestion framework is responsible for committing updates into the tables. The deltas written by the ingestion framework only serve to satisfy the durability requirements of the ingestion framework, and hence are write optimized. These deltas need to be further consolidated before they can be applied to tables and their associated views.
+- The storage framework incrementally applies the updates to tables and their views. Napa tables and their views are maintained incrementally as log-structured merge-forests. Thus, each table is a collection of updates. Deltas are constantly consolidated t oform larger deltas; we call this process "compaction" The view maintenance layer transoforms table deltas into view deltas by applying the corresponding SQL transformation. The storage layer is also responsible for periodically compacting tables and views.
+- Query serving is responsible for answering client queries. The system performs merging of necessary deltas of the table(or view) at query time. Note that query latency is a function of the query time merge effort, so the faster the storage subsystem can process updates, the fewer deltas need to be merged at query time. F1 Query is used as the query engine for data stored in Napa. We provide more details for query serving in Section 8.
+
+Napa decouples ingestion from view maintenance, and view maintenance from query processing. This decoupling provides clients knobs to meet their requirements, allowing tradeoffs among freshness, performance, and cost.
+
+Users specify their requirements in terms of expected query performance, data freshness, and costs.
+Napa introduces the concept called `Queryable Timestamp (QT)` to provide clients with a live marker(just like an advancing timestamp). QT is the direct indicator of freshness since [NOW() - QT] indicates data delay. All data up the QT timestamp can be queried by the client.
+
+> Napa architecture showing the major system components
+![](https://raw.githubusercontent.com/klion26/ImageRepo/master/202512291645719.png)
+
+Napa's high-level architecture consists of data and control planes as above. The architecture is deployed at multiple data centers to manage the replicas at each data center. The data plane consists of ingestion, storage, and query serving. The control plane is made up of a controller that coordinates work among the various subsystems. The control is also responsible for synchronizing and corrdinating metadata transactions across multiple data centers.
+
+Napa clients use ETL pipelines to insert data into their tables. The ingestion framework can sustain very high load, such as tens of GB/s of compressed data. Client data are delivered to any of the Napa replicas and Napa ensures that the data ingestion is incorporated at all the data centers. This significantly simplifies the design of ingestion pipelines.
+
+Query serving deals with the necessary caching, prefetching and merging of deltas at runtime. The goal of query serving is to serve queries with low latency and low variance. Low latency is archieved by directing the queries to precomputed materialized views as opposed to the base table, and parallel execution of queries. Low variance is achieved by controlling the fan-in of the merges as well as a range of other I/O reduction and tail tolerance techniques.
+
+Napa relies on views as the main mechanism for good qauery performance. Napa's choice is largely motivated by the strict latency and resource requirements of its workloads, making it necessary to leverage indexed key lookups.
+
+The Nap controller schedules compaction and view update tasks to keep the count of deltas for a table to a configurable value. These storage tasks are needed to keep the queryable Timestamp(QT) as fresh as possible given the cost tradeoffs.
+
+The goal of the ingestion framework is to accept data, perform minima processing, and make it durable without considering the pace of subsequent view maintenance.
+
+The queryable timestamp(QT) of a table is a timestamp which indicates the freshness of data that can be queried. If QT(table) = X, all data that was ingested into the table before time X can be queried by the client and the data after time X is not part of the query results.
+
+An important criterion to ensure good query performance is to optimize the underlying data for reads and ensure views are available to speed up the queries.
+
+A table in Napa is a collection of all of its delta files, each delta corresponding to updates received for the table over a window of time, as below
+![](https://raw.githubusercontent.com/klion26/ImageRepo/master/202512291733204.png)
+
+The non-queryable deltas correspond to newly received updates written by the ingestion framework in the most recent time window(typically seconds.) THe largest deltas, on the other hand, span a time window of weeks or even months. Each delta is sorted by its keys, range partitioned, and has a local B-tree like index.
+
+The QT of the database is the minimum of the QT of all the tables in the database. QT is also used to give clients a consistent view of data across all Napa replicas.
+
+Napa's storage subsystem is responsible for maintaining views and compacting deltas. It is also responsible for ensuring data integrity, durability via replication across data centers, and handling outages from individual machines to entire data centers.
+
+Compaction improves query performance and reduces storage consumption by 1) sorting inputs together and 2)aggregating multiple updates to the same rows. Since the delta files are individually sorted, compaction is essentially merge sorting. It is intentionally kept large during compaction so that the height of the merge tree is small, thus minimizing key comparisions.
+
+Robust query serving performance
+query serving subsystem achieves robust performance, using Queryable Timestamp(QT), materialized views, and a range of other techniques.
+1. Reducing data in the critical path
+Whenever possible, Napa uses views to answer a query instead of the base table, since views with aggregation functions may have significantly less data. Nap maintains sparse B-tree indexes on its stored data, and uses them to quickly partition an input query ito thousands of subqueries that satisfy the filter predicates. This partitioning mechanism additionally looks at the latency budget and availability of query serviing resources to achieve good performance.
+
+> 增加 Figure7
+
+2. Minimizing Number of Sequential I/Os
+When a query is issued, Napa uses the value of QT to decide the version of metadata to be processed. The metadata in turns determines what data has to be process. Therefore, mateadata reads are on the critical path of query serving. Nap aensures all metadata can always be served from memory without contacting the persistent storage. This is achieved by affinity-based distributed metadata caching with periodic background refresheds. A particular QT is delayed to wait for the completion of periodic background refresh of metadata.
+
+Napa performs offline and online prefetching to further reduce the number of sequential I/Os in the critical path. Offline prefetching occurs as soon as data is ingested for frequently queried tables, before QT advances to make the new data available to query. Online prefetching starts when a query arrives and is performed by a shadow query executor which shares the data access pattern with the main query executor but skips all query processing steps.(like dry run?)
+
+3. Combining Small I/Os
+During query serving, Napa aggressively parallelizes the work by partitioning the query into fine grained units and then parallelizing I/O calls across deltas and across queried columns. To combat such amplification on tail letency, Napa uses QT to limit the number of queryable deltas. In addition, Napa also tries to combine small I/Os as much as possible, by using the fowlling two techniques: lazy merging across deltas and size-based disk layout.
+
+- lazy mering across deltas: When there are thousands(N) of subqueries and serval tens(M) of deltas, the number of parallel I/Os are in the order of tens of thousands(N * M). However, due to the parallelism each subquery reads very little data from most deltas. Meanwhile, a large fraction of Napa queries require merging based on a subset of primary keys in the subsequent phase of the query plan. In these cases, Napa adapts the query plan to avoid cross-delta merging in Delta Server and lets each Delta Server only process one delta, combining N * M parallel I/Ss into close to N parallel I/Os （merge 的数据尽量不跨 delta server？）
+- size-based disk layout: Napa uses a custom-built columnar storage format supporting multiple disk layout options, which are applied based on delta sizes. The PAX layout which can combine all column accesses into one I/O for lookup queries, is applied to small dltas. For large deltas, column-by-column layout is used that is I/O efficient for san queries but requires one I/O per column for lookup queries. This size-based choice ensures that Napa receives columnar storage benefits as well as reduces I/O operations.（基于大小选择不同的磁盘布局，PAX 作为小的布局，可以一次 IO 读取完毕，大文件则是按列存放，这样每一列需要一个 IO 但是 scan 更友好
+
+4. Tolerating tails and failures
+Napa adopts the principle of tolerating tail latency, rather than eliminating it, because eliminating all soruces of variability for such a complex and interdependent system is infeasible.
+
+For a non-streaming RPC, such as the RPC between Metadata Server and Delta Server, Napa uses the machnism of *hedging*, which sends a secondary RPC identical to the original one to a different server after a certain delay, and waits for the faster reply.
+For a streaming RPC, such as the RPC between F1 worker and Delta Server, Napa estimates its expected progress rate and requires the server executing it periodically to report progress, together with a *continuation* token. If the reported progress is below expectation or the report is missing, the last continuation token would be used to restart a new streaming RPC on a different server without losing progress. Pushdown operators like filtering and partial aggregation need to be carefully handled in progress reporting as they can significantly reduce the data size, causing progress reports to be superficially low or even missing. Napa uses bytes processed before filtering and partial aggregation as the progress rate metric and periodically forces these operators to flushes its internal state to generate a progress report with a continuation token.
+
+Production metrics insights
+Napa manages thousands of tables and views in production, where many tables are petabyte scale. It serves over a billion queries per day and ingests trillions of rows. Napa is able to provide robust query performance through three techniques: 1) by more actively using views, Napa reduces raw query performance and variance even at 99th percentile, 2) by chaning storage policies, Napa can reduce the number of deltas and hence the tail latency, and 3) by decoupling ingesting, view maintenance, and query execution; Napa can mitigate the impact of infrastructure and workload changes on query performance.
+
+1. Views and QT Help achive robust query performance
+First, most client queries are aggregation queries, and materialized views are typically at least an order of magnitude smaller than the base tables from which they are derived. Reading from views not only improves raw performance, but also improves tail latency as their smaller size is more cache friendly, and requires less compute resources, which reduces the change of continetion for query resources.
+
+> Add the figure for #views with the query latency
+
+Second, latency can be improved by reducing the number of deltas that have to be opend, read, and merged at query time.（相当于文件数量？）
+> Add the figure for #deltas with the query latency
+
+Figure 8(b) shows that as we change storage policies to reduce the number of deltas, the query latency improves significantly. The biggest impact is at the 99th percentile latency which reduces by more than 3.6x as the number of deltas is changed from 8 to 2. The main reasons are: 1) fewer deltas means there are less number of small, parallel IOs which are prone to cause latency tails, 2) fewer deltas also means that data is premerged and aggregated, and less processing is required at query time.（这个类似 MOR 中，文件数量少，则 IO 少，而且读取的时候需要进行的聚合计算也少）
+
+2. Handling infrastructure issues
+> Add figure 9
+Figure 9 shows that Napa is able to guarantee its client stable query performance even when the ingestion load changes or there are infrastructure outages.  Napa decouples ingestion from view maintenance and querying which allows us to optimize for low variance in query latency, in some cases by trading off data freshness. Figure 9(a) shows that the client continuously sends data to Napa, with some variance in the input rate over the course of the week. Figure 9(b) shows that the view maintennace performance dropped for the duration between X and Y indicating an infrastructure issue which affected the tasks updating views. However, the query serving latency remains near constant (Figure 9(d)) throughout the whole duration. In this particular example, client queries continued to be fast, however , for certain parts during the outage data freshness was impacted, as seen in Figure 9(c) where the value of delay is high. 就算 view 的维护因为基建受影响了，那么不影响写入和读取的性能，但是能读到的数据的新鲜度会受影响
+
+3. Client workloads
+支持不同的 tradeoff，比如 [Client A: Tradoff freshness] wants moderate query performance and low costs, but can tolerate lower freshness.
+[Client B: Tradeoff query performance] cares the most about low costs but can tolerate lower query performance
+[Client C Tradeoff costs] has high freshness and high query performance requirements, and is willing to pay high costs to achieve them.
+> Add figure 10 for different workloads
+
+Napa is a fully indexed system that is optimized for key lookups, range scans, and efficient incremental maintenance of indexes on tables and views. Napa can easily support both adhoc queries and highly selective and less diverse queries.
+
+Napa uses a varaint of B+-trees that exploits the fact that Napa tables have multi-part keys. Additionally, min/max keys(per-column min/max values) are stored along with each non-leaf block to eanble effective pruning. LSM adapt B-tree indexes for high update rates. Napa belongs to a class of  LSM systems that trade high write throughput for fast reads. (看起来是 LSM 和 B-tree 的结合）
+
 2023-Progressive Partitioning for Parallelized Query Execution in Google's Napa
+Napa holds Google's critical data warehouses in log-structured merge trees for real-time data ingestion and sub-second response for billions of queries per day. These queries are foten multi-key look-ups in highly skewed tables and indexes.
+
+In our production experience, only progressive query-specific partitioning can achieve Napa's strict query latency SLOs.  Here we advocate good-enough partitioning that keeps the per-query partitioning time low without risking uneven work distribution. Our design combines pragmatic system choices and algorithmic innovations. For instance, B-trees are augmented with statistics of key distributions, thus serving the dual purpose of aiding lookups and partitioning. Furthermore, progressive partitioning is designed to be "good enough" thereby balancing partitioning time with performance. The resulting system is robust and successfully serves day-in-day-out billions of queries with very high quality of service forming a core infrastructure at Google
+
+Napa's diverse query workload consists of large scans and many-key lookups. The analytical queries with many-key lookups have strict QoS requirements and is the main focus of this paper.
+
+From our experience in running production services, we found the following three requirements important:
+- Query-specific partitioning. Any approach that we take should meet the latency SLOs across a diverse set of query workloads. In our experience, the partitioning granularity needs to be adjusted on a per-query basis to meet the latency and resource budget requirements. The expectation from the partitioning step is that it is able to produce number of partitions denoted by the parallelization requirement within bounded amount of error.
+- Evenness. Execution involves the partitioning of the tables into key ranges such that the partitioning results in even partitions. Partitioning should operate on tables with extreme skews where some keys span terabytes in disk. As an example, in Figure 1, a key range like < K1 = 1, K2 = 20 > may correspond to, say, a hundred GB portion of the table while another key range may be considerably smaller at a few MB.
+- Progressiveness. Query partitioning must balance overall execution time against the time and effort to produce query-specific partitions. For instance, one can produce perfectly even partiions while still ending up missing the QoS requirement. It is imperative that the partitioning method has the notion of "good enough" in the sense that it stops when the partitioing is the sufficient quality. Our porposed technique in hte paper is progressive such that 1) the longer the alogirhtm runs the better the quality of the resultant partitioning; 2) the algorithm stops once the desired error bound has been met.
+
+Our experimental results show that the use of statistics that is too find-grained can often result in queries spending too much time generating partitioning at the expense of overall query execution time.
+
+We address this dilemma by leveraging B-trees to optimize access to the statistical information on the tables. Each LSM run has an associated B-tree index which are enhanced so that index nodes maintain size information for the associated key ranges. With these enhancements, we can estimate the input data size of the query starting with the root of the B-tree. If this estimation is not accurate enought or if the statistics point to areas of skews, we can descend to the next level in the index structure to obtain a finer level of statistical distributions for the key ranges overlapping with the query.
+
+Our proposed algorithm traverses the B-tree to produce even and query-specific partitioning. It is progressvie in the sense that it descends and accesses additional index information only if it does not satisfy the stipulated error bounds. In addition, the refinement is selective that it only descends to the lower levels of trees for those partitions that do not have gight enough bounds on the error.
+
+The following key aspects of Napa are the bedrock principles of its design and are aligned with our client requirements: i) Robust Qury Performance: Napa clients expect low query latency, typically sub-seconds, as well as low variance in latency under a wide spectrum of query and data ingestion load; ii) System Flexibility: While performance is important, our clients also require the flexibility to change system configurations to their dynamic requirements such as trading freshness or recency of ingested data for better performance; iii) High-throughput Data Ingestion: Napa's ingestion, storage and query serving functions performan udner a massive update load.
+
+A Napa table consists of multiple data sets called deltas(corresponding to sorted runs of an LSM-tree) and we have one B-tree index for each delta. Not that each delta corresponds to updates on a table during a time window(e.g., last 1 minute, 1 day etc.).
+
+Progressive partitioning using B-tree: The B-trees on the deltas are fairly generic except that it hierarchically stores statistics of the underlying data. In particular, we store the number of rows that is indexed by each sub-tree and aggregate that statistics up the level. The partitioning algorithm we propose in the paper takes queried keys as input, retrieves and merges relevant keys taken from these B-tree indices, to generate an approximate histogram. Starting with the highest level histograms (i.e., the B-tree root index blocks), it tries to find accurate enough paritions. If it needs more detailed information, the algorithm will retrieve requried index blocks from the next highest level, repeating this trial and retrieve until it reaches the desired accuracy.
+
+LSM 让 partition 变的更复杂
+The LSM data model complicates the task of query-specific partitioning in the following ways.
+- First, the keys specified in the query may be present in may(possibly all) of the deltas. Note that the same query worker must process all deltas where the keys are present in order to reconcile all relevant version.
+- Second, this proves to be a serious challenge for the evenness of the partitioning since some deltas may contribute many more matched rows than others.
+- Third, a query may involve seeking across multiple deltas and not all deltasequally contribute to the query. Thus, the paritioning effort may not be uniform across the deltas. For some deltas, it may be sufficient to perform coarser partitioning while others require significantly more effort in producing equal splits.
+
+Why rely on progressive query-specific partitioning?
+The ideal partitioning unit size can vary from 10MB(e.g., when reading 1GB data using 100 scan workers) to 1GB(e.g., when reading 1TB data using 1000 scan workers) on a per-query basis. 
+The next complexity here is that it is possible that there is one particular "Date = d3", which accounts for most of the data to be scanned in a query. So, that means that we need to partition the range <c1, d3>, <c2, d3> and <c3, d3> much more finely than the other key ranges. This means the partitioning algorithm needs to be progressive such that it can stop early on other dates and focus on generating finer grained partitions for "Date = d3" 
+Standard write-time partitioning mechanisms are not able to address the requirements discussed above.
+
+Partitioning is highly specific to query under consideration and existing write-time partitioning is inadequate for workloads with a wide spectrum of query workloads. We have also established that one needs a way of producing both fine and coarse grained partitions even on the same key range, based on the query predicates, latency target and resource budget.
+
+Progressive partitioning
+The progressive query-specific partitioning algorithm using *size-enhanced* B-trees. Our solution is to enhance typical B-trees with the statistics on data size in a hierarchical manner. For each delta, we maintain a B-tree pointing to data blocks, e.g. a block in the PAX layout. The index not only helps a query to efficiently seek on data using prefix keys but also provides statistical information for partitioning. Both querying and query-specific partitioning traverse the B-tree.
+
 # SQL Has Problems
 文章描述了 SQL 是一个很好的抽象，但是学习和维护不方便，重新造一个类似 SQL 的语言又很麻烦，所以有了 PipelinedSQL 这个渐进式改进的方案。
 >SQL is not an easy language to learn or use. Even for expert users, SQL is challenging to read, write and work with, which hurts user productivity. Serveral alternative languages have been prposed, but none have gained widespread adoption or displaced SQL. Migrating away from existing SQL ecosystems is expensive and generally unappealing for users.
