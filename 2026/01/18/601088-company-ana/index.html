@@ -3,13 +3,20 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Hexo</title>
+  <title>中国神华公司初步分析 | Hexo</title>
   <meta name="author" content="klion26">
+  
+  <meta name="description" content="中国神华的情况，数据主要以 2024 年年报为主
+
+股东以及相关关系整体的控股关系如下图所示
+
+
+业务基本情况公司包括多个部门，煤炭生产→煤炭运输 （铁路、 港口、 航运） →煤炭转化 （发电及煤化工）的一体化产业链，各分部之间存在业务往来，比如本公司的煤炭供给给发电部门，然后途中会使用本公司的铁路">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  
+  <meta property="og:title" content="中国神华公司初步分析"/>
   <meta property="og:site_name" content="Hexo"/>
 
   
@@ -99,77 +106,32 @@
 
   <div class="container">
     <div class="content">
-      <div class="page-header page-header-inverse ">
-  <h1 class="title title-inverse ">Hexo</h1>
-</div>
+      
 
-<div class="row page">
 
 	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> 中国神华公司初步分析</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
 	<div class="col-md-9">
 	
 
-		
-<div class="slogan">
-      <i class="fa fa-heart"></i>
-      The way to freedom.
-</div>
+	<!-- content -->
+	<div class="mypage">		
+	  		
 
-
-		<div id="top_search"></div>
-		<div class="mypage">
-		
-		<!-- title and entry -->
-        <!-- render top articles firstly -->
-        
-		
-            
-		
-            
-		
-            
-		
-            
-		
-            
-		
-            
-		
-            
-		
-            
-		
-            
-		
-            
-		
-            
-		
-            
-		
-            
-		
-        
-        <!-- render other articles -->
-        
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2026-01-18 </div>
-			<div class="article-title"><a href="/2026/01/18/601088-company-ana/" >中国神华公司初步分析</a></div>
-		</h3>
-	
-
-
-			  
-<div class="entry">
-
-  <div class="row">
-	
-	
-		<blockquote>
+	  <blockquote>
 <p>中国神华的情况，数据主要以 2024 年年报为主</p>
 </blockquote>
 <h1 id="股东以及相关关系"><a href="#股东以及相关关系" class="headerlink" title="股东以及相关关系"></a>股东以及相关关系</h1><p>整体的控股关系如下图所示</p>
@@ -1631,494 +1593,134 @@
   }
 </script>
 <h1 id="Ref"><a href="#Ref" class="headerlink" title="Ref"></a>Ref</h1><p>[1] 华源证券 煤炭行业中期策略报告 (2025.06.27)<br>[2] <a target="_blank" rel="noopener" href="https://www.ndrc.gov.cn/xxgk/zcfb/tz/202311/t20231110_1361897.html">https://www.ndrc.gov.cn/xxgk/zcfb/tz/202311/t20231110_1361897.html</a><br>[3] <a target="_blank" rel="noopener" href="https://www.ndrc.gov.cn/xxgk/zcfb/tz/202110/t20211012_1299461.html">https://www.ndrc.gov.cn/xxgk/zcfb/tz/202110/t20211012_1299461.html</a><br>[4] <a target="_blank" rel="noopener" href="https://www.nea.gov.cn/20251026/70d3b88f62f1401bbe47a8212e06ad8e/c.html">https://www.nea.gov.cn/20251026/70d3b88f62f1401bbe47a8212e06ad8e/c.html</a></p>
-
-	
+	  
 	</div>
-  <a type="button" href="/2026/01/18/601088-company-ana/#more" class="btn btn-default more">Read More</a>
-</div>
 
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2025-11-16 </div>
-			<div class="article-title"><a href="/2025/11/16/column-format-compare/" >columnar-file-formats</a></div>
-		</h3>
+	<!-- recommended posts -->
 	
 
-
-			  
-<div class="entry">
-
-  <div class="row">
-	
-	
-		<h1 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h1><p>在分析场景下列存相对行存有非常大的优势，可以极大减少 IO 的开销。在 Data Page Layouts for Relational Databases on Deep Memory Hierarchies[1] 一文中，引出了 PAX 格式并与行存进行了对比。</p>
-<p>以下表数据为例</p>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>column_a</th>
-<th>column_b</th>
-<th>column_c</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>abcd</td>
-<td>3.2</td>
-</tr>
-<tr>
-<td>2</td>
-<td>efdf</td>
-<td>4.7</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>分别使用行存和列存写到磁盘后的格式大致如下</p>
-<blockquote>
-<p>为了较好展示，以 <code>,</code> 为分隔符，且省略了各种 header/footer</p>
-</blockquote>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>存储格式</th>
-<th>内容</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>行存</td>
-<td>1,abcd,3.2,2,efdf,4.7</td>
-</tr>
-<tr>
-<td>列存</td>
-<td>1,2,abcd,efdf,3.2,4.7</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>在分析场景中，读取某一列所有的数据是常见操作，但是对于行存来说读取某一列数据，需要在文件中进行多次 IO 定位，然后读取值，而对于列存来说可以直接顺序的读取某列整体的值。比如上述示例中读取 <code>column_c</code> 的值</p>
-<p>在行存中需要</p>
-<ul>
-<li>定位到 3.2 的位置</li>
-<li>读取 3.2 的值</li>
-<li>定位到 4.7 的位置</li>
-<li>读取 4.7 的值</li>
-</ul>
-<p>在列存中需要</p>
-<ul>
-<li>定位到 3.2 的位置</li>
-<li>连续读取 3.2 和 4.7 的值</li>
-</ul>
-<p>连续读取的开销比随机读取少，也就是第二种的开销更小，因此列存在分析场景中开销更小。</p>
-<p>文献[1] 中描述列存格式可以比行存减少由于 cache miss 导致的停顿延时 75%；range selection 的查询可以快 17-25%，TPC-H 中 I/O  更重的 query 要快 11-48%。</p>
-	
-	</div>
-  <a type="button" href="/2025/11/16/column-format-compare/#more" class="btn btn-default more">Read More</a>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2025-10-07 </div>
-			<div class="article-title"><a href="/2025/10/07/a-perspective-of-investment/" >价值投资是一种思维模式</a></div>
-		</h3>
-	
-
-
-			  
-<div class="entry">
-
-  <div class="row">
-	
-	
-		<blockquote>
-<p>交易市场往往在大幅波动（大涨/大跌）的时候会比较活跃，最近市场行情不错，整体活跃度增长，这里记录下自己当前关于价值投资的一些看法。值投资价值投资的好处：比较大概率能赚钱（逻辑通顺），主要依赖自己下的功夫，不需要一直盯盘（投入时间不一定少，但是不那么急迫），最近 2972 天的复合年化 22.03% ，基本没有盯盘，整体效果还不错。</p>
-</blockquote>
-<p>所有的投资都是一种 <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/2L5CN1WoKViSk6UUduuP0Q">套利</a>，价值投资则是在有价值的资产上以较低价格买入，然后等升值后卖出赚钱。因为在投资之前就已经进行了重复的计算，因此投资过程相对简单，但是简单并不表示容易：1）什么是有价值的资产：2）什么时候是（较）低价：3）如何能做到不受波动影响。每一步都不容易，但是做到一次之后就会越来越容易，而且这个会有复利</p>
-	
-	</div>
-  <a type="button" href="/2025/10/07/a-perspective-of-investment/#more" class="btn btn-default more">Read More</a>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2025-09-19 </div>
-			<div class="article-title"><a href="/2025/09/19/investment-startup-innovation/" >投资、创业与创新</a></div>
-		</h3>
-	
-
-
-			  
-<div class="entry">
-
-  <div class="row">
-	
-	
-		<blockquote>
-<p>尝试记录一个思想快照，供后续 review 使用。</p>
-</blockquote>
-<h1 id="套利"><a href="#套利" class="headerlink" title="套利"></a>套利</h1><blockquote>
-<p>Arbitrage is the practice of taking advantage of a difference in prices in two or more markets – striking a combination of matching deals to capitalize on the difference, the profit being the difference between the market prices at which the unit is traded. Arbitrage has the effect of causing prices of the same or very similar assets in different markets to converge.</p>
-</blockquote>
-<p>套利(Arbitrage)： 是一种利用资产在不同市场/不同形态进行交易获取价差来获利的行为。这里的描述中更多的是空间上的，而没有描述时间上的。加上时间维度，就变成了二维空间（时间和空间），套利行为则是在二维空间中某两个（或多个）点之间赚取利差。前面的套利则是时间（基本）一致的情况下。</p>
-	
-	</div>
-  <a type="button" href="/2025/09/19/investment-startup-innovation/#more" class="btn btn-default more">Read More</a>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2025-07-29 </div>
-			<div class="article-title"><a href="/2025/07/29/arrow_variant_optimize/" >Arrow 中一次代码性能优化的记录</a></div>
-		</h3>
-	
-
-
-			  
-<div class="entry">
-
-  <div class="row">
-	
-	
-		<blockquote>
-<p>本文记录 Arrow-RS 中一次性能优化的情况。</p>
-</blockquote>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>最近尝试在 Arrow-rs 中做一些贡献来更好的学习了解下 Arrow 和 Rust。本文的事情则是在为 Arrow-rs 支持 parquet variant 中的一个修改。当前实现的过程中，Object 和 List 会创建临时 buffer，然后在最终 copy，这样会有一定的性能损失（主要在于临时 buffer 的创建以及拷贝），希望有一种方案能够直接写入到目标的 buffer 而不需要进行拷贝，也就是 <a target="_blank" rel="noopener" href="https://github.com/apache/arrow-rs/issues/7977">ARROW-RS-7977</a> 所记录的事情。</p>
-	
-	</div>
-  <a type="button" href="/2025/07/29/arrow_variant_optimize/#more" class="btn btn-default more">Read More</a>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2025-07-05 </div>
-			<div class="article-title"><a href="/2025/07/05/maotai-price-decreasing/" >maotai-price-deprese</a></div>
-		</h3>
-	
-
-
-			  
-<div class="entry">
-
-  <div class="row">
-	
-	
-		<blockquote>
-<p>茅台股价和批价齐跌，作为股民我该怎么办？</p>
-</blockquote>
-<p>最近（一年）茅台股价下跌，加上现在批价下行，作为茅台股民我该怎么办呢？</p>
-<p>这个时候作为股民应该感到高兴，理由有几：1）股价下跌，导致入场成本低；2）批价下跌，会影响股价向下，转到第一点；3）股价/批价不影响茅台公司的盈利能力。</p>
-	
-	</div>
-  <a type="button" href="/2025/07/05/maotai-price-decreasing/#more" class="btn btn-default more">Read More</a>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2025-05-20 </div>
-			<div class="article-title"><a href="/2025/05/20/iceberg-summit-2025/" >iceberg summit 2025 notes</a></div>
-		</h3>
-	
-
-
-			  
-<div class="entry">
-
-  <div class="row">
-	
-	
-		<p>本次 Iceberg Summit 2025[0] 上行业内众多公司做了分享，包括 Iceberg 核心技术、使用案例，优化方案，未来走向等等。其中国内的腾讯（两个 talk），小米，小红书均有分享，整体内容不错，这里做一个总结，更详细的请参考原视频。</p>
-	
-	</div>
-  <a type="button" href="/2025/05/20/iceberg-summit-2025/#more" class="btn btn-default more">Read More</a>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2025-04-26 </div>
-			<div class="article-title"><a href="/2025/04/26/differentiation/" >差异化和公司文化</a></div>
-		</h3>
-	
-
-
-			  
-<div class="entry">
-
-  <div class="row">
-	
-	
-		<p>在商业世界中，公司靠持续提供有差异化的产品保持竞争力，公司的文化则在更长时间范围内保证可以提供差异化的产品。</p>
-<blockquote>
-<p>本文受《雪球特别版-段永平投资问答录》启发</p>
-</blockquote>
-	
-	</div>
-  <a type="button" href="/2025/04/26/differentiation/#more" class="btn btn-default more">Read More</a>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2025-04-17 </div>
-			<div class="article-title"><a href="/2025/04/17/compare-opportunity-cost-and-ratio/" >比较，机会成本以及迭代速度</a></div>
-		</h3>
-	
-
-
-			  
-<div class="entry">
-
-  <div class="row">
-	
-	
-		<blockquote>
-<p>本文希望能够通过对一些例子，梳理一些基本/常用的事项。</p>
-</blockquote>
-<p>在 <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/7T22TF60g_FQV10xfzZBZw">分红及投资复利-以茅台为例</a> 一文中主要阐述了投资中复利的力量，从相关数据可以看出，复利能够让我们的得到更好的结果，复利中结果和利率也会相关。</p>
-<p>本文尝试对利率(本文中的迭代速度)，比较以及机会成本进行相关阐述，希望能对这些有一个更深的认识。部分想法受《雪球特别版-段永平投资问答录》启发。 </p>
-	
-	</div>
-  <a type="button" href="/2025/04/17/compare-opportunity-cost-and-ratio/#more" class="btn btn-default more">Read More</a>
-</div>
-
-           
-		
-           
-			  
-	
-	<!-- display as entry -->	
-		<h3 class="title">
-			<div class="date"> 2025-04-09 </div>
-			<div class="article-title"><a href="/2025/04/09/invest-compond/" >分红以及投资复利-以茅台为例</a></div>
-		</h3>
-	
-
-
-			  
-<div class="entry">
-
-  <div class="row">
-	
-	
-		<blockquote>
-<p>本文尝试对上市公司分红以及投资复利进行一些分析，希望能够更好的了解投资的选择标准，以及操作标准。</p>
-</blockquote>
-<p>在 <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/2KbUDJNn7-DLrqGPRHT0iA">赚钱机器茅台</a> 一文中，我们有提到分红相关的事情，这里我们仍旧以茅台为例分析下分红相关的内容。</p>
-	
-	</div>
-  <a type="button" href="/2025/04/09/invest-compond/#more" class="btn btn-default more">Read More</a>
-</div>
-
-           
-		
-
-		</div>
-
-		<!-- pagination -->
-		<div>
-  		<center>
-		<div class="pagination">
+	<div>
+  	<center>
+	<div class="pagination">
 <ul class="pagination">
 	 
 		
           <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>Prev</a></li>
         
 
-        <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
 
 		
-		   <li class="next"> <a href="/page/2/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a> </li>
+          <li class="next"><a href="/2025/11/16/column-format-compare/" class="alignright next">Next<i class="fa fa-arrow-circle-o-right"></i></a></li>
         
 	
 </ul>
 </div>
 
-  		</center>
-		</div>
-
-		
-		
-	</div> <!-- col-md-9 -->
-
-	
-		<div class="col-md-3">
-	<div id="sidebar">
-	
-			
-  <div id="site_search">
-   <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
-   </div>  
-  <div id="local-search-result"></div>
-  </div>
-
-
-		
-			<div class="widget">
-    
-	    <h4 class="dsq-widget-title">Recent Comments</h4>
-		<div id="recent-comments"></div>
-		<script type="text/javascript">
-		    getRecentCommentsList({
-			   type: "github" ? "github" : "github",
-			   user: "klion26",
-               repo: "klion26.github.io",
-               client_id: "",
-               client_secret: "",
-			   count: "5" ? "5" : 5,
-			   recent_comments_target: "#recent-comments"
-			});
-		</script>
-	
-</div>
-
-		
-			
-		
-			
-	<div class="widget">
-		<h4>Tag Cloud</h4>
-		<ul class="tag_box inline list-unstyled">		
-		
-			<li><a href="/tags/lsm-tree/">lsm-tree<span>1</span></a></li>
-		
-			<li><a href="/tags/%E5%88%86%E7%BA%A2/">分红<span>1</span></a></li>
-		
-			<li><a href="/tags/innovation/">innovation<span>1</span></a></li>
-		
-			<li><a href="/tags/compond/">compond<span>1</span></a></li>
-		
-			<li><a href="/tags/company-analysis/">company-analysis<span>2</span></a></li>
-		
-			<li><a href="/tags/pattern/">pattern<span>1</span></a></li>
-		
-			<li><a href="/tags/theory/">theory<span>1</span></a></li>
-		
-			<li><a href="/tags/cost/">cost<span>1</span></a></li>
-		
-			<li><a href="/tags/wine/">wine<span>2</span></a></li>
-		
-			<li><a href="/tags/parquet/">parquet<span>2</span></a></li>
-		
-			<li><a href="/tags/arrow/">arrow<span>1</span></a></li>
-		
-			<li><a href="/tags/601088/">601088<span>1</span></a></li>
-		
-			<li><a href="/tags/file-format/">file-format<span>1</span></a></li>
-		
-			<li><a href="/tags/lance/">lance<span>1</span></a></li>
-		
-			<li><a href="/tags/stock/">stock<span>4</span></a></li>
-		
-			<li><a href="/tags/optimization/">optimization<span>1</span></a></li>
-		
-			<li><a href="/tags/iceberg-summit/">iceberg-summit<span>1</span></a></li>
-		
-			<li><a href="/tags/notes/">notes<span>1</span></a></li>
-		
-			<li><a href="/tags/profit/">profit<span>1</span></a></li>
-		
-			<li><a href="/tags/maotai/">maotai<span>3</span></a></li>
-		
-		
-		   <li><a href="/tags">...<span>37</span></a></li>
-		 
-		</ul>
+    </center>
 	</div>
 
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
 
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">Comments</h2>
+    	 
+	 <div id="comment-thread"></div>
+	 <div id="loading-spin"></div>
+	 <script type="text/javascript">
+	   getComments({
+           type: "github" ? "github" : "github",       
+	       user: "klion26",
+	       repo: "klion26.github.io",
+		   client_id: "",
+           client_secret: "",
+		   no_comment: "No comments yet. Press the button and go to comment now!",
+		   go_to_comment: "Go to comment",
+		   no_issue: "no_issue",
+		   issue_title: "中国神华公司初步分析",
+		   issue_id: "",
+		   btn_class: "btn btn-primary",
+		   comments_target: "#comment-thread",
+		   loading_target: "#loading_spin"
+		   });
+	 </script>
+  
+</section>
+
+
+	</div> <!-- col-md-9/col-md-12 -->
 		
-			
-<div class="widget">
-  <h4>Recent Posts</h4>
-  <ul class="entry list-unstyled">
-    
-      <li>
-        <a href="/2026/01/18/601088-company-ana/" ><i class="fa fa-file-o"></i>中国神华公司初步分析</a>
-      </li>
-    
-      <li>
-        <a href="/2025/11/16/column-format-compare/" ><i class="fa fa-file-o"></i>columnar-file-formats</a>
-      </li>
-    
-      <li>
-        <a href="/2025/10/07/a-perspective-of-investment/" ><i class="fa fa-file-o"></i>价值投资是一种思维模式</a>
-      </li>
-    
-      <li>
-        <a href="/2025/09/19/investment-startup-innovation/" ><i class="fa fa-file-o"></i>投资、创业与创新</a>
-      </li>
-    
-      <li>
-        <a href="/2025/07/29/arrow_variant_optimize/" ><i class="fa fa-file-o"></i>Arrow 中一次代码性能优化的记录</a>
-      </li>
-    
-  </ul>
-</div>
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
 
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2026-01-18 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/company-analysis/">company-analysis<span>2</span></a></li> <li><a href="/tags/investment/">investment<span>4</span></a></li> <li><a href="/tags/601088/">601088<span>1</span></a></li>
+
+    </ul>
+	</div>
+	
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	   <a data-toggle="collapse" data-target="#toc"><i class="fa fa-bars"></i></a>
+	   <div id="toc" class="toc collapse in">
+			<ol class="toc-article"><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#%E8%82%A1%E4%B8%9C%E4%BB%A5%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%85%B3%E7%B3%BB"><span class="toc-article-text">股东以及相关关系</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#%E4%B8%9A%E5%8A%A1%E5%9F%BA%E6%9C%AC%E6%83%85%E5%86%B5"><span class="toc-article-text">业务基本情况</span></a><ol class="toc-article-child"><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#%E7%85%A4%E7%82%AD"><span class="toc-article-text">煤炭</span></a></li><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#%E7%94%B5%E5%8A%9B"><span class="toc-article-text">电力</span></a></li><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#%E9%93%81%E8%B7%AF"><span class="toc-article-text">铁路</span></a></li><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#%E6%B8%AF%E5%8F%A3"><span class="toc-article-text">港口</span></a></li><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#%E8%88%AA%E8%BF%90"><span class="toc-article-text">航运</span></a></li><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#%E7%85%A4%E5%8C%96%E5%B7%A5"><span class="toc-article-text">煤化工</span></a></li><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#%E7%85%A4%E7%94%B5%E7%BB%93%E5%90%88"><span class="toc-article-text">煤电结合</span></a></li></ol></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#%E7%BB%8F%E8%90%A5%E6%83%85%E5%86%B5"><span class="toc-article-text">经营情况</span></a><ol class="toc-article-child"><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#%E7%8E%B0%E9%87%91%E6%B5%81%E9%87%8F%E4%BB%A5%E5%8F%8A%E5%88%86%E7%BA%A2"><span class="toc-article-text">现金流量以及分红</span></a></li><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#%E5%90%88%E5%90%8C%E8%B4%9F%E5%80%BA%E5%92%8C%E5%BA%94%E6%94%B6%E6%AC%BE"><span class="toc-article-text">合同负债和应收款</span></a></li><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#%E5%92%8C%E7%85%A4%E7%82%AD%E5%85%AC%E5%8F%B8%EF%BC%8C%E7%94%B5%E5%8A%9B%E5%85%AC%E5%8F%B8%E7%9A%84%E9%83%A8%E5%88%86%E5%AF%B9%E6%AF%94"><span class="toc-article-text">和煤炭公司，电力公司的部分对比</span></a></li></ol></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#%E9%A3%8E%E9%99%A9"><span class="toc-article-text">风险</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Ref"><span class="toc-article-text">Ref</span></a></li></ol>
+		</div>
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
 		
-			
-<div class="widget">
-	<h4>Links</h4>
-	<ul class="blogroll list-unstyled">
-	
-		<li><i class="fa fa-github"></i><a href="https://github.com/wzpan/freemind/" title="Freemind's Github repository." target="_blank"]);">Freemind</a></li>
-	
-		<li><i class="fa fa-github"></i><a href="http://www.github.com/klion26" title="My Github account." target="_blank"]);">My Github</a></li>
-	
-	</ul>
-</div>
+
+</div><!-- row -->
 
 
-		
-	</div> <!-- sidebar -->
-</div> <!-- col-md-3 -->
-
-	
-
-</div> <!-- row-fluid -->
 
 
     </div>
