@@ -19,6 +19,8 @@ toc: true
 
 ![](https://raw.githubusercontent.com/klion26/ImageRepo/master/202601151953271.png)
 
+<!-- more -->
+
 # 业务基本情况
 
 公司包括多个部门，煤炭生产→煤炭运输 （铁路、 港口、 航运） →煤炭转化 （发
