@@ -80,7 +80,7 @@ A key design choice in Napa is to rely on materialized views for predicatable an
 
 Napa's high-level architecture consists of three main components as shown in the figure above.
 - Napa's ingestion framework is responsible for committing updates into the tables. The deltas written by the ingestion framework only serve to satisfy the durability requirements of the ingestion framework, and hence are write optimized. These deltas need to be further consolidated before they can be applied to tables and their associated views.
-- The storage framework incrementally applies the updates to tables and their views. Napa tables and their views are maintained incrementally as log-structured merge-forests. Thus, each table is a collection of updates. Deltas are constantly consolidated t oform larger deltas; we call this process "compaction" The view maintenance layer transoforms table deltas into view deltas by applying the corresponding SQL transformation. The storage layer is also responsible for periodically compacting tables and views.
+- The storage framework incrementally applies the updates to tables and their views. Napa tables and their views are maintained incrementally as log-structured merge-forests. Thus, each table is a collection of updates. Deltas are constantly consolidated to form larger deltas; we call this process "compaction" The view maintenance layer transoforms table deltas into view deltas by applying the corresponding SQL transformation. The storage layer is also responsible for periodically compacting tables and views.
 - Query serving is responsible for answering client queries. The system performs merging of necessary deltas of the table(or view) at query time. Note that query latency is a function of the query time merge effort, so the faster the storage subsystem can process updates, the fewer deltas need to be merged at query time. F1 Query is used as the query engine for data stored in Napa. We provide more details for query serving in Section 8.
 
 Napa decouples ingestion from view maintenance, and view maintenance from query processing. This decoupling provides clients knobs to meet their requirements, allowing tradeoffs among freshness, performance, and cost.
@@ -169,7 +169,8 @@ Napa is a fully indexed system that is optimized for key lookups, range scans, a
 
 Napa uses a varaint of B+-trees that exploits the fact that Napa tables have multi-part keys. Additionally, min/max keys(per-column min/max values) are stored along with each non-leaf block to eanble effective pruning. LSM adapt B-tree indexes for high update rates. Napa belongs to a class of  LSM systems that trade high write throughput for fast reads. (看起来是 LSM 和 B-tree 的结合）
 
-2023-Progressive Partitioning for Parallelized Query Execution in Google's Napa
+
+# 2023-Progressive Partitioning for Parallelized Query Execution in Google's Napa
 Napa holds Google's critical data warehouses in log-structured merge trees for real-time data ingestion and sub-second response for billions of queries per day. These queries are foten multi-key look-ups in highly skewed tables and indexes.
 
 In our production experience, only progressive query-specific partitioning can achieve Napa's strict query latency SLOs.  Here we advocate good-enough partitioning that keeps the per-query partitioning time low without risking uneven work distribution. Our design combines pragmatic system choices and algorithmic innovations. For instance, B-trees are augmented with statistics of key distributions, thus serving the dual purpose of aiding lookups and partitioning. Furthermore, progressive partitioning is designed to be "good enough" thereby balancing partitioning time with performance. The resulting system is robust and successfully serves day-in-day-out billions of queries with very high quality of service forming a core infrastructure at Google
@@ -207,7 +208,22 @@ Standard write-time partitioning mechanisms are not able to address the requirem
 Partitioning is highly specific to query under consideration and existing write-time partitioning is inadequate for workloads with a wide spectrum of query workloads. We have also established that one needs a way of producing both fine and coarse grained partitions even on the same key range, based on the query predicates, latency target and resource budget.
 
 Progressive partitioning
-The progressive query-specific partitioning algorithm using *size-enhanced* B-trees. Our solution is to enhance typical B-trees with the statistics on data size in a hierarchical manner. For each delta, we maintain a B-tree pointing to data blocks, e.g. a block in the PAX layout. The index not only helps a query to efficiently seek on data using prefix keys but also provides statistical information for partitioning. Both querying and query-specific partitioning traverse the B-tree.
+The progressive query-specific partitioning algorithm using *size-enhanced* B-trees. Our solution is to enhance typical B-trees with the statistics on data size in a hierarchical manner. For each delta, we maintain a B-tree pointing to data blocks, e.g. a block in the PAX layout. The index not only helps a query to efficiently seek on data using prefix keys but also provides statistical information for partitioning. Both querying and query-specific partitioning traverse the B-tree. The querying traverses the B-tree through the leaf level to visit dat ablocks. The query-specific partitioning does not visit data blocks and visits the index node at the leaf level only when required for finding "good enough" partitions as we describe below.
+> 使用 size-enhanced B-Tree，对于每一个 delta 都维护一个 B-tree 指向 data blocks，这样可以提供前缀查询，以及统计信息等
+
+For a given query Q, the algorithm divides D deltas into P key range partitions that are nearly even with an error margin of \{thelta}. Each delta has a size-enhanced B-tree, which carries keys and the size of data between these keys. We analyze the estimated size of matching data by combining keys and sizes from D indices. To get the most precise matching estimate from B-trees, we may need to visit the leaf index entries matching with the query. 但是读所有的 leaf 会很耗时，另外一种方式就是通过 root 来推测 partition 的数量，这是两个极端，文中从中间进行选择：从 root 开始，然后仅在需要下一层提供更多信息的时候才进行继续读取。
+
+文中有一个具体的例子
+> 补充 fig 4 和 fig 5
+
+其中两个 Delta，然后希望分成两个 partition（分 parition 是希望能够并行处理），然后考虑第一层的时候（从 B-tree 获得信息），Delta 1 的 [K1, K3) 有 15 个，[K4, K8) 有 20 个； Delta 2 的 [K2, K5) 有 20 个，[K6, K7) 15 个。
+
+那么把所有的数目都加在一起就是 15 +  20 + 20 + 15 = 70 个，然后会选择在 K4 和 K5 这里做分割，这样会把 [K4, K8) 和 [K2, K5) 做一些分割，然后对于第一个 partition 来说，大小可能是 15（也就是 [K2, K5) 的倾斜全在右侧，[K4, K8) 也倾斜），同样最大可能是 15+20+20 = 55,那么估算这个大小是 (15 + 55) / 2 = 35，然后 size margin = 55 -15 = 40,同样第二个 partition 类似，得到估算大小是 35, size margin 是 40,如果 (40/35, 40/35) -- 两个 parititon 的误差 -- 能满足 \{theata} 那么就按照这么切分，如果不行，就对 B-Tree 进行下一层读取，然后再进一步进行划分
+
+> We represent this size-embedded index entry in a B-tree index node as e = <start, end, size, level, block>, which corresponds to the key range [e.start, e.end) having the estimated size e.size. The entry e is in a index block at tree level e.level(the value of 0 for e.level corresponds to the leaf level). Finally, e.block is a pointer to the child index block having range [e.start, e.end) (if e.level > 0)
+
+> 根据和 Gemini 的沟通，大概理解 Napa 的存储结构如下
+> 首先是 LSM Tree，然后每个 SSTable 是一个 B-tree，B-tree 就是文中的 Delta，B-tree 中包括多个实际的文件，以及对应的索引，然后渐进式则是「够用」就好，-- 「够用」是满足对应的误差
 
 # SQL Has Problems
 文章描述了 SQL 是一个很好的抽象，但是学习和维护不方便，重新造一个类似 SQL 的语言又很麻烦，所以有了 PipelinedSQL 这个渐进式改进的方案。
