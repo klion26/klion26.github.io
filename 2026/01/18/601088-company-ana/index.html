@@ -905,7 +905,7 @@
 </tbody>
 </table>
 </div>
-<p>可以看到自产煤的毛利率远大于外购煤的毛利率，另外这部分既然不赚钱，为啥还要做生意呢？或许是为了维持运输线路，运输路线只要能同正常流转就能够赚钱（运输自己的煤可以减少开支，运输其他公司物品可以赚利润）</p>
+<p>可以看到自产煤的毛利率远大于外购煤的毛利率，另外这部分既然不赚钱，为啥还要做生意呢？或许是为了保证长协煤？</p>
 <p>从发电分部来说，现在有两个政策对火电相对较好：1）容量电价[2]；2）电价浮动[3]。第一个是说只要保证有相关的能力，就能有一定的收入（不管是否发电） — 但是需要电的时候要能保证提供，否则会扣费，甚至取消相关资格；第二个是电价会按市场需要波动，低峰更便宜，高峰更贵。</p>
 <p>由于公司内部有煤，有电，然后有容量电价，以及电价的浮动，那么在煤炭价格进行波动的时候，可以内部进行一定的缓冲，比如煤炭价格下跌的时候，可以适当的给内部发电部门供应更多的煤炭（这个有上限），然后发电分部可以通过多发电（甚至在高峰期多发电 — 这个查看调度优先级），这样可以把一部分由于煤炭降价导致收入转移到电力下游，一定程度的对冲价格的波动，整体的收入和利润会更平衡一些。后文我们会对具体的波动数值进行一个推演。</p>
 <p>这里可以分为 </p>
@@ -1513,13 +1513,13 @@
 </div>
 <p>相关图形如下所示（可以观察斜率表示增长率）</p>
 
-<div id="echarts1019" style="width: 85%;height:400px;margin: 0 auto"></div>
+<div id="echarts1463" style="width: 85%;height:400px;margin: 0 auto"></div>
 <script src="https://unpkg.com/echarts@5.6.0/dist/echarts.min.js" ></script>
 <script >
-  if (window.eChartecharts1019ResizeHandler) {
-    window.removeEventListener("resize", eChartecharts1019ResizeHandler);
+  if (window.eChartecharts1463ResizeHandler) {
+    window.removeEventListener("resize", eChartecharts1463ResizeHandler);
   }
-  var optionecharts1019 = option = {
+  var optionecharts1463 = option = {
   title: {
     text: '新增装机量'
   },
@@ -1582,12 +1582,12 @@
   ]
 };;
   if (window.echarts !== undefined) {
-    var eChartecharts1019 = echarts.init(document.getElementById('echarts1019'));
-    eChartecharts1019.setOption(optionecharts1019);
-    var eChartecharts1019ResizeHandler = function() {
-      eChartecharts1019.resize();
+    var eChartecharts1463 = echarts.init(document.getElementById('echarts1463'));
+    eChartecharts1463.setOption(optionecharts1463);
+    var eChartecharts1463ResizeHandler = function() {
+      eChartecharts1463.resize();
     };
-    window.addEventListener("resize", eChartecharts1019ResizeHandler);
+    window.addEventListener("resize", eChartecharts1463ResizeHandler);
   }
 </script>
 <h1 id="神华自己的价值"><a href="#神华自己的价值" class="headerlink" title="神华自己的价值"></a>神华自己的价值</h1><p>首先我们对神华进行公司的价值估算，这样可以和现在的市值进行比较。我们根据不同业务的综合进行估值</p>
