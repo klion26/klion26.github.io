@@ -14,7 +14,7 @@ date: 2025-12-16
 - [腾讯] 内部 Flink 版本开发：Flink 单点重启功能，单 task failvoer 耗时降为 0；Flink 大状态快速恢复功能，40TB state 恢复耗时从 20 分钟优化到 1 分钟
 - [腾讯] 广告提效项目支持：支持 实时样本、特性、训练等使用 Flink，并支持 Native K8S 相关功能，为广告节省成本 40%。
 - [腾讯] Flink 作业管理平台开发，支持多种作业类型（代码、SQL、拖拽式画布），支持多环境部署
-- [天翼云]
+- [天翼云] 实时湖仓：从零打造一套实时湖仓，单表百亿，日更新 100% 的情况下做到分钟级新鲜度，入湖速度单条数据 1K 的情况下单核做到 1500条/s，支持SchemaEvolution，同一用户稳定管理 9W+ 表
 
 # Talks
 - 2019 年 Flink Forward Asia
@@ -25,10 +25,10 @@ date: 2025-12-16
 - 2025 年 CommunityOverCode Asia
 
 # 经历
+- 2024.12 Apache Amoro PMC member
 - 2023.8 - 天翼云 大数据产线
+- 2020.10 Apache Flink Committer
 - 2020.5 - 2023.8 腾讯科技有限公司  数据平台部
 - 2018.3 - 2020.5 阿里巴巴 Blink 团队
 - 2015.7 - 2018.3 美团 数据平台部
 - 2008.9 - 2015.6 中南大学 计算机学院
-- 2020.10 Apache Flink Committer
-- 2024.12 Apache Amoro PMC member

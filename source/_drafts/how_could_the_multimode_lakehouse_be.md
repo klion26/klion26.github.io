@@ -53,14 +53,110 @@ Dremeal A Decade of Interactive SQL Analysis at Web Scale
 Bigtable A Distributed Storage System for Structured Data
 Adaptive and Robust Query Execution for Lakehouse at Scale
 Column Sketches A Scan Accelerator for Rapid and Robust Predicate Evaluation
-- Napa: Powering Scalable Data Warehousing with Robust Query Performance at Google
-- [x] Big Metadata: When Metadata is Big Data
-- [x] Vortex: A Stream-oriented Storage Engine For Big Data Analytics
-- BigLake: BigQuery's Evolution toward a Multi-Cloud Lakehouse
-- [x] SQL Has Problems. We Can Fix Them: Pipe Syntax in SQL
-  - 这个还是挺好的，也有开源的实现可以参考
-- [x] Procella: Unifying serving and analytical data at YouTube
+- [x] Napa Powering Scalable Data Warehousing with Robust Query Performance at Google
+- [x] Big Metadata When Metadata is Big Data
+- [x] Vortex A Stream-oriented Storage Engine For Big Data Analytics
+- [x] BigLake BigQuery's Evolution toward a Multi-Cloud Lakehouse
+- [x] SQL Has Problems. We Can Fix Them Pipe Syntax in SQL(这个还是挺好的，也有开源的实现可以参考)
+- [x] Procella Unifying serving and analytical data at YouTube
 Unity Catalog
+
+# BigLake BigQuery's Evolution toward a Multi-Cloud Lakehouse
+
+BigQuery's cloud-native disaggregated architecture has allowed Google Cloud to evolve the system to meet serveral customer needs across the analytics and AI/ML workload spectrum. A key customer requirement for BigQuery centers around the unification of data lake and enterprise data warehousing workloads. This approcache combines: 1) the need for core data management primitives, e.g., securit, governance, common runtime metadata, performance acceleration, ACID transactions, provided by an enterprise data warehouses coupled with 2) harnessing the flexibility of the open source format and analytics ecosystem along with new workload types such as AI/ML over unstructured data on object storage.
+
+> 希望对 data lake 和 data warehousing 进行 unification
+
+This papaer describes BigLake, an evolution of BigQuery toward a multi-cloud lakehouse to address these customer requirements in novel ways.
+> BigQuery 如果做多云 lakehouse
+- BigLake tables, making open-source table formats(e.g., Apache Parquet, Iceberg) first class citizens, providing finegrained governance enforcement and performance acceleration over these formats to BigQuery and otehr open-source analytics engines.
+- we cover the design and implementation of BigLake Object tables that allow BigQuery to integrate AI/ML for inferencing and processing over unstructured data.
+- we present Omni, a platform for deploying BigQuery on non-GCP clouds, focusing on the infrastructure and operational innovations we made to provide an enterprise lakehouse product regardless of the cloud provider hosting the data.
+
+- Read API offers a high-performance, scalable way of accessing BigQuery managed storage and BigLake tables. The Read PAI is implemented as a gRPC-based protocol that uses an efficient binary serialization format, with scalability features such as support form ultiple streams for reading disjoint sets of rows in parallel(suitable for parallel clients such as external analytics engines like Apache Spark, or Presto/Trino). The Read API embeds Superluminal, a C++ library that does high-performance vectorized execution of GoogleSQL expressions and operators.
+- WRite API provides a mechanism for scalable, high-speed and high-volume streaming data ingestion into BigQuery with support for multiple streams.
+
+为啥需要 Delegated Access Model
+直接用 Object storage的不便
+- credential forwarding implies that the user has direct access to raw data files, which would allow users to bypass fine-grained access controls such as data masking or row-level security; 绕过了当前系统不太好做精细化的权限管控
+- BigLake tables need to access storage outside of the context of a query to perform maintenance operations, for example refreshing the metdata cache or backgrouond data reclustering。另外 Biglake 需要做一些维护操作（非用户执行的），比如刷新 metadata，reclustering
+
+BigLake table 依赖 delegated access mode，这个权限是 readonly 的. The table uses the connection credentials to process queries and perform background maintenance operations. Users can reuse the same connection object for multiple tables: typically, our customers use one connection per data lake.
+
+
+提供 Fine-Grained Security（包括 row/column-level)
+BigLake tables provides consistent and unified fine-grained(row and column-level) access controls independent of storage (data lake or data warehouse) or analytics engine(BigQuery or open-source query engines like Spark).
+- For BigQuery users, the delegated access model enables BigQuery to enforce column-security, data maksing, and row-level filtering using the same implementation for data in object stores or in its native storage.
+- The current status quo in open-source analytics places the responsibility of enforcing the fine-grained access controls with the query engines. This leads to two downsides: 1) security policies such as data maksing and row-level filtering are tied to a SQL dialect, requireing duplication of governance policies across multiple query engines. 2)the model of entrusting the query engine to enforce filtering do not work well on engines like Apache Spark that are designed to run arbitrary procedural code directly within the query engine worker processes.
+> 第二点怎么理解？
+
+BigLake tables offer a stronger security model where the Read API establishes a security trust boundary and applies the same set of fine-grained access controls before data is returned to the query engine, with zero trust granted to the query engine itself.
+
+针对 Iceberg 等 opensource 的表进行查询加速
+Open source tables employ limited physical metadata: typically, only the file system prefix of a table or a partition is stored in the metadata. As a result, query engines need to perform listint operations on object storage buckets to obtain the list of data files to operate on.
+> 开源的湖仓格式，metadata 仅记录类似前缀的东西，这样查询的时候，需要进行 list 会比较慢。partition prune 范围太广了，只能从 file 的 metaata 等进行过滤
+
+BigLake 支持 metadata cache 的机制，具体使用的是 BigMetadata 的机制（metadata 更详细，也能够更好的支持更大的表），The metadata cache updates automatically as new files are ETLed in the object store.
+
+Spark 读取 BigLake 表的加速的 future work
+- Efficiency of the ReadRows payload. Dictionary and run-length encodings on the Arrow columnar batches can significantly reduce the amount of bytes that need to be sent over the wire.
+- Reuse of read sessions. Dynamic partition pruning can generate new predicates during runtime and this results in the recreation of Read API sessions. Creating a Read API session is expensive on the server side since it requires enumerating/pruning files and persisting stream metadata to Spanner. Dynamic partition pruning can be redesigned to reuse read API sessions.
+- Aggregate pushdown. DataSourceV2 supports pushing down partial aggregates such as MIN/MAX/SUM. The Read API can be extended to compute the partial aggregate using Superluminal, returning a much smaller payload to Spark
+
+
+- Supporting unstructured data
+非结构化数据，更多，但是更不好分析，BigQuery Object table 提供了一套 SQL 接口给 object store metadata(BigQuery Object tables provide a SQL interface to object store metadata). With Object tables, BigLake enables users to analyze unstructured data using local and remote AI services using familiar SQL commands.
+
+Object tables are system-maintained tables where each row represents an object, and columns contain object attributes such as URI, object size, MIME type, creation time. The output of SELECT * on an object table is equivalent to ls or dir on a filesystem. BigLake features extend naturally to unstructured data
+- Fine-grained Security
+- Scalability
+
+跨云的分析
+在实际的分析场景中往往需要跨云/地域的数据分析，以往会使用 ETL 然后维护多份数据，但是这样会有一些不好的地方：
+- data staleness
+- egress and data storage cost
+- complexity
+- compliance(e.g. data wipeout) concerns.
+
+有一些是用 federated approach 的方案(查询从一个系统到另一个系统，最后在进行数据汇合的），但是 Omini 使用不同的方案
+> Many systems have tried to take a federated approach to data where a query is dispatched from one system to another, with results streaming back to a central point. Omni takes a different approach, with the same query engine being colocated with the data and operating on the primary data copy _in situ_, enabling optimization that reduce egress costs and increase performance and efficiency. We describe two Omni innovations in this space through both cross-cloud queries and cross-cloud materialized views.
+
+--- Cross Cloud Queries
+通常 db 不允许跨域查询，原因如下：
+- need for a bandwidth-intensive and expensive cross-region data transfer in the general case（数据传输的成本高）
+- the difficulty of accessing table metadat and data in other locations.（获取远程 metdata 和 data 难）
+
+Omni 的做法不一样，首先通过在多云部署查询引擎
+> Omni architecture provides a way to overcome such complications by leveraging the availability of a fully managed query engine in multiple clouds.
+
+```SQL
+SELECT o.order_id, o.order_total, ads.id
+  FROM local_dataset.ads_impressions AS ads
+  JOIN aws_dataset.customer_order AS o
+  ON o.customer_id = ad.customer_id
+```
+
+we leverage subquery pushdown, BigQuery cross-region metdata availability, and the high throughput streaming service along with secure VPN for the data movement between regions.
+
+收到 SQL 的时候，首先进行解释，如果所有的表都在同一个 region，那就正常处理；
+如果发现有其他地域的表，则从其他 地域拉取 metadata，然后将 query 拆分成 per region 的 subquery 并且附带一定的 filter pushdown；然后往远程 region 提交一个新的 query，再把结果传回来作为一个临时表，最后使用临时表在本地继续处理
+> When a query reaches the server, we parse the query and identify if there are any tables that are located in remote regions. If all the referenced tables are in the same region, the query proceeds to execute like a normal query. However, if we find table references to one or more regions that allow cross cloud queries, then we retrieve the remote table metadata, and split the query into regional subqueries with appropriate filter push down. We then submit new queries as cross-region Create Table As Select queries that run in the remote regions and push the data back into the local tables. The BigQuery query engine running locally in each region executes the corresponding query and pushes the results to the primary region using BigQuery’s high throughput streaming APIs.
+
+--- Cross Cloud Materialized Views
+
+Omni 的一个用处就是支持增量的数据传输
+> A core use cases for Omni is supporting incremental cross cloud data transfer.
+
+> 增加 Fig 10
+
+CCMV 支持各种跨云跨域的需求，使用增量复制来减少带宽成本。首先在本地维护一个 MV -- 保存在对象存储中，然后增量更新本地的 MV，再同步（这里 upsert/delete 会新建一个本地的 MV，避免全量的传输文件）
+Cross Cloud Meaterialized Views(CCMV) provide incremental replication of data from Omni region to GCP region by maintaining the replication state. CCMVs enable various ETL and dashboard use cases, along with seamlessly integrating a customer's foreign-cloud data with GCP-based services such as Vertex AI.
+
+Omni CCMSs replicate incrementally to reduce egress costs. We first create a local materialized view in the foreign-cloud region with object storage as the storage medium. This local materialized view is periodically refreshed. If there are any new changes to the source, the new data is read and the materialized view is updated/appended incrementally.
+
+For any upsert/delete in the source, we recreate the local materialized view partition that the source belonged to, avoiding re-replication of the entire materialized view.
+
+The materialized view replication process relies on stateful file based replication that copies the files from AWS S3 to Google's Colossus file system. Network throughtput is controlled through Google Cloud project quotas. Customers are charged based on the physical bytes copied.
 
 # Napa
 2021-Powering Scalable Data Warehousing with Robust Query Performance at Google
@@ -225,6 +321,13 @@ For a given query Q, the algorithm divides D deltas into P key range partitions 
 > 根据和 Gemini 的沟通，大概理解 Napa 的存储结构如下
 > 首先是 LSM Tree，然后每个 SSTable 是一个 B-tree，B-tree 就是文中的 Delta，B-tree 中包括多个实际的文件，以及对应的索引，然后渐进式则是「够用」就好，-- 「够用」是满足对应的误差
 
+
+切分点的寻找
+- 生成一系列切分点的集合
+- 从上面的候选点中进行挑选
+
+切分点的候选点：在不同集合中与查询有交叉的那些点。(The split point candidates are the keys in each E_i that have an overlap with the query.)
+
 # SQL Has Problems
 文章描述了 SQL 是一个很好的抽象，但是学习和维护不方便，重新造一个类似 SQL 的语言又很麻烦，所以有了 PipelinedSQL 这个渐进式改进的方案。
 >SQL is not an easy language to learn or use. Even for expert users, SQL is challenging to read, write and work with, which hurts user productivity. Serveral alternative languages have been prposed, but none have gained widespread adoption or displaced SQL. Migrating away from existing SQL ecosystems is expensive and generally unappealing for users.
@@ -286,8 +389,6 @@ pipelined SQL 使用 '|>' 这个 suffix 来衔接
 这个如果成熟之后，应该也可以更方便的推广拖拽式的表现形式（？），能够更好的一一对应起来
 然后 ZetaSQL（已开源） 也有实现
 
-# Napa
-# BigLake
 # Procella
 > These can be categorized as: reporting and dashboarding, embedded statistics in pages, time-series monitoring, and ad-hoc analysis. Typically, organizations build specialized infrastructure for each of these use cases. This however, creates silos of data and processing, and results in a complex, expensive, and harder to maintain infrastructure.
 > At YouTube, we solved this problem by building a new SQL query engine -- Procella.
