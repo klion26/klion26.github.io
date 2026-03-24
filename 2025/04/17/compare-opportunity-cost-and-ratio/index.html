@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>比较，机会成本以及迭代速度 | Hexo</title>
+  <title>比较，机会成本以及迭代速度 | Build &amp; Compound</title>
   <meta name="author" content="klion26">
   
   <meta name="description" content="本文希望能够通过对一些例子，梳理一些基本/常用的事项。
@@ -15,14 +15,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   <meta property="og:title" content="比较，机会成本以及迭代速度"/>
-  <meta property="og:site_name" content="Hexo"/>
+  <meta property="og:site_name" content="Build &amp; Compound"/>
 
   
     <meta property="og:image" content=""/>
   
 
   
-    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="Build &amp; Compound" type="application/atom+xml">
   
   
     <link href="/favicon.png" rel="icon">
@@ -68,7 +68,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-       <a class="navbar-brand" href="/">Hexo</a>
+       <a class="navbar-brand" href="/">Build &amp; Compound</a>
       <div class="collapse navbar-collapse nav-menu">
 		<ul class="nav navbar-nav">
 		  
@@ -147,13 +147,13 @@
 <p>下图中通过点击标题，可以展示/隐藏不同情况下的曲线</p>
 </blockquote>
 
-<div id="echarts4680" style="width: 85%;height:400px;margin: 0 auto"></div>
+<div id="echarts7051" style="width: 85%;height:400px;margin: 0 auto"></div>
 <script src="https://unpkg.com/echarts@5.6.0/dist/echarts.min.js" ></script>
 <script >
-  if (window.eChartecharts4680ResizeHandler) {
-    window.removeEventListener("resize", eChartecharts4680ResizeHandler);
+  if (window.eChartecharts7051ResizeHandler) {
+    window.removeEventListener("resize", eChartecharts7051ResizeHandler);
   }
-  var optionecharts4680 = {
+  var optionecharts7051 = {
   legend: {
     data: ['2', '5', '8', '8(-2)', '10', '15', '15(-2)', '20', '25', '-2', '-5', '-8', '-10']
   },
@@ -252,12 +252,12 @@
   ]
 };
   if (window.echarts !== undefined) {
-    var eChartecharts4680 = echarts.init(document.getElementById('echarts4680'));
-    eChartecharts4680.setOption(optionecharts4680);
-    var eChartecharts4680ResizeHandler = function() {
-      eChartecharts4680.resize();
+    var eChartecharts7051 = echarts.init(document.getElementById('echarts7051'));
+    eChartecharts7051.setOption(optionecharts7051);
+    var eChartecharts7051ResizeHandler = function() {
+      eChartecharts7051.resize();
     };
-    window.addEventListener("resize", eChartecharts4680ResizeHandler);
+    window.addEventListener("resize", eChartecharts7051ResizeHandler);
   }
 </script>
 <p>我们可以大致对比几组上面的情况：</p>
