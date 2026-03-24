@@ -1,20 +1,14 @@
 ---
 title: About Me
-date: 2025-12-16
+date: 2026-03-26
 ---
 
 # 主要工作
-工作主要围绕大数据实时计算与数据湖展开，主要在 Data Infra 团队工作，也贴身支持过业务团队，对 Data Infra 以及上层团队如何使用 Data Infra 有一定自己的理解。
-
-主要一些工作包括
-- [美团] 基于 Storm 搭建一套实时大屏全链路，其中为酒旅提供的效果在中央十台播出
-- [美团] 基于 SparkStreaming 的 ODS 数据同步系统，日均同步数据 10T，TPS 峰值 60W/s
-- [阿里] Blink -- 阿里内部 Flink 版 -- 开发：主要包括 Java 版 KV-Store，在客户线上获得 2.5 倍性能提升；Flink Checkpoint 小文件合并解决 HDFS 压力大的问题；其他各项功能特性
-- [阿里] Flink 社区中 State/Checkpoint 多项重大特性开发支持，包括 State 多线程上传下载、Savepoint relocation、State Migration、StateBackend 丢数等
-- [腾讯] 内部 Flink 版本开发：Flink 单点重启功能，单 task failvoer 耗时降为 0；Flink 大状态快速恢复功能，40TB state 恢复耗时从 20 分钟优化到 1 分钟
-- [腾讯] 广告提效项目支持：支持 实时样本、特性、训练等使用 Flink，并支持 Native K8S 相关功能，为广告节省成本 40%。
-- [腾讯] Flink 作业管理平台开发，支持多种作业类型（代码、SQL、拖拽式画布），支持多环境部署
-- [天翼云] 实时湖仓：从零打造一套实时湖仓，单表百亿，日更新 100% 的情况下做到分钟级新鲜度，入湖速度单条数据 1K 的情况下单核做到 1500条/s，支持SchemaEvolution，同一用户稳定管理 9W+ 表
+工作主要围绕大数据计算与数据湖展开，包括 Data Infra 以及支持业务（数仓、广告等），对 Data Infra 的构建以及使用场景有独特的理解。部分工作如下
+- Flink 重大特性：主导 State&Checkpoint 重大特性开发（Checkpoint 加速，Checkpoint 小文件问题等); 作业单点重启功能; 大状态快速恢复功能(40TB Checkpoint 1 分钟恢复完成）; 多形态、多环境的 Flink 一站式作业开发平台; 参与 Java 版 KV-Store 开发 -- 客户线上 2.5 倍性能提升
+- 基于 Spark Streaming 的 ODS 数据同步系统，保证数据一致性、完整性、系统稳定，峰值 60W/S
+- 全链路实时大屏构建（数据采集，计算，展示），相关效果在中央十台展出
+- 实时湖仓系统构建：百亿级别表，日更新 100% 情况下做到分钟级新鲜度，保证高效查询性能（Hive 的 4 倍），单条数据 1K 的情况下入湖效率单核达到 1500~2000 条/s，支持 SchemaEvolution（包括分库分表），单客户稳定支持 10W 表的管理和优化
 
 # Talks
 - 2019 年 Flink Forward Asia
