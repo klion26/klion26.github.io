@@ -4,19 +4,17 @@ date: 2026-03-26
 ---
 
 # 主要工作
-工作主要围绕大数据计算与数据湖展开，包括 Data Infra 以及支持业务（数仓、广告等），对 Data Infra 的构建以及使用场景有独特的理解。部分工作如下
-- Flink 重大特性：主导 State&Checkpoint 重大特性开发（Checkpoint 加速，Checkpoint 小文件问题等); 作业单点重启功能; 大状态快速恢复功能(40TB Checkpoint 1 分钟恢复完成）; 多形态、多环境的 Flink 一站式作业开发平台; 参与 Java 版 KV-Store 开发 -- 客户线上 2.5 倍性能提升
-- 基于 Spark Streaming 的 ODS 数据同步系统，保证数据一致性、完整性、系统稳定，峰值 60W/S
-- 全链路实时大屏构建（数据采集，计算，展示），相关效果在中央十台展出
-- 实时湖仓系统构建：百亿级别表，日更新 100% 情况下做到分钟级新鲜度，保证高效查询性能（Hive 的 4 倍），单条数据 1K 的情况下入湖效率单核达到 1500~2000 条/s，支持 SchemaEvolution（包括分库分表），单客户稳定支持 10W 表的管理和优化
+工作主要包括大数据计算和存储，包括异构数据同步，实时数据计算，数据湖的构建和优化等，同时支持过数仓、搜索、广告（样本、训练以及样本）等业务。
+
+异构数据入湖基于 FlinkCDC，性能较开源提升 2+ 倍，唯一一家支持上游分库分表的 SchemaEvolution 自动同步（无约束）；实时计算支持过包括双十一在内重大业务场景，主导开发过 Flink Runtime、State&Checkpoint 等重大特性，在功能（单点重启），性能（StateStore）以及稳定性（Checkpoint 小文件合并，Checkpoint 快速恢复）等方面均有良好的效果；在数据湖方面大规模落地基于 Iceberg 的湖仓一体架构，单客户支持 13W+ 表，千亿单表日更新 100% 的情况下做到 10 分钟时效性，且查询效率明显优于传统数仓，支持多模态数据。Arrow-rs 项目中 parquet-variant 特性核心贡献者，正在构建基于 arrow/datafusion/iceberg 等开源组件的 [多模态数据湖系统](https://www.klion26.com/2026/03/18/multi-mode-datalake-from-google-papers/) 。
 
 # Talks
-- 2019 年 Flink Forward Asia
-- 2021 年 Flink Forward Asia
-- 2022 年 DataFun Summit
-- 2022 年 CommunityOverCode Asia
-- 2024 年 Flink Forward Asia
 - 2025 年 CommunityOverCode Asia
+- 2024 年 Flink Forward Asia
+- 2022 年 CommunityOverCode Asia
+- 2022 年 DataFun Summit
+- 2021 年 Flink Forward Asia
+- 2019 年 Flink Forward Asia
 
 # 经历
 - 2024.12 Apache Amoro PMC member
