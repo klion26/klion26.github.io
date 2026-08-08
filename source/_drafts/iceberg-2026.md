@@ -512,4 +512,27 @@ Data Sharing
 - Shares all datasets publicly
 - No more FTPs
 
-# Iceberg + Spark DSv2: Growing Up Fast
+# [Spark] Iceberg + Spark DSv2: Growing Up Fast
+DSv2 
+- A protocol for integrating external connectors into Spark
+- Designed to fix gaps in orginal Data Source API
+  - High-level abstractions
+  - Complexity shifts to Spark, maiking connectors simple
+  - Consistent behavior controlled by Spark
+- DSv2 capabilities define Iceberg <> spark integration
+
+Change Data Capture (Spark 4.2)
+Merge into (with schema evolution)
+
+# [Pinot] Beyond the Forklift: Unlocking Revenue-Critical Workloads on Iceberg
+
+为什么用 Iceberg
+Federate queries across Real-Time & Data Lakes
+什么地方用
+Use cases
+- Observability + Security
+
+做的修改
+构建了一些索引（可选），包括多层索引
+metadata prune，index 等，这些降低了 5 倍的数据传输量
+
