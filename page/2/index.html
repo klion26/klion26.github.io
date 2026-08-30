@@ -129,6 +129,34 @@
 	
 	<!-- display as entry -->	
 		<h3 class="title">
+			<div class="date"> 2025-07-29 </div>
+			<div class="article-title"><a href="/2025/07/29/arrow_variant_optimize/" >Arrow 中一次代码性能优化的记录</a></div>
+		</h3>
+	
+
+
+			  
+<div class="entry">
+
+  <div class="row">
+	
+	
+		<blockquote>
+<p>本文记录 Arrow-RS 中一次性能优化的情况。</p>
+</blockquote>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>最近尝试在 Arrow-rs 中做一些贡献来更好的学习了解下 Arrow 和 Rust。本文的事情则是在为 Arrow-rs 支持 parquet variant 中的一个修改。当前实现的过程中，Object 和 List 会创建临时 buffer，然后在最终 copy，这样会有一定的性能损失（主要在于临时 buffer 的创建以及拷贝），希望有一种方案能够直接写入到目标的 buffer 而不需要进行拷贝，也就是 <a target="_blank" rel="noopener" href="https://github.com/apache/arrow-rs/issues/7977">ARROW-RS-7977</a> 所记录的事情。</p>
+	
+	</div>
+  <a type="button" href="/2025/07/29/arrow_variant_optimize/#more" class="btn btn-default more">Read More</a>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
 			<div class="date"> 2025-07-05 </div>
 			<div class="article-title"><a href="/2025/07/05/maotai-price-decreasing/" >maotai-price-deprese</a></div>
 		</h3>
@@ -385,48 +413,48 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
+			<li><a href="/tags/iceberg-summit/">iceberg-summit<span>1</span></a></li>
+		
+			<li><a href="/tags/investment/">investment<span>7</span></a></li>
+		
 			<li><a href="/tags/price/">price<span>1</span></a></li>
+		
+			<li><a href="/tags/lsm-tree/">lsm-tree<span>1</span></a></li>
+		
+			<li><a href="/tags/cost/">cost<span>1</span></a></li>
+		
+			<li><a href="/tags/lance/">lance<span>1</span></a></li>
+		
+			<li><a href="/tags/iterative-velocity/">iterative velocity<span>1</span></a></li>
 		
 			<li><a href="/tags/innovation/">innovation<span>1</span></a></li>
 		
-			<li><a href="/tags/theory/">theory<span>1</span></a></li>
+			<li><a href="/tags/optimization/">optimization<span>1</span></a></li>
 		
-			<li><a href="/tags/vortex/">vortex<span>1</span></a></li>
+			<li><a href="/tags/stock-investment/">stock-investment<span>1</span></a></li>
 		
-			<li><a href="/tags/notes/">notes<span>1</span></a></li>
-		
-			<li><a href="/tags/lsm/">lsm<span>1</span></a></li>
+			<li><a href="/tags/startup/">startup<span>1</span></a></li>
 		
 			<li><a href="/tags/minimum-global-awareness/">minimum-global-awareness<span>1</span></a></li>
 		
-			<li><a href="/tags/profit/">profit<span>1</span></a></li>
-		
-			<li><a href="/tags/paper/">paper<span>2</span></a></li>
-		
-			<li><a href="/tags/arbitrage/">arbitrage<span>1</span></a></li>
-		
-			<li><a href="/tags/differentiation/">differentiation<span>1</span></a></li>
-		
-			<li><a href="/tags/stock/">stock<span>4</span></a></li>
-		
-			<li><a href="/tags/variant/">variant<span>1</span></a></li>
-		
-			<li><a href="/tags/nimble/">nimble<span>1</span></a></li>
+			<li><a href="/tags/600519/">600519<span>1</span></a></li>
 		
 			<li><a href="/tags/multi-mode/">multi-mode<span>1</span></a></li>
 		
-			<li><a href="/tags/maotai/">maotai<span>3</span></a></li>
+			<li><a href="/tags/meta/">meta<span>2</span></a></li>
 		
-			<li><a href="/tags/engineering/">engineering<span>1</span></a></li>
+			<li><a href="/tags/nimble/">nimble<span>1</span></a></li>
 		
-			<li><a href="/tags/compond/">compond<span>1</span></a></li>
+			<li><a href="/tags/vortex/">vortex<span>1</span></a></li>
 		
-			<li><a href="/tags/parquet/">parquet<span>2</span></a></li>
+			<li><a href="/tags/column-fiel-format/">column-fiel-format<span>1</span></a></li>
 		
 			<li><a href="/tags/ai/">ai<span>1</span></a></li>
 		
+			<li><a href="/tags/pattern/">pattern<span>1</span></a></li>
 		
-		   <li><a href="/tags">...<span>45</span></a></li>
+		
+		   <li><a href="/tags">...<span>46</span></a></li>
 		 
 		</ul>
 	</div>
@@ -437,6 +465,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2026/08/30/option_in_mainland/" ><i class="fa fa-file-o"></i>期权以及套利</a>
+      </li>
     
       <li>
         <a href="/2026/08/08/difficulty-of-investing/" ><i class="fa fa-file-o"></i>简单投资不容易</a>
@@ -452,10 +484,6 @@
     
       <li>
         <a href="/2026/03/18/multi-mode-datalake-from-google-papers/" ><i class="fa fa-file-o"></i>多模态数据湖系统的可能形态</a>
-      </li>
-    
-      <li>
-        <a href="/2026/01/18/601088-company-ana/" ><i class="fa fa-file-o"></i>中国神华公司初步分析</a>
       </li>
     
   </ul>
