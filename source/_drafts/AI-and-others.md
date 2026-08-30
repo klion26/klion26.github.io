@@ -72,3 +72,6 @@ AI 不仅仅包括 LLM（也就是大模型），但是最吸引眼球的是 LLM
 
     天孚通信 (刀具与摆盘供应商)： 提供顶级厨具（精密光器件）的，虽然不卖肉，但主厨离不开它的精密工具，而且它利润很高。
   接收端芯片       PD                        Hamamatsu    Kyosemi
+
+
+B 站上的 AI 链路的所有东西（https://m.bilibili.com/space/1517478075?plat_id=1&share_from=space&share_medium=iphone&share_plat=ios&share_session_id=DA46A2BC-3459-4DFA-B5E0-32D57D50F1EF&share_source=WEIXIN&share_tag=s_i&spmid=main.space.0.0&timestamp=1784872850&unique_k=04JAt7C&_unique_id_=a552d0c1-ac73-4275-9f41-93c1af3b2db1&code=0715GGGa1IzLdM0wltHa1Cgapr05GGGh&state=）
