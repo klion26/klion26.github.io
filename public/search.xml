@@ -4,6 +4,29 @@
   
     
     <entry>
+      <title>learn-coach-skill</title>
+      <link href="/2026/11/20/learn-coach-skill/"/>
+      <url>/2026/11/20/learn-coach-skill/</url>
+      
+        <content type="html"><![CDATA[<p>AI 时代，以慢打快</p><span id="more"></span><p>AI 发展越来越迅速，现在部分模型已经到了足够低价，效果也不错的程度，基本已经可以全民推广，日常使用。<a href="https://mp.weixin.qq.com/s/pitKMYJMQIGQW6J9lVMMAw">AI 能思考吗</a> 中写的有些内容已经不成立了，AI 越来越厉害，那人的位置在哪呢？</p><p>这倒逼我们不得不重新思考，或许我们可以从最基本的物理规则出发，然后分析并找到「关键点」，这样不仅可以应对变化，甚至可以提前布局。本文记录并介绍一下做的一个学习 Skill</p><h1 id="为什么还需要学习"><a href="#为什么还需要学习" class="headerlink" title="为什么还需要学习"></a>为什么还需要学习</h1><p>AI 已经这么厉害了，那为啥还需要人去学习呢？或许我们可以换一个视角：我们所有活动的目的是什么？然后从目的触发找出所有的环节与瓶颈，然后再进行优化调整，这个过程是一次 TOC 理论的应用。TOC 理论后续可以单独介绍一次，这里简单描述下</p><ul><li>所有系统都有一个目的</li><li>为了达到目的会有多个相互依赖的环节</li><li>从吞吐而非成本视角调整能达到更好的效果</li></ul><p>学习可以用来武装我们自己，不仅可以优化调整目的，也可以在后面分析和执行过程中进行引导，校验等。</p><h1 id="学习与因材施教"><a href="#学习与因材施教" class="headerlink" title="学习与因材施教"></a>学习与因材施教</h1><p>之前受限于人力物力，无法大规模的开展「因材施教」，现在借助 AI 已经基本可以做到了。所有的前沿理论都已经在模型中，不再依赖具体某个人，而模型的访问已经不再是瓶颈（足够廉价，效果足够好）。我们需要做的是引导模型去使用这些理论然后教会我们。</p><p>在这个过程中，模型需要了解我们的水平，针对性的进行知识点的讲解，测验，在学习的时候，需要需要能够考虑我们的认知负载能能力，在学习完成之后需要通过测试验证我们的习得的水平，而测验也有不同程度的题目，怎么衡量我们属于哪个阶段。</p><p>这些对于模型来说是比较容易的事情，但是如果让人来教，则需要教的人了解所有的这些知识点，然后教的人和学的人有重叠的时间段，这样的成本太高了。</p><h1 id="Learn-coach"><a href="#Learn-coach" class="headerlink" title="Learn-coach"></a>Learn-coach</h1><p>这个 skill 希望应用一些前沿认知理论以及测试理论，让学习者能够比较轻松的学会知识并用起来。在学习过程中尽可能的借助一些可视化，可交互的材料进行辅助，更详细的请参考仓库[1] 中的详细介绍和使用方式。</p><p>我自己使用这个尝试学习了 「Rust ownership」相关的知识（使用 DeepSeek 4.1Flash 1017 模型），整体效果还行。后续也会根据使用情况进行更新迭代，如果有人在使用过程中有需求，或者问题也欢迎在本文或者 github 进行反馈</p><h2 id="简易-安装和使用方式"><a href="#简易-安装和使用方式" class="headerlink" title="简易 安装和使用方式"></a>简易 安装和使用方式</h2><blockquote><p>安装后除访问模型外，不需要联网，所有数据保存在本地</p></blockquote><ol><li>使用 Node 方式</li></ol><ul><li><code>npx mastery-loop</code> # 装到 ~/.agents/skills，并软链到检测到的 agent</li><li><code>npx mastery-loop --link ~/.workbuddy/skills</code>   # 额外接入其他 agent（可重复） </li></ul><ol><li>不使用 Node 的方式</li></ol><ul><li><code>git clone https://github.com/klion26/learn-coach.git ~/.agents/skills/learn-coach</code> 下载到本地目录</li><li><code>ln -s ~/.agents/skills/learn-coach ~/.claude/skills/learn-coach</code> 链接到自己使用的 agent 目录</li></ul><h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>使用方式</p><ul><li><code>@learn-coach</code> 教我 XXX  这种可以</li><li>直接和 agent 对话，说“教我 X/帮我制定 XX 的学习计划” 也可以触发</li></ul><h2 id="数据"><a href="#数据" class="headerlink" title="数据"></a>数据</h2><p>所有学习记录会保存在本地，默认在 ~/.local/share/learn_coach/<slug>/，目录如下<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$~/.local/share/learn-coach/&lt;slug&gt;/</span><br><span class="line">├── brief.md     学习任务书</span><br><span class="line">├── map.html     全局骨架图</span><br><span class="line">├── state.json   学习者模型（层级、错误概念、复习队列）</span><br><span class="line">├── artifacts/   每节课的交互件</span><br><span class="line">└── notes/       学习者复述、错题</span><br><span class="line"></span><br></pre></td></tr></table></figure></p><h1 id="Ref"><a href="#Ref" class="headerlink" title="Ref"></a>Ref</h1><p>[1] <a href="https://github.com/klion26/learn-coach">https://github.com/klion26/learn-coach</a></p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> ai </tag>
+            
+            <tag> skill </tag>
+            
+            <tag> learn </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>期权以及套利</title>
       <link href="/2026/08/30/option_in_mainland/"/>
       <url>/2026/08/30/option_in_mainland/</url>

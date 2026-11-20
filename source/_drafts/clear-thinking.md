@@ -30,8 +30,10 @@
 > You don't need to be smarter than others to outperform them if you can out-position them
 如果位置更好的话，不需要更聪明就能有更好的产出。
 
-> Time is the friend of someone who is properly positioned and the enemy of someone poorly positioned.
+> You can think of this a bit like palying Tetris. When you play well, you have many options for where to put the next piece, When you play poorly, you need just the right piece.
+在游戏中，如果下的好的话，那么就有很多的选择，如果下的不好就被迫选择，我们需要增加自己的选择权
 
+> Time is the friend of someone who is properly positioned and the enemy of someone poorly positioned.
 需要给自己留 buffer
 
 > What a lot of people miss is that ordinary moments determine your position, and your position determines your options.
@@ -39,6 +41,10 @@
 
 > It doesn't matter what position you find yourself in right now. What matters is wheter you improve your position today.
 重点不是现在，还是未来是不是更好。
+
+
+>The enemies of clear thinking -- the more primal parts of our nature -- make it hard to see what's hapening and instead just make our lives more challengin.
+人的天性会选一些让自己生活更困难的方式
 
 
 第一部分
