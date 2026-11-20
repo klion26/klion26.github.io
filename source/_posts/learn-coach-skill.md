@@ -1,5 +1,5 @@
 ---
-title: learn-coach-skill
+title: AI 时代以慢打快之 learn-coach-skill
 date: 2026-11-20 10:35:02
 tags: 
       - skill
